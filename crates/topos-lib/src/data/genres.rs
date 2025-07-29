@@ -29,13 +29,11 @@ impl<'a> GenreKey<'a> {
     }
 }
 
-// TODO: Optimization, use Cow<String> for Genre Title, perhaps even with a new-type wrapper
-// struct
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Genres<'a> {
     genres: BTreeMap<GenreKey<'a>, Genre<'a>>,
     /// Key/Abbreviation to Genre Title
-    key_to_genre: BTreeMap<String, GenreKey<'a>>,
+    input_to_key: BTreeMap<String, GenreKey<'a>>,
 }
 
 impl<'a> Genres<'a> {
@@ -76,7 +74,7 @@ impl<'a> Genres<'a> {
 
         Self {
             genres,
-            key_to_genre,
+            input_to_key: key_to_genre,
             // genre_to_ids: genre_to_keys,
         }
     }
@@ -85,7 +83,7 @@ impl<'a> Genres<'a> {
     /// - Also this should return the key :/, not all the data
     pub fn search(&'a self, input: &'_ str) -> Option<&'a GenreKey<'a>> {
         let key = Self::normalize_key(input);
-        self.key_to_genre.get(&key)
+        self.input_to_key.get(&key)
     }
 
     pub fn get(&'a self, input: &'_ str) -> Option<&'a Genre<'a>> {

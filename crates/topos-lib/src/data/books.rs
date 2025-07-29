@@ -24,7 +24,7 @@ pub struct BookId(pub u8);
 #[derive(Clone, Debug)]
 pub struct Books {
     /// map of abbreviations and actual name (all lowercase) to book id (for searching)
-    keys_to_book_id: BTreeMap<String, BookId>,
+    input_to_book_id: BTreeMap<String, BookId>,
     /// map of book id to book name (for display)
     book_id_to_name: BTreeMap<BookId, String>,
     /// map of book id to abbreviation (for display)
@@ -33,7 +33,7 @@ pub struct Books {
 
 impl Books {
     fn key_to_id(&self) -> &BTreeMap<String, BookId> {
-        &self.keys_to_book_id
+        &self.input_to_book_id
     }
     fn id_to_name(&self) -> &BTreeMap<BookId, String> {
         &self.book_id_to_name
@@ -84,7 +84,7 @@ impl<'a> Books {
 
         Ok(Books {
             // book_regex,
-            keys_to_book_id: abbreviations_to_book_id,
+            input_to_book_id: abbreviations_to_book_id,
             book_id_to_name,
             book_id_to_abbreviation,
         })
