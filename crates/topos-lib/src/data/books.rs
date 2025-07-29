@@ -1,5 +1,6 @@
 use std::collections::BTreeMap;
 
+use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
 
 /// eventually this will have a locale so i can group by languages
@@ -43,8 +44,7 @@ impl Books {
 
 impl Default for Books {
     fn default() -> Self {
-        let data = BooksInput::default();
-        Self::new(data).expect("The default provided data data should always compile")
+        Self::base().clone()
     }
 }
 
@@ -80,7 +80,19 @@ impl<'a> Books {
             .trim()
             .to_string()
     }
+
+    /// - This is a global reference to the default book data. If you want to clone it, just use
+    /// [`Default::default`]
+    /// - This lets me reference it in other defaults without having to clone it
+    pub fn base() -> &'static Self {
+        &DEFAULT_BOOKS
+    }
 }
+
+pub static DEFAULT_BOOKS: Lazy<Books> = Lazy::new(|| {
+    let data = BooksInput::default();
+    Books::new(data).expect("The default provided data data should always compile")
+});
 
 /**
 Example:
