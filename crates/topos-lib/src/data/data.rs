@@ -1,4 +1,4 @@
-use crate::filter::{books::Books, genres::Genres};
+use super::{books::Books, genres::Genres};
 
 pub struct BibleData {
     books: Books,

@@ -1,6 +1,6 @@
 use clap::Parser;
 use std::path::PathBuf;
-use topos_lib::filter::testaments::Testament;
+use topos_lib::filter::filters::testament::Testament;
 
 /**
 - By positively specifying a testament/genre/book, you will implicitly telling the program to exclude the remaining items in that category.
@@ -116,4 +116,7 @@ pub struct Args {
         help = "Use a custom configuration file"
     )]
     pub config: Option<PathBuf>,
+
+    #[clap(long = "igonre", help = "Ignore when non-real books/genres are given")]
+    pub ignore_non_existent: bool,
 }

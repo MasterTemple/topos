@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use crate::filter::filter::GetIds;
+use crate::filter::filter::IsFilter;
 
 #[derive(Copy, Clone, Debug)]
 pub enum Testament {
@@ -17,8 +17,8 @@ impl Testament {
     }
 }
 
-impl GetIds for Testament {
-    fn ids(&self, _data: &super::data::BibleData) -> std::collections::BTreeSet<u8> {
+impl IsFilter for Testament {
+    fn get_ids(&self, _data: &crate::data::data::BibleData) -> std::collections::BTreeSet<u8> {
         match self {
             Testament::Old => 1..=39,
             Testament::New => 40..=66,

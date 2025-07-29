@@ -3,11 +3,11 @@ use std::collections::BTreeSet;
 use itertools::Itertools;
 use regex::Regex;
 
-use crate::filter::data::BibleData;
+use crate::data::data::BibleData;
 
-pub trait GetIds {
+pub trait IsFilter {
     /// These are the ids that correspond to the argument, excluded or included
-    fn ids(&self, data: &BibleData) -> BTreeSet<u8>;
+    fn get_ids(&self, data: &BibleData) -> BTreeSet<u8>;
 }
 
 pub enum Operation<T> {
@@ -24,9 +24,9 @@ impl<T> Operation<T> {
     }
 }
 
-impl<T: GetIds> GetIds for Operation<T> {
-    fn ids(&self, data: &BibleData) -> BTreeSet<u8> {
-        self.inner().ids(data)
+impl<T: IsFilter> IsFilter for Operation<T> {
+    fn get_ids(&self, data: &BibleData) -> BTreeSet<u8> {
+        self.inner().get_ids(data)
     }
 }
 
@@ -52,8 +52,8 @@ impl<'a> BookFilter<'a> {
         }
     }
 
-    pub fn add_filter<T: GetIds>(&mut self, op: Operation<T>) {
-        let ids = op.ids(self.data);
+    pub fn add_filter<T: IsFilter>(&mut self, op: Operation<T>) {
+        let ids = op.get_ids(self.data);
 
         match op {
             Operation::Include(_) => {

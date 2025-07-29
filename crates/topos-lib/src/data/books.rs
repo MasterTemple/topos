@@ -27,7 +27,7 @@ impl Books {
 
 static DEFAULT_BOOKS_JSON: &'static str = include_str!(concat!(
     env!("CARGO_MANIFEST_DIR"),
-    "/src/filter/default_books.json"
+    "/src/data/default_books.json"
 ));
 
 /**

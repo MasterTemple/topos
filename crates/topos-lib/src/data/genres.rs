@@ -12,7 +12,7 @@ pub struct Genre {
 
 static DEFAULT_GENRES_JSON: &'static str = include_str!(concat!(
     env!("CARGO_MANIFEST_DIR"),
-    "/src/filter/default_genres.json"
+    "/src/data/default_genres.json"
 ));
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
