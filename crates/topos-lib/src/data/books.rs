@@ -149,7 +149,8 @@ pub struct Book {
     /// - the display abbreviation
     /// - case is kept
     /// - does not need to be repeated in abbreviations
-    /// - TODO: if not provided, the first abbreviations as title case
+    /// - TODO: if not provided, the first abbreviations as title case; do that by changing this to
+    /// a BookInput struct
     #[serde(alias = "abbr")]
     #[serde(alias = "abbrv")]
     #[serde(alias = "abbrev")]

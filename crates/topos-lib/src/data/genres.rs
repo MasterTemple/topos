@@ -40,9 +40,8 @@ impl<'a> Genres<'a> {
     pub fn create(books: &Books, input: GenresInput) -> Self {
         let mut genres = BTreeMap::default();
         let mut key_to_genre = BTreeMap::default();
-        // let mut genre_to_keys = BTreeMap::default();
 
-        for genre in input.0 {
+        for genre in input.0.clone() {
             // use title as key
             let ab = Self::normalize_key(&genre.title);
             let key = GenreKey::new(genre.title);
@@ -72,23 +71,45 @@ impl<'a> Genres<'a> {
             genres.insert(key.clone(), genre);
         }
 
-        Self {
+        let mut data = Self {
             genres,
             input_to_key: key_to_genre,
             // genre_to_ids: genre_to_keys,
+        };
+
+        // In order to support using abbreviations, I should do this at the end
+        for genre in input.0 {
+            let Some(subcategories) = genre.subcategories else {
+                continue;
+            };
+            for cat in subcategories {
+                let Some(ids) = data.genre_ids(&cat).cloned() else {
+                    continue;
+                };
+                if let Some(g) = data.get_mut(&genre.title) {
+                    g.books.extend(ids);
+                }
+            }
         }
+
+        data
     }
 
     /// - But this returned struct gives the user the input data; I need a separate type
     /// - Also this should return the key :/, not all the data
-    pub fn search(&'a self, input: &'_ str) -> Option<&'a GenreKey<'a>> {
+    pub fn search<'f>(&'f self, input: &'_ str) -> Option<&'f GenreKey<'a>> {
         let key = Self::normalize_key(input);
         self.input_to_key.get(&key)
     }
 
-    pub fn get(&'a self, input: &'_ str) -> Option<&'a Genre<'a>> {
+    pub fn get<'f>(&'f self, input: &'_ str) -> Option<&'f Genre<'a>> {
         let key = self.search(input)?;
         self.genres.get(&key)
+    }
+
+    fn get_mut<'f>(&'f mut self, input: &'_ str) -> Option<&'f mut Genre<'a>> {
+        let key = self.search(input)?.clone();
+        self.genres.get_mut(&key)
     }
 
     pub fn genre_ids(&'a self, input: &'_ str) -> Option<&'a BTreeSet<BookId>> {
