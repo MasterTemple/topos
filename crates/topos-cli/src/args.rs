@@ -1,6 +1,6 @@
 use clap::Parser;
 use std::path::PathBuf;
-use topos_lib::filter::filters::testament::Testament;
+use topos_lib::filter::filters::testament::TestamentFilter;
 
 /**
 - By positively specifying a testament/genre/book, you will implicitly telling the program to exclude the remaining items in that category.
@@ -52,13 +52,13 @@ pub struct Args {
         short,
         help = "Include books from a specific testament (old/new)"
     )]
-    pub testaments: Option<Vec<Testament>>,
+    pub testaments: Option<Vec<TestamentFilter>>,
 
     #[clap(
         long = "exclude-testament",
         help = "Exclude books from a specific testament"
     )]
-    pub exclude_testaments: Option<Vec<Testament>>,
+    pub exclude_testaments: Option<Vec<TestamentFilter>>,
 
     // Genre filters
     #[clap(

@@ -3,31 +3,31 @@ use std::str::FromStr;
 use crate::filter::filter::IsFilter;
 
 #[derive(Copy, Clone, Debug)]
-pub enum Testament {
+pub enum TestamentFilter {
     Old,
     New,
 }
 
-impl Testament {
+impl TestamentFilter {
     pub fn contains(&self, book_id: u8) -> bool {
         match self {
-            Testament::Old => 1 <= book_id && book_id <= 39,
-            Testament::New => 40 <= book_id && book_id <= 66,
+            TestamentFilter::Old => 1 <= book_id && book_id <= 39,
+            TestamentFilter::New => 40 <= book_id && book_id <= 66,
         }
     }
 }
 
-impl IsFilter for Testament {
+impl IsFilter for TestamentFilter {
     fn get_ids(&self, _data: &crate::data::data::BibleData) -> std::collections::BTreeSet<u8> {
         match self {
-            Testament::Old => 1..=39,
-            Testament::New => 40..=66,
+            TestamentFilter::Old => 1..=39,
+            TestamentFilter::New => 40..=66,
         }
         .collect()
     }
 }
 
-impl FromStr for Testament {
+impl FromStr for TestamentFilter {
     type Err = String;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {

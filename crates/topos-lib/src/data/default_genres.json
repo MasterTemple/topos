@@ -36,8 +36,8 @@
   },
   {
     "title": "Prophets"
-    "abbreviations": [],
-    "subcategories": [ "Major", "Minor" ],
+    "abbreviations": [ "pr" ],
+    "subcategories": [ "Major Prophets", "Minor Prophets" ],
   },
   {
     "title": "Gospels"

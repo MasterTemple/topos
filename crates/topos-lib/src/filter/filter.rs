@@ -74,9 +74,8 @@ impl<'a> BookFilter<'a> {
         let books_pattern: String = self
             .data
             .books()
-            .abbrev_to_id()
-            .iter()
-            .filter_map(|(ab, id)| (self.ids.contains(&id).then_some(ab)))
+            .iter_keys_and_ids()
+            .filter_map(|(key, id)| (self.ids.contains(&id).then_some(key)))
             .join("|");
 
         let book_regex = Regex::new(format!(r"\b(((?:)(?i){books_pattern})[A-z]*)\.?").as_str())

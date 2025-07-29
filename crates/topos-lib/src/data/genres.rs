@@ -3,21 +3,15 @@ use std::collections::BTreeMap;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct Genre {
-    title: String,
-    abbreviations: Vec<String>,
-    books: Option<Vec<String>>,
-    subcategories: Option<Vec<String>>,
-}
-
-static DEFAULT_GENRES_JSON: &'static str = include_str!(concat!(
-    env!("CARGO_MANIFEST_DIR"),
-    "/src/data/default_genres.json"
-));
-
-#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Genres {
     genres: BTreeMap<String, Genre>,
+    // TODO: I need to have searchable data, which would mean I might need to store a reference
+    // to Books
+    // key_to_genre: BTreeMap<String, String>,
+}
+
+impl Genres {
+    // pub fn
 }
 
 impl From<GenresInput> for Genres {
@@ -44,6 +38,42 @@ impl Genres {
         }
     }
 }
+
+/**
+Example:
+```jsonc
+[
+  {
+    "title": "Major Prophets"
+    "abbreviations": [ "major" ],
+    "books": [ "Isaiah", "Jeremiah", "Lamentations", "Ezekiel", "Daniel" ]
+  },
+  {
+    "title": "Minor Prophets"
+    "abbreviations": [ "minor" ],
+    "books": [ "Hosea", "Joel", "Amos", "Obadiah", "Jonah", "Micah", "Nahum", "Habakkuk", "Zephaniah", "Haggai", "Zechariah", "Malachi" ]
+  },
+  {
+    "title": "Prophets"
+    "abbreviations": [ "pr" ],
+    "subcategories": [ "Major Prophets", "Minor Prophets" ],
+  },
+  // ...
+]
+```
+*/
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct Genre {
+    title: String,
+    abbreviations: Vec<String>,
+    books: Option<Vec<String>>,
+    subcategories: Option<Vec<String>>,
+}
+
+static DEFAULT_GENRES_JSON: &'static str = include_str!(concat!(
+    env!("CARGO_MANIFEST_DIR"),
+    "/src/data/default_genres.json"
+));
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct GenresInput(Vec<Genre>);
