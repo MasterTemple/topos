@@ -14,3 +14,12 @@ impl<'a> BibleData<'a> {
         &self.genres
     }
 }
+
+impl<'a> Default for BibleData<'a> {
+    fn default() -> Self {
+        Self {
+            books: Default::default(),
+            genres: Default::default(),
+        }
+    }
+}

@@ -30,7 +30,7 @@ impl<T: IsFilter> IsFilter for Operation<T> {
     }
 }
 
-pub struct BookFilter<'a> {
+pub struct BibleFilter<'a> {
     data: &'a BibleData<'a>,
     /// indicates whether or not there has been an inclusion, which implicitly calls an exclusion
     /// on all the original data
@@ -40,7 +40,7 @@ pub struct BookFilter<'a> {
     ids: BTreeSet<BookId>,
 }
 
-impl<'a> BookFilter<'a> {
+impl<'a> BibleFilter<'a> {
     pub fn new(data: &'a BibleData) -> Self {
         // this should start full
         let ids = (1..=66).map_into().collect();
@@ -68,6 +68,10 @@ impl<'a> BookFilter<'a> {
                 self.ids.retain(|id| !ids.contains(&id));
             }
         };
+    }
+
+    pub fn ids(&self) -> &BTreeSet<BookId> {
+        &self.ids
     }
 
     pub fn create_regex(&self) -> Result<Regex, String> {

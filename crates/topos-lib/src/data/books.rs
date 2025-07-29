@@ -106,7 +106,7 @@ impl<'a> Books {
     }
 }
 
-pub static DEFAULT_BOOKS: Lazy<Books> = Lazy::new(|| {
+static DEFAULT_BOOKS: Lazy<Books> = Lazy::new(|| {
     let data = BooksInput::default();
     Books::new(data).expect("The default provided data data should always compile")
 });
@@ -165,10 +165,12 @@ pub struct Book {
     abbreviations: Vec<String>,
 }
 
-static DEFAULT_BOOKS_JSON: &'static str = include_str!(concat!(
-    env!("CARGO_MANIFEST_DIR"),
-    "/src/data/default_books.json"
-));
+// static DEFAULT_BOOKS_JSON: &'static str = include_str!(concat!(
+//     env!("CARGO_MANIFEST_DIR"),
+//     "/src/data/default_books.json"
+// ));
+
+static DEFAULT_BOOKS_JSON: &'static str = include_str!("./default_books.json");
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 // #[derive(Deref, DerefMut, IntoIterator)]
@@ -177,7 +179,7 @@ pub struct BooksInput(Vec<Book>);
 impl Default for BooksInput {
     fn default() -> Self {
         serde_json::from_str(&DEFAULT_BOOKS_JSON)
-            .map_err(|_| format!("Could not parse default file"))
+            .map_err(|_| format!("Could not parse default book file"))
             .unwrap()
     }
 }

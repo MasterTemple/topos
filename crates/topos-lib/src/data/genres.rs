@@ -175,10 +175,12 @@ pub struct GenreInput {
     subcategories: Option<Vec<String>>,
 }
 
-static DEFAULT_GENRES_JSON: &'static str = include_str!(concat!(
-    env!("CARGO_MANIFEST_DIR"),
-    "/src/data/default_genres.json"
-));
+// static DEFAULT_GENRES_JSON: &'static str = include_str!(concat!(
+//     env!("CARGO_MANIFEST_DIR"),
+//     "/src/data/default_genres.json"
+// ));
+
+static DEFAULT_GENRES_JSON: &'static str = include_str!("./default_genres.json");
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct GenresInput(Vec<GenreInput>);
@@ -186,7 +188,7 @@ pub struct GenresInput(Vec<GenreInput>);
 impl Default for GenresInput {
     fn default() -> Self {
         serde_json::from_str(&DEFAULT_GENRES_JSON)
-            .map_err(|_| format!("Could not parse default file"))
+            .map_err(|_| format!("Could not parse default genre file"))
             .unwrap()
     }
 }
