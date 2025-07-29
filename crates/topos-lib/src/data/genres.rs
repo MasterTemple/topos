@@ -1,66 +1,100 @@
-use std::collections::{BTreeMap, BTreeSet};
+use std::{
+    borrow::Cow,
+    collections::{BTreeMap, BTreeSet},
+};
 
 use serde::{Deserialize, Serialize};
 
 use crate::data::books::{BookId, Books};
 
+/// This is not guaranteed to be a valid key, I just am using a unique type
+#[derive(
+    Clone,
+    Debug,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Serialize,
+    Deserialize,
+    derive_more::From,
+    derive_more::Deref,
+    derive_more::DerefMut,
+)]
+pub struct GenreKey<'a>(Cow<'a, String>);
+
+impl<'a> GenreKey<'a> {
+    pub fn new(s: String) -> Self {
+        Self(Cow::Owned(s))
+    }
+}
+
 // TODO: Optimization, use Cow<String> for Genre Title, perhaps even with a new-type wrapper
 // struct
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct Genres {
-    genres: BTreeMap<String, GenreInput>,
+pub struct Genres<'a> {
+    genres: BTreeMap<GenreKey<'a>, Genre<'a>>,
     /// Key/Abbreviation to Genre Title
-    key_to_genre: BTreeMap<String, String>,
-    genre_to_ids: BTreeMap<String, BTreeSet<BookId>>,
+    key_to_genre: BTreeMap<String, GenreKey<'a>>,
 }
 
-impl Genres {
+impl<'a> Genres<'a> {
     pub fn create(books: &Books, input: GenresInput) -> Self {
         let mut genres = BTreeMap::default();
         let mut key_to_genre = BTreeMap::default();
-        let mut genre_to_keys = BTreeMap::default();
+        // let mut genre_to_keys = BTreeMap::default();
 
         for genre in input.0 {
+            // use title as key
+            let ab = Self::normalize_key(&genre.title);
+            let key = GenreKey::new(genre.title);
+            key_to_genre.insert(ab, key.clone());
+
+            // use normalized abbreviations as keys
+            for ab in &genre.abbreviations {
+                let ab = Self::normalize_key(ab);
+                key_to_genre.insert(ab, key.clone());
+            }
+
             // search for book ids now so i only have to do it once
-            if let Some(books_in_genre) = &genre.books {
+            let ids = if let Some(books_in_genre) = &genre.books {
                 let ids = books_in_genre
                     .iter()
                     .filter_map(|b| books.search(b))
                     .collect();
-                genre_to_keys.insert(genre.title.clone(), ids);
-            }
+                // genre_to_keys.insert(key.clone(), ids);
+                ids
+            } else {
+                BTreeSet::default()
+            };
 
-            // use normalized abbreviations + title as keys
-            for ab in &genre.abbreviations {
-                let key = Self::normalize_key(ab);
-                key_to_genre.insert(key, genre.title.clone());
-            }
-            let key = Self::normalize_key(&genre.title);
-            key_to_genre.insert(key, genre.title.clone());
+            let genre = Genre::new(key.clone(), ids);
 
             // use title as the genre key
-            genres.insert(genre.title.clone(), genre);
+            genres.insert(key.clone(), genre);
         }
 
         Self {
             genres,
             key_to_genre,
-            genre_to_ids: genre_to_keys,
+            // genre_to_ids: genre_to_keys,
         }
     }
 
     /// - But this returned struct gives the user the input data; I need a separate type
     /// - Also this should return the key :/, not all the data
-    pub fn search(&self, input: &str) -> Option<&GenreInput> {
+    pub fn search(&'a self, input: &'_ str) -> Option<&'a GenreKey<'a>> {
         let key = Self::normalize_key(input);
-        let key = self.key_to_genre.get(&key)?;
-        self.genres.get(key)
+        self.key_to_genre.get(&key)
     }
 
-    pub fn genre_ids(&self, input: &str) -> Option<BTreeSet<BookId>> {
-        let key = Self::normalize_key(input);
-        let key = self.key_to_genre.get(&key)?;
-        self.genre_to_ids.get(key).cloned()
+    pub fn get(&'a self, input: &'_ str) -> Option<&'a Genre<'a>> {
+        let key = self.search(input)?;
+        self.genres.get(&key)
+    }
+
+    pub fn genre_ids(&'a self, input: &'_ str) -> Option<&'a BTreeSet<BookId>> {
+        Some(&self.get(input)?.books)
     }
 
     pub fn normalize_key(name: &str) -> String {
@@ -73,28 +107,21 @@ impl Genres {
     }
 }
 
-// impl From<GenresInput> for Genres {
-//     fn from(value: GenresInput) -> Self {
-//         // let mut genres = BTreeMap::default();
-//         let genres = value.0.into_iter().map(|g| (g.title.clone(), g)).collect();
-//         Self { genres }
-//     }
-// }
-
-impl Default for Genres {
+impl<'a> Default for Genres<'a> {
     fn default() -> Self {
         Self::create(Books::base(), GenresInput::default())
     }
 }
 
-impl Genres {
-    pub fn add(&mut self, genre: GenreInput) {
-        _ = self.genres.insert(genre.title.clone(), genre);
-    }
-    pub fn add_many(&mut self, input: GenresInput) {
-        for genre in input.0 {
-            self.add(genre);
-        }
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct Genre<'a> {
+    title: GenreKey<'a>,
+    books: BTreeSet<BookId>,
+}
+
+impl<'a> Genre<'a> {
+    pub fn new(key: GenreKey<'a>, books: BTreeSet<BookId>) -> Self {
+        Self { title: key, books }
     }
 }
 

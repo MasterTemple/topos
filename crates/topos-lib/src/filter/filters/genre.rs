@@ -6,6 +6,9 @@ pub struct GenreFilter {
 
 impl IsFilter for GenreFilter {
     fn get_ids(&self, data: &crate::data::data::BibleData) -> std::collections::BTreeSet<BookId> {
-        data.genres().genre_ids(&self.input).unwrap_or_default()
+        data.genres()
+            .genre_ids(&self.input)
+            .cloned()
+            .unwrap_or_default()
     }
 }

@@ -31,7 +31,7 @@ impl<T: IsFilter> IsFilter for Operation<T> {
 }
 
 pub struct BookFilter<'a> {
-    data: &'a BibleData,
+    data: &'a BibleData<'a>,
     /// indicates whether or not there has been an inclusion, which implicitly calls an exclusion
     /// on all the original data
     /// i dont need to use this if an exclusion is called at the beginning, but then again, there
