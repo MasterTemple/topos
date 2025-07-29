@@ -38,7 +38,7 @@ mod tests {
                 let data = crate::data::data::BibleData::default();
                 let mut filter = crate::filter::filter::BibleFilter::new(&data);
                 $(
-                    filter.add_filter($filter);
+                    filter.push($filter);
                 )*
                 assert_eq!(filter.ids().len(), $count);
             }

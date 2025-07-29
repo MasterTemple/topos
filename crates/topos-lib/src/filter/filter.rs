@@ -52,7 +52,7 @@ impl<'a> BibleFilter<'a> {
         }
     }
 
-    pub fn add_filter<T: IsFilter>(&mut self, op: Operation<T>) {
+    pub fn push<T: IsFilter>(&mut self, op: Operation<T>) {
         let ids = op.get_ids(self.data);
 
         match op {
@@ -68,6 +68,11 @@ impl<'a> BibleFilter<'a> {
                 self.ids.retain(|id| !ids.contains(&id));
             }
         };
+    }
+
+    pub fn add<T: IsFilter>(mut self, op: Operation<T>) -> BibleFilter<'a> {
+        self.push(op);
+        self
     }
 
     pub fn ids(&self) -> &BTreeSet<BookId> {
@@ -106,9 +111,10 @@ mod tests {
 
     #[test]
     fn make_regex() {
-        let mut filter = BibleFilter::default();
-        filter.add_filter(Operation::Include(GenreFilter::new("Pauline")));
-        let re = filter.create_regex().unwrap();
+        let re = BibleFilter::default()
+            .add(Operation::Include(GenreFilter::new("Pauline")))
+            .create_regex()
+            .unwrap();
         println!(r#"rg "{}""#, re.as_str());
     }
 }
