@@ -1,6 +1,8 @@
 use std::str::FromStr;
 
-use crate::filter::filter::IsFilter;
+use itertools::Itertools;
+
+use crate::{data::books::BookId, filter::filter::IsFilter};
 
 #[derive(Copy, Clone, Debug)]
 pub enum TestamentFilter {
@@ -9,20 +11,21 @@ pub enum TestamentFilter {
 }
 
 impl TestamentFilter {
-    pub fn contains(&self, book_id: u8) -> bool {
+    pub fn contains(&self, book_id: BookId) -> bool {
         match self {
-            TestamentFilter::Old => 1 <= book_id && book_id <= 39,
-            TestamentFilter::New => 40 <= book_id && book_id <= 66,
+            TestamentFilter::Old => 1 <= *book_id && *book_id <= 39,
+            TestamentFilter::New => 40 <= *book_id && *book_id <= 66,
         }
     }
 }
 
 impl IsFilter for TestamentFilter {
-    fn get_ids(&self, _data: &crate::data::data::BibleData) -> std::collections::BTreeSet<u8> {
+    fn get_ids(&self, _data: &crate::data::data::BibleData) -> std::collections::BTreeSet<BookId> {
         match self {
             TestamentFilter::Old => 1..=39,
             TestamentFilter::New => 40..=66,
         }
+        .map_into()
         .collect()
     }
 }

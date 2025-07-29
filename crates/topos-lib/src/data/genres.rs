@@ -2,7 +2,7 @@ use std::collections::{BTreeMap, BTreeSet};
 
 use serde::{Deserialize, Serialize};
 
-use crate::data::books::Books;
+use crate::data::books::{BookId, Books};
 
 // TODO: Optimization, use Cow<String> for Genre Title, perhaps even with a new-type wrapper
 // struct
@@ -11,7 +11,7 @@ pub struct Genres {
     genres: BTreeMap<String, GenreInput>,
     /// Key/Abbreviation to Genre Title
     key_to_genre: BTreeMap<String, String>,
-    genre_to_ids: BTreeMap<String, BTreeSet<u8>>,
+    genre_to_ids: BTreeMap<String, BTreeSet<BookId>>,
 }
 
 impl Genres {
@@ -57,7 +57,7 @@ impl Genres {
         self.genres.get(key)
     }
 
-    pub fn genre_ids(&self, input: &str) -> Option<BTreeSet<u8>> {
+    pub fn genre_ids(&self, input: &str) -> Option<BTreeSet<BookId>> {
         let key = Self::normalize_key(input);
         let key = self.key_to_genre.get(&key)?;
         self.genre_to_ids.get(key).cloned()

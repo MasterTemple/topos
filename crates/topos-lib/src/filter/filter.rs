@@ -3,11 +3,11 @@ use std::collections::BTreeSet;
 use itertools::Itertools;
 use regex::Regex;
 
-use crate::data::data::BibleData;
+use crate::data::{books::BookId, data::BibleData};
 
 pub trait IsFilter {
     /// These are the ids that correspond to the argument, excluded or included
-    fn get_ids(&self, data: &BibleData) -> BTreeSet<u8>;
+    fn get_ids(&self, data: &BibleData) -> BTreeSet<BookId>;
 }
 
 pub enum Operation<T> {
@@ -25,7 +25,7 @@ impl<T> Operation<T> {
 }
 
 impl<T: IsFilter> IsFilter for Operation<T> {
-    fn get_ids(&self, data: &BibleData) -> BTreeSet<u8> {
+    fn get_ids(&self, data: &BibleData) -> BTreeSet<BookId> {
         self.inner().get_ids(data)
     }
 }
@@ -37,13 +37,13 @@ pub struct BookFilter<'a> {
     /// i dont need to use this if an exclusion is called at the beginning, but then again, there
     /// is no point in doing that, unless i am only doing an exclusion
     has_done_an_inclusion: bool,
-    ids: BTreeSet<u8>,
+    ids: BTreeSet<BookId>,
 }
 
 impl<'a> BookFilter<'a> {
     pub fn new(data: &'a BibleData) -> Self {
         // this should start full
-        let ids = (1..=66).collect();
+        let ids = (1..=66).map_into().collect();
         let has_done_an_inclusion = false;
         Self {
             data,

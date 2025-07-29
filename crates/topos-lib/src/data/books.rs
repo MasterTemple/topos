@@ -3,41 +3,58 @@ use std::collections::BTreeMap;
 use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
 
+/// This is not guaranteed to be a valid key, I just am using a unique type
+#[derive(
+    Clone,
+    Copy,
+    Debug,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Serialize,
+    Deserialize,
+    derive_more::From,
+    derive_more::Deref,
+    derive_more::DerefMut,
+)]
+pub struct BookId(pub u8);
+
 /// eventually this will have a locale so i can group by languages
 #[derive(Clone, Debug)]
 pub struct Books {
     /// map of abbreviations and actual name (all lowercase) to book id (for searching)
-    keys_to_book_id: BTreeMap<String, u8>,
+    keys_to_book_id: BTreeMap<String, BookId>,
     /// map of book id to book name (for display)
-    book_id_to_name: BTreeMap<u8, String>,
+    book_id_to_name: BTreeMap<BookId, String>,
     /// map of book id to abbreviation (for display)
-    book_id_to_abbreviation: BTreeMap<u8, String>,
+    book_id_to_abbreviation: BTreeMap<BookId, String>,
 }
 
 impl Books {
-    fn key_to_id(&self) -> &BTreeMap<String, u8> {
+    fn key_to_id(&self) -> &BTreeMap<String, BookId> {
         &self.keys_to_book_id
     }
-    fn id_to_name(&self) -> &BTreeMap<u8, String> {
+    fn id_to_name(&self) -> &BTreeMap<BookId, String> {
         &self.book_id_to_name
     }
-    fn id_to_abbrev(&self) -> &BTreeMap<u8, String> {
+    fn id_to_abbrev(&self) -> &BTreeMap<BookId, String> {
         &self.book_id_to_abbreviation
     }
 }
 
 impl Books {
-    pub fn iter_keys_and_ids(&self) -> impl Iterator<Item = (&String, &u8)> {
+    pub fn iter_keys_and_ids(&self) -> impl Iterator<Item = (&String, &BookId)> {
         self.key_to_id().iter()
     }
-    pub fn search(&self, name: &str) -> Option<u8> {
+    pub fn search(&self, name: &str) -> Option<BookId> {
         let name = Self::normalize_book_name(name);
         self.key_to_id().get(&name).cloned()
     }
-    pub fn get_name(&self, id: u8) -> Option<&String> {
+    pub fn get_name(&self, id: BookId) -> Option<&String> {
         self.id_to_name().get(&id)
     }
-    pub fn get_abbrev(&self, id: u8) -> Option<&String> {
+    pub fn get_abbrev(&self, id: BookId) -> Option<&String> {
         self.id_to_abbrev().get(&id)
     }
 }
@@ -119,7 +136,7 @@ pub struct Book {
     /// - Matthew = 40
     #[serde(alias = "num")]
     #[serde(alias = "number")]
-    id: u8,
+    id: BookId,
 
     /// - the display name
     /// - case is kept
