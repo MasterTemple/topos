@@ -1,0 +1,11 @@
+# Cargo build artifacts
+target/
+**/target/
+
+Cargo.lock
+
+# Editor/IDE specific files
+.vscode/
+.idea/
+*.swp
+*.bak

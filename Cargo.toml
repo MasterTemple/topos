@@ -1,0 +1,6 @@
+[workspace]
+members = [
+    "crates/topos-cli",
+    "crates/topos-lib",
+]
+resolver = "3"
