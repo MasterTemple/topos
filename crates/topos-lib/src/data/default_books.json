@@ -47,7 +47,8 @@
     "abbreviations": [
       "deut",
       "de",
-      "dt"
+      "dt",
+			"deu"
     ]
   },
   {
@@ -78,7 +79,8 @@
     "abbreviations": [
       "ruth",
       "rth",
-      "ru"
+      "ru",
+      "rut"
     ]
   },
   {
@@ -178,7 +180,8 @@
       "1st chronicles",
       "1st chron",
       "first chronicles",
-      "first chron"
+      "first chron",
+      "1ch"
     ]
   },
   {
@@ -198,7 +201,8 @@
       "2nd chronicles",
       "2nd chron",
       "second chronicles",
-      "second chron"
+      "second chron",
+      "2ch"
     ]
   },
   {
@@ -249,7 +253,8 @@
       "pslm",
       "psa",
       "psm",
-      "pss"
+      "pss",
+      "psa"
     ]
   },
   {
@@ -286,7 +291,8 @@
       "so",
       "canticle of canticles",
       "canticles",
-      "cant"
+      "cant",
+			"sng"
     ]
   },
   {
@@ -352,7 +358,8 @@
     "abbreviation": "Jl",
     "abbreviations": [
       "joel",
-      "jl"
+      "jl",
+      "jol"
     ]
   },
   {
@@ -361,7 +368,8 @@
     "abbreviation": "Am",
     "abbreviations": [
       "amos",
-      "am"
+      "am",
+			"amo"
     ]
   },
   {
@@ -370,7 +378,8 @@
     "abbreviation": "Ob",
     "abbreviations": [
       "obad",
-      "ob"
+      "ob",
+      "oba"
     ]
   },
   {
@@ -398,7 +407,8 @@
     "abbreviation": "Na",
     "abbreviations": [
       "nah",
-      "na"
+      "na",
+      "nam"
     ]
   },
   {
@@ -454,7 +464,8 @@
     "abbreviation": "Mt",
     "abbreviations": [
       "matt",
-      "mt"
+      "mt",
+      "mat"
     ]
   },
   {
@@ -466,7 +477,8 @@
       "mrk",
       "mar",
       "mk",
-      "mr"
+      "mr",
+      "mrk"
     ]
   },
   {
@@ -476,7 +488,8 @@
     "abbreviations": [
       "luke",
       "luk",
-      "lk"
+      "lk",
+      "luk"
     ]
   },
   {
