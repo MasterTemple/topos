@@ -82,7 +82,9 @@ impl<'a> BibleFilter<'a> {
             .filter_map(|(key, id)| (self.ids.contains(&id).then_some(key)))
             .join("|");
 
-        let book_regex = Regex::new(format!(r"\b(((?:)(?i){books_pattern})[A-z]*)\.?").as_str())
+        // let book_regex = Regex::new(format!(r"\b(((?:)(?i){books_pattern})[A-z]*)\.?").as_str())
+        // I am including a chapter number to reduce false positives on abbreviations
+        let book_regex = Regex::new(format!(r"\b(((?:)(?i){books_pattern}))\.?\s*\d").as_str())
             .map_err(|e| format!("Failed to compile book_regex because of bad user input.\n{e}"))?;
 
         Ok(book_regex)
@@ -99,7 +101,7 @@ impl Default for BibleFilter<'static> {
 mod tests {
     use crate::filter::{
         filter::{BibleFilter, Operation},
-        filters::{book::BookFilter, genre::GenreFilter},
+        filters::genre::GenreFilter,
     };
 
     #[test]
@@ -107,7 +109,6 @@ mod tests {
         let mut filter = BibleFilter::default();
         filter.add_filter(Operation::Include(GenreFilter::new("Pauline")));
         let re = filter.create_regex().unwrap();
-        println!("{}", re.as_str());
-        dbg!(re);
+        println!(r#"rg "{}""#, re.as_str());
     }
 }
