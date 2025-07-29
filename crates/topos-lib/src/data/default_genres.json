@@ -56,12 +56,12 @@
   },
   {
     "title": "Pauline Epistles",
-    "abbreviations": [ "pauline", "pe" ],
+    "abbreviations": [ "pauline", "pe", "paul" ],
     "books": [ "Romans", "1 Corinthians", "2 Corinthians", "Galatians", "Ephesians", "Philippians", "Colossians", "1 Thessalonians", "2 Thessalonians", "1 Timothy", "2 Timothy", "Titus", "Philemon" ]
   },
   {
     "title": "General Epistles",
-    "abbreviations": [ "general", "ge" ],
+    "abbreviations": [ "general", "ge", "gen" ],
     "books": [ "Hebrews", "James", "1 Peter", "2 Peter", "1 John", "2 John", "3 John", "Jude", "Revelation" ]
   },
   {

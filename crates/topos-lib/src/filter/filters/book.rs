@@ -26,20 +26,17 @@ impl IsFilter for BookFilter {
 
 #[cfg(test)]
 mod tests {
-    use crate::{
-        data::data::BibleData,
-        filter::{
-            filter::{BibleFilter, Operation},
-            filters::{book::BookFilter, genre::GenreFilter, testament::TestamentFilter},
-        },
+    use crate::filter::{
+        filter::Operation,
+        filters::{book::BookFilter, genre::GenreFilter},
     };
 
     macro_rules! mk_test {
         ($fn_name: ident, [$($filter:expr),+ $(,)?], $count:literal) => {
             #[test]
             fn $fn_name() {
-                let data = BibleData::default();
-                let mut filter = BibleFilter::new(&data);
+                let data = crate::data::data::BibleData::default();
+                let mut filter = crate::filter::filter::BibleFilter::new(&data);
                 $(
                     filter.add_filter($filter);
                 )*

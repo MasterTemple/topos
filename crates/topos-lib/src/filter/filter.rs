@@ -88,3 +88,26 @@ impl<'a> BibleFilter<'a> {
         Ok(book_regex)
     }
 }
+
+impl Default for BibleFilter<'static> {
+    fn default() -> Self {
+        Self::new(BibleData::base())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::filter::{
+        filter::{BibleFilter, Operation},
+        filters::{book::BookFilter, genre::GenreFilter},
+    };
+
+    #[test]
+    fn make_regex() {
+        let mut filter = BibleFilter::default();
+        filter.add_filter(Operation::Include(GenreFilter::new("Pauline")));
+        let re = filter.create_regex().unwrap();
+        println!("{}", re.as_str());
+        dbg!(re);
+    }
+}

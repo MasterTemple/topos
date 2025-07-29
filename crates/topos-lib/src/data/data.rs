@@ -1,3 +1,5 @@
+use once_cell::sync::Lazy;
+
 use super::{books::Books, genres::Genres};
 
 pub struct BibleData<'a> {
@@ -23,3 +25,14 @@ impl<'a> Default for BibleData<'a> {
         }
     }
 }
+
+impl<'a> BibleData<'a> {
+    pub fn base() -> &'static Self {
+        &DEFAULT_DATA
+    }
+}
+
+static DEFAULT_DATA: Lazy<BibleData> = Lazy::new(|| BibleData {
+    books: Books::base().clone(),
+    genres: Genres::base().clone(),
+});
