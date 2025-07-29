@@ -14,6 +14,10 @@ pub struct Books {
 }
 
 impl Books {
+    pub fn search(&self, name: &str) -> Option<u8> {
+        let name = Self::normalize_book_name(name);
+        self.abbrev_to_id().get(&name).cloned()
+    }
     pub fn abbrev_to_id(&self) -> &BTreeMap<String, u8> {
         &self.abbreviations_to_book_id
     }
