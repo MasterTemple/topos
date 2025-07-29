@@ -1,0 +1,839 @@
+[
+  {
+    "id": 1,
+    "book": "Genesis",
+    "abbreviation": "Gn",
+    "abbreviations": [
+      "gen",
+      "ge",
+      "gn"
+    ]
+  },
+  {
+    "id": 2,
+    "book": "Exodus",
+    "abbreviation": "Ex",
+    "abbreviations": [
+      "ex",
+      "exod",
+      "exo"
+    ]
+  },
+  {
+    "id": 3,
+    "book": "Leviticus",
+    "abbreviation": "Lv",
+    "abbreviations": [
+      "lev",
+      "le",
+      "lv"
+    ]
+  },
+  {
+    "id": 4,
+    "book": "Numbers",
+    "abbreviation": "Nm",
+    "abbreviations": [
+      "num",
+      "nu",
+      "nm",
+      "nb"
+    ]
+  },
+  {
+    "id": 5,
+    "book": "Deuteronomy",
+    "abbreviation": "Dt",
+    "abbreviations": [
+      "deut",
+      "de",
+      "dt"
+    ]
+  },
+  {
+    "id": 6,
+    "book": "Joshua",
+    "abbreviation": "Jos",
+    "abbreviations": [
+      "josh",
+      "jos",
+      "jsh"
+    ]
+  },
+  {
+    "id": 7,
+    "book": "Judges",
+    "abbreviation": "Jgs",
+    "abbreviations": [
+      "judg",
+      "jdg",
+      "jg",
+      "jdgs"
+    ]
+  },
+  {
+    "id": 8,
+    "book": "Ruth",
+    "abbreviation": "Ru",
+    "abbreviations": [
+      "ruth",
+      "rth",
+      "ru"
+    ]
+  },
+  {
+    "id": 9,
+    "book": "1 Samuel",
+    "abbreviation": "1 Sm",
+    "abbreviations": [
+      "1 sam",
+      "1 sm",
+      "1 sa",
+      "1 s",
+      "i sam",
+      "i sa",
+      "1sam",
+      "1sa",
+      "1s",
+      "1st samuel",
+      "1st sam",
+      "first samuel",
+      "first sam"
+    ]
+  },
+  {
+    "id": 10,
+    "book": "2 Samuel",
+    "abbreviation": "2 Sm",
+    "abbreviations": [
+      "2 sam",
+      "2 sm",
+      "2 sa",
+      "2 s",
+      "ii sam",
+      "ii sa",
+      "2sam",
+      "2sa",
+      "2s",
+      "2nd samuel",
+      "2nd sam",
+      "second samuel",
+      "second sam"
+    ]
+  },
+  {
+    "id": 11,
+    "book": "1 Kings",
+    "abbreviation": "1 Kgs",
+    "abbreviations": [
+      "1 kings",
+      "1 kgs",
+      "1 ki",
+      "1kgs",
+      "1kin",
+      "1ki",
+      "1k",
+      "i kgs",
+      "i ki",
+      "1st kings",
+      "1st kgs",
+      "first kings",
+      "first kgs"
+    ]
+  },
+  {
+    "id": 12,
+    "book": "2 Kings",
+    "abbreviation": "2 Kgs",
+    "abbreviations": [
+      "2 kings",
+      "2 kgs",
+      "2 ki",
+      "2kgs",
+      "2kin",
+      "2ki",
+      "2k",
+      "ii kgs",
+      "ii ki",
+      "2nd kings",
+      "2nd kgs",
+      "second kings",
+      "second kgs"
+    ]
+  },
+  {
+    "id": 13,
+    "book": "1 Chronicles",
+    "abbreviation": "1 Chr",
+    "abbreviations": [
+      "1 chron",
+      "1 chr",
+      "1 ch",
+      "1chron",
+      "1chr",
+      "1ch",
+      "i chron",
+      "i chr",
+      "i ch",
+      "1st chronicles",
+      "1st chron",
+      "first chronicles",
+      "first chron"
+    ]
+  },
+  {
+    "id": 14,
+    "book": "2 Chronicles",
+    "abbreviation": "2 Chr",
+    "abbreviations": [
+      "2 chron",
+      "2 chr",
+      "2 ch",
+      "2chron",
+      "2chr",
+      "2ch",
+      "ii chron",
+      "ii chr",
+      "ii ch",
+      "2nd chronicles",
+      "2nd chron",
+      "second chronicles",
+      "second chron"
+    ]
+  },
+  {
+    "id": 15,
+    "book": "Ezra",
+    "abbreviation": "Ezr",
+    "abbreviations": [
+      "ezra",
+      "ezr",
+      "ez"
+    ]
+  },
+  {
+    "id": 16,
+    "book": "Nehemiah",
+    "abbreviation": "Neh",
+    "abbreviations": [
+      "neh",
+      "ne"
+    ]
+  },
+  {
+    "id": 17,
+    "book": "Esther",
+    "abbreviation": "Est",
+    "abbreviations": [
+      "est",
+      "esth",
+      "es"
+    ]
+  },
+  {
+    "id": 18,
+    "book": "Job",
+    "abbreviation": "Jb",
+    "abbreviations": [
+      "job",
+      "jb"
+    ]
+  },
+  {
+    "id": 19,
+    "book": "Psalms",
+    "abbreviation": "Ps",
+    "abbreviations": [
+      "ps",
+      "psalm",
+      "pslm",
+      "psa",
+      "psm",
+      "pss"
+    ]
+  },
+  {
+    "id": 20,
+    "book": "Proverbs",
+    "abbreviation": "Prv",
+    "abbreviations": [
+      "prov",
+      "pro",
+      "prv",
+      "pr"
+    ]
+  },
+  {
+    "id": 21,
+    "book": "Ecclesiastes",
+    "abbreviation": "Eccl",
+    "abbreviations": [
+      "eccles",
+      "eccle",
+      "ecc",
+      "ec",
+      "qoh"
+    ]
+  },
+  {
+    "id": 22,
+    "book": "Song of Solomon",
+    "abbreviation": "Sg",
+    "abbreviations": [
+      "song",
+      "song of songs",
+      "sos",
+      "so",
+      "canticle of canticles",
+      "canticles",
+      "cant"
+    ]
+  },
+  {
+    "id": 23,
+    "book": "Isaiah",
+    "abbreviation": "Is",
+    "abbreviations": [
+      "isa",
+      "is"
+    ]
+  },
+  {
+    "id": 24,
+    "book": "Jeremiah",
+    "abbreviation": "Jer",
+    "abbreviations": [
+      "jer",
+      "je",
+      "jr"
+    ]
+  },
+  {
+    "id": 25,
+    "book": "Lamentations",
+    "abbreviation": "Lam",
+    "abbreviations": [
+      "lam",
+      "la"
+    ]
+  },
+  {
+    "id": 26,
+    "book": "Ezekiel",
+    "abbreviation": "Ezk",
+    "abbreviations": [
+      "ezek",
+      "eze",
+      "ezk"
+    ]
+  },
+  {
+    "id": 27,
+    "book": "Daniel",
+    "abbreviation": "Dn",
+    "abbreviations": [
+      "dan",
+      "da",
+      "dn"
+    ]
+  },
+  {
+    "id": 28,
+    "book": "Hosea",
+    "abbreviation": "Hos",
+    "abbreviations": [
+      "hos",
+      "ho"
+    ]
+  },
+  {
+    "id": 29,
+    "book": "Joel",
+    "abbreviation": "Jl",
+    "abbreviations": [
+      "joel",
+      "jl"
+    ]
+  },
+  {
+    "id": 30,
+    "book": "Amos",
+    "abbreviation": "Am",
+    "abbreviations": [
+      "amos",
+      "am"
+    ]
+  },
+  {
+    "id": 31,
+    "book": "Obadiah",
+    "abbreviation": "Ob",
+    "abbreviations": [
+      "obad",
+      "ob"
+    ]
+  },
+  {
+    "id": 32,
+    "book": "Jonah",
+    "abbreviation": "Jon",
+    "abbreviations": [
+      "jonah",
+      "jnh",
+      "jon"
+    ]
+  },
+  {
+    "id": 33,
+    "book": "Micah",
+    "abbreviation": "Mi",
+    "abbreviations": [
+      "mic",
+      "mc"
+    ]
+  },
+  {
+    "id": 34,
+    "book": "Nahum",
+    "abbreviation": "Na",
+    "abbreviations": [
+      "nah",
+      "na"
+    ]
+  },
+  {
+    "id": 35,
+    "book": "Habakkuk",
+    "abbreviation": "Hab",
+    "abbreviations": [
+      "hab",
+      "hb"
+    ]
+  },
+  {
+    "id": 36,
+    "book": "Zephaniah",
+    "abbreviation": "Zep",
+    "abbreviations": [
+      "zeph",
+      "zep",
+      "zp"
+    ]
+  },
+  {
+    "id": 37,
+    "book": "Haggai",
+    "abbreviation": "Hg",
+    "abbreviations": [
+      "hag",
+      "hg"
+    ]
+  },
+  {
+    "id": 38,
+    "book": "Zechariah",
+    "abbreviation": "Zec",
+    "abbreviations": [
+      "zech",
+      "zec",
+      "zc"
+    ]
+  },
+  {
+    "id": 39,
+    "book": "Malachi",
+    "abbreviation": "Mal",
+    "abbreviations": [
+      "mal",
+      "ml"
+    ]
+  },
+  {
+    "id": 40,
+    "book": "Matthew",
+    "abbreviation": "Mt",
+    "abbreviations": [
+      "matt",
+      "mt"
+    ]
+  },
+  {
+    "id": 41,
+    "book": "Mark",
+    "abbreviation": "Mk",
+    "abbreviations": [
+      "mark",
+      "mrk",
+      "mar",
+      "mk",
+      "mr"
+    ]
+  },
+  {
+    "id": 42,
+    "book": "Luke",
+    "abbreviation": "Lk",
+    "abbreviations": [
+      "luke",
+      "luk",
+      "lk"
+    ]
+  },
+  {
+    "id": 43,
+    "book": "John",
+    "abbreviation": "Jn",
+    "abbreviations": [
+      "john",
+      "joh",
+      "jhn",
+      "jn"
+    ]
+  },
+  {
+    "id": 44,
+    "book": "Acts",
+    "abbreviation": "Acts",
+    "abbreviations": [
+      "acts",
+      "act",
+      "ac"
+    ]
+  },
+  {
+    "id": 45,
+    "book": "Romans",
+    "abbreviation": "Rom",
+    "abbreviations": [
+      "rom",
+      "ro",
+      "rm"
+    ]
+  },
+  {
+    "id": 46,
+    "book": "1 Corinthians",
+    "abbreviation": "1 Cor",
+    "abbreviations": [
+      "1 cor",
+      "1 co",
+      "i cor",
+      "i co",
+      "1cor",
+      "1co",
+      "i corinthians",
+      "1corinthians",
+      "1st corinthians",
+      "first corinthians"
+    ]
+  },
+  {
+    "id": 47,
+    "book": "2 Corinthians",
+    "abbreviation": "2 Cor",
+    "abbreviations": [
+      "2 cor",
+      "2 co",
+      "ii cor",
+      "ii co",
+      "2cor",
+      "2co",
+      "ii corinthians",
+      "2corinthians",
+      "2nd corinthians",
+      "second corinthians"
+    ]
+  },
+  {
+    "id": 48,
+    "book": "Galatians",
+    "abbreviation": "Gal",
+    "abbreviations": [
+      "gal",
+      "ga"
+    ]
+  },
+  {
+    "id": 49,
+    "book": "Ephesians",
+    "abbreviation": "Eph",
+    "abbreviations": [
+      "eph",
+      "ephes"
+    ]
+  },
+  {
+    "id": 50,
+    "book": "Philippians",
+    "abbreviation": "Phil",
+    "abbreviations": [
+      "phil",
+      "php",
+      "pp"
+    ]
+  },
+  {
+    "id": 51,
+    "book": "Colossians",
+    "abbreviation": "Col",
+    "abbreviations": [
+      "col",
+      "co"
+    ]
+  },
+  {
+    "id": 52,
+    "book": "1 Thessalonians",
+    "abbreviation": "1 Thes",
+    "abbreviations": [
+      "1 thess",
+      "1 thes",
+      "1 th",
+      "i thessalonians",
+      "i thess",
+      "i thes",
+      "i th",
+      "1thessalonians",
+      "1thess",
+      "1thes",
+      "1th",
+      "1st thessalonians",
+      "1st thess",
+      "first thessalonians",
+      "first thess"
+    ]
+  },
+  {
+    "id": 53,
+    "book": "2 Thessalonians",
+    "abbreviation": "2 Thes",
+    "abbreviations": [
+      "2 thess",
+      "2 thes",
+      "ii thessalonians",
+      "ii thess",
+      "ii thes",
+      "ii th",
+      "2thessalonians",
+      "2thess",
+      "2thes",
+      "2th",
+      "2nd thessalonians",
+      "2nd thess",
+      "second thessalonians",
+      "second thess"
+    ]
+  },
+  {
+    "id": 54,
+    "book": "1 Timothy",
+    "abbreviation": "1 Tm",
+    "abbreviations": [
+      "1 tim",
+      "1 ti",
+      "i timothy",
+      "i tim",
+      "i ti",
+      "1timothy",
+      "1tim",
+      "1ti",
+      "1st timothy",
+      "1st tim",
+      "first timothy",
+      "first tim"
+    ]
+  },
+  {
+    "id": 55,
+    "book": "2 Timothy",
+    "abbreviation": "2 Tm",
+    "abbreviations": [
+      "2 tim",
+      "2 ti",
+      "ii timothy",
+      "ii tim",
+      "ii ti",
+      "2timothy",
+      "2tim",
+      "2ti",
+      "2nd timothy",
+      "2nd tim",
+      "second timothy",
+      "second tim"
+    ]
+  },
+  {
+    "id": 56,
+    "book": "Titus",
+    "abbreviation": "Ti",
+    "abbreviations": [
+      "titus",
+      "tit",
+      "ti"
+    ]
+  },
+  {
+    "id": 57,
+    "book": "Philemon",
+    "abbreviation": "Phlm",
+    "abbreviations": [
+      "philem",
+      "phm",
+      "pm"
+    ]
+  },
+  {
+    "id": 58,
+    "book": "Hebrews",
+    "abbreviation": "Heb",
+    "abbreviations": [
+      "heb"
+    ]
+  },
+  {
+    "id": 59,
+    "book": "James",
+    "abbreviation": "Jas",
+    "abbreviations": [
+      "james",
+      "jas",
+      "jm"
+    ]
+  },
+  {
+    "id": 60,
+    "book": "1 Peter",
+    "abbreviation": "1 Pt",
+    "abbreviations": [
+      "1 pet",
+      "1 pe",
+      "1 pt",
+      "1 p",
+      "i pet",
+      "i pt",
+      "i pe",
+      "1peter",
+      "1pet",
+      "1pe",
+      "1pt",
+      "1p",
+      "i peter",
+      "1st peter",
+      "first peter"
+    ]
+  },
+  {
+    "id": 61,
+    "book": "2 Peter",
+    "abbreviation": "2 Pt",
+    "abbreviations": [
+      "2 pet",
+      "2 pe",
+      "2 pt",
+      "2 p",
+      "ii peter",
+      "ii pet",
+      "ii pt",
+      "ii pe",
+      "2peter",
+      "2pet",
+      "2pe",
+      "2pt",
+      "2p",
+      "2nd peter",
+      "second peter"
+    ]
+  },
+  {
+    "id": 62,
+    "book": "1 John",
+    "abbreviation": "1 Jn",
+    "abbreviations": [
+      "1 john",
+      "1 jhn",
+      "1 jn",
+      "1 j",
+      "1john",
+      "1jhn",
+      "1joh",
+      "1jn",
+      "1jo",
+      "1j",
+      "i john",
+      "i jhn",
+      "i joh",
+      "i jn",
+      "i jo",
+      "1st john",
+      "first john"
+    ]
+  },
+  {
+    "id": 63,
+    "book": "2 John",
+    "abbreviation": "2 Jn",
+    "abbreviations": [
+      "2 john",
+      "2 jhn",
+      "2 jn",
+      "2 j",
+      "2john",
+      "2jhn",
+      "2joh",
+      "2jn",
+      "2jo",
+      "2j",
+      "ii john",
+      "ii jhn",
+      "ii joh",
+      "ii jn",
+      "ii jo",
+      "2nd john",
+      "second john"
+    ]
+  },
+  {
+    "id": 64,
+    "book": "3 John",
+    "abbreviation": "3 Jn",
+    "abbreviations": [
+      "3 john",
+      "3 jhn",
+      "3 jn",
+      "3 j",
+      "3john",
+      "3jhn",
+      "3joh",
+      "3jn",
+      "3jo",
+      "3j",
+      "iii john",
+      "iii jhn",
+      "iii joh",
+      "iii jn",
+      "iii jo",
+      "3rd john",
+      "third john"
+    ]
+  },
+  {
+    "id": 65,
+    "book": "Jude",
+    "abbreviation": "Jude",
+    "abbreviations": [
+      "jude",
+      "jud",
+      "jd"
+    ]
+  },
+  {
+    "id": 66,
+    "book": "Revelation",
+    "abbreviation": "Rv",
+    "abbreviations": [
+      "rev",
+      "re",
+      "the revelation"
+    ]
+  }
+]

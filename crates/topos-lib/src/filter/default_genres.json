@@ -1,0 +1,72 @@
+[
+  {
+    "title": "Pentateuch"
+    "abbreviations": [ "pent", "penta" ],
+    "books": [ "Genesis", "Exodus", "Leviticus", "Numbers", "Deuteronomy" ]
+  },
+  {
+    "title": "History"
+    "abbreviations": [ "hist", "narrative", "historical narrative" ],
+    "books": [ "Joshua", "Judges", "Ruth", "1 Samuel", "2 Samuel", "1 Kings", "2 Kings", "1 Chronicles", "2 Chronicles", "Ezra", "Nehemiah", "Esther" ]
+  },
+  {
+    "title": "Wisdom"
+    "abbreviations": [ "wis" ],
+    "books": [ "Job", "Proverbs", "Ecclesiastes" ]
+  },
+  {
+    "title": "Poetry"
+    "abbreviations": [ "poe" ],
+    "books": [ "Psalms" ]
+  },
+  {
+    "title": "Wisdom And Poetry",
+    "abbreviations": [ "wap", "w&p" ],
+    "subcategories": [ "Wisdom", "Poetry" ],
+  },
+  {
+    "title": "Major Prophets"
+    "abbreviations": [ "major" ],
+    "books": [ "Isaiah", "Jeremiah", "Lamentations", "Ezekiel", "Daniel" ]
+  },
+  {
+    "title": "Minor Prophets"
+    "abbreviations": [ "minor" ],
+    "books": [ "Hosea", "Joel", "Amos", "Obadiah", "Jonah", "Micah", "Nahum", "Habakkuk", "Zephaniah", "Haggai", "Zechariah", "Malachi" ]
+  },
+  {
+    "title": "Prophets"
+    "abbreviations": [],
+    "subcategories": [ "Major", "Minor" ],
+  },
+  {
+    "title": "Gospels"
+    "abbreviations": [ "gos", "gospel" ],
+    "books": [ "Matthew", "Mark", "Luke", "John" ]
+  },
+  {
+    "title": "Acts"
+    "abbreviations": [ "act", "acts of the apostles" ],
+    "books": [ "Acts" ]
+  },
+  {
+    "title": "Gospels And Acts"
+    "abbreviations": [ "gaa", "g&a" ],
+    "subcategories": [ "Gospels", "Acts" ],
+  },
+  {
+    "title": "Pauline Epistles"
+    "abbreviations": [ "pauline", "pe" ],
+    "books": [ "Romans", "1 Corinthians", "2 Corinthians", "Galatians", "Ephesians", "Philippians", "Colossians", "1 Thessalonians", "2 Thessalonians", "1 Timothy", "2 Timothy", "Titus", "Philemon" ]
+  },
+  {
+    "title": "General Epistles"
+    "abbreviations": [ "general", "ge" ],
+    "books": [ "Hebrews", "James", "1 Peter", "2 Peter", "1 John", "2 John", "3 John", "Jude", "Revelation" ]
+  },
+  {
+    "title": "Epistles"
+    "abbreviations": [ "ep" ],
+    "subcategories": [ "Pauline Epistles", "General Epistles" ],
+  }
+]
