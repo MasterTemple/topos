@@ -7,11 +7,14 @@ use std::{
     thread,
     time::Instant,
 };
-use topos_lib::matcher::matcher::{BibleMatcher, ThreadableBibleMatcher};
+use topos_lib::matcher::{
+    instance::BibleMatch,
+    matcher::{BibleMatcher, ThreadableBibleMatcher},
+};
 
 use ignore::{WalkBuilder, WalkState};
 
-use crate::args::Args;
+use crate::args::{Args, InputType};
 
 pub mod args;
 
@@ -121,9 +124,49 @@ pub fn run_multi_threaded_ref<'a>(walk: WalkBuilder, matcher: ThreadableBibleMat
     });
 
     let results = results.lock().unwrap().clone();
-    let total: usize = results.iter().map(|(_, list)| list.len()).sum();
-    println!("Matches Found: {}\n", total);
+    // let total: usize = results.iter().map(|(_, list)| list.len()).sum();
+    // println!("Matches Found: {}\n", total);
+    print_qf_list(matcher, results);
 
+    // dbg!(results);
+}
+
+pub fn print_qf_list<'a>(
+    matcher: ThreadableBibleMatcher<'a>,
+    results: Vec<(PathBuf, Vec<BibleMatch>)>,
+) {
+    for (file, matches) in results {
+        for m in matches {
+            let psg = m.psg;
+
+            let Some(book) = matcher.data().books().get_name(psg.book) else {
+                continue;
+            };
+
+            let segments = psg
+                .segments
+                .iter()
+                .map(|e| e.to_string())
+                .collect::<Vec<_>>()
+                .join(",");
+
+            let start = m.location.start;
+            let psg = format!("{} {}", book, segments);
+            println!(
+                "{}:{}:{}: {}",
+                file.to_string_lossy(),
+                start.line,
+                start.column,
+                psg
+            )
+        }
+    }
+}
+
+pub fn print_table<'a>(
+    matcher: ThreadableBibleMatcher<'a>,
+    results: Vec<(PathBuf, Vec<BibleMatch>)>,
+) {
     println!("| File | Line | Col | Verse |");
     println!("| ---- | ---- | --- | ----- |");
     for (file, matches) in results {
@@ -152,25 +195,50 @@ pub fn run_multi_threaded_ref<'a>(walk: WalkBuilder, matcher: ThreadableBibleMat
             )
         }
     }
-    // dbg!(results);
+}
+
+pub fn handle_text(text: String, matcher: BibleMatcher) {
+    let results = matcher.as_threadable().search(&text);
+    print_table(matcher.as_threadable(), vec![(PathBuf::new(), results)])
+}
+
+pub fn handle_file(path: PathBuf, matcher: BibleMatcher) {
+    let text = std::fs::read_to_string(&path).unwrap();
+    handle_text(text, matcher)
+}
+
+pub fn handle_dir(path: PathBuf, matcher: BibleMatcher) {
+    let walk = WalkBuilder::new(path);
+    run_multi_threaded_ref(walk, matcher.as_threadable());
+}
+
+pub fn handle_input(input: InputType, matcher: BibleMatcher) {
+    match input {
+        InputType::Directory(path) => handle_dir(path, matcher),
+        InputType::File(path) => handle_file(path, matcher),
+        InputType::TextInput(text) => handle_text(text, matcher),
+    }
 }
 
 pub fn main() {
     let args = Args::parse();
-    dbg!(&args);
-    let walk = WalkBuilder::new(args.files.get(0).unwrap_or(&PathBuf::from(".")));
+    // dbg!(&args);
+    let input = InputType::new(args.input.clone());
+    // let walk = WalkBuilder::new(args.files.get(0).unwrap_or(&PathBuf::from(".")));
     let matcher = BibleMatcher::try_from(args).unwrap();
 
-    let timer = Instant::now();
+    handle_input(input, matcher);
+
+    // let timer = Instant::now();
     // run_single_threaded(walk.clone(), matcher.clone());
     // println!("Single Threaded: {}ms", timer.elapsed().as_millis());
     //
     // let timer = Instant::now();
     // run_multi_threaded(walk.clone(), matcher.clone());
     // println!("Multi Threaded: {}ms", timer.elapsed().as_millis());
-    let timer = Instant::now();
-    run_multi_threaded_ref(walk, matcher.as_threadable());
-    println!("Multi Threaded: {}ms", timer.elapsed().as_millis());
+    // let timer = Instant::now();
+    // run_multi_threaded_ref(walk, matcher.as_threadable());
+    // println!("Multi Threaded: {}ms", timer.elapsed().as_millis());
 }
 
 #[cfg(test)]

@@ -1,5 +1,9 @@
-use clap::Parser;
-use std::path::PathBuf;
+use clap::{Parser, ValueEnum};
+use std::{
+    fmt::Display,
+    io::{self, IsTerminal, Read},
+    path::PathBuf,
+};
 use topos_lib::{
     data::genres::Genres,
     filter::{
@@ -8,6 +12,55 @@ use topos_lib::{
     },
     matcher::matcher::BibleMatcher,
 };
+
+#[derive(Clone, Debug, Default, ValueEnum)]
+pub enum OutputMode {
+    JSON,
+    #[default]
+    Table,
+    #[value(alias = "qflist", help = "A format for the Neovim Quickfix List")]
+    Quickfix,
+}
+
+#[derive(Clone, Debug)]
+pub enum InputType {
+    Directory(PathBuf),
+    File(PathBuf),
+    TextInput(String),
+}
+
+impl InputType {
+    pub fn new(input: Option<String>) -> Self {
+        match input {
+            Some(input) => {
+                let path = PathBuf::from(&input);
+                if path.is_file() {
+                    Self::File(path)
+                } else if path.is_dir() {
+                    Self::Directory(path)
+                } else {
+                    Self::TextInput(input)
+                }
+            }
+            None => {
+                if !io::stdin().is_terminal() {
+                    // If no positional argument is given and stdin is being piped, read from stdin
+                    let mut buffer = String::new();
+                    io::stdin().read_to_string(&mut buffer).unwrap();
+                    Self::TextInput(buffer.trim_end().to_string())
+                } else {
+                    Self::default()
+                }
+            }
+        }
+    }
+}
+
+impl Default for InputType {
+    fn default() -> Self {
+        Self::Directory(PathBuf::from("."))
+    }
+}
 
 /**
 - By positively specifying a testament/genre/book, you will implicitly telling the program to exclude the remaining items in that category.
@@ -21,37 +74,39 @@ use topos_lib::{
     version = "0.1.0"
 )]
 pub struct Args {
-    // Input source: text or file
-    #[clap(
-        long = "text",
-        long = "input",
-        // group = "input",
-        // These have to be 2 separate groups, because I do want the user to be able to specify
-        // files and directories
-        group = "input_or_files",
-        group = "input_or_dirs",
-        help = "Text to search within (instead of files)"
-    )]
+    #[clap(help = "The input can be a directory path, a file path, or text.")]
     pub input: Option<String>,
-
-    // File and directory paths
-    #[clap(
-        long = "file",
-        short,
-        // group = "input",
-        group = "input_or_files",
-        help = "One or more files to search"
-    )]
-    pub files: Vec<PathBuf>,
-
-    #[clap(
-        long = "dir",
-        short,
-        // group = "input",
-        group = "input_or_dirs",
-        help = "One or more directories to search recursively"
-    )]
-    pub dirs: Vec<PathBuf>,
+    // // Input source: text or file
+    // #[clap(
+    //     long = "text",
+    //     long = "input",
+    //     // group = "input",
+    //     // These have to be 2 separate groups, because I do want the user to be able to specify
+    //     // files and directories
+    //     group = "input_or_files",
+    //     group = "input_or_dirs",
+    //     help = "Text to search within (instead of files)"
+    // )]
+    // pub input: Option<String>,
+    //
+    // // File and directory paths
+    // #[clap(
+    //     long = "file",
+    //     short,
+    //     // group = "input",
+    //     group = "input_or_files",
+    //     help = "One or more files to search"
+    // )]
+    // pub files: Vec<PathBuf>,
+    //
+    // #[clap(
+    //     long = "dir",
+    //     short,
+    //     // group = "input",
+    //     group = "input_or_dirs",
+    //     help = "One or more directories to search recursively"
+    // )]
+    // pub dirs: Vec<PathBuf>,
 
     // Testament filters
     #[clap(
@@ -125,6 +180,14 @@ pub struct Args {
     //
     // #[clap(long = "igonre", help = "Ignore when non-real books/genres are given")]
     // pub ignore_non_existent: bool,
+    #[clap(
+        long = "mode",
+        short = 'm',
+        help = "Specify output mode",
+        default_value_t
+    )]
+    #[arg(value_enum)]
+    pub mode: OutputMode,
 }
 
 impl TryFrom<Args> for BibleMatcher {
