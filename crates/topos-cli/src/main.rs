@@ -1,4 +1,6 @@
 use clap::Parser;
+use crossbeam_channel::{Receiver, unbounded};
+use itertools::Either;
 use std::{
     fs::File,
     io::{BufRead, BufReader},
@@ -14,9 +16,11 @@ use topos_lib::matcher::{
 
 use ignore::{WalkBuilder, WalkState};
 
-use crate::args::{Args, InputType};
+use crate::{args::Args, inputs::InputType};
 
 pub mod args;
+pub mod inputs;
+pub mod matches;
 
 // pub fn run_single_threaded(walk: WalkBuilder, matcher: BibleMatcherData) {
 //     for entry in walk.build() {
@@ -93,43 +97,95 @@ pub mod args;
 //     // dbg!(results);
 // }
 
-pub fn run_multi_threaded_ref<'a>(walk: WalkBuilder, matcher: ThreadableBibleMatcher<'a>) {
-    let walk = walk.build_parallel();
-    let results: Arc<Mutex<Vec<_>>> = Arc::new(Mutex::new(Vec::new()));
-
-    walk.run(|| {
-        Box::new(|entry| match entry {
-            Ok(entry) => {
-                if entry.path().is_dir() {
-                    return WalkState::Continue;
-                }
-
-                let Ok(contents) = &std::fs::read_to_string(entry.path()) else {
-                    return WalkState::Continue;
-                };
-
-                let matches = matcher.search(&contents);
-                results
-                    .lock()
-                    .unwrap()
-                    .push((entry.path().to_path_buf(), matches));
-
-                WalkState::Continue
-            }
-            Err(err) => {
-                eprintln!("Error: {}", err);
-                WalkState::Continue
-            }
-        })
-    });
-
-    let results = results.lock().unwrap().clone();
-    // let total: usize = results.iter().map(|(_, list)| list.len()).sum();
-    // println!("Matches Found: {}\n", total);
-    print_qf_list(matcher, results);
-
-    // dbg!(results);
-}
+// pub fn run_multi_threaded_ref<'a>(walk: WalkBuilder, matcher: ThreadableBibleMatcher<'a>) {
+//     let walk = walk.build_parallel();
+//     let results: Arc<Mutex<Vec<_>>> = Arc::new(Mutex::new(Vec::new()));
+//
+//     walk.run(|| {
+//         Box::new(|entry| match entry {
+//             Ok(entry) => {
+//                 if entry.path().is_dir() {
+//                     return WalkState::Continue;
+//                 }
+//
+//                 let Ok(contents) = &std::fs::read_to_string(entry.path()) else {
+//                     return WalkState::Continue;
+//                 };
+//
+//                 let matches = matcher.search(&contents);
+//                 results
+//                     .lock()
+//                     .unwrap()
+//                     .push((entry.path().to_path_buf(), matches));
+//
+//                 WalkState::Continue
+//             }
+//             Err(err) => {
+//                 eprintln!("Error: {}", err);
+//                 WalkState::Continue
+//             }
+//         })
+//     });
+//
+//     let results = results.lock().unwrap().clone();
+//     // let total: usize = results.iter().map(|(_, list)| list.len()).sum();
+//     // println!("Matches Found: {}\n", total);
+//     print_qf_list(matcher, results);
+//
+//     // dbg!(results);
+// }
+//
+// pub fn run_multi_threaded_streaming2<'a>(
+//     walk: WalkBuilder,
+//     matcher: BibleMatcher,
+// ) -> Receiver<InputMatches> {
+//     let (sender, receiver) = unbounded();
+//
+//     // Clone the matcher so it can be moved into the thread
+//     let matcher = Arc::new(matcher);
+//     let walk = walk.build_parallel();
+//
+//     // Spawn the parallel walk in a background thread
+//     std::thread::spawn(move || {
+//         walk.run(|| {
+//             let sender = sender.clone();
+//             let matcher = Arc::clone(&matcher);
+//
+//             Box::new(move |entry| {
+//                 match entry {
+//                     Ok(entry) => {
+//                         if entry.path().is_dir() {
+//                             return WalkState::Continue;
+//                         }
+//
+//                         let path = entry.path().to_path_buf();
+//                         let contents = match std::fs::read_to_string(&path) {
+//                             Ok(c) => c,
+//                             Err(err) => {
+//                                 eprintln!("Failed to read {:?}: {}", path, err);
+//                                 return WalkState::Continue;
+//                             }
+//                         };
+//
+//                         let matches = matcher.search(&contents);
+//                         let matches = InputMatches::new(matches).with_path(path);
+//                         // Send result to channel
+//                         if sender.send(matches).is_err() {
+//                             // Receiver was dropped, stop early
+//                             return WalkState::Quit;
+//                         }
+//                     }
+//                     Err(err) => {
+//                         eprintln!("Error: {}", err);
+//                     }
+//                 }
+//                 WalkState::Continue
+//             })
+//         });
+//     });
+//
+//     receiver
+// }
 
 pub fn print_qf_list<'a>(
     matcher: ThreadableBibleMatcher<'a>,
@@ -197,37 +253,12 @@ pub fn print_table<'a>(
     }
 }
 
-pub fn handle_text(text: String, matcher: BibleMatcher) {
-    let results = matcher.as_threadable().search(&text);
-    print_table(matcher.as_threadable(), vec![(PathBuf::new(), results)])
-}
-
-pub fn handle_file(path: PathBuf, matcher: BibleMatcher) {
-    let text = std::fs::read_to_string(&path).unwrap();
-    handle_text(text, matcher)
-}
-
-pub fn handle_dir(path: PathBuf, matcher: BibleMatcher) {
-    let walk = WalkBuilder::new(path);
-    run_multi_threaded_ref(walk, matcher.as_threadable());
-}
-
-pub fn handle_input(input: InputType, matcher: BibleMatcher) {
-    match input {
-        InputType::Directory(path) => handle_dir(path, matcher),
-        InputType::File(path) => handle_file(path, matcher),
-        InputType::TextInput(text) => handle_text(text, matcher),
-    }
-}
-
 pub fn main() {
     let args = Args::parse();
-    // dbg!(&args);
     let input = InputType::new(args.input.clone());
-    // let walk = WalkBuilder::new(args.files.get(0).unwrap_or(&PathBuf::from(".")));
     let matcher = BibleMatcher::try_from(args).unwrap();
 
-    handle_input(input, matcher);
+    let results = input.search(matcher);
 
     // let timer = Instant::now();
     // run_single_threaded(walk.clone(), matcher.clone());

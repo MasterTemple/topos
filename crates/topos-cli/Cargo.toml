@@ -5,5 +5,7 @@ edition = "2024"
 
 [dependencies]
 clap = { version = "4.5.41", features = ["derive"] }
+crossbeam-channel = "0.5.15"
 ignore = "0.4.23"
+itertools = "0.14.0"
 topos-lib = { path = "../topos-lib/" }

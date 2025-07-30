@@ -22,46 +22,6 @@ pub enum OutputMode {
     Quickfix,
 }
 
-#[derive(Clone, Debug)]
-pub enum InputType {
-    Directory(PathBuf),
-    File(PathBuf),
-    TextInput(String),
-}
-
-impl InputType {
-    pub fn new(input: Option<String>) -> Self {
-        match input {
-            Some(input) => {
-                let path = PathBuf::from(&input);
-                if path.is_file() {
-                    Self::File(path)
-                } else if path.is_dir() {
-                    Self::Directory(path)
-                } else {
-                    Self::TextInput(input)
-                }
-            }
-            None => {
-                if !io::stdin().is_terminal() {
-                    // If no positional argument is given and stdin is being piped, read from stdin
-                    let mut buffer = String::new();
-                    io::stdin().read_to_string(&mut buffer).unwrap();
-                    Self::TextInput(buffer.trim_end().to_string())
-                } else {
-                    Self::default()
-                }
-            }
-        }
-    }
-}
-
-impl Default for InputType {
-    fn default() -> Self {
-        Self::Directory(PathBuf::from("."))
-    }
-}
-
 /**
 - By positively specifying a testament/genre/book, you will implicitly telling the program to exclude the remaining items in that category.
 - You may choose to exclude a subset from a larger inclusion (ex: book from a genre), however this must be specified **after** the inclusion (or else it will be re-added)

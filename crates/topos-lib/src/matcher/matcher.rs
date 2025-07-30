@@ -93,6 +93,42 @@ impl BibleMatcher {
         }
     }
 
+    /// How can I make it so that I can iter over lines and take a string input or a BufReader
+    /// input (I don't want to convert BufReader to a string because of performance overhead)
+    pub fn search(&self, input: &str) -> Vec<BibleMatch> {
+        // let mut matches: Vec<BibleMatch> = vec![];
+        let mut filtered = FilteredBibleMatches::new(&self.complex_filter);
+
+        let mut prev: Option<Match<'_>> = None;
+        let lookup = LineColLookup::new(input);
+        // basically execute behind by 1 iteration (so I can see the start of the next match)
+        for cur in self.filtered_books.captures_iter(input) {
+            // this is just the book name
+            let cur = cur.get(1).unwrap();
+            if let Some(prev) = prev {
+                if let Some(m) = BibleMatch::try_match(
+                    &lookup,
+                    self.data.as_ref(),
+                    input,
+                    prev,
+                    Some(cur.start()),
+                ) {
+                    filtered.try_add(m);
+                }
+            }
+            prev = Some(cur);
+        }
+
+        // handle last one
+        if let Some(prev) = prev {
+            if let Some(m) = BibleMatch::try_match(&lookup, self.data.as_ref(), input, prev, None) {
+                filtered.try_add(m);
+            }
+        }
+
+        return filtered.matches();
+    }
+
     pub fn data(&self) -> &BibleData {
         &self.data
     }
