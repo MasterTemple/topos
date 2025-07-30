@@ -1,28 +1,28 @@
-use crate::{matcher::instance::BibleMatch, segments::segments::BookSegments};
+use crate::{matcher::instance::BibleMatch, segments::segments::Passage};
 
 #[derive(Clone, Debug, Default)]
 pub struct ComplexFilter {
-    inside_of: Vec<BookSegments>,
-    outside_of: Vec<BookSegments>,
+    inside_of: Vec<Passage>,
+    outside_of: Vec<Passage>,
 }
 
 impl ComplexFilter {
-    pub fn new(inside_of: Vec<BookSegments>, outside_of: Vec<BookSegments>) -> Self {
+    pub fn new(inside_of: Vec<Passage>, outside_of: Vec<Passage>) -> Self {
         Self {
             inside_of,
             outside_of,
         }
     }
 
-    pub fn inside(&mut self, psg: BookSegments) {
+    pub fn inside(&mut self, psg: Passage) {
         self.inside_of.push(psg);
     }
 
-    pub fn outside(&mut self, psg: BookSegments) {
+    pub fn outside(&mut self, psg: Passage) {
         self.outside_of.push(psg);
     }
 
-    pub fn keep(&self, psg: &BookSegments) -> bool {
+    pub fn keep(&self, psg: &Passage) -> bool {
         let is_inside = self.inside_of.is_empty()
             || self
                 .inside_of

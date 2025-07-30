@@ -1,6 +1,6 @@
 use once_cell::sync::Lazy;
 
-use crate::segments::segments::BookSegments;
+use crate::segments::segments::Passage;
 
 use super::{books::Books, genres::Genres};
 

@@ -7,7 +7,7 @@ use regex::Regex;
 use crate::{
     data::{books::BookId, data::BibleData},
     matcher::{matcher::BibleMatcher, matches::ComplexFilter},
-    segments::segments::BookSegments,
+    segments::segments::Passage,
 };
 
 pub trait IsFilter {

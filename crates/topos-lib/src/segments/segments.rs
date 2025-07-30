@@ -7,13 +7,13 @@ use crate::{
 };
 
 #[derive(Clone, Debug)]
-pub struct BookSegments {
+pub struct Passage {
     pub book: BookId,
     pub segments: Segments,
 }
 
-impl BookSegments {
-    pub fn overlaps_with(&self, other: &BookSegments) -> bool {
+impl Passage {
+    pub fn overlaps_with(&self, other: &Passage) -> bool {
         if self.book != other.book {
             return false;
         }
@@ -40,8 +40,8 @@ impl Segments {
         self.iter().any(|this| other.overlaps_with(this))
     }
 
-    pub fn with_book(self, book_id: BookId) -> BookSegments {
-        BookSegments {
+    pub fn with_book(self, book_id: BookId) -> Passage {
+        Passage {
             book: book_id,
             segments: self,
         }

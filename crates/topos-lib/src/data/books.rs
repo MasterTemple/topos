@@ -5,7 +5,7 @@ use once_cell::sync::Lazy;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 
-use crate::segments::segments::{BookSegments, Segments};
+use crate::segments::segments::{Passage, Segments};
 
 /// This is not guaranteed to be a valid key, I just am using a unique type
 #[derive(
@@ -111,7 +111,7 @@ impl<'a> Books {
         })
     }
 
-    pub fn parse(&self, input: &str) -> Option<BookSegments> {
+    pub fn parse(&self, input: &str) -> Option<Passage> {
         let m = &self.passage_regex.captures_iter(input).next()?;
         let book = m.get(1)?.as_str();
         let book = self.search(book)?;

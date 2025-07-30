@@ -5,7 +5,7 @@ use crate::{
     data::{books::BookId, data::BibleData},
     segments::{
         parse::SegmentInput,
-        segments::{BookSegments, Segments},
+        segments::{Passage, Segments},
     },
 };
 
@@ -47,7 +47,7 @@ pub struct BibleMatch {
     pub location: Location,
     /// I want this to be of type [`BookSegments`] so that way I can use the
     /// [`BookSegments::overlaps_with`] function
-    pub psg: BookSegments,
+    pub psg: Passage,
 }
 
 impl BibleMatch {

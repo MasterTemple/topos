@@ -14,7 +14,7 @@ use crate::{
     },
     segments::{
         parse::SegmentInput,
-        segments::{BookSegments, Segments},
+        segments::{Passage, Segments},
     },
 };
 
