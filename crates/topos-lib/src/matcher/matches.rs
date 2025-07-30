@@ -14,6 +14,14 @@ impl ComplexFilter {
         }
     }
 
+    pub fn inside(&mut self, psg: BookSegments) {
+        self.inside_of.push(psg);
+    }
+
+    pub fn outside(&mut self, psg: BookSegments) {
+        self.outside_of.push(psg);
+    }
+
     pub fn keep(&self, psg: &BookSegments) -> bool {
         let is_inside = self.inside_of.is_empty()
             || self

@@ -129,12 +129,15 @@ impl<'a> BibleFilter<'a> {
     }
 
     pub fn filter_inside(&mut self, passage: &str) {
-        // self.data
-        // todo!()
+        if let Some(psg) = self.data.books().parse(passage) {
+            self.complex_filter.inside(psg);
+        }
     }
 
     pub fn filter_outside(&mut self, passage: &str) {
-        // todo!()
+        if let Some(psg) = self.data.books().parse(passage) {
+            self.complex_filter.outside(psg);
+        }
     }
 
     pub fn create_matcher(self) -> Result<BibleMatcher<'a>, String> {
