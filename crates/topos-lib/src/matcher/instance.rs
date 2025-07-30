@@ -44,17 +44,17 @@ impl Location {
 */
 #[derive(Clone, Debug)]
 pub struct BibleMatch {
-    location: Location,
+    pub location: Location,
     /// I want this to be of type [`BookSegments`] so that way I can use the
     /// [`BookSegments::overlaps_with`] function
-    book_segments: BookSegments,
+    pub psg: BookSegments,
 }
 
 impl BibleMatch {
     pub fn new(location: Location, book_id: BookId, segments: Segments) -> Self {
         Self {
             location,
-            book_segments: segments.with_book(book_id),
+            psg: segments.with_book(book_id),
         }
     }
 
