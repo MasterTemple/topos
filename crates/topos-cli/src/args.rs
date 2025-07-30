@@ -171,7 +171,7 @@ fn idk(args: Args) {
     // matcher
 }
 
-impl<'a> TryFrom<Args> for BibleMatcher<'a> {
+impl TryFrom<Args> for BibleMatcher {
     type Error = Box<dyn std::error::Error>;
 
     fn try_from(value: Args) -> Result<Self, Self::Error> {

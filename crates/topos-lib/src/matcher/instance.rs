@@ -60,7 +60,7 @@ impl BibleMatch {
 
     pub fn try_match<'a>(
         lookup: &LineColLookup,
-        data: &'a BibleData<'a>,
+        data: &'a BibleData,
         input: &str,
         cur: Match<'a>,
         next_start: Option<usize>,

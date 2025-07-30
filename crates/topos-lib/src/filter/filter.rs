@@ -1,4 +1,4 @@
-use std::collections::BTreeSet;
+use std::{collections::BTreeSet, rc::Rc};
 
 use itertools::Itertools;
 use once_cell::sync::Lazy;
@@ -36,8 +36,8 @@ impl<T: IsFilter> IsFilter for Operation<T> {
 }
 
 #[derive(Clone)]
-pub struct BibleFilter<'a> {
-    data: &'a BibleData<'a>,
+pub struct BibleFilter {
+    data: Rc<BibleData>,
     /// indicates whether or not there has been an inclusion, which implicitly calls an exclusion
     /// on all the original data
     /// i dont need to use this if an exclusion is called at the beginning, but then again, there
@@ -47,8 +47,8 @@ pub struct BibleFilter<'a> {
     complex_filter: ComplexFilter,
 }
 
-impl<'a> BibleFilter<'a> {
-    pub fn new(data: &'a BibleData) -> Self {
+impl BibleFilter {
+    pub fn new(data: Rc<BibleData>) -> Self {
         // this should start full
         let ids = (1..=66).map_into().collect();
         let has_done_an_inclusion = false;
@@ -62,7 +62,7 @@ impl<'a> BibleFilter<'a> {
     }
 
     pub fn push<T: IsFilter>(&mut self, op: Operation<T>) {
-        let ids = op.get_ids(self.data);
+        let ids = op.get_ids(self.data.as_ref());
 
         match op {
             Operation::Include(_) => {
@@ -79,7 +79,7 @@ impl<'a> BibleFilter<'a> {
         };
     }
 
-    pub fn add<T: IsFilter>(mut self, op: Operation<T>) -> BibleFilter<'a> {
+    pub fn add<T: IsFilter>(mut self, op: Operation<T>) -> BibleFilter {
         self.push(op);
         self
     }
@@ -140,28 +140,25 @@ impl<'a> BibleFilter<'a> {
         }
     }
 
-    pub fn create_matcher(self) -> Result<BibleMatcher<'a>, String> {
-        Ok(BibleMatcher::new(
-            self.data,
-            self.create_regex()?,
-            self.complex_filter,
-        ))
+    pub fn create_matcher(self) -> Result<BibleMatcher, String> {
+        let re = self.create_regex()?;
+        Ok(BibleMatcher::new(self.data, re, self.complex_filter))
     }
 }
 
-impl Default for BibleFilter<'static> {
+impl Default for BibleFilter {
     fn default() -> Self {
-        Self::new(BibleData::base())
+        Self::new(Rc::new(BibleData::default()))
     }
 }
 
-static DEFAULT_FILTER: Lazy<BibleFilter<'static>> = Lazy::new(|| BibleFilter::default());
-
-impl<'a> BibleFilter<'a> {
-    pub fn base() -> &'static Self {
-        &DEFAULT_FILTER
-    }
-}
+// static DEFAULT_FILTER: Lazy<BibleFilter<'static>> = Lazy::new(|| BibleFilter::default());
+//
+// impl BibleFilter {
+//     pub fn base() -> &'static Self {
+//         &DEFAULT_FILTER
+//     }
+// }
 
 #[cfg(test)]
 mod tests {

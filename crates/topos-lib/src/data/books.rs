@@ -1,4 +1,4 @@
-use std::collections::BTreeMap;
+use std::{collections::BTreeMap, rc::Rc};
 
 use itertools::Itertools;
 use once_cell::sync::Lazy;
@@ -78,7 +78,7 @@ impl Default for Books {
     }
 }
 
-impl<'a> Books {
+impl Books {
     /// - You only want to use this when you have custom data
     /// - If you would like English book names, please just use [`Default::default()`]
     pub fn new(data: BooksInput) -> Result<Self, String> {
@@ -140,6 +140,11 @@ static DEFAULT_BOOKS: Lazy<Books> = Lazy::new(|| {
     let data = BooksInput::default();
     Books::new(data).expect("The default provided books data should always compile")
 });
+
+// static DEFAULT_BOOKS: Lazy<Arc<Books>> = Lazy::new(|| {
+//     let data = BooksInput::default();
+//     Arc::new(Books::new(data).expect("The default provided books data should always compile"))
+// });
 
 /**
 Example:

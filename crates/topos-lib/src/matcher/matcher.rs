@@ -1,4 +1,4 @@
-use std::collections::BTreeSet;
+use std::{collections::BTreeSet, rc::Rc};
 
 use itertools::Itertools;
 use line_col::LineColLookup;
@@ -19,8 +19,8 @@ use crate::{
 };
 
 #[derive(Clone, Debug)]
-pub struct BibleMatcher<'a> {
-    data: &'a BibleData<'a>,
+pub struct BibleMatcher {
+    data: Rc<BibleData>,
     /// The books to **not** match on are removed from this RegEx, so I won't process unnecessary
     /// books
     filtered_books: Regex,
@@ -28,12 +28,8 @@ pub struct BibleMatcher<'a> {
     complex_filter: ComplexFilter,
 }
 
-impl<'a> BibleMatcher<'a> {
-    pub fn new(
-        data: &'a BibleData<'a>,
-        filtered_books: Regex,
-        complex_filter: ComplexFilter,
-    ) -> Self {
+impl BibleMatcher {
+    pub fn new(data: Rc<BibleData>, filtered_books: Regex, complex_filter: ComplexFilter) -> Self {
         Self {
             data,
             filtered_books,
@@ -54,9 +50,13 @@ impl<'a> BibleMatcher<'a> {
             // this is just the book name
             let cur = cur.get(1).unwrap();
             if let Some(prev) = prev {
-                if let Some(m) =
-                    BibleMatch::try_match(&lookup, self.data, input, prev, Some(cur.start()))
-                {
+                if let Some(m) = BibleMatch::try_match(
+                    &lookup,
+                    self.data.as_ref(),
+                    input,
+                    prev,
+                    Some(cur.start()),
+                ) {
                     filtered.try_add(m);
                 }
             }
@@ -65,7 +65,7 @@ impl<'a> BibleMatcher<'a> {
 
         // handle last one
         if let Some(prev) = prev {
-            if let Some(m) = BibleMatch::try_match(&lookup, self.data, input, prev, None) {
+            if let Some(m) = BibleMatch::try_match(&lookup, self.data.as_ref(), input, prev, None) {
                 filtered.try_add(m);
             }
         }
@@ -74,17 +74,19 @@ impl<'a> BibleMatcher<'a> {
     }
 }
 
-static DEFAULT_MATCHER: Lazy<BibleMatcher<'static>> = Lazy::new(|| BibleMatcher::default());
+// static DEFAULT_MATCHER: Lazy<BibleMatcher<'static>> = Lazy::new(|| BibleMatcher::default());
+//
+// impl BibleMatcher {
+//     pub fn base() -> &'static Self {
+//         &DEFAULT_MATCHER
+//     }
+// }
 
-impl<'a> BibleMatcher<'a> {
-    pub fn base() -> &'static Self {
-        &DEFAULT_MATCHER
-    }
-}
-
-impl Default for BibleMatcher<'static> {
+impl Default for BibleMatcher {
     fn default() -> Self {
-        Self::base().clone()
+        BibleFilter::default()
+            .create_matcher()
+            .expect("The default provided matcher should always compile")
     }
 }
 

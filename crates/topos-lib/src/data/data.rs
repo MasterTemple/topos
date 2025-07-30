@@ -5,13 +5,13 @@ use crate::segments::segments::Passage;
 use super::{books::Books, genres::Genres};
 
 #[derive(Clone, Debug)]
-pub struct BibleData<'a> {
+pub struct BibleData {
     books: Books,
-    genres: Genres<'a>,
+    genres: Genres,
     // testaments: Test
 }
 
-impl<'a> BibleData<'a> {
+impl BibleData {
     pub fn books(&self) -> &Books {
         &self.books
     }
@@ -24,7 +24,7 @@ impl<'a> BibleData<'a> {
     // }
 }
 
-impl<'a> Default for BibleData<'a> {
+impl Default for BibleData {
     fn default() -> Self {
         Self {
             books: Default::default(),
@@ -33,13 +33,13 @@ impl<'a> Default for BibleData<'a> {
     }
 }
 
-impl<'a> BibleData<'a> {
-    pub fn base() -> &'static Self {
-        &DEFAULT_DATA
-    }
-}
-
-static DEFAULT_DATA: Lazy<BibleData> = Lazy::new(|| BibleData {
-    books: Books::base().clone(),
-    genres: Genres::base().clone(),
-});
+// impl BibleData {
+//     pub fn base() -> &'static Self {
+//         &DEFAULT_DATA
+//     }
+// }
+//
+// static DEFAULT_DATA: Lazy<BibleData> = Lazy::new(|| BibleData {
+//     books: Books::base().clone(),
+//     genres: Genres::default(),
+// });

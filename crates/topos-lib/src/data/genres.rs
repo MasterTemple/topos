@@ -1,6 +1,7 @@
 use std::{
     borrow::Cow,
     collections::{BTreeMap, BTreeSet},
+    rc::Rc,
 };
 
 use once_cell::sync::Lazy;
@@ -22,22 +23,22 @@ use crate::data::books::{BookId, Books};
     derive_more::Deref,
     derive_more::DerefMut,
 )]
-pub struct GenreKey<'a>(Cow<'a, String>);
+pub struct GenreKey(Rc<String>);
 
-impl<'a> GenreKey<'a> {
+impl GenreKey {
     pub fn new(s: String) -> Self {
-        Self(Cow::Owned(s))
+        Self(Rc::new(s))
     }
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct Genres<'a> {
-    genres: BTreeMap<GenreKey<'a>, Genre<'a>>,
+pub struct Genres {
+    genres: BTreeMap<GenreKey, Genre>,
     /// Key/Abbreviation to Genre Title
-    input_to_key: BTreeMap<String, GenreKey<'a>>,
+    input_to_key: BTreeMap<String, GenreKey>,
 }
 
-impl<'a> Genres<'a> {
+impl Genres {
     pub fn create(books: &Books, input: GenresInput) -> Self {
         let mut genres = BTreeMap::default();
         let mut key_to_genre = BTreeMap::default();
@@ -98,22 +99,22 @@ impl<'a> Genres<'a> {
 
     /// - But this returned struct gives the user the input data; I need a separate type
     /// - Also this should return the key :/, not all the data
-    pub fn search<'f>(&'f self, input: &'_ str) -> Option<&'f GenreKey<'a>> {
+    pub fn search<'a>(&'a self, input: &'_ str) -> Option<&'a GenreKey> {
         let key = Self::normalize_key(input);
         self.input_to_key.get(&key)
     }
 
-    pub fn get<'f>(&'f self, input: &'_ str) -> Option<&'f Genre<'a>> {
+    pub fn get<'a>(&'a self, input: &'_ str) -> Option<&'a Genre> {
         let key = self.search(input)?;
         self.genres.get(&key)
     }
 
-    fn get_mut<'f>(&'f mut self, input: &'_ str) -> Option<&'f mut Genre<'a>> {
+    fn get_mut<'a>(&'a mut self, input: &'_ str) -> Option<&'a mut Genre> {
         let key = self.search(input)?.clone();
         self.genres.get_mut(&key)
     }
 
-    pub fn genre_ids(&'a self, input: &'_ str) -> Option<&'a BTreeSet<BookId>> {
+    pub fn genre_ids<'a>(&'a self, input: &'_ str) -> Option<&'a BTreeSet<BookId>> {
         Some(&self.get(input)?.books)
     }
 
@@ -126,27 +127,27 @@ impl<'a> Genres<'a> {
             .to_string()
     }
 
-    pub fn base() -> &'static Self {
-        &DEFAULT_GENRES
-    }
+    // pub fn base() -> &'static Self {
+    //     &DEFAULT_GENRES
+    // }
 }
 
-static DEFAULT_GENRES: Lazy<Genres> = Lazy::new(|| Genres::default());
+// static DEFAULT_GENRES: Lazy<Genres> = Lazy::new(|| Genres::default());
 
-impl<'a> Default for Genres<'a> {
+impl Default for Genres {
     fn default() -> Self {
         Self::create(Books::base(), GenresInput::default())
     }
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct Genre<'a> {
-    title: GenreKey<'a>,
+pub struct Genre {
+    title: GenreKey,
     books: BTreeSet<BookId>,
 }
 
-impl<'a> Genre<'a> {
-    pub fn new(key: GenreKey<'a>, books: BTreeSet<BookId>) -> Self {
+impl Genre {
+    pub fn new(key: GenreKey, books: BTreeSet<BookId>) -> Self {
         Self { title: key, books }
     }
 }
