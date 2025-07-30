@@ -1,4 +1,4 @@
-use std::{collections::BTreeSet, rc::Rc};
+use std::{collections::BTreeSet, sync::Arc};
 
 use itertools::Itertools;
 use once_cell::sync::Lazy;
@@ -37,7 +37,7 @@ impl<T: IsFilter> IsFilter for Operation<T> {
 
 #[derive(Clone)]
 pub struct BibleFilter {
-    data: Rc<BibleData>,
+    data: Arc<BibleData>,
     /// indicates whether or not there has been an inclusion, which implicitly calls an exclusion
     /// on all the original data
     /// i dont need to use this if an exclusion is called at the beginning, but then again, there
@@ -48,7 +48,7 @@ pub struct BibleFilter {
 }
 
 impl BibleFilter {
-    pub fn new(data: Rc<BibleData>) -> Self {
+    pub fn new(data: Arc<BibleData>) -> Self {
         // this should start full
         let ids = (1..=66).map_into().collect();
         let has_done_an_inclusion = false;
@@ -148,7 +148,7 @@ impl BibleFilter {
 
 impl Default for BibleFilter {
     fn default() -> Self {
-        Self::new(Rc::new(BibleData::default()))
+        Self::new(Arc::new(BibleData::default()))
     }
 }
 

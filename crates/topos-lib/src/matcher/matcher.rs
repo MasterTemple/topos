@@ -1,4 +1,4 @@
-use std::{collections::BTreeSet, rc::Rc};
+use std::{collections::BTreeSet, sync::Arc};
 
 use itertools::Itertools;
 use line_col::LineColLookup;
@@ -20,7 +20,7 @@ use crate::{
 
 #[derive(Clone, Debug)]
 pub struct BibleMatcher {
-    data: Rc<BibleData>,
+    data: Arc<BibleData>,
     /// The books to **not** match on aren't in this RegEx, so I won't process unnecessary books
     filtered_books: Regex,
     /// These are so I can check if the matches overlap with these
@@ -28,12 +28,16 @@ pub struct BibleMatcher {
 }
 
 impl BibleMatcher {
-    pub fn new(data: Rc<BibleData>, filtered_books: Regex, complex_filter: ComplexFilter) -> Self {
+    pub fn new(data: Arc<BibleData>, filtered_books: Regex, complex_filter: ComplexFilter) -> Self {
         Self {
             data,
             filtered_books,
             complex_filter,
         }
+    }
+
+    pub fn data(&self) -> &BibleData {
+        &self.data
     }
 
     /// How can I make it so that I can iter over lines and take a string input or a BufReader
@@ -94,11 +98,11 @@ mod tests {
 
     #[test]
     fn matcher() {
-        let v = std::rc::Rc::new(true);
+        let v = Arc::new(true);
         let v = v.clone();
         let v = v.to_owned();
         let o = v.as_ref().clone();
-        let o = std::rc::Rc::into_inner(v);
+        let o = Arc::into_inner(v);
         // let data = BibleData::base();
         // let filtered_books = BibleFilter::default()
         //     // .add(Operation::Include(GenreFilter::new("Pauline")))

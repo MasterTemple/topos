@@ -12,7 +12,8 @@ use crate::segments::{segment::Segment, segments::Segments, units::chapter_verse
 /// Basically, start with and end with a digit
 /// and then collect digits joined by ranges `-–——⸺` or segments `,;` or chapters `:`
 static POST_BOOK_VALID_REFERENCE_SEGMENT_CHARACTERS: Lazy<Regex> =
-    Lazy::new(|| Regex::new(r"^ *\d+( *[\.,:;\-–——⸺] *\d+)*").unwrap());
+    // Lazy::new(|| Regex::new(r"^ *\d+( *[\.,:;\-–——⸺] *\d+)*").unwrap());
+    Lazy::new(|| Regex::new(r"^ *\d{1,3}( *[\.,:;\-–——⸺] *\d{1,3})*").unwrap());
 // Lazy::new(|| Regex::new(r"^( *[\.,:;\-–——⸺] *\d+)*").unwrap());
 
 const ALL_DASHES: [char; 5] = ['-', '–', '—', '—', '⸺'];
@@ -247,6 +248,8 @@ fn parse_reference_segments(input: &str) -> Segments {
             else {
                 // handle `ch`
                 if check_for_full_chapters {
+                    // TODO: "Mar 25, 2025" will be interpreted as chapters, but parsing 2025
+                    // panics because it can't fit in a u8
                     chapter = range.parse().unwrap();
                     segments.push(Segment::full_chapter(chapter));
                     continue;

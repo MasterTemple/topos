@@ -4,6 +4,8 @@ use std::{
     io::{BufRead, BufReader},
     path::PathBuf,
     sync::{Arc, Mutex},
+    thread,
+    time::Instant,
 };
 use topos_lib::matcher::matcher::BibleMatcher;
 
@@ -13,92 +15,94 @@ use crate::args::Args;
 
 pub mod args;
 
-pub fn main() {
-    let args = Args::parse();
-    dbg!(&args);
-
-    // let walk = WalkBuilder::new(".").build_parallel();
-    let walk = WalkBuilder::new(".").build();
-
-    // let results: Arc<Mutex<Vec<_>>> = Arc::new(Mutex::new(Vec::new()));
-    let matcher = BibleMatcher::try_from(args).unwrap();
-    // dbg!(&matcher);
-
-    for entry in walk {
+pub fn run_single_threaded(walk: WalkBuilder, matcher: BibleMatcher) {
+    for entry in walk.build() {
         let entry = entry.unwrap();
-        // multiple ways to check if is dir
-        // entry.metadata().unwrap().is_dir()
-        // entry.file_type().unwrap().is_dir();
-        // entry.path().is_dir()
-        if entry.metadata().unwrap().is_dir() {
+        if entry.path().is_dir() {
             continue;
         }
 
         let Ok(contents) = &std::fs::read_to_string(entry.path()) else {
             continue;
         };
-        println!("------------------------------");
-        println!("{:?}", entry.path());
-        println!("------------------------------");
+        // println!("{:?}", entry.path());
         let matches = matcher.search(&contents);
-        // dbg!(&matches);
-        for m in matches {
-            let psg = m.psg;
-            let start = m.location.start;
-            print!("[L{}:{}]", start.line, start.column);
-            println!(
-                "{} {}",
-                *psg.book,
-                psg.segments
-                    .iter()
-                    .map(|e| e.to_string())
-                    .collect::<Vec<_>>()
-                    .join("\n")
-            );
+        if matches.is_empty() {
+            continue;
         }
-        println!("------------------------------");
+        //     println!("------------------------------");
+        //     println!("{:?}", entry.path());
+        //     println!("------------------------------");
+        //     // dbg!(&matches);
+        //     for m in matches {
+        //         let psg = m.psg;
+        //         let start = m.location.start;
+        //         print!("[L{}:{}]: ", start.line, start.column);
+        //         println!(
+        //             "{} {}",
+        //             // *psg.book,
+        //             matcher
+        //                 .data()
+        //                 .books()
+        //                 .get_name(psg.book)
+        //                 .unwrap_or(&format!("Book {}", psg.book.0)),
+        //             psg.segments
+        //                 .iter()
+        //                 .map(|e| e.to_string())
+        //                 .collect::<Vec<_>>()
+        //                 .join("\n")
+        //         );
+        //     }
+        //     println!("------------------------------");
     }
+}
 
-    // let matcher = Arc::new(matcher);
-    // walk.run(|| {
-    //     Box::new(|entry| match entry {
-    //         Ok(entry) => {
-    //             // multiple ways to check if is dir
-    //             // entry.metadata().unwrap().is_dir()
-    //             // entry.file_type().unwrap().is_dir();
-    //             // entry.path().is_dir()
-    //             if entry.metadata().unwrap().is_dir() {
-    //                 return WalkState::Continue;
-    //             }
-    //
-    //             let Ok(contents) = &std::fs::read_to_string(entry.path()) else {
-    //                 return WalkState::Continue;
-    //             };
-    //             let matches = matcher.search(&contents);
-    //             dbg!(&matches);
-    //
-    //             results.lock().unwrap().extend(matches);
-    //             // results.lock().unwrap().push(entry.path().to_path_buf());
-    //
-    //             // println!("------------------------------");
-    //             // println!("{:?}", entry.path());
-    //             // println!("------------------------------");
-    //             //
-    //             // let file = File::open(entry.path()).unwrap();
-    //             // let reader = BufReader::new(file);
-    //             // for (idx, line) in reader.lines().enumerate() {
-    //             //     println!("{}. {}", idx, line.unwrap());
-    //             // }
-    //             // println!("------------------------------");
-    //             WalkState::Continue
-    //         }
-    //         Err(err) => {
-    //             eprintln!("Error: {}", err);
-    //             WalkState::Continue
-    //         }
-    //     })
-    // });
+pub fn run_multi_threaded(walk: WalkBuilder, matcher: BibleMatcher) {
+    let walk = walk.build_parallel();
+    let results: Arc<Mutex<Vec<_>>> = Arc::new(Mutex::new(Vec::new()));
+
+    walk.run(|| {
+        Box::new(|entry| match entry {
+            Ok(entry) => {
+                if entry.path().is_dir() {
+                    return WalkState::Continue;
+                }
+
+                let Ok(contents) = &std::fs::read_to_string(entry.path()) else {
+                    return WalkState::Continue;
+                };
+
+                let matches = matcher.search(&contents);
+                results
+                    .lock()
+                    .unwrap()
+                    .push((entry.path().to_path_buf(), matches));
+
+                WalkState::Continue
+            }
+            Err(err) => {
+                eprintln!("Error: {}", err);
+                WalkState::Continue
+            }
+        })
+    });
+
     // dbg!(results);
+}
+
+pub fn main() {
+    let args = Args::parse();
+    dbg!(&args);
+    let walk = WalkBuilder::new(args.files.get(0).unwrap_or(&PathBuf::from(".")));
+    let matcher = BibleMatcher::try_from(args).unwrap();
+
+    let timer = Instant::now();
+    run_single_threaded(walk.clone(), matcher.clone());
+    println!("Single Threaded: {}ms", timer.elapsed().as_millis());
+
+    let timer = Instant::now();
+    run_multi_threaded(walk.clone(), matcher.clone());
+    println!("Multi Threaded: {}ms", timer.elapsed().as_millis());
 }
 
 #[cfg(test)]

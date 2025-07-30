@@ -1,7 +1,7 @@
 use std::{
     borrow::Cow,
     collections::{BTreeMap, BTreeSet},
-    rc::Rc,
+    sync::Arc,
 };
 
 use once_cell::sync::Lazy;
@@ -23,11 +23,11 @@ use crate::data::books::{BookId, Books};
     derive_more::Deref,
     derive_more::DerefMut,
 )]
-pub struct GenreKey(Rc<String>);
+pub struct GenreKey(Arc<String>);
 
 impl GenreKey {
     pub fn new(s: String) -> Self {
-        Self(Rc::new(s))
+        Self(Arc::new(s))
     }
 }
 

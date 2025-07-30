@@ -19,6 +19,11 @@ impl Passage {
         }
         self.segments.contains_overlap(&other.segments)
     }
+
+    /// TODO: check if passage entirely contains the other passage
+    pub fn contains(&self, other: &Passage) -> bool {
+        todo!()
+    }
 }
 
 #[derive(Clone, Debug, Deref, DerefMut, Serialize, Deserialize, IntoIterator)]
