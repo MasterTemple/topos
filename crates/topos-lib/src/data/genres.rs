@@ -23,16 +23,22 @@ use crate::data::books::{BookId, Books};
     derive_more::Deref,
     derive_more::DerefMut,
 )]
-pub struct GenreKey(Arc<String>);
+// pub struct GenreKey(Arc<String>);
+pub struct GenreKey(u32);
 
 impl GenreKey {
-    pub fn new(s: String) -> Self {
-        Self(Arc::new(s))
+    // pub fn new(s: String) -> Self {
+    //     Self(Arc::new(s))
+    // }
+    //
+    pub fn new(id: u32) -> Self {
+        Self(id)
     }
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Genres {
+    id: u32,
     genres: BTreeMap<GenreKey, Genre>,
     /// Key/Abbreviation to Genre Title
     input_to_key: BTreeMap<String, GenreKey>,
@@ -43,10 +49,11 @@ impl Genres {
         let mut genres = BTreeMap::default();
         let mut key_to_genre = BTreeMap::default();
 
+        let mut id = 1;
         for genre in input.0.clone() {
             // use title as key
             let ab = Self::normalize_key(&genre.title);
-            let key = GenreKey::new(genre.title);
+            let key = GenreKey::new(id);
             key_to_genre.insert(ab, key.clone());
 
             // use normalized abbreviations as keys
@@ -71,9 +78,11 @@ impl Genres {
 
             // use title as the genre key
             genres.insert(key.clone(), genre);
+            id += 1;
         }
 
         let mut data = Self {
+            id,
             genres,
             input_to_key: key_to_genre,
             // genre_to_ids: genre_to_keys,

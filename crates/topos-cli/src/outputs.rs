@@ -1,3 +1,5 @@
+use std::time::Instant;
+
 use clap::ValueEnum;
 use topos_lib::matcher::matcher::BibleMatcher;
 
@@ -5,6 +7,8 @@ use crate::matches::PathMatches;
 
 #[derive(Copy, Clone, Debug, Default, ValueEnum)]
 pub enum OutputMode {
+    #[value(alias = "find", help = "Find matches and print total time")]
+    Count,
     #[value(alias = "j", help = "Output matches as JSON")]
     JSON,
     #[default]
@@ -29,11 +33,25 @@ impl OutputMode {
     */
     pub fn write(&self, matcher: &BibleMatcher, results: impl Iterator<Item = PathMatches>) {
         match self {
+            OutputMode::Count => print_time(matcher, results),
             OutputMode::JSON => print_json(matcher, results),
             OutputMode::Table => print_table(matcher, results),
             OutputMode::Quickfix => print_qf_list(matcher, results),
         }
     }
+}
+
+fn print_time(matcher: &BibleMatcher, results: impl Iterator<Item = PathMatches>) {
+    let start = Instant::now();
+    let mut count = 0;
+    for PathMatches { path, matches } in results {
+        let path = path
+            .map(|p| p.to_string_lossy().into_owned())
+            .unwrap_or_default();
+        count += matches.len();
+    }
+    println!("Matches: {}", start.elapsed().as_millis());
+    println!("Elapsed: {}ms", start.elapsed().as_millis());
 }
 
 fn print_json(matcher: &BibleMatcher, results: impl Iterator<Item = PathMatches>) {
