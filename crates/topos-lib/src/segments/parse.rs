@@ -13,6 +13,7 @@ use crate::segments::{segment::Segment, segments::Segments, units::chapter_verse
 /// and then collect digits joined by ranges `-–——⸺` or segments `,;` or chapters `:`
 static POST_BOOK_VALID_REFERENCE_SEGMENT_CHARACTERS: Lazy<Regex> =
     Lazy::new(|| Regex::new(r"^ *\d+( *[\.,:;\-–——⸺] *\d+)*").unwrap());
+// Lazy::new(|| Regex::new(r"^( *[\.,:;\-–——⸺] *\d+)*").unwrap());
 
 const ALL_DASHES: [char; 5] = ['-', '–', '—', '—', '⸺'];
 const SEGMENT_SPLITTERS: [char; 2] = [',', ';'];
@@ -21,12 +22,36 @@ static NON_SEGMENT_CHARACTERS: Lazy<Regex> = Lazy::new(|| Regex::new(r"[^\d,:;-]
 
 static TRAILING_NON_DIGITS: Lazy<Regex> = Lazy::new(|| Regex::new(r"(\D+$)").unwrap());
 
+/// This is a separate struct so that way I can see how much of the remaining str are actual segments (to get the corresponding end position)
+pub struct SegmentInput<'a> {
+    input: &'a str,
+}
+
+impl<'a> SegmentInput<'a> {
+    pub fn try_extract(input: &'a str) -> Option<Self> {
+        let input = POST_BOOK_VALID_REFERENCE_SEGMENT_CHARACTERS
+            .find_iter(input)
+            .next()?
+            .as_str();
+        Some(Self { input })
+    }
+    pub fn len(&self) -> usize {
+        self.input.len()
+    }
+}
+
 impl Segments {
-    pub fn parse(segment_input: &str) -> Result<Self, String> {
-        let input = match_and_sanitize_segment_input(segment_input)
+    pub fn parse<'a>(segment_input: SegmentInput<'a>) -> Result<Self, String> {
+        let input = sanitize_segment_input(segment_input.input)
             .ok_or_else(|| String::from("Failed to parse segments"))?;
         let segments = parse_reference_segments(&input);
         Ok(segments)
+    }
+
+    pub fn parse_str(segment_input: &str) -> Result<Self, String> {
+        let input = SegmentInput::try_extract(segment_input)
+            .ok_or_else(|| String::from("Failed to parse segments"))?;
+        Ok(Self::parse(input)?)
     }
 }
 
@@ -34,7 +59,7 @@ impl FromStr for Segments {
     type Err = String;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Self::parse(s)
+        Self::parse_str(s)
     }
 }
 
@@ -82,7 +107,7 @@ pub trait ParsableSegment: Sized + TryFrom<Segment, Error = String> {
     /// - There must only be **exactly 1** segment matched
     fn parse(input: &str) -> Result<Self, String> {
         Self::parse_strict(input).or_else(|_| {
-            let segments = Segments::parse(input).map_err(|_| {
+            let segments = Segments::parse_str(input).map_err(|_| {
                 format!(
                     "Could not parse any segments. Expected format '{}'",
                     Self::EXPECTED_FORMAT
@@ -112,7 +137,8 @@ impl FromStr for Segment {
     type Err = String;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let segments = Segments::parse(s).map_err(|_| format!("Could not parse any segments."))?;
+        let segments =
+            Segments::parse_str(s).map_err(|_| format!("Could not parse any segments."))?;
         if segments.is_empty() {
             Err(String::from("No segments found"))?
         }
@@ -124,14 +150,9 @@ impl FromStr for Segment {
     }
 }
 
-fn match_and_sanitize_segment_input(segment_input: &str) -> Option<String> {
-    let segment_match = POST_BOOK_VALID_REFERENCE_SEGMENT_CHARACTERS
-        .find_iter(segment_input)
-        .next()?
-        .as_str();
-
+fn sanitize_segment_input(input: &str) -> Option<String> {
     // swap weird hyphens with normal dash
-    let input = &segment_match.replace(ALL_DASHES, "-");
+    let input = &input.replace(ALL_DASHES, "-");
 
     // swap period with colon (to support 'Jn1.1')
     let input = &input.replace(".", ":");
@@ -241,128 +262,128 @@ fn parse_reference_segments(input: &str) -> Segments {
     Segments(segments)
 }
 
-// #[cfg(test)]
-// mod parse_tests {
-//     use super::*;
-//
-//     fn parse(input: &str) -> Vec<Segment> {
-//         let parsed = Segments::parse(input).unwrap();
-//         parsed.0
-//     }
-//
-//     // ChapterVerse: 1:2
-//     #[test]
-//     fn chapter_verse() {
-//         assert_eq!(parse("1:2"), vec![Segment::chapter_verse(1, 2)]);
-//
-//         assert_eq!(parse("1.2"), vec![Segment::chapter_verse(1, 2)]);
-//     }
-//
-//     // ChapterVerseRange: 1:2-3
-//     #[test]
-//     fn chapter_verse_range() {
-//         assert_eq!(parse("1:2-3"), vec![Segment::chapter_verse_range(1, 2, 3)]);
-//     }
-//
-//     // ChapterRange: 1:2-3:4
-//     #[test]
-//     fn chapter_range() {
-//         assert_eq!(parse("1:2-3:4"), vec![Segment::chapter_range(1, 2, 3, 4)]);
-//     }
-//
-//     // FullChapter: 1
-//     #[test]
-//     fn full_chapter() {
-//         assert_eq!(parse("1"), vec![Segment::full_chapter(1)]);
-//     }
-//
-//     // FullChapterRange: 1-2
-//     #[test]
-//     fn full_chapter_range() {
-//         assert_eq!(parse("1-2"), vec![Segment::full_chapter_range(1, 2)]);
-//     }
-//
-//     #[test]
-//     fn change_out_of_chapter() {
-//         assert_eq!(
-//             parse("1:1,3-4"),
-//             vec![
-//                 Segment::chapter_verse(1, 1),
-//                 Segment::chapter_verse_range(1, 3, 4),
-//             ]
-//         )
-//     }
-//
-//     // John 1,2-4,5:1-3,5,7-9,12-6:6,7:7-8:8
-//     #[test]
-//     fn combined() {
-//         // 1
-//         assert_eq!(parse("1"), vec![Segment::full_chapter(1),]);
-//
-//         // 1,2-4
-//         assert_eq!(
-//             parse("1,2-4"),
-//             vec![Segment::full_chapter(1), Segment::full_chapter_range(2, 4),]
-//         );
-//
-//         // 1,2-4,5:1-3
-//         assert_eq!(
-//             parse("1,2-4,5:1-3"),
-//             vec![
-//                 Segment::full_chapter(1),
-//                 Segment::full_chapter_range(2, 4),
-//                 Segment::chapter_verse_range(5, 1, 3),
-//             ]
-//         );
-//
-//         // 1,2-4,5:1-3,5
-//         assert_eq!(
-//             parse("1,2-4,5:1-3,5"),
-//             vec![
-//                 Segment::full_chapter(1),
-//                 Segment::full_chapter_range(2, 4),
-//                 Segment::chapter_verse_range(5, 1, 3),
-//                 Segment::chapter_verse(5, 5),
-//             ]
-//         );
-//
-//         // 1,2-4,5:1-3,5,7-9
-//         assert_eq!(
-//             parse("1,2-4,5:1-3,5,7-9"),
-//             vec![
-//                 Segment::full_chapter(1),
-//                 Segment::full_chapter_range(2, 4),
-//                 Segment::chapter_verse_range(5, 1, 3),
-//                 Segment::chapter_verse(5, 5),
-//                 Segment::chapter_verse_range(5, 7, 9),
-//             ]
-//         );
-//
-//         // 1,2-4,5:1-3,5,7-9,12-6:6
-//         assert_eq!(
-//             parse("1,2-4,5:1-3,5,7-9,12-6:6"),
-//             vec![
-//                 Segment::full_chapter(1),
-//                 Segment::full_chapter_range(2, 4),
-//                 Segment::chapter_verse_range(5, 1, 3),
-//                 Segment::chapter_verse(5, 5),
-//                 Segment::chapter_verse_range(5, 7, 9),
-//                 Segment::chapter_range(5, 12, 6, 6),
-//             ]
-//         );
-//
-//         // 1,2-4,5:1-3,5,7-9,12-6:6,7:7-8:8
-//         assert_eq!(
-//             parse("1,2-4,5:1-3,5,7-9,12-6:6,7:7-8:8"),
-//             vec![
-//                 Segment::full_chapter(1),
-//                 Segment::full_chapter_range(2, 4),
-//                 Segment::chapter_verse_range(5, 1, 3),
-//                 Segment::chapter_verse(5, 5),
-//                 Segment::chapter_verse_range(5, 7, 9),
-//                 Segment::chapter_range(5, 12, 6, 6),
-//                 Segment::chapter_range(7, 7, 8, 8),
-//             ]
-//         );
-//     }
-// }
+#[cfg(test)]
+mod parse_tests {
+    use super::*;
+
+    fn parse(input: &str) -> Vec<Segment> {
+        let parsed = Segments::parse_str(input).unwrap();
+        parsed.0
+    }
+
+    // ChapterVerse: 1:2
+    #[test]
+    fn chapter_verse() {
+        assert_eq!(parse("1:2"), vec![Segment::chapter_verse(1, 2)]);
+
+        assert_eq!(parse("1.2"), vec![Segment::chapter_verse(1, 2)]);
+    }
+
+    // ChapterVerseRange: 1:2-3
+    #[test]
+    fn chapter_verse_range() {
+        assert_eq!(parse("1:2-3"), vec![Segment::chapter_verse_range(1, 2, 3)]);
+    }
+
+    // ChapterRange: 1:2-3:4
+    #[test]
+    fn chapter_range() {
+        assert_eq!(parse("1:2-3:4"), vec![Segment::chapter_range(1, 2, 3, 4)]);
+    }
+
+    // FullChapter: 1
+    #[test]
+    fn full_chapter() {
+        assert_eq!(parse("1"), vec![Segment::full_chapter(1)]);
+    }
+
+    // FullChapterRange: 1-2
+    #[test]
+    fn full_chapter_range() {
+        assert_eq!(parse("1-2"), vec![Segment::full_chapter_range(1, 2)]);
+    }
+
+    #[test]
+    fn change_out_of_chapter() {
+        assert_eq!(
+            parse("1:1,3-4"),
+            vec![
+                Segment::chapter_verse(1, 1),
+                Segment::chapter_verse_range(1, 3, 4),
+            ]
+        )
+    }
+
+    // John 1,2-4,5:1-3,5,7-9,12-6:6,7:7-8:8
+    #[test]
+    fn combined() {
+        // 1
+        assert_eq!(parse("1"), vec![Segment::full_chapter(1),]);
+
+        // 1,2-4
+        assert_eq!(
+            parse("1,2-4"),
+            vec![Segment::full_chapter(1), Segment::full_chapter_range(2, 4),]
+        );
+
+        // 1,2-4,5:1-3
+        assert_eq!(
+            parse("1,2-4,5:1-3"),
+            vec![
+                Segment::full_chapter(1),
+                Segment::full_chapter_range(2, 4),
+                Segment::chapter_verse_range(5, 1, 3),
+            ]
+        );
+
+        // 1,2-4,5:1-3,5
+        assert_eq!(
+            parse("1,2-4,5:1-3,5"),
+            vec![
+                Segment::full_chapter(1),
+                Segment::full_chapter_range(2, 4),
+                Segment::chapter_verse_range(5, 1, 3),
+                Segment::chapter_verse(5, 5),
+            ]
+        );
+
+        // 1,2-4,5:1-3,5,7-9
+        assert_eq!(
+            parse("1,2-4,5:1-3,5,7-9"),
+            vec![
+                Segment::full_chapter(1),
+                Segment::full_chapter_range(2, 4),
+                Segment::chapter_verse_range(5, 1, 3),
+                Segment::chapter_verse(5, 5),
+                Segment::chapter_verse_range(5, 7, 9),
+            ]
+        );
+
+        // 1,2-4,5:1-3,5,7-9,12-6:6
+        assert_eq!(
+            parse("1,2-4,5:1-3,5,7-9,12-6:6"),
+            vec![
+                Segment::full_chapter(1),
+                Segment::full_chapter_range(2, 4),
+                Segment::chapter_verse_range(5, 1, 3),
+                Segment::chapter_verse(5, 5),
+                Segment::chapter_verse_range(5, 7, 9),
+                Segment::chapter_range(5, 12, 6, 6),
+            ]
+        );
+
+        // 1,2-4,5:1-3,5,7-9,12-6:6,7:7-8:8
+        assert_eq!(
+            parse("1,2-4,5:1-3,5,7-9,12-6:6,7:7-8:8"),
+            vec![
+                Segment::full_chapter(1),
+                Segment::full_chapter_range(2, 4),
+                Segment::chapter_verse_range(5, 1, 3),
+                Segment::chapter_verse(5, 5),
+                Segment::chapter_verse_range(5, 7, 9),
+                Segment::chapter_range(5, 12, 6, 6),
+                Segment::chapter_range(7, 7, 8, 8),
+            ]
+        );
+    }
+}

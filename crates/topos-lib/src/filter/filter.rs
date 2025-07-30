@@ -79,6 +79,10 @@ impl<'a> BibleFilter<'a> {
         &self.ids
     }
 
+    /**
+    The problem is that a RegEx isn't enough
+    I need to create/return a struct that contains that regex and the segment regex, so that
+    */
     pub fn create_regex(&self) -> Result<Regex, String> {
         let books_pattern: String = self
             .data
@@ -112,7 +116,7 @@ mod tests {
     #[test]
     fn make_regex() {
         let re = BibleFilter::default()
-            .add(Operation::Include(GenreFilter::new("Pauline")))
+            // .add(Operation::Include(GenreFilter::new("Pauline")))
             .create_regex()
             .unwrap();
         println!(r#"rg "{}""#, re.as_str());

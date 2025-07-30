@@ -20,6 +20,13 @@ use serde::{Deserialize, Serialize};
 )]
 pub struct BookId(pub u8);
 
+// How do I want to do this so that I am not creating tons of strings? should I use Cow<String>s?
+// pub struct BookInfo {
+//     id: BookId,
+//     name: String,
+//     abbrev: String,
+// }
+
 /// eventually this will have a locale so i can group by languages
 #[derive(Clone, Debug)]
 pub struct Books {
