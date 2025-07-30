@@ -9,10 +9,7 @@ use std::{
     thread,
     time::Instant,
 };
-use topos_lib::matcher::{
-    instance::BibleMatch,
-    matcher::{BibleMatcher, ThreadableBibleMatcher},
-};
+use topos_lib::matcher::{instance::BibleMatch, matcher::BibleMatcher};
 
 use ignore::{WalkBuilder, WalkState};
 

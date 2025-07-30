@@ -28,63 +28,6 @@ pub struct BibleMatcher {
 }
 
 impl BibleMatcher {
-    pub fn as_threadable<'a>(&'a self) -> ThreadableBibleMatcher<'a> {
-        ThreadableBibleMatcher {
-            data: self.data.as_ref(),
-            filtered_books: &self.filtered_books,
-            complex_filter: &self.complex_filter,
-        }
-    }
-}
-
-/// This is a reference holding struct for non-Arc multi-threading
-pub struct ThreadableBibleMatcher<'a> {
-    data: &'a BibleData,
-    /// The books to **not** match on aren't in this RegEx, so I won't process unnecessary books
-    filtered_books: &'a Regex,
-    /// These are so I can check if the matches overlap with these
-    complex_filter: &'a ComplexFilter,
-}
-
-impl<'a> ThreadableBibleMatcher<'a> {
-    /// How can I make it so that I can iter over lines and take a string input or a BufReader
-    /// input (I don't want to convert BufReader to a string because of performance overhead)
-    pub fn search(&self, input: &str) -> Vec<BibleMatch> {
-        // let mut matches: Vec<BibleMatch> = vec![];
-        let mut filtered = FilteredBibleMatches::new(&self.complex_filter);
-
-        let mut prev: Option<Match<'_>> = None;
-        let lookup = LineColLookup::new(input);
-        // basically execute behind by 1 iteration (so I can see the start of the next match)
-        for cur in self.filtered_books.captures_iter(input) {
-            // this is just the book name
-            let cur = cur.get(1).unwrap();
-            if let Some(prev) = prev {
-                if let Some(m) =
-                    BibleMatch::try_match(&lookup, self.data, input, prev, Some(cur.start()))
-                {
-                    filtered.try_add(m);
-                }
-            }
-            prev = Some(cur);
-        }
-
-        // handle last one
-        if let Some(prev) = prev {
-            if let Some(m) = BibleMatch::try_match(&lookup, self.data, input, prev, None) {
-                filtered.try_add(m);
-            }
-        }
-
-        return filtered.matches();
-    }
-
-    pub fn data(&self) -> &BibleData {
-        &self.data
-    }
-}
-
-impl BibleMatcher {
     pub fn new(data: Arc<BibleData>, filtered_books: Regex, complex_filter: ComplexFilter) -> Self {
         Self {
             data,
