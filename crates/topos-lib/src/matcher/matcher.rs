@@ -2,6 +2,7 @@ use std::collections::BTreeSet;
 
 use itertools::Itertools;
 use line_col::LineColLookup;
+use once_cell::sync::Lazy;
 use regex::{Match, Regex};
 
 use crate::{
@@ -17,6 +18,7 @@ use crate::{
     },
 };
 
+#[derive(Clone)]
 pub struct BibleMatcher<'a> {
     data: &'a BibleData<'a>,
     /// The books to **not** match on are removed from this RegEx, so I won't process unnecessary
@@ -72,6 +74,20 @@ impl<'a> BibleMatcher<'a> {
     }
 }
 
+static DEFAULT_MATCHER: Lazy<BibleMatcher<'static>> = Lazy::new(|| BibleMatcher::default());
+
+impl<'a> BibleMatcher<'a> {
+    pub fn base() -> &'static Self {
+        &DEFAULT_MATCHER
+    }
+}
+
+impl Default for BibleMatcher<'static> {
+    fn default() -> Self {
+        Self::base().clone()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::data::books::BookId;
@@ -85,22 +101,25 @@ mod tests {
 
     #[test]
     fn matcher() {
-        let data = BibleData::base();
-        let filtered_books = BibleFilter::default()
-            // .add(Operation::Include(GenreFilter::new("Pauline")))
-            .create_regex()
-            .unwrap();
+        // let data = BibleData::base();
+        // let filtered_books = BibleFilter::default()
+        //     // .add(Operation::Include(GenreFilter::new("Pauline")))
+        //     .create_regex()
+        //     .unwrap();
+        //
+        // let matcher = BibleFilter::default().create_matcher().unwrap();
+        let matcher = BibleMatcher::default();
 
         let john = BookId(43);
 
-        let matcher = BibleMatcher {
-            data,
-            filtered_books,
-            complex_filter: ComplexFilter::new(
-                vec![],
-                vec![Segments::parse_str("3:17-18").unwrap().with_book(john)],
-            ),
-        };
+        // let matcher = BibleMatcher {
+        //     data,
+        //     filtered_books,
+        //     complex_filter: ComplexFilter::new(
+        //         vec![Segments::parse_str("3").unwrap().with_book(john)],
+        //         vec![Segments::parse_str("3:17-18").unwrap().with_book(john)],
+        //     ),
+        // };
         let results = matcher.search(
             vec![
                 "Hello there",

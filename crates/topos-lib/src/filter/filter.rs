@@ -1,9 +1,13 @@
 use std::collections::BTreeSet;
 
 use itertools::Itertools;
+use once_cell::sync::Lazy;
 use regex::Regex;
 
-use crate::data::{books::BookId, data::BibleData};
+use crate::{
+    data::{books::BookId, data::BibleData},
+    matcher::{matcher::BibleMatcher, matches::ComplexFilter},
+};
 
 pub trait IsFilter {
     /// These are the ids that correspond to the argument, excluded or included
@@ -30,6 +34,7 @@ impl<T: IsFilter> IsFilter for Operation<T> {
     }
 }
 
+#[derive(Clone)]
 pub struct BibleFilter<'a> {
     data: &'a BibleData<'a>,
     /// indicates whether or not there has been an inclusion, which implicitly calls an exclusion
@@ -98,11 +103,27 @@ impl<'a> BibleFilter<'a> {
 
         Ok(book_regex)
     }
+
+    pub fn create_matcher(&self) -> Result<BibleMatcher, String> {
+        Ok(BibleMatcher::new(
+            self.data,
+            self.create_regex()?,
+            ComplexFilter::default(),
+        ))
+    }
 }
 
 impl Default for BibleFilter<'static> {
     fn default() -> Self {
         Self::new(BibleData::base())
+    }
+}
+
+static DEFAULT_FILTER: Lazy<BibleFilter<'static>> = Lazy::new(|| BibleFilter::default());
+
+impl<'a> BibleFilter<'a> {
+    pub fn base() -> &'static Self {
+        &DEFAULT_FILTER
     }
 }
 
