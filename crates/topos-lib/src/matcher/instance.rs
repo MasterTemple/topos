@@ -79,7 +79,7 @@ impl BibleMatch {
         let end = cur.end() + segment_input.len();
         let location = Location::new(&lookup, start, end);
 
-        let segments = Segments::parse(segment_input).ok()?;
+        let segments = Segments::parse(segment_input)?;
 
         Some(BibleMatch::new(location, book_id, segments))
     }

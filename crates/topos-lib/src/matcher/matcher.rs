@@ -102,7 +102,10 @@ mod tests {
     #[test]
     fn matcher() {
         let v = std::rc::Rc::new(true);
+        let v = v.clone();
         let v = v.to_owned();
+        let o = v.as_ref().clone();
+        let o = std::rc::Rc::into_inner(v);
         // let data = BibleData::base();
         // let filtered_books = BibleFilter::default()
         //     // .add(Operation::Include(GenreFilter::new("Pauline")))

@@ -41,17 +41,17 @@ impl<'a> SegmentInput<'a> {
 }
 
 impl Segments {
-    pub fn parse<'a>(segment_input: SegmentInput<'a>) -> Result<Self, String> {
-        let input = sanitize_segment_input(segment_input.input)
-            .ok_or_else(|| String::from("Failed to parse segments"))?;
+    pub fn parse<'a>(segment_input: SegmentInput<'a>) -> Option<Self> {
+        let input = sanitize_segment_input(segment_input.input)?;
+        // .ok_or_else(|| String::from("Failed to parse segments"))?;
         let segments = parse_reference_segments(&input);
-        Ok(segments)
+        Some(segments)
     }
 
-    pub fn parse_str(segment_input: &str) -> Result<Self, String> {
-        let input = SegmentInput::try_extract(segment_input)
-            .ok_or_else(|| String::from("Failed to parse segments"))?;
-        Ok(Self::parse(input)?)
+    pub fn parse_str(segment_input: &str) -> Option<Self> {
+        let input = SegmentInput::try_extract(segment_input)?;
+        // .ok_or_else(|| String::from("Failed to parse segments"))?;
+        Some(Self::parse(input)?)
     }
 }
 
@@ -59,7 +59,7 @@ impl FromStr for Segments {
     type Err = String;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Self::parse_str(s)
+        Self::parse_str(s).ok_or_else(|| String::from("Failed to parse segments"))
     }
 }
 
@@ -107,7 +107,7 @@ pub trait ParsableSegment: Sized + TryFrom<Segment, Error = String> {
     /// - There must only be **exactly 1** segment matched
     fn parse(input: &str) -> Result<Self, String> {
         Self::parse_strict(input).or_else(|_| {
-            let segments = Segments::parse_str(input).map_err(|_| {
+            let segments = Segments::parse_str(input).ok_or_else(|| {
                 format!(
                     "Could not parse any segments. Expected format '{}'",
                     Self::EXPECTED_FORMAT
@@ -138,7 +138,7 @@ impl FromStr for Segment {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let segments =
-            Segments::parse_str(s).map_err(|_| format!("Could not parse any segments."))?;
+            Segments::parse_str(s).ok_or_else(|| format!("Could not parse any segments."))?;
         if segments.is_empty() {
             Err(String::from("No segments found"))?
         }
