@@ -13,14 +13,7 @@ use topos_lib::{
     matcher::matcher::BibleMatcher,
 };
 
-#[derive(Clone, Debug, Default, ValueEnum)]
-pub enum OutputMode {
-    JSON,
-    #[default]
-    Table,
-    #[value(alias = "qflist", help = "A format for the Neovim Quickfix List")]
-    Quickfix,
-}
+use crate::outputs::OutputMode;
 
 /**
 - By positively specifying a testament/genre/book, you will implicitly telling the program to exclude the remaining items in that category.
