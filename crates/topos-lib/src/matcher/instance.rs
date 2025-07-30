@@ -41,9 +41,36 @@ impl Location {
 /**
 - This is the minimal amount of data needed for a match in order to do complex filtering
 - There will be a separate struct that will include file name, book name, book abbreviation, and so on
+
+I think this is the ideal representation, because a matcher could have the capacity to get different locations
+```ignore
+pub trait Matcher<Location> {
+    fn search(&self, input: PathOrContent) -> Option<Vec<BibleMatch<Location>>>;
+}
+
+impl Matcher<LineCol> for PlaintextMatcher {}
+impl Matcher<TextFragment> for PlaintextMatcher {}
+
+impl Matcher<Timestamp> for MediaMatcher {}
+
+impl Matcher<Page> for PDFMatcher {}
+impl Matcher<TextFragment> for PDFMatcher {}
+```
+
+but how will I parse, for example, timestamps from both SRT files and Whisper JSON files?
+perhaps have additional args/params to the search method?
+**no, make them part of the matcher struct**
+create child structs if I need them: `WhisperJSONMediaMatcher` and `SRTMediaMatcher`
+
+ideally, Location will be a big enum, so I don't have to deal with generics at the top level
+
+
 */
 #[derive(Clone, Debug)]
 pub struct BibleMatch {
+    // TODO: make this into context, where Minimal<Location> is just the location, but
+    // Verbose<Location> has the location and other things like the line, surrounding context
+    // NOTE: I should make location (and maybe context type too) into enums
     pub location: Location,
     /// I want this to be of type [`BookSegments`] so that way I can use the
     /// [`BookSegments::overlaps_with`] function

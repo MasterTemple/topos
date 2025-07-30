@@ -64,7 +64,7 @@ pub struct Args {
     // Testament filters
     #[clap(
         long = "testament",
-        short,
+        short = 't',
         help = "Include books from a specific testament (old/new)"
     )]
     pub testaments: Option<Vec<TestamentFilter>>,
@@ -78,7 +78,7 @@ pub struct Args {
     // Genre filters
     #[clap(
         long = "genre",
-        short,
+        short = 'g',
         help = "Include books of a specific genre (e.g. epistles, gospels)"
     )]
     pub genres: Option<Vec<String>>,
@@ -87,7 +87,11 @@ pub struct Args {
     pub exclude_genres: Option<Vec<String>>,
 
     // Book filters
-    #[clap(long = "book", short, help = "Include specific books (e.g. John)")]
+    #[clap(
+        long = "book",
+        short = 'b',
+        help = "Include specific books (e.g. John)"
+    )]
     pub books: Option<Vec<String>>,
 
     #[clap(long = "exclude-book", help = "Exclude specific books")]
@@ -141,6 +145,27 @@ pub struct Args {
     )]
     #[arg(value_enum)]
     pub mode: OutputMode,
+
+    #[clap(
+        long = "verbose",
+        short = 'v',
+        help = "Include more data about each match"
+    )]
+    pub versbose: bool,
+
+    #[clap(
+        long = "context",
+        short = 'c',
+        help = "Units of context",
+        default_value_t = 1
+    )]
+    pub context: u64,
+
+    #[clap(long = "before", help = "Context: Specify units before match")]
+    pub before_context: Option<u64>,
+
+    #[clap(long = "after", help = "Context: Specify units after match")]
+    pub after_context: Option<u64>,
 }
 
 impl TryFrom<Args> for BibleMatcher {

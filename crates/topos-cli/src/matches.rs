@@ -6,6 +6,7 @@ pub struct PathMatches {
     pub path: Option<PathBuf>,
     pub matches: Vec<BibleMatch>,
 }
+
 impl PathMatches {
     pub fn new(matches: Vec<BibleMatch>) -> Self {
         Self {

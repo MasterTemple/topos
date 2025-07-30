@@ -14,7 +14,19 @@ pub enum OutputMode {
     Quickfix,
 }
 
+/// But what about static methods, for things like column headers
+trait OutputEntryFormat {
+    fn json(self) -> String;
+    fn table(self) -> String;
+    fn quickfix(self) -> String;
+}
+
 impl OutputMode {
+    /**
+    TODO: this should not return an iterator of a struct, but an iterator of a type
+    This type should implement [`OutputEntryFormat`]
+    This is so that I can do different kinds of JSON outputs for example, based on the verbosity that the user requests (like context, ..)
+    */
     pub fn write(&self, matcher: &BibleMatcher, results: impl Iterator<Item = PathMatches>) {
         match self {
             OutputMode::JSON => print_json(matcher, results),
