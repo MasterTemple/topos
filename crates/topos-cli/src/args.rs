@@ -1,6 +1,13 @@
 use clap::Parser;
 use std::path::PathBuf;
-use topos_lib::filter::filters::testament::TestamentFilter;
+use topos_lib::{
+    data::genres::Genres,
+    filter::{
+        filter::{BibleFilter, IsFilter, Operation},
+        filters::{book::BookFilter, genre::GenreFilter, testament::TestamentFilter},
+    },
+    matcher::matcher::BibleMatcher,
+};
 
 /**
 - By positively specifying a testament/genre/book, you will implicitly telling the program to exclude the remaining items in that category.
@@ -92,31 +99,96 @@ pub struct Args {
         short = 'o',
         help = "Forbid search from matching a verse range (e.g. John 1:1-5)"
     )]
-    pub outisde: Option<Vec<String>>,
-
-    // Verse match mode
-    #[clap(long = "matches", help = "Check if the input is a valid Bible verse")]
-    pub matches: Option<String>,
-
-    // Boolean flags
-    #[clap(
-        long = "check",
-        group = "operation",
-        help = "Return true/false (or 0/1) if a verse is present"
-    )]
-    pub check: bool,
-
-    // Boolean flags
-    #[clap(long = "first", group = "operation", help = "Get first verse")]
-    pub first: bool,
-
-    #[clap(
-        long = "config",
-        // parse(from_os_str),
-        help = "Use a custom configuration file"
-    )]
-    pub config: Option<PathBuf>,
-
-    #[clap(long = "igonre", help = "Ignore when non-real books/genres are given")]
-    pub ignore_non_existent: bool,
+    pub outside: Option<Vec<String>>,
+    // // Verse match mode
+    // #[clap(long = "matches", help = "Check if the input is a valid Bible verse")]
+    // pub matches: Option<String>,
+    //
+    // // Boolean flags
+    // #[clap(
+    //     long = "check",
+    //     group = "operation",
+    //     help = "Return true/false (or 0/1) if a verse is present"
+    // )]
+    // pub check: bool,
+    //
+    // // Boolean flags
+    // #[clap(long = "first", group = "operation", help = "Get first verse")]
+    // pub first: bool,
+    //
+    // #[clap(
+    //     long = "config",
+    //     // parse(from_os_str),
+    //     help = "Use a custom configuration file"
+    // )]
+    // pub config: Option<PathBuf>,
+    //
+    // #[clap(long = "igonre", help = "Ignore when non-real books/genres are given")]
+    // pub ignore_non_existent: bool,
 }
+
+fn include_list<T: IsFilter>(filter: &mut BibleFilter, list: Option<Vec<T>>) {
+    if let Some(inside) = list {
+        for value in inside {
+            filter.include(value);
+        }
+    }
+}
+
+fn exclude_list<T: IsFilter>(filter: &mut BibleFilter, list: Option<Vec<T>>) {
+    if let Some(inside) = list {
+        for value in inside {
+            filter.exclude(value);
+        }
+    }
+}
+
+fn idk(args: Args) {
+    let filter = &mut BibleFilter::default();
+
+    if let Some(list) = args.testaments {
+        filter.include_many(list);
+    }
+
+    if let Some(list) = args.genres {
+        filter.include_many(list.into_iter().map(GenreFilter::new).collect());
+    }
+
+    if let Some(list) = args.books {
+        filter.include_many(list.into_iter().map(BookFilter::new).collect());
+    }
+
+    if let Some(list) = args.exclude_testaments {
+        filter.exclude_many(list);
+    }
+
+    if let Some(list) = args.exclude_genres {
+        filter.exclude_many(list.into_iter().map(GenreFilter::new).collect());
+    }
+
+    if let Some(list) = args.exclude_books {
+        filter.exclude_many(list.into_iter().map(BookFilter::new).collect());
+    }
+
+    if let Some(list) = args.inside {
+        for value in list {
+            filter.filter_inside(&value);
+        }
+    }
+
+    if let Some(list) = args.outside {
+        for value in list {
+            filter.filter_outside(&value);
+        }
+    }
+
+    filter;
+}
+
+// impl<'a> TryFrom<Args> for BibleMatcher<'a> {
+//     type Error = Box<dyn std::error::Error>;
+//
+//     fn try_from(value: Args) -> Result<Self, Self::Error> {
+//         todo!()
+//     }
+// }

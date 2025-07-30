@@ -7,6 +7,7 @@ use regex::Regex;
 use crate::{
     data::{books::BookId, data::BibleData},
     matcher::{matcher::BibleMatcher, matches::ComplexFilter},
+    segments::segments::BookSegments,
 };
 
 pub trait IsFilter {
@@ -43,6 +44,7 @@ pub struct BibleFilter<'a> {
     /// is no point in doing that, unless i am only doing an exclusion
     has_done_an_inclusion: bool,
     ids: BTreeSet<BookId>,
+    complex_filter: ComplexFilter,
 }
 
 impl<'a> BibleFilter<'a> {
@@ -50,10 +52,12 @@ impl<'a> BibleFilter<'a> {
         // this should start full
         let ids = (1..=66).map_into().collect();
         let has_done_an_inclusion = false;
+        let complex_filter = ComplexFilter::default();
         Self {
             data,
-            ids,
             has_done_an_inclusion,
+            ids,
+            complex_filter,
         }
     }
 
@@ -80,6 +84,26 @@ impl<'a> BibleFilter<'a> {
         self
     }
 
+    pub fn include<T: IsFilter>(&mut self, value: T) {
+        self.push(Operation::Include(value));
+    }
+
+    pub fn include_many<T: IsFilter>(&mut self, list: Vec<T>) {
+        for value in list {
+            self.include(value);
+        }
+    }
+
+    pub fn exclude<T: IsFilter>(&mut self, value: T) {
+        self.push(Operation::Exclude(value));
+    }
+
+    pub fn exclude_many<T: IsFilter>(&mut self, list: Vec<T>) {
+        for value in list {
+            self.exclude(value);
+        }
+    }
+
     pub fn ids(&self) -> &BTreeSet<BookId> {
         &self.ids
     }
@@ -104,11 +128,20 @@ impl<'a> BibleFilter<'a> {
         Ok(book_regex)
     }
 
-    pub fn create_matcher(&self) -> Result<BibleMatcher, String> {
+    pub fn filter_inside(&mut self, passage: &str) {
+        // self.data
+        // todo!()
+    }
+
+    pub fn filter_outside(&mut self, passage: &str) {
+        // todo!()
+    }
+
+    pub fn create_matcher(self) -> Result<BibleMatcher<'a>, String> {
         Ok(BibleMatcher::new(
             self.data,
             self.create_regex()?,
-            ComplexFilter::default(),
+            self.complex_filter,
         ))
     }
 }

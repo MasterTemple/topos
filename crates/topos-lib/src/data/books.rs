@@ -1,7 +1,11 @@
 use std::collections::BTreeMap;
 
+use itertools::Itertools;
 use once_cell::sync::Lazy;
+use regex::Regex;
 use serde::{Deserialize, Serialize};
+
+use crate::segments::segments::{BookSegments, Segments};
 
 /// This is not guaranteed to be a valid key, I just am using a unique type
 #[derive(
@@ -36,6 +40,8 @@ pub struct Books {
     book_id_to_name: BTreeMap<BookId, String>,
     /// map of book id to abbreviation (for display)
     book_id_to_abbreviation: BTreeMap<BookId, String>,
+    /// match any book; used to parse complex filters
+    passage_regex: Regex,
 }
 
 impl Books {
@@ -89,12 +95,29 @@ impl<'a> Books {
             }
         }
 
+        let books_pattern: String = abbreviations_to_book_id.keys().join("|");
+
+        let passage_regex = Regex::new(format!(r"\b(((?:)(?i){books_pattern}))\.?(.*)").as_str())
+            .map_err(|e| {
+            format!("Failed to compile book_regex because of bad user input.\n{e}")
+        })?;
+
         Ok(Books {
             // book_regex,
             input_to_book_id: abbreviations_to_book_id,
             book_id_to_name,
             book_id_to_abbreviation,
+            passage_regex,
         })
+    }
+
+    pub fn parse(&self, input: &str) -> Option<BookSegments> {
+        let m = &self.passage_regex.captures_iter(input).next()?;
+        let book = m.get(1)?.as_str();
+        let book = self.search(book)?;
+        let segments = m.get(2)?.as_str();
+        let segments = Segments::parse_str(segments).ok()?;
+        Some(segments.with_book(book))
     }
 
     pub fn normalize_book_name(name: &str) -> String {
@@ -115,7 +138,7 @@ impl<'a> Books {
 
 static DEFAULT_BOOKS: Lazy<Books> = Lazy::new(|| {
     let data = BooksInput::default();
-    Books::new(data).expect("The default provided data data should always compile")
+    Books::new(data).expect("The default provided books data should always compile")
 });
 
 /**

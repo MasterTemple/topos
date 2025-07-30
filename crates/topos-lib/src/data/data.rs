@@ -1,5 +1,7 @@
 use once_cell::sync::Lazy;
 
+use crate::segments::segments::BookSegments;
+
 use super::{books::Books, genres::Genres};
 
 pub struct BibleData<'a> {
@@ -15,6 +17,10 @@ impl<'a> BibleData<'a> {
     pub fn genres(&self) -> &Genres {
         &self.genres
     }
+
+    // pub fn parse(&self, input: &str) -> Option<BookSegments> {
+    //
+    // }
 }
 
 impl<'a> Default for BibleData<'a> {
