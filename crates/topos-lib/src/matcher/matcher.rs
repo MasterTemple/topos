@@ -1,3 +1,5 @@
+use std::collections::BTreeSet;
+
 use itertools::Itertools;
 use line_col::LineColLookup;
 use regex::{Match, Regex};
@@ -5,27 +7,39 @@ use regex::{Match, Regex};
 use crate::{
     data::data::BibleData,
     filter::filter::BibleFilter,
-    matcher::instance::{BibleInstance, Location},
-    segments::{parse::SegmentInput, segments::Segments},
+    matcher::instance::{BibleMatch, Location},
+    segments::{
+        parse::SegmentInput,
+        segments::{BookSegments, Segments},
+    },
 };
 
 pub struct BibleMatcher<'a> {
     data: &'a BibleData<'a>,
+    /// The books to **not** match on are removed from this RegEx, so I won't process unnecessary
+    /// books
     filtered_books: Regex,
+    /// These are so I can check if the matches overlap with these
+    complex_filter: Vec<BookSegments>,
 }
 
 impl<'a> BibleMatcher<'a> {
-    pub fn new(data: &'a BibleData<'a>, filtered_books: Regex) -> Self {
+    pub fn new(
+        data: &'a BibleData<'a>,
+        filtered_books: Regex,
+        complex_filter: Vec<BookSegments>,
+    ) -> Self {
         Self {
             data,
             filtered_books,
+            complex_filter,
         }
     }
 
     /// How can I make it so that I can iter over lines and take a string input or a BufReader
     /// input (I don't want to convert BufReader to a string because of performance overhead)
-    pub fn search(&self, input: &str) -> Vec<BibleInstance> {
-        let mut matches: Vec<BibleInstance> = vec![];
+    pub fn search(&self, input: &str) -> Vec<BibleMatch> {
+        let mut matches: Vec<BibleMatch> = vec![];
         let mut prev: Option<Match<'_>> = None;
         let lookup = LineColLookup::new(input);
         // basically execute behind once
@@ -34,13 +48,9 @@ impl<'a> BibleMatcher<'a> {
             let cur = cur.get(1).unwrap();
             match prev {
                 Some(prev) => {
-                    if let Some(m) = BibleInstance::try_process(
-                        &lookup,
-                        self.data,
-                        input,
-                        prev,
-                        Some(cur.start()),
-                    ) {
+                    if let Some(m) =
+                        BibleMatch::try_match(&lookup, self.data, input, prev, Some(cur.start()))
+                    {
                         matches.push(m);
                     }
                 }
@@ -51,7 +61,7 @@ impl<'a> BibleMatcher<'a> {
 
         // handle last one
         if let Some(prev) = prev {
-            if let Some(m) = BibleInstance::try_process(&lookup, self.data, input, prev, None) {
+            if let Some(m) = BibleMatch::try_match(&lookup, self.data, input, prev, None) {
                 matches.push(m);
             }
         }
@@ -79,6 +89,7 @@ mod tests {
         let matcher = BibleMatcher {
             data,
             filtered_books,
+            complex_filter: vec![],
         };
         let results = matcher.search(
             vec![

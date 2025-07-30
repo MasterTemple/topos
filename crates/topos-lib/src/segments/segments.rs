@@ -1,7 +1,25 @@
 use derive_more::{Deref, DerefMut, IntoIterator};
 use serde::{Deserialize, Serialize};
 
-use crate::segments::{segment::Segment, verse_bounds::VerseBounds};
+use crate::{
+    data::books::BookId,
+    segments::{segment::Segment, verse_bounds::VerseBounds},
+};
+
+#[derive(Clone, Debug)]
+pub struct BookSegments {
+    pub book: BookId,
+    pub segments: Segments,
+}
+
+impl BookSegments {
+    pub fn overlaps_with(&self, other: &BookSegments) -> bool {
+        if self.book != other.book {
+            return false;
+        }
+        self.segments.contains_overlap(&other.segments)
+    }
+}
 
 #[derive(Clone, Debug, Deref, DerefMut, Serialize, Deserialize, IntoIterator)]
 pub struct Segments(pub Vec<Segment>);
@@ -20,5 +38,12 @@ impl Segments {
     /// - I just need some way to order the segments and do it in linear time
     pub fn contains_overlap(&self, other: &Segments) -> bool {
         self.iter().any(|this| other.overlaps_with(this))
+    }
+
+    pub fn with_book(self, book_id: BookId) -> BookSegments {
+        BookSegments {
+            book: book_id,
+            segments: self,
+        }
     }
 }

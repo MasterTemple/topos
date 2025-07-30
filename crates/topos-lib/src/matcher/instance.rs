@@ -3,7 +3,10 @@ use regex::Match;
 
 use crate::{
     data::{books::BookId, data::BibleData},
-    segments::{parse::SegmentInput, segments::Segments},
+    segments::{
+        parse::SegmentInput,
+        segments::{BookSegments, Segments},
+    },
 };
 
 #[derive(Copy, Clone, Debug)]
@@ -35,26 +38,27 @@ impl Location {
     }
 }
 
+/**
+- This is the minimal amount of data needed for a match in order to do complex filtering
+- There will be a separate struct that will include file name, book name, book abbreviation, and so on
+*/
 #[derive(Clone, Debug)]
-pub struct BibleInstance {
-    // file: String,
+pub struct BibleMatch {
     location: Location,
-    // content: String,
-    book_id: BookId,
-    // book_name: String,
-    segments: Segments,
+    /// I want this to be of type [`BookSegments`] so that way I can use the
+    /// [`BookSegments::overlaps_with`] function
+    book_segments: BookSegments,
 }
 
-impl BibleInstance {
+impl BibleMatch {
     pub fn new(location: Location, book_id: BookId, segments: Segments) -> Self {
         Self {
             location,
-            book_id,
-            segments,
+            book_segments: segments.with_book(book_id),
         }
     }
 
-    pub fn try_process<'a>(
+    pub fn try_match<'a>(
         lookup: &LineColLookup,
         data: &'a BibleData<'a>,
         input: &str,
@@ -77,6 +81,6 @@ impl BibleInstance {
 
         let segments = Segments::parse(segment_input).ok()?;
 
-        Some(BibleInstance::new(location, book_id, segments))
+        Some(BibleMatch::new(location, book_id, segments))
     }
 }
