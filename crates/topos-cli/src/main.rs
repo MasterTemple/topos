@@ -7,7 +7,7 @@ use std::{
     thread,
     time::Instant,
 };
-use topos_lib::matcher::matcher::BibleMatcher;
+use topos_lib::matcher::matcher::{BibleMatcher, ThreadableBibleMatcher};
 
 use ignore::{WalkBuilder, WalkState};
 
@@ -15,49 +15,82 @@ use crate::args::Args;
 
 pub mod args;
 
-pub fn run_single_threaded(walk: WalkBuilder, matcher: BibleMatcher) {
-    for entry in walk.build() {
-        let entry = entry.unwrap();
-        if entry.path().is_dir() {
-            continue;
-        }
+// pub fn run_single_threaded(walk: WalkBuilder, matcher: BibleMatcherData) {
+//     for entry in walk.build() {
+//         let entry = entry.unwrap();
+//         if entry.path().is_dir() {
+//             continue;
+//         }
+//
+//         let Ok(contents) = &std::fs::read_to_string(entry.path()) else {
+//             continue;
+//         };
+//         // println!("{:?}", entry.path());
+//         let matches = matcher.search(&contents);
+//         if matches.is_empty() {
+//             continue;
+//         }
+//         //     println!("------------------------------");
+//         //     println!("{:?}", entry.path());
+//         //     println!("------------------------------");
+//         //     // dbg!(&matches);
+//         //     for m in matches {
+//         //         let psg = m.psg;
+//         //         let start = m.location.start;
+//         //         print!("[L{}:{}]: ", start.line, start.column);
+//         //         println!(
+//         //             "{} {}",
+//         //             // *psg.book,
+//         //             matcher
+//         //                 .data()
+//         //                 .books()
+//         //                 .get_name(psg.book)
+//         //                 .unwrap_or(&format!("Book {}", psg.book.0)),
+//         //             psg.segments
+//         //                 .iter()
+//         //                 .map(|e| e.to_string())
+//         //                 .collect::<Vec<_>>()
+//         //                 .join("\n")
+//         //         );
+//         //     }
+//         //     println!("------------------------------");
+//     }
+// }
 
-        let Ok(contents) = &std::fs::read_to_string(entry.path()) else {
-            continue;
-        };
-        // println!("{:?}", entry.path());
-        let matches = matcher.search(&contents);
-        if matches.is_empty() {
-            continue;
-        }
-        //     println!("------------------------------");
-        //     println!("{:?}", entry.path());
-        //     println!("------------------------------");
-        //     // dbg!(&matches);
-        //     for m in matches {
-        //         let psg = m.psg;
-        //         let start = m.location.start;
-        //         print!("[L{}:{}]: ", start.line, start.column);
-        //         println!(
-        //             "{} {}",
-        //             // *psg.book,
-        //             matcher
-        //                 .data()
-        //                 .books()
-        //                 .get_name(psg.book)
-        //                 .unwrap_or(&format!("Book {}", psg.book.0)),
-        //             psg.segments
-        //                 .iter()
-        //                 .map(|e| e.to_string())
-        //                 .collect::<Vec<_>>()
-        //                 .join("\n")
-        //         );
-        //     }
-        //     println!("------------------------------");
-    }
-}
+// pub fn run_multi_threaded(walk: WalkBuilder, matcher: BibleMatcherData) {
+//     let walk = walk.build_parallel();
+//     let results: Arc<Mutex<Vec<_>>> = Arc::new(Mutex::new(Vec::new()));
+//
+//     walk.run(|| {
+//         Box::new(|entry| match entry {
+//             Ok(entry) => {
+//                 if entry.path().is_dir() {
+//                     return WalkState::Continue;
+//                 }
+//
+//                 let Ok(contents) = &std::fs::read_to_string(entry.path()) else {
+//                     return WalkState::Continue;
+//                 };
+//
+//                 let matches = matcher.search(&contents);
+//                 results
+//                     .lock()
+//                     .unwrap()
+//                     .push((entry.path().to_path_buf(), matches));
+//
+//                 WalkState::Continue
+//             }
+//             Err(err) => {
+//                 eprintln!("Error: {}", err);
+//                 WalkState::Continue
+//             }
+//         })
+//     });
+//
+//     // dbg!(results);
+// }
 
-pub fn run_multi_threaded(walk: WalkBuilder, matcher: BibleMatcher) {
+pub fn run_multi_threaded_ref<'a>(walk: WalkBuilder, matcher: ThreadableBibleMatcher<'a>) {
     let walk = walk.build_parallel();
     let results: Arc<Mutex<Vec<_>>> = Arc::new(Mutex::new(Vec::new()));
 
@@ -87,6 +120,38 @@ pub fn run_multi_threaded(walk: WalkBuilder, matcher: BibleMatcher) {
         })
     });
 
+    let results = results.lock().unwrap().clone();
+    let total: usize = results.iter().map(|(_, list)| list.len()).sum();
+    println!("Matches Found: {}\n", total);
+
+    println!("| File | Line | Col | Verse |");
+    println!("| ---- | ---- | --- | ----- |");
+    for (file, matches) in results {
+        for m in matches {
+            let psg = m.psg;
+
+            let Some(book) = matcher.data().books().get_name(psg.book) else {
+                continue;
+            };
+
+            let segments = psg
+                .segments
+                .iter()
+                .map(|e| e.to_string())
+                .collect::<Vec<_>>()
+                .join(",");
+
+            let start = m.location.start;
+            println!(
+                "| {} | {} | {} | {} {} |",
+                file.to_string_lossy(),
+                start.line,
+                start.column,
+                book,
+                segments
+            )
+        }
+    }
     // dbg!(results);
 }
 
@@ -97,11 +162,14 @@ pub fn main() {
     let matcher = BibleMatcher::try_from(args).unwrap();
 
     let timer = Instant::now();
-    run_single_threaded(walk.clone(), matcher.clone());
-    println!("Single Threaded: {}ms", timer.elapsed().as_millis());
-
+    // run_single_threaded(walk.clone(), matcher.clone());
+    // println!("Single Threaded: {}ms", timer.elapsed().as_millis());
+    //
+    // let timer = Instant::now();
+    // run_multi_threaded(walk.clone(), matcher.clone());
+    // println!("Multi Threaded: {}ms", timer.elapsed().as_millis());
     let timer = Instant::now();
-    run_multi_threaded(walk.clone(), matcher.clone());
+    run_multi_threaded_ref(walk, matcher.as_threadable());
     println!("Multi Threaded: {}ms", timer.elapsed().as_millis());
 }
 

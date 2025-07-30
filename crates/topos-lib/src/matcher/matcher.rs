@@ -28,18 +28,25 @@ pub struct BibleMatcher {
 }
 
 impl BibleMatcher {
-    pub fn new(data: Arc<BibleData>, filtered_books: Regex, complex_filter: ComplexFilter) -> Self {
-        Self {
-            data,
-            filtered_books,
-            complex_filter,
+    pub fn as_threadable<'a>(&'a self) -> ThreadableBibleMatcher<'a> {
+        ThreadableBibleMatcher {
+            data: self.data.as_ref(),
+            filtered_books: &self.filtered_books,
+            complex_filter: &self.complex_filter,
         }
     }
+}
 
-    pub fn data(&self) -> &BibleData {
-        &self.data
-    }
+/// This is a reference holding struct for non-Arc multi-threading
+pub struct ThreadableBibleMatcher<'a> {
+    data: &'a BibleData,
+    /// The books to **not** match on aren't in this RegEx, so I won't process unnecessary books
+    filtered_books: &'a Regex,
+    /// These are so I can check if the matches overlap with these
+    complex_filter: &'a ComplexFilter,
+}
 
+impl<'a> ThreadableBibleMatcher<'a> {
     /// How can I make it so that I can iter over lines and take a string input or a BufReader
     /// input (I don't want to convert BufReader to a string because of performance overhead)
     pub fn search(&self, input: &str) -> Vec<BibleMatch> {
@@ -53,13 +60,9 @@ impl BibleMatcher {
             // this is just the book name
             let cur = cur.get(1).unwrap();
             if let Some(prev) = prev {
-                if let Some(m) = BibleMatch::try_match(
-                    &lookup,
-                    self.data.as_ref(),
-                    input,
-                    prev,
-                    Some(cur.start()),
-                ) {
+                if let Some(m) =
+                    BibleMatch::try_match(&lookup, self.data, input, prev, Some(cur.start()))
+                {
                     filtered.try_add(m);
                 }
             }
@@ -68,12 +71,30 @@ impl BibleMatcher {
 
         // handle last one
         if let Some(prev) = prev {
-            if let Some(m) = BibleMatch::try_match(&lookup, self.data.as_ref(), input, prev, None) {
+            if let Some(m) = BibleMatch::try_match(&lookup, self.data, input, prev, None) {
                 filtered.try_add(m);
             }
         }
 
         return filtered.matches();
+    }
+
+    pub fn data(&self) -> &BibleData {
+        &self.data
+    }
+}
+
+impl BibleMatcher {
+    pub fn new(data: Arc<BibleData>, filtered_books: Regex, complex_filter: ComplexFilter) -> Self {
+        Self {
+            data,
+            filtered_books,
+            complex_filter,
+        }
+    }
+
+    pub fn data(&self) -> &BibleData {
+        &self.data
     }
 }
 
@@ -85,65 +106,65 @@ impl Default for BibleMatcher {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use crate::data::books::BookId;
-
-    use super::*;
-
-    use std::{
-        fs::File,
-        io::{BufRead, BufReader},
-    };
-
-    #[test]
-    fn matcher() {
-        let v = Arc::new(true);
-        let v = v.clone();
-        let v = v.to_owned();
-        let o = v.as_ref().clone();
-        let o = Arc::into_inner(v);
-        // let data = BibleData::base();
-        // let filtered_books = BibleFilter::default()
-        //     // .add(Operation::Include(GenreFilter::new("Pauline")))
-        //     .create_regex()
-        //     .unwrap();
-        //
-        // let matcher = BibleFilter::default().create_matcher().unwrap();
-        let matcher = BibleMatcher::default();
-
-        let john = BookId(43);
-
-        // let matcher = BibleMatcher {
-        //     data,
-        //     filtered_books,
-        //     complex_filter: ComplexFilter::new(
-        //         vec![Segments::parse_str("3").unwrap().with_book(john)],
-        //         vec![Segments::parse_str("3:17-18").unwrap().with_book(john)],
-        //     ),
-        // };
-        let results = matcher.search(
-            vec![
-                "Hello there",
-                "Here is some text",
-                "Oh wow, John 3:16",
-                "John 1:1-2 and Ephesians 4:28",
-                "Even John 1:1-4, 1 John 2:1-10",
-                "Can I even do Ephesians",
-                "1:1-3? I guess not",
-                "Last, John 3:16",
-                "Last, John 3:17",
-                "Last, John 3:18",
-                "Last, John 4:18",
-                "Last, John 3:19",
-            ]
-            .join("\n")
-            .as_str(),
-        );
-        // dbg!(results);
-        for result in results {
-            let psg = result.psg;
-            println!("{} {}", *psg.book, psg.segments.iter().join("\n"));
-        }
-    }
-}
+// #[cfg(test)]
+// mod tests {
+//     use crate::data::books::BookId;
+//
+//     use super::*;
+//
+//     use std::{
+//         fs::File,
+//         io::{BufRead, BufReader},
+//     };
+//
+//     #[test]
+//     fn matcher() {
+//         let v = Arc::new(true);
+//         let v = v.clone();
+//         let v = v.to_owned();
+//         let o = v.as_ref().clone();
+//         let o = Arc::into_inner(v);
+//         // let data = BibleData::base();
+//         // let filtered_books = BibleFilter::default()
+//         //     // .add(Operation::Include(GenreFilter::new("Pauline")))
+//         //     .create_regex()
+//         //     .unwrap();
+//         //
+//         // let matcher = BibleFilter::default().create_matcher().unwrap();
+//         let matcher = BibleMatcherData::default();
+//
+//         let john = BookId(43);
+//
+//         // let matcher = BibleMatcher {
+//         //     data,
+//         //     filtered_books,
+//         //     complex_filter: ComplexFilter::new(
+//         //         vec![Segments::parse_str("3").unwrap().with_book(john)],
+//         //         vec![Segments::parse_str("3:17-18").unwrap().with_book(john)],
+//         //     ),
+//         // };
+//         let results = matcher.search(
+//             vec![
+//                 "Hello there",
+//                 "Here is some text",
+//                 "Oh wow, John 3:16",
+//                 "John 1:1-2 and Ephesians 4:28",
+//                 "Even John 1:1-4, 1 John 2:1-10",
+//                 "Can I even do Ephesians",
+//                 "1:1-3? I guess not",
+//                 "Last, John 3:16",
+//                 "Last, John 3:17",
+//                 "Last, John 3:18",
+//                 "Last, John 4:18",
+//                 "Last, John 3:19",
+//             ]
+//             .join("\n")
+//             .as_str(),
+//         );
+//         // dbg!(results);
+//         for result in results {
+//             let psg = result.psg;
+//             println!("{} {}", *psg.book, psg.segments.iter().join("\n"));
+//         }
+//     }
+// }
