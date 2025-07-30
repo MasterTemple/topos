@@ -97,7 +97,7 @@ impl Books {
 
         let books_pattern: String = abbreviations_to_book_id.keys().join("|");
 
-        let passage_regex = Regex::new(format!(r"\b(((?:)(?i){books_pattern}))\.?(.*)").as_str())
+        let passage_regex = Regex::new(format!(r"\b((?:)(?i){books_pattern})\b\.?(.*)").as_str())
             .map_err(|e| {
             format!("Failed to compile book_regex because of bad user input.\n{e}")
         })?;
@@ -140,11 +140,6 @@ static DEFAULT_BOOKS: Lazy<Books> = Lazy::new(|| {
     let data = BooksInput::default();
     Books::new(data).expect("The default provided books data should always compile")
 });
-
-// static DEFAULT_BOOKS: Lazy<Arc<Books>> = Lazy::new(|| {
-//     let data = BooksInput::default();
-//     Arc::new(Books::new(data).expect("The default provided books data should always compile"))
-// });
 
 /**
 Example:

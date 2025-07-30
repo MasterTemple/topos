@@ -21,8 +21,7 @@ use crate::{
 #[derive(Clone, Debug)]
 pub struct BibleMatcher {
     data: Rc<BibleData>,
-    /// The books to **not** match on are removed from this RegEx, so I won't process unnecessary
-    /// books
+    /// The books to **not** match on aren't in this RegEx, so I won't process unnecessary books
     filtered_books: Regex,
     /// These are so I can check if the matches overlap with these
     complex_filter: ComplexFilter,
@@ -73,14 +72,6 @@ impl BibleMatcher {
         return filtered.matches();
     }
 }
-
-// static DEFAULT_MATCHER: Lazy<BibleMatcher<'static>> = Lazy::new(|| BibleMatcher::default());
-//
-// impl BibleMatcher {
-//     pub fn base() -> &'static Self {
-//         &DEFAULT_MATCHER
-//     }
-// }
 
 impl Default for BibleMatcher {
     fn default() -> Self {

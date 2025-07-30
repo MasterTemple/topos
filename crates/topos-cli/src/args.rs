@@ -89,7 +89,7 @@ pub struct Args {
     #[clap(
         long = "inside",
         short = 'i',
-        help = "Limit search to a verse range (e.g. John 1:1-5)"
+        help = "Limit search to a verse range (e.g. John 1:2-3)"
     )]
     pub inside: Option<Vec<String>>,
 
@@ -97,7 +97,7 @@ pub struct Args {
     #[clap(
         long = "outside",
         short = 'o',
-        help = "Forbid search from matching a verse range (e.g. John 1:1-5)"
+        help = "Forbid search from matching a verse range (e.g. John 3:4-5)"
     )]
     pub outside: Option<Vec<String>>,
     // // Verse match mode
@@ -127,54 +127,49 @@ pub struct Args {
     // pub ignore_non_existent: bool,
 }
 
-fn idk(args: Args) {
-    // TODO: get alternate Bible/Genre data
-    let mut filter = BibleFilter::default();
-
-    if let Some(list) = args.testaments {
-        filter.include_many(list);
-    }
-
-    if let Some(list) = args.genres {
-        filter.include_many(list.into_iter().map(GenreFilter::new).collect());
-    }
-
-    if let Some(list) = args.books {
-        filter.include_many(list.into_iter().map(BookFilter::new).collect());
-    }
-
-    if let Some(list) = args.exclude_testaments {
-        filter.exclude_many(list);
-    }
-
-    if let Some(list) = args.exclude_genres {
-        filter.exclude_many(list.into_iter().map(GenreFilter::new).collect());
-    }
-
-    if let Some(list) = args.exclude_books {
-        filter.exclude_many(list.into_iter().map(BookFilter::new).collect());
-    }
-
-    if let Some(list) = args.inside {
-        for value in list {
-            filter.filter_inside(&value);
-        }
-    }
-
-    if let Some(list) = args.outside {
-        for value in list {
-            filter.filter_outside(&value);
-        }
-    }
-
-    let matcher = filter.create_matcher().unwrap();
-    // matcher
-}
-
 impl TryFrom<Args> for BibleMatcher {
     type Error = Box<dyn std::error::Error>;
 
-    fn try_from(value: Args) -> Result<Self, Self::Error> {
-        todo!()
+    fn try_from(args: Args) -> Result<Self, Self::Error> {
+        // TODO: get alternate Bible/Genre data
+        let mut filter = BibleFilter::default();
+
+        if let Some(list) = args.testaments {
+            filter.include_many(list);
+        }
+
+        if let Some(list) = args.genres {
+            filter.include_many(list.into_iter().map(GenreFilter::new).collect());
+        }
+
+        if let Some(list) = args.books {
+            filter.include_many(list.into_iter().map(BookFilter::new).collect());
+        }
+
+        if let Some(list) = args.exclude_testaments {
+            filter.exclude_many(list);
+        }
+
+        if let Some(list) = args.exclude_genres {
+            filter.exclude_many(list.into_iter().map(GenreFilter::new).collect());
+        }
+
+        if let Some(list) = args.exclude_books {
+            filter.exclude_many(list.into_iter().map(BookFilter::new).collect());
+        }
+
+        if let Some(list) = args.inside {
+            for value in list {
+                filter.filter_inside(&value);
+            }
+        }
+
+        if let Some(list) = args.outside {
+            for value in list {
+                filter.filter_outside(&value);
+            }
+        }
+
+        Ok(filter.create_matcher()?)
     }
 }
