@@ -127,24 +127,9 @@ pub struct Args {
     // pub ignore_non_existent: bool,
 }
 
-fn include_list<T: IsFilter>(filter: &mut BibleFilter, list: Option<Vec<T>>) {
-    if let Some(inside) = list {
-        for value in inside {
-            filter.include(value);
-        }
-    }
-}
-
-fn exclude_list<T: IsFilter>(filter: &mut BibleFilter, list: Option<Vec<T>>) {
-    if let Some(inside) = list {
-        for value in inside {
-            filter.exclude(value);
-        }
-    }
-}
-
 fn idk(args: Args) {
-    let filter = &mut BibleFilter::default();
+    // TODO: get alternate Bible/Genre data
+    let mut filter = BibleFilter::default();
 
     if let Some(list) = args.testaments {
         filter.include_many(list);
@@ -182,13 +167,14 @@ fn idk(args: Args) {
         }
     }
 
-    filter;
+    let matcher = filter.create_matcher().unwrap();
+    // matcher
 }
 
-// impl<'a> TryFrom<Args> for BibleMatcher<'a> {
-//     type Error = Box<dyn std::error::Error>;
-//
-//     fn try_from(value: Args) -> Result<Self, Self::Error> {
-//         todo!()
-//     }
-// }
+impl<'a> TryFrom<Args> for BibleMatcher<'a> {
+    type Error = Box<dyn std::error::Error>;
+
+    fn try_from(value: Args) -> Result<Self, Self::Error> {
+        todo!()
+    }
+}

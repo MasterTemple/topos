@@ -4,6 +4,7 @@ use crate::segments::segments::Passage;
 
 use super::{books::Books, genres::Genres};
 
+#[derive(Clone, Debug)]
 pub struct BibleData<'a> {
     books: Books,
     genres: Genres<'a>,

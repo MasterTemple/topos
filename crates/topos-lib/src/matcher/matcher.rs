@@ -18,7 +18,7 @@ use crate::{
     },
 };
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct BibleMatcher<'a> {
     data: &'a BibleData<'a>,
     /// The books to **not** match on are removed from this RegEx, so I won't process unnecessary
