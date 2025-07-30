@@ -2,6 +2,7 @@ use std::path::PathBuf;
 
 use topos_lib::matcher::{instance::BibleMatch, matcher::BibleMatcher};
 
+#[derive(Clone, Debug)]
 pub struct PathMatches {
     pub path: Option<PathBuf>,
     pub matches: Vec<BibleMatch>,

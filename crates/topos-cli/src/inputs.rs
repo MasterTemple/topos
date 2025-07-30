@@ -63,25 +63,20 @@ impl Default for InputType {
 
 fn handle_dir(path: PathBuf, matcher: BibleMatcher) -> impl Iterator<Item = PathMatches> {
     let walk = WalkBuilder::new(path);
-    let receiver = run_multi_threaded_streaming(walk, matcher);
+    let receiver = run_multi_threaded_streaming(walk, &matcher);
     receiver.into_iter()
 }
 
-fn run_multi_threaded_streaming<'a>(
+fn run_multi_threaded_streaming<'scope>(
     walk: WalkBuilder,
-    matcher: BibleMatcher,
+    matcher: &'scope BibleMatcher,
 ) -> Receiver<PathMatches> {
     let (sender, receiver) = unbounded();
-
-    // Clone the matcher so it can be moved into the thread
-    let matcher = Arc::new(matcher);
     let walk = walk.build_parallel();
 
-    // Spawn the parallel walk in a background thread
-    std::thread::spawn(move || {
+    std::thread::scope(|_| {
         walk.run(|| {
             let sender = sender.clone();
-            let matcher = Arc::clone(&matcher);
 
             Box::new(move |entry| {
                 match entry {
@@ -90,10 +85,8 @@ fn run_multi_threaded_streaming<'a>(
                             return WalkState::Continue;
                         }
                         let path = entry.path().to_path_buf();
-                        let matches = PathMatches::from_file(path, matcher.as_ref());
-                        // Send result to channel
+                        let matches = PathMatches::from_file(path, matcher);
                         if sender.send(matches).is_err() {
-                            // Receiver was dropped, stop early
                             return WalkState::Quit;
                         }
                     }

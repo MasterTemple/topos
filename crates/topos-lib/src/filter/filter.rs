@@ -37,7 +37,8 @@ impl<T: IsFilter> IsFilter for Operation<T> {
 
 #[derive(Clone)]
 pub struct BibleFilter {
-    data: Arc<BibleData>,
+    // data: Arc<BibleData>,
+    data: BibleData,
     /// indicates whether or not there has been an inclusion, which implicitly calls an exclusion
     /// on all the original data
     /// i dont need to use this if an exclusion is called at the beginning, but then again, there
@@ -48,7 +49,7 @@ pub struct BibleFilter {
 }
 
 impl BibleFilter {
-    pub fn new(data: Arc<BibleData>) -> Self {
+    pub fn new(data: BibleData) -> Self {
         // this should start full
         let ids = (1..=66).map_into().collect();
         let has_done_an_inclusion = false;
@@ -62,7 +63,7 @@ impl BibleFilter {
     }
 
     pub fn push<T: IsFilter>(&mut self, op: Operation<T>) {
-        let ids = op.get_ids(self.data.as_ref());
+        let ids = op.get_ids(&self.data);
 
         match op {
             Operation::Include(_) => {
@@ -148,7 +149,8 @@ impl BibleFilter {
 
 impl Default for BibleFilter {
     fn default() -> Self {
-        Self::new(Arc::new(BibleData::default()))
+        // Self::new(Arc::new(BibleData::default()))
+        Self::new(BibleData::default())
     }
 }
 

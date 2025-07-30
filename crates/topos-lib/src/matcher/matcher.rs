@@ -20,7 +20,8 @@ use crate::{
 
 #[derive(Clone, Debug)]
 pub struct BibleMatcher {
-    data: Arc<BibleData>,
+    // data: Arc<BibleData>,
+    data: BibleData,
     /// The books to **not** match on aren't in this RegEx, so I won't process unnecessary books
     filtered_books: Regex,
     /// These are so I can check if the matches overlap with these
@@ -28,7 +29,8 @@ pub struct BibleMatcher {
 }
 
 impl BibleMatcher {
-    pub fn new(data: Arc<BibleData>, filtered_books: Regex, complex_filter: ComplexFilter) -> Self {
+    // pub fn new(data: Arc<BibleData>, filtered_books: Regex, complex_filter: ComplexFilter) -> Self {
+    pub fn new(data: BibleData, filtered_books: Regex, complex_filter: ComplexFilter) -> Self {
         Self {
             data,
             filtered_books,
@@ -51,7 +53,8 @@ impl BibleMatcher {
             if let Some(prev) = prev {
                 if let Some(m) = BibleMatch::try_match(
                     &lookup,
-                    self.data.as_ref(),
+                    // self.data.as_ref(),
+                    &self.data,
                     input,
                     prev,
                     Some(cur.start()),
@@ -64,7 +67,7 @@ impl BibleMatcher {
 
         // handle last one
         if let Some(prev) = prev {
-            if let Some(m) = BibleMatch::try_match(&lookup, self.data.as_ref(), input, prev, None) {
+            if let Some(m) = BibleMatch::try_match(&lookup, &self.data, input, prev, None) {
                 filtered.try_add(m);
             }
         }
