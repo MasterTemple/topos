@@ -5,8 +5,14 @@ use crate::{
         books::BookId,
         chapter_verses::{BookChapterVerses, ChapterVerses},
     },
+    matcher::{
+        instance::{BibleMatch, Location, Position},
+        matcher::BibleMatcher,
+    },
     segments::{
-        segment::Segment, segments::Segments, units::chapter_verse::ChapterVerse,
+        segment::Segment,
+        segments::{Passage, Segments},
+        units::chapter_verse::ChapterVerse,
         verse_bounds::VerseBounds,
     },
 };
@@ -14,8 +20,6 @@ use crate::{
 // pub struct SegmentAutoCompleter {
 //     chapter_verses: BookChapterVerses,
 // }
-
-pub struct SegmentAutoCompleter(BookChapterVerses);
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum SegmentJoiner {
@@ -29,6 +33,40 @@ pub enum SegmentJoiner {
     /// - There should not be 2 of these in a row
     Chapter,
 }
+
+pub struct InputAutoCompleter<'a> {
+    matcher: &'a BibleMatcher,
+    completer: &'a SegmentAutoCompleter,
+}
+
+impl<'a> InputAutoCompleter<'a> {
+    pub fn new(matcher: &'a BibleMatcher, completer: &'a SegmentAutoCompleter) -> Self {
+        Self { matcher, completer }
+    }
+    pub fn suggest(&self, input: &str) -> Option<Vec<Segments>> {
+        let mat = self.matcher.find(input)?;
+        dbg!(&mat);
+        let Passage { book, segments } = &mat.psg;
+        let Position { line, column } = &mat.location.end;
+
+        let line = input.lines().nth(line - 1)?;
+        dbg!(&line);
+        let remaining = &line[column - 1..];
+        dbg!(&remaining);
+        let joiner = match remaining.trim() {
+            ":" => Some(SegmentJoiner::Chapter),
+            "-" => Some(SegmentJoiner::Range),
+            // d if ALL_DASHES.contains(d) => Some(SegmentJoiner::Range),
+            "." | "," => Some(SegmentJoiner::Separate),
+            "" => None,
+            _ => None?,
+        };
+
+        self.completer.suggest(book, segments, joiner)
+    }
+}
+
+pub struct SegmentAutoCompleter(BookChapterVerses);
 
 impl SegmentAutoCompleter {
     pub fn suggest(
@@ -89,9 +127,6 @@ impl SegmentAutoCompleter {
                 vec![]
             }
         };
-        let remaining_chapters = (current_chapter + 1..=last_chapter)
-            .map(|ch| Segment::full_chapter(ch))
-            .collect_vec();
 
         Some(match joiner {
             // if the joiner is a range, I will want to add
@@ -106,6 +141,20 @@ impl SegmentAutoCompleter {
                     prev.push(seg);
                     results.push(prev);
                 }
+
+                let remaining_chapters = if let Some(current_verse) = current_verse {
+                    (current_chapter + 1..=last_chapter)
+                        // BUG: I need some kind of way to indicate that the range is to the next
+                        // chapter, but where it does not have the starting verse; this should be a
+                        // separate segment type
+                        .map(|ch| Segment::chapter_range(current_chapter, current_verse, ch, 1))
+                        .collect_vec()
+                } else {
+                    (current_chapter + 1..=last_chapter)
+                        .map(|ch| Segment::full_chapter_range(current_chapter, ch))
+                        .collect_vec()
+                };
+
                 for seg in remaining_chapters {
                     let mut prev = before_range.clone();
                     prev.push(seg);
@@ -122,6 +171,10 @@ impl SegmentAutoCompleter {
                     prev.push(seg);
                     results.push(prev);
                 }
+                let remaining_chapters = (current_chapter + 1..=last_chapter)
+                    .map(|ch| Segment::full_chapter(ch))
+                    .collect_vec();
+
                 for seg in remaining_chapters {
                     let mut prev = segments.clone();
                     prev.push(seg);
@@ -132,8 +185,10 @@ impl SegmentAutoCompleter {
             // I will only suggest verses after the user has given a `:`
             SegmentJoiner::Chapter => {
                 let mut results = vec![];
+                let mut before_range = segments.clone();
+                before_range.pop();
                 for seg in remaining_verses {
-                    let mut prev = segments.clone();
+                    let mut prev = before_range.clone();
                     prev.push(seg);
                     results.push(prev);
                 }
@@ -252,5 +307,22 @@ mod tests {
         assert_eq!(genesis("1:2-3, 5-8", Separate), 49 + 23);
 
         // ---
+    }
+
+    #[test]
+    fn suggest() {
+        let completer = SegmentAutoCompleter(BookChapterVerses::default());
+        let matcher = BibleMatcher::default();
+        let completer = InputAutoCompleter::new(&matcher, &completer);
+
+        for (idx, suggestion) in completer
+            // .suggest("Genesis 1:1-")
+            .suggest("Genesis 1:1-2,")
+            .unwrap()
+            .iter()
+            .enumerate()
+        {
+            println!("{}. '{}'", idx, suggestion);
+        }
     }
 }

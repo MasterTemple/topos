@@ -65,6 +65,19 @@ impl BibleMatcher {
         return filtered.matches();
     }
 
+    pub fn find(&self, input: &str) -> Option<BibleMatch> {
+        let mut filtered = FilteredBibleMatches::new(&self.complex_filter);
+        let lookup = LineColLookup::new(input);
+
+        let first = self.filtered_books.captures_iter(input).next()?.get(1)?;
+
+        filtered.try_add(BibleMatch::try_match(
+            &lookup, &self.data, input, first, None,
+        )?);
+
+        return filtered.matches().into_iter().next();
+    }
+
     pub fn data(&self) -> &BibleData {
         &self.data
     }
