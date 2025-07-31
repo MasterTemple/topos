@@ -5,9 +5,11 @@ edition = "2024"
 
 [dependencies]
 derive_more = { version = "2.0.1", features = ["deref", "deref_mut", "from", "into_iterator"] }
-itertools = "0.14.0"
 line-col = "0.2.1"
 once_cell = "1.21.3"
-regex = "1.11.1"
-serde = { version = "1.0.219", features = ["derive", "rc"] }
-serde_json = "1.0.141"
+
+# workspace dependencies
+regex = { workspace = true }
+itertools = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }

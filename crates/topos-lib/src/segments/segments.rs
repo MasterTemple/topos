@@ -6,7 +6,7 @@ use crate::{
     segments::{segment::Segment, verse_bounds::VerseBounds},
 };
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Passage {
     pub book: BookId,
     pub segments: Segments,
