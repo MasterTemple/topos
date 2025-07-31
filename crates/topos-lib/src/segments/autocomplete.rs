@@ -17,14 +17,16 @@ use crate::{
 
 pub struct SegmentAutoCompleter(BookChapterVerses);
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum SegmentJoiner {
-    None,
     /// Joined by characters like `-`
+    /// - There should not be 2 of these in a row, must be followed by `,` or `:` and then `,`
     Range,
     /// Joined by characters like `,` or `;`
+    /// - There can be as many of these in a row as you would like
     Separate,
     /// Joined by characters like `:`
+    /// - There should not be 2 of these in a row
     Chapter,
 }
 
@@ -33,10 +35,7 @@ impl SegmentAutoCompleter {
         &self,
         book: &BookId,
         segments: &Segments,
-        joiner: SegmentJoiner,
-        // TODO: This will probably have to return Segments because there will be modifications to
-        // the input segments when there is a range (because it gets joined)
-        // Or I have some enum that has MergeLastSegment or AppendSegment
+        joiner: Option<SegmentJoiner>,
     ) -> Option<Vec<Segments>> {
         let chapter_verses = self.0.get_chapter_verses(book)?;
         let last_chapter = chapter_verses.get_chapter_count();
@@ -53,6 +52,28 @@ impl SegmentAutoCompleter {
 
         let current_verse = last.ending_verse();
         let current_chapter = last.ending_chapter();
+        let joiner = joiner?;
+
+        // preventing cases which look like `1-2-` or `1:1-2-` or `1-2:2-` or `1:1-2:2-`
+        if last.is_range() && joiner == SegmentJoiner::Range {
+            return None;
+        }
+
+        // preventing cases which look like `1:2:` or `1-2:2:` or `1:1-2:2:`
+        let second_to_last = segments.iter().rev().nth(1);
+        let has_previous_chapter_that_is_different =
+            second_to_last.is_some_and(|s| s.ending_chapter() != current_chapter);
+        // this means that it is `1:1` and not just `1`
+        let is_first_chapter_and_verse_provided =
+            second_to_last.is_none() && last.ending_verse().is_some();
+
+        let is_different_chapter =
+            has_previous_chapter_that_is_different || is_first_chapter_and_verse_provided;
+
+        if is_different_chapter && joiner == SegmentJoiner::Chapter {
+            return None;
+        }
+
         let last_verse = chapter_verses.get_last_verse(current_chapter)?;
 
         let remaining_verses = if let Some(current_verse) = current_verse {
@@ -96,7 +117,7 @@ impl SegmentAutoCompleter {
             }
             // if it is separate, just suggest things that are after this, both verses and
             // chapters
-            SegmentJoiner::Chapter | SegmentJoiner::None | SegmentJoiner::Separate => {
+            SegmentJoiner::Chapter | SegmentJoiner::Separate => {
                 let mut results = vec![];
                 for seg in remaining_verses {
                     let mut prev = segments.clone();
@@ -121,112 +142,92 @@ mod tests {
     fn complete() {
         let engine = SegmentAutoCompleter(BookChapterVerses::default());
 
-        use SegmentJoiner as Joiner;
+        use SegmentJoiner::*;
 
         // genesis has 50 chapters
         // chapter 1 has 31 verses
         // chapter 2 has 25 verses
         let genesis = |input: &str, joiner: SegmentJoiner| {
             engine
-                .suggest(&BookId(1), &Segments::parse_str(input).unwrap(), joiner)
+                .suggest(
+                    &BookId(1),
+                    &Segments::parse_str(input).unwrap(),
+                    Some(joiner),
+                )
                 .unwrap()
                 .len()
         };
 
+        let doesnt_parse = |input: &str, joiner: SegmentJoiner| -> bool {
+            engine
+                .suggest(
+                    &BookId(1),
+                    &Segments::parse_str(input).unwrap(),
+                    Some(joiner),
+                )
+                .is_none()
+        };
+
         assert_eq!(
             engine
-                .suggest(&BookId(1), &Segments::new(), SegmentJoiner::None)
+                .suggest(&BookId(1), &Segments::new(), None)
                 .unwrap()
                 .len(),
             50 // chapters
         );
 
-        assert_eq!(
-            genesis("1", Joiner::Range),
-            49 // remaining chapters
-        );
-
-        assert_eq!(
-            genesis("1", Joiner::Separate),
-            49 // remaining chapters
-        );
-
-        assert_eq!(
-            genesis("1", Joiner::Chapter),
-            49 + 31 // remaining chapters + verses
-        );
+        // remaining chapters
+        assert_eq!(genesis("1", Range), 49);
+        assert_eq!(genesis("1", Separate), 49);
+        // remaining chapters + verses
+        assert_eq!(genesis("1", Chapter), 49 + 31);
 
         // ---
 
-        assert_eq!(
-            genesis("1:1", Joiner::Range),
-            49 + 30 // remaining chapters + remaining verses
-        );
-
-        // this should not be valid
-        // assert_eq!(
-        //     genesis("1:1", Joiner::Chapter),
-        //     49 + 30 // remaining chapters + remaining verses
-        // );
-
-        assert_eq!(
-            genesis("1:1", Joiner::Separate),
-            49 + 30 // remaining chapters + remaining verses
-        );
+        assert_eq!(genesis("1:1", Range), 49 + 30);
+        assert_eq!(genesis("1:1", Separate), 49 + 30);
 
         // ---
 
-        assert_eq!(
-            genesis("1:2", Joiner::Range),
-            49 + 29 // remaining chapters + remaining verses
-        );
-
-        assert_eq!(
-            genesis("1:2", Joiner::Separate),
-            49 + 29 // remaining chapters + remaining verses
-        );
+        assert_eq!(genesis("1:2", Range), 49 + 29);
+        assert_eq!(genesis("1:2", Separate), 49 + 29);
 
         // ---
 
-        assert_eq!(
-            genesis("2", Joiner::Range),
-            48 // remaining chapters
-        );
-
-        assert_eq!(
-            genesis("2", Joiner::Separate),
-            48 // remaining chapters
-        );
-
-        assert_eq!(
-            genesis("2", Joiner::Chapter),
-            48 + 25 // remaining chapters + verses
-        );
+        assert_eq!(genesis("2", Range), 48);
+        assert_eq!(genesis("2", Separate), 48);
+        assert_eq!(genesis("2", Chapter), 48 + 25);
 
         // ---
 
-        assert_eq!(
-            genesis("2:1", Joiner::Range),
-            48 + 24 // remaining chapters + remaining verses
-        );
-
-        assert_eq!(
-            genesis("2:1", Joiner::Separate),
-            48 + 24 // remaining chapters + remaining verses
-        );
+        assert_eq!(genesis("2:1", Range), 48 + 24);
+        assert_eq!(genesis("2:1", Separate), 48 + 24);
 
         // ---
 
-        assert_eq!(
-            genesis("2:2", Joiner::Range),
-            48 + 23 // remaining chapters + remaining verses
-        );
+        assert_eq!(genesis("2:2", Range), 48 + 23);
+        assert_eq!(genesis("2:2", Separate), 48 + 23);
 
-        assert_eq!(
-            genesis("2:2", Joiner::Separate),
-            48 + 23 // remaining chapters + remaining verses
-        );
+        // ---
 
-        // --
+        assert!(doesnt_parse("1-2", Range));
+        assert!(doesnt_parse("2-3", Range));
+
+        assert!(doesnt_parse("1:1-2", Range));
+        assert!(doesnt_parse("2:2-3", Range));
+
+        assert!(doesnt_parse("1-2:2", Range));
+        assert!(doesnt_parse("2-3:3", Range));
+
+        assert!(doesnt_parse("1:1-2:2", Range));
+        assert!(doesnt_parse("2:2-3:3", Range));
+
+        // ---
+
+        assert!(doesnt_parse("1:2", Chapter));
+        assert!(doesnt_parse("1-2:2", Chapter));
+        assert!(doesnt_parse("1:1-2:2", Chapter));
+
+        // ---
     }
 }

@@ -140,6 +140,15 @@ impl Segment {
     pub fn as_segments(self) -> Segments {
         Segments(vec![self])
     }
+
+    pub fn is_range(&self) -> bool {
+        match self {
+            Segment::ChapterVerse(_) | Segment::FullChapter(_) => false,
+            Segment::ChapterVerseRange(_)
+            | Segment::ChapterRange(_)
+            | Segment::FullChapterRange(_) => true,
+        }
+    }
 }
 
 // Formatting
