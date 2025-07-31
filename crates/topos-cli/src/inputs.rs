@@ -63,6 +63,9 @@ impl Default for InputType {
 fn handle_dir(path: PathBuf, matcher: BibleMatcher) -> impl Iterator<Item = PathMatches> {
     let walk = WalkBuilder::new(path);
     let receiver = run_multi_threaded_streaming(walk, &matcher);
+    // BUG: Make it return a receiver, and have the single file/input return a receiver to iterate
+    // over
+    // I think it is actually collecting them all and then returning a full iterator
     receiver.into_iter()
 }
 

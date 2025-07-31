@@ -43,6 +43,7 @@ impl OutputMode {
 
 /// BUG: The problem is that I am running the timer at the wrong spot, I think once the iterator is
 /// created, it means all items have been sent
+/// Here's an idea: pass the OutputMode to the matcher and call it on each iteration
 fn print_time(matcher: &BibleMatcher, results: impl Iterator<Item = PathMatches>) {
     let start = Instant::now();
     let mut count = 0;

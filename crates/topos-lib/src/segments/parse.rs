@@ -45,7 +45,7 @@ impl Segments {
     pub fn parse<'a>(segment_input: SegmentInput<'a>) -> Option<Self> {
         let input = sanitize_segment_input(segment_input.input)?;
         // .ok_or_else(|| String::from("Failed to parse segments"))?;
-        let segments = parse_reference_segments(&input);
+        let segments = parse_reference_segments(&input)?;
         Some(segments)
     }
 
@@ -169,7 +169,7 @@ fn sanitize_segment_input(input: &str) -> Option<String> {
 
 /// - This function is meant to parse the `1,2-4,5:1-3,5,7-9,12-6:6,7:7-8:8` in `John 1,2-4,5:1-3,5,7-9,12-6:6,7:7-8:8`
 /// - It expects input [`from match_and_sanitize_segment_input`]
-fn parse_reference_segments(input: &str) -> Segments {
+fn parse_reference_segments(input: &str) -> Option<Segments> {
     // split at , or ; (because there is no uniform standard)
     // now I only have ranges (or a single verse)
     let ranges: Vec<&str> = input.split(SEGMENT_SPLITTERS).collect();
@@ -187,8 +187,8 @@ fn parse_reference_segments(input: &str) -> Segments {
             if check_for_full_chapters {
                 // try a chapter range
                 if !left.contains(":") && !right.contains(":") {
-                    let start = left.parse().unwrap();
-                    let end = right.parse().unwrap();
+                    let start = left.parse().ok()?;
+                    let end = right.parse().ok()?;
                     segments.push(Segment::full_chapter_range(start, end));
                     chapter = end;
                     continue;
@@ -199,40 +199,40 @@ fn parse_reference_segments(input: &str) -> Segments {
             match (left.split_once(":"), right.split_once(":")) {
                 // `ch1:v1 - ch2:v2`
                 (Some((ch1, v1)), Some((ch2, v2))) => {
-                    chapter = ch2.parse().unwrap();
+                    chapter = ch2.parse().ok()?;
                     segments.push(Segment::chapter_range(
-                        ch1.parse().unwrap(),
-                        v1.parse().unwrap(),
+                        ch1.parse().ok()?,
+                        v1.parse().ok()?,
                         chapter,
-                        v2.parse().unwrap(),
+                        v2.parse().ok()?,
                     ));
                 }
                 // `ch1:v1 - v2`
                 (Some((ch1, v1)), None) => {
-                    chapter = ch1.parse().unwrap();
+                    chapter = ch1.parse().ok()?;
                     segments.push(Segment::chapter_verse_range(
                         chapter,
-                        v1.parse().unwrap(),
-                        right.parse().unwrap(),
+                        v1.parse().ok()?,
+                        right.parse().ok()?,
                     ));
                 }
                 // `v1 - ch2:v2`
                 (None, Some((ch2, v2))) => {
                     let start_chapter = chapter;
-                    chapter = ch2.parse().unwrap();
+                    chapter = ch2.parse().ok()?;
                     segments.push(Segment::chapter_range(
                         start_chapter,
-                        left.parse().unwrap(),
+                        left.parse().ok()?,
                         chapter,
-                        v2.parse().unwrap(),
+                        v2.parse().ok()?,
                     ));
                 }
                 // `v1 - v2`
                 (None, None) => {
                     segments.push(Segment::chapter_verse_range(
                         chapter,
-                        left.parse().unwrap(),
-                        right.parse().unwrap(),
+                        left.parse().ok()?,
+                        right.parse().ok()?,
                     ));
                 }
             };
@@ -241,8 +241,8 @@ fn parse_reference_segments(input: &str) -> Segments {
         else {
             // handle `ch:v`
             if let Some((ch, v)) = range.split_once(":") {
-                chapter = ch.parse().unwrap();
-                segments.push(Segment::chapter_verse(chapter, v.parse().unwrap()));
+                chapter = ch.parse().ok()?;
+                segments.push(Segment::chapter_verse(chapter, v.parse().ok()?));
             }
             // handle `ch` or `v`
             else {
@@ -250,19 +250,19 @@ fn parse_reference_segments(input: &str) -> Segments {
                 if check_for_full_chapters {
                     // TODO: "Mar 25, 2025" will be interpreted as chapters, but parsing 2025
                     // panics because it can't fit in a u8
-                    chapter = range.parse().unwrap();
+                    chapter = range.parse().ok()?;
                     segments.push(Segment::full_chapter(chapter));
                     continue;
                 }
 
                 // handle `v`
-                let v = range.parse().unwrap();
+                let v = range.parse().ok()?;
                 segments.push(Segment::chapter_verse(chapter, v));
             }
             check_for_full_chapters = false;
         }
     }
-    Segments(segments)
+    Some(Segments(segments))
 }
 
 #[cfg(test)]
