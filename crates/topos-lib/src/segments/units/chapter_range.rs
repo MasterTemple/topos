@@ -1,6 +1,7 @@
 use crate::segments::{
     parse::{ParsableSegment, SegmentParseMethods},
     segment::{ChapterlessFormat, Segment},
+    units::chapter_verse_range::ChapterVerseRange,
     verse_bounds::VerseBounds,
 };
 
@@ -17,22 +18,44 @@ use std::{
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Ord)]
 pub struct ChapterRange(RangePair<ChapterVerse>);
 
+impl ChapterRange {
+    pub fn as_chapter_verse_range(&self) -> Option<ChapterVerseRange> {
+        if self.start.chapter == self.end.chapter {
+            Some(ChapterVerseRange::new(
+                self.start.chapter,
+                self.start.verse,
+                self.end.verse,
+            ))
+        } else {
+            None
+        }
+    }
+}
+
 impl Display for ChapterRange {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "{}:{}-{}:{}",
-            self.start.chapter, self.start.verse, self.end.chapter, self.end.verse
-        )
+        if let Some(cvr) = self.as_chapter_verse_range() {
+            cvr.fmt(f)
+        } else {
+            write!(
+                f,
+                "{}:{}-{}:{}",
+                self.start.chapter, self.start.verse, self.end.chapter, self.end.verse
+            )
+        }
     }
 }
 
 impl ChapterlessFormat for ChapterRange {
     fn chapterless_format(&self) -> String {
-        format!(
-            "{}-{}:{}",
-            self.start.verse, self.end.chapter, self.end.verse
-        )
+        if let Some(cvr) = self.as_chapter_verse_range() {
+            cvr.chapterless_format()
+        } else {
+            format!(
+                "{}-{}:{}",
+                self.start.verse, self.end.chapter, self.end.verse
+            )
+        }
     }
 }
 

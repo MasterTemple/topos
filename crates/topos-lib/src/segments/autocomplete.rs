@@ -138,6 +138,22 @@ impl SegmentAutoCompleter {
                 let mut results = vec![];
                 for seg in remaining_verses {
                     let mut prev = before_range.clone();
+                    let current_verse = current_verse.unwrap_or(1);
+                    // BUG: this is not right, i need to merge them
+                    let seg = if let Some(ending) = seg.ending_verse() {
+                        Segment::chapter_range(
+                            current_chapter,
+                            current_verse,
+                            seg.ending_chapter(),
+                            ending,
+                        )
+                    } else {
+                        Segment::chapter_verse_range(
+                            current_chapter,
+                            current_verse,
+                            seg.ending_chapter(),
+                        )
+                    };
                     prev.push(seg);
                     results.push(prev);
                 }
@@ -316,12 +332,17 @@ mod tests {
         let completer = InputAutoCompleter::new(&matcher, &completer);
 
         for (idx, suggestion) in completer
-            // .suggest("Genesis 1:1-")
-            .suggest("Genesis 1:1-2,")
+            // .suggest("Genesis") // bad
+            // .suggest("Genesis 1") // bad
+            // .suggest("Genesis 1:") // good
+            // .suggest("Genesis 1-") // good
+            .suggest("Genesis 1:1-") // good
+            // .suggest("Genesis 1:1-2,")
             .unwrap()
             .iter()
             .enumerate()
         {
+            // dbg!(&suggestion);
             println!("{}. '{}'", idx, suggestion);
         }
     }
