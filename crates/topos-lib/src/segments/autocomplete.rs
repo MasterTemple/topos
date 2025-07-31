@@ -93,8 +93,6 @@ impl SegmentAutoCompleter {
             .map(|ch| Segment::full_chapter(ch))
             .collect_vec();
 
-        // let remaining_chapters = 1;
-
         Some(match joiner {
             // if the joiner is a range, I will want to add
             SegmentJoiner::Range => {
@@ -117,7 +115,7 @@ impl SegmentAutoCompleter {
             }
             // if it is separate, just suggest things that are after this, both verses and
             // chapters
-            SegmentJoiner::Chapter | SegmentJoiner::Separate => {
+            SegmentJoiner::Separate => {
                 let mut results = vec![];
                 for seg in remaining_verses {
                     let mut prev = segments.clone();
@@ -125,6 +123,16 @@ impl SegmentAutoCompleter {
                     results.push(prev);
                 }
                 for seg in remaining_chapters {
+                    let mut prev = segments.clone();
+                    prev.push(seg);
+                    results.push(prev);
+                }
+                results
+            }
+            // I will only suggest verses after the user has given a `:`
+            SegmentJoiner::Chapter => {
+                let mut results = vec![];
+                for seg in remaining_verses {
                     let mut prev = segments.clone();
                     prev.push(seg);
                     results.push(prev);
@@ -179,11 +187,11 @@ mod tests {
         // remaining chapters
         assert_eq!(genesis("1", Range), 49);
         assert_eq!(genesis("1", Separate), 49);
-        // remaining chapters + verses
-        assert_eq!(genesis("1", Chapter), 49 + 31);
+        assert_eq!(genesis("1", Chapter), 31);
 
         // ---
 
+        // remaining chapters + verses
         assert_eq!(genesis("1:1", Range), 49 + 30);
         assert_eq!(genesis("1:1", Separate), 49 + 30);
 
@@ -196,7 +204,7 @@ mod tests {
 
         assert_eq!(genesis("2", Range), 48);
         assert_eq!(genesis("2", Separate), 48);
-        assert_eq!(genesis("2", Chapter), 48 + 25);
+        assert_eq!(genesis("2", Chapter), 25);
 
         // ---
 
@@ -227,6 +235,21 @@ mod tests {
         assert!(doesnt_parse("1:2", Chapter));
         assert!(doesnt_parse("1-2:2", Chapter));
         assert!(doesnt_parse("1:1-2:2", Chapter));
+
+        // ---
+
+        assert_eq!(genesis("1:1-2", Separate), 49 + 29);
+        assert_eq!(genesis("1:2-3", Separate), 49 + 28);
+
+        assert_eq!(genesis("1:1-2, 5", Separate), 49 + 26);
+        assert_eq!(genesis("1:2-3, 5", Separate), 49 + 26);
+        assert_eq!(genesis("1:1-2, 5", Range), 49 + 26);
+        assert_eq!(genesis("1:2-3, 5", Range), 49 + 26);
+        assert_eq!(genesis("1:1-2, 5", Chapter), 26);
+        assert_eq!(genesis("1:2-3, 5", Chapter), 26);
+
+        assert_eq!(genesis("1:1-2, 5-7", Separate), 49 + 24);
+        assert_eq!(genesis("1:2-3, 5-8", Separate), 49 + 23);
 
         // ---
     }
