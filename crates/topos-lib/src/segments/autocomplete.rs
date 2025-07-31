@@ -121,6 +121,18 @@ mod tests {
     fn complete() {
         let engine = SegmentAutoCompleter(BookChapterVerses::default());
 
+        use SegmentJoiner as Joiner;
+
+        // genesis has 50 chapters
+        // chapter 1 has 31 verses
+        // chapter 2 has 25 verses
+        let genesis = |input: &str, joiner: SegmentJoiner| {
+            engine
+                .suggest(&BookId(1), &Segments::parse_str(input).unwrap(), joiner)
+                .unwrap()
+                .len()
+        };
+
         assert_eq!(
             engine
                 .suggest(&BookId(1), &Segments::new(), SegmentJoiner::None)
@@ -130,65 +142,91 @@ mod tests {
         );
 
         assert_eq!(
-            engine
-                .suggest(
-                    &BookId(1),
-                    &Segments::parse_str("1").unwrap(),
-                    SegmentJoiner::Range
-                )
-                .unwrap()
-                .len(),
+            genesis("1", Joiner::Range),
             49 // remaining chapters
         );
 
         assert_eq!(
-            engine
-                .suggest(
-                    &BookId(1),
-                    &Segments::parse_str("1").unwrap(),
-                    SegmentJoiner::Separate
-                )
-                .unwrap()
-                .len(),
+            genesis("1", Joiner::Separate),
             49 // remaining chapters
         );
 
         assert_eq!(
-            engine
-                .suggest(
-                    &BookId(1),
-                    &Segments::parse_str("1").unwrap(),
-                    SegmentJoiner::Chapter
-                )
-                .unwrap()
-                .len(),
+            genesis("1", Joiner::Chapter),
             49 + 31 // remaining chapters + verses
         );
 
+        // ---
+
         assert_eq!(
-            engine
-                .suggest(
-                    &BookId(1),
-                    &Segments::parse_str("1:1").unwrap(),
-                    SegmentJoiner::Range
-                )
-                .unwrap()
-                .len(),
+            genesis("1:1", Joiner::Range),
             49 + 30 // remaining chapters + remaining verses
         );
 
+        // this should not be valid
+        // assert_eq!(
+        //     genesis("1:1", Joiner::Chapter),
+        //     49 + 30 // remaining chapters + remaining verses
+        // );
+
         assert_eq!(
-            engine
-                .suggest(
-                    &BookId(1),
-                    &Segments::parse_str("1:2").unwrap(),
-                    SegmentJoiner::Range
-                )
-                .unwrap()
-                .len(),
+            genesis("1:1", Joiner::Separate),
+            49 + 30 // remaining chapters + remaining verses
+        );
+
+        // ---
+
+        assert_eq!(
+            genesis("1:2", Joiner::Range),
             49 + 29 // remaining chapters + remaining verses
         );
 
-        //
+        assert_eq!(
+            genesis("1:2", Joiner::Separate),
+            49 + 29 // remaining chapters + remaining verses
+        );
+
+        // ---
+
+        assert_eq!(
+            genesis("2", Joiner::Range),
+            48 // remaining chapters
+        );
+
+        assert_eq!(
+            genesis("2", Joiner::Separate),
+            48 // remaining chapters
+        );
+
+        assert_eq!(
+            genesis("2", Joiner::Chapter),
+            48 + 25 // remaining chapters + verses
+        );
+
+        // ---
+
+        assert_eq!(
+            genesis("2:1", Joiner::Range),
+            48 + 24 // remaining chapters + remaining verses
+        );
+
+        assert_eq!(
+            genesis("2:1", Joiner::Separate),
+            48 + 24 // remaining chapters + remaining verses
+        );
+
+        // ---
+
+        assert_eq!(
+            genesis("2:2", Joiner::Range),
+            48 + 23 // remaining chapters + remaining verses
+        );
+
+        assert_eq!(
+            genesis("2:2", Joiner::Separate),
+            48 + 23 // remaining chapters + remaining verses
+        );
+
+        // --
     }
 }
