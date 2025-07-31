@@ -69,6 +69,52 @@ impl<'a> InputAutoCompleter<'a> {
 pub struct SegmentAutoCompleter(BookChapterVerses);
 
 /**
+This comes after complete segments
+*/
+pub enum CompletionSegment {
+    /// `John ?`
+    Chapter,
+    /// `John 1:1,?`
+    ChapterOrVerse,
+    /// `John 1:1,2:?`
+    ChapterVerse { chapter: u8 },
+    /// `John 1:1,2:1-?`
+    ChapterVerseRange { chapter: u8, verse: u8 },
+    /// `John 1:1,2:1-3:?`
+    ChapterRange {
+        start_chapter: u8,
+        start_verse: u8,
+        end_chapter: u8,
+    },
+}
+
+/**
+This is what is returned in response to a set of segments
+*/
+pub enum CompletionSegmentSuggestion {
+    /// `John ?`
+    Chapter(u8),
+    /// `John 1:1,?`
+    ChapterOrVerse(u8),
+    /// `John 1:1,2:?`
+    ChapterVerse { chapter: u8, verse: u8 },
+    /// `John 1:1,2:1-?`
+    ChapterVerseRange {
+        chapter: u8,
+        verse: u8,
+        /// chapter or verse
+        end: u8,
+    },
+    /// `John 1:1,2:1-3:?`
+    ChapterRange {
+        start_chapter: u8,
+        start_verse: u8,
+        end_chapter: u8,
+        end_verse: u8,
+    },
+}
+
+/**
 But thinking about this and I am realizing that even with this, I fail because how do I parse `John 1:1-3:`?
 I think it is `John 1:1-3`, but I need to recognize that it is a chapter, not a verse
 Perhaps I need to do some trimming before matching?
