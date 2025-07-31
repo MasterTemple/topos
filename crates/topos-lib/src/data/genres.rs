@@ -1,10 +1,5 @@
-use std::{
-    borrow::Cow,
-    collections::{BTreeMap, BTreeSet},
-    sync::Arc,
-};
+use std::collections::{BTreeMap, BTreeSet};
 
-use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
 
 use crate::data::books::{BookId, Books};
@@ -23,14 +18,9 @@ use crate::data::books::{BookId, Books};
     derive_more::Deref,
     derive_more::DerefMut,
 )]
-// pub struct GenreKey(Arc<String>);
 pub struct GenreKey(u32);
 
 impl GenreKey {
-    // pub fn new(s: String) -> Self {
-    //     Self(Arc::new(s))
-    // }
-    //
     pub fn new(id: u32) -> Self {
         Self(id)
     }
@@ -68,7 +58,6 @@ impl Genres {
                     .iter()
                     .filter_map(|b| books.search(b))
                     .collect();
-                // genre_to_keys.insert(key.clone(), ids);
                 ids
             } else {
                 BTreeSet::default()
@@ -85,7 +74,6 @@ impl Genres {
             id,
             genres,
             input_to_key: key_to_genre,
-            // genre_to_ids: genre_to_keys,
         };
 
         // In order to support using abbreviations, I should do this at the end

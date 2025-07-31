@@ -1,19 +1,7 @@
 use clap::Parser;
-use crossbeam_channel::{Receiver, unbounded};
-use itertools::Either;
-use std::{
-    fs::File,
-    io::{BufRead, BufReader},
-    path::PathBuf,
-    sync::{Arc, Mutex},
-    thread,
-    time::Instant,
-};
-use topos_lib::matcher::{instance::BibleMatch, matcher::BibleMatcher};
+use topos_lib::matcher::matcher::BibleMatcher;
 
-use ignore::{WalkBuilder, WalkState};
-
-use crate::{args::Args, inputs::InputType, outputs::OutputMode};
+use crate::{args::Args, inputs::InputType};
 
 pub mod args;
 pub mod inputs;

@@ -41,16 +41,19 @@ impl OutputMode {
     }
 }
 
+/// BUG: The problem is that I am running the timer at the wrong spot, I think once the iterator is
+/// created, it means all items have been sent
 fn print_time(matcher: &BibleMatcher, results: impl Iterator<Item = PathMatches>) {
     let start = Instant::now();
     let mut count = 0;
+    // i think it skips this completely because there is code after it
     for PathMatches { path, matches } in results {
         let path = path
             .map(|p| p.to_string_lossy().into_owned())
             .unwrap_or_default();
         count += matches.len();
     }
-    println!("Matches: {}", start.elapsed().as_millis());
+    println!("Matches: {}", count);
     println!("Elapsed: {}ms", start.elapsed().as_millis());
 }
 

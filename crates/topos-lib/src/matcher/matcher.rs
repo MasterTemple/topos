@@ -1,26 +1,17 @@
-use std::{collections::BTreeSet, sync::Arc};
-
-use itertools::Itertools;
 use line_col::LineColLookup;
-use once_cell::sync::Lazy;
 use regex::{Match, Regex};
 
 use crate::{
     data::data::BibleData,
     filter::filter::BibleFilter,
     matcher::{
-        instance::{BibleMatch, Location},
+        instance::BibleMatch,
         matches::{ComplexFilter, FilteredBibleMatches},
-    },
-    segments::{
-        parse::SegmentInput,
-        segments::{Passage, Segments},
     },
 };
 
 #[derive(Clone, Debug)]
 pub struct BibleMatcher {
-    // data: Arc<BibleData>,
     data: BibleData,
     /// The books to **not** match on aren't in this RegEx, so I won't process unnecessary books
     filtered_books: Regex,
@@ -29,7 +20,6 @@ pub struct BibleMatcher {
 }
 
 impl BibleMatcher {
-    // pub fn new(data: Arc<BibleData>, filtered_books: Regex, complex_filter: ComplexFilter) -> Self {
     pub fn new(data: BibleData, filtered_books: Regex, complex_filter: ComplexFilter) -> Self {
         Self {
             data,

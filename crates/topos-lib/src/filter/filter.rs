@@ -1,13 +1,11 @@
-use std::{collections::BTreeSet, sync::Arc};
+use std::collections::BTreeSet;
 
 use itertools::Itertools;
-use once_cell::sync::Lazy;
 use regex::Regex;
 
 use crate::{
     data::{books::BookId, data::BibleData},
     matcher::{matcher::BibleMatcher, matches::ComplexFilter},
-    segments::segments::Passage,
 };
 
 pub trait IsFilter {
@@ -37,7 +35,6 @@ impl<T: IsFilter> IsFilter for Operation<T> {
 
 #[derive(Clone)]
 pub struct BibleFilter {
-    // data: Arc<BibleData>,
     data: BibleData,
     /// indicates whether or not there has been an inclusion, which implicitly calls an exclusion
     /// on all the original data
@@ -149,7 +146,6 @@ impl BibleFilter {
 
 impl Default for BibleFilter {
     fn default() -> Self {
-        // Self::new(Arc::new(BibleData::default()))
         Self::new(BibleData::default())
     }
 }

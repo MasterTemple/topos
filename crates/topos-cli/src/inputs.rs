@@ -1,6 +1,5 @@
 use std::io::{self, IsTerminal, Read};
 use std::path::PathBuf;
-use std::sync::Arc;
 
 use crossbeam_channel::{Receiver, unbounded};
 use ignore::{WalkBuilder, WalkState};
@@ -74,10 +73,11 @@ fn run_multi_threaded_streaming<'scope>(
     let (sender, receiver) = unbounded();
     let walk = walk.build_parallel();
 
-    std::thread::scope(|_| {
+    std::thread::scope(|s| {
+        // let sender = sender.clone();
+        // s.spawn(move || {
         walk.run(|| {
             let sender = sender.clone();
-
             Box::new(move |entry| {
                 match entry {
                     Ok(entry) => {
@@ -97,6 +97,7 @@ fn run_multi_threaded_streaming<'scope>(
                 WalkState::Continue
             })
         });
+        // });
     });
 
     receiver
