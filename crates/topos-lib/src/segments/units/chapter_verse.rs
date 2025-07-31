@@ -1,6 +1,6 @@
 use crate::segments::{
     parse::{ParsableSegment, SegmentParseMethods},
-    segment::Segment,
+    segment::{ChapterlessFormat, Segment},
     verse_bounds::VerseBounds,
 };
 use serde::{Deserialize, Serialize, de::Visitor};
@@ -20,6 +20,12 @@ pub struct ChapterVerse {
 impl Display for ChapterVerse {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}:{}", self.chapter, self.verse)
+    }
+}
+
+impl ChapterlessFormat for ChapterVerse {
+    fn chapterless_format(&self) -> String {
+        format!("{}", self.verse)
     }
 }
 

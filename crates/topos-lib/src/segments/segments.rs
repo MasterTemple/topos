@@ -3,7 +3,10 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     data::books::BookId,
-    segments::{segment::Segment, verse_bounds::VerseBounds},
+    segments::{
+        segment::{ChapterlessFormat, Segment},
+        verse_bounds::VerseBounds,
+    },
 };
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -62,12 +65,15 @@ impl Segments {
             if let Some(chapter) = prev_chapter {
                 if chapter == current_chapter {
                     output.push_str(verse_seperator);
+                    output.push_str(&seg.chapterless_format());
                 } else {
                     output.push_str(chapter_seperator);
+                    output.push_str(&seg.to_string());
                 }
+            } else {
+                output.push_str(&seg.to_string());
             }
             prev_chapter = Some(current_chapter);
-            output.push_str(&seg.to_string());
         }
         output
     }

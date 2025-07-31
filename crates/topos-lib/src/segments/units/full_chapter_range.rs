@@ -1,6 +1,6 @@
 use crate::segments::{
     parse::{ParsableSegment, SegmentParseMethods},
-    segment::Segment,
+    segment::{ChapterlessFormat, Segment},
     units::chapter_verse_range::ChapterVerseRange,
     verse_bounds::VerseBounds,
 };
@@ -21,6 +21,12 @@ pub struct FullChapterRange(RangePair<FullChapter>);
 impl Display for FullChapterRange {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}-{}", self.start, self.end)
+    }
+}
+
+impl ChapterlessFormat for FullChapterRange {
+    fn chapterless_format(&self) -> String {
+        self.to_string()
     }
 }
 

@@ -1,7 +1,7 @@
 use super::range_pair::RangePair;
 use crate::segments::{
     parse::{ParsableSegment, SegmentParseMethods},
-    segment::Segment,
+    segment::{ChapterlessFormat, Segment},
     verse_bounds::VerseBounds,
 };
 use serde::{Deserialize, Serialize, de::Visitor};
@@ -25,6 +25,12 @@ impl Display for ChapterVerseRange {
             "{}:{}-{}",
             self.chapter, self.verses.start, self.verses.end
         )
+    }
+}
+
+impl ChapterlessFormat for ChapterVerseRange {
+    fn chapterless_format(&self) -> String {
+        format!("{}-{}", self.verses.start, self.verses.end)
     }
 }
 
