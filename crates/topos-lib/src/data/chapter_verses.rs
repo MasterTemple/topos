@@ -12,6 +12,14 @@ impl ChapterVerses {
         let idx = chapter.checked_sub(1)? as usize;
         self.0.get(idx).cloned()
     }
+
+    pub fn has_one_chapter(&self) -> bool {
+        self.0.len() == 1
+    }
+
+    pub fn get_chapter_count(&self) -> u8 {
+        self.0.len() as u8
+    }
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -28,9 +36,13 @@ impl BookChapterVerses {
         )
     }
 
-    pub fn get_last_verse(&self, book: BookId, chapter: u8) -> Option<u8> {
-        self.0.get(&book)?.get_last_verse(chapter)
+    pub fn get_chapter_verses(&self, book: &BookId) -> Option<&ChapterVerses> {
+        self.0.get(book)
     }
+
+    // pub fn get_last_verse(&self, book: &BookId, chapter: u8) -> Option<u8> {
+    //     self.0.get(book)?.get_last_verse(chapter)
+    // }
 }
 
 impl Default for BookChapterVerses {

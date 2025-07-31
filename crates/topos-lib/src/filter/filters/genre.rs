@@ -33,7 +33,7 @@ mod tests {
             #[test]
             fn $fn_name() {
                 let data = crate::data::data::BibleData::default();
-                let mut filter = crate::filter::filter::BibleFilter::new(&data);
+                let mut filter = crate::filter::filter::BibleFilter::new(data);
                 $(
                     filter.push($filter);
                 )*

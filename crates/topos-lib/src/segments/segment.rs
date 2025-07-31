@@ -2,6 +2,7 @@ use serde::{Deserialize, Serialize};
 use std::fmt::{Debug, Display};
 
 use crate::segments::{
+    segments::Segments,
     units::{
         chapter_range::ChapterRange, chapter_verse::ChapterVerse,
         chapter_verse_range::ChapterVerseRange, full_chapter::FullChapter,
@@ -134,6 +135,10 @@ impl Segment {
 
     pub fn full_chapter_range(start: u8, end: u8) -> Self {
         Self::FullChapterRange(FullChapterRange::new(start, end))
+    }
+
+    pub fn as_segments(self) -> Segments {
+        Segments(vec![self])
     }
 }
 

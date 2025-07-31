@@ -6,12 +6,17 @@
   },
   {
     "title": "History",
-    "abbreviations": [ "hist", "narrative", "historical narrative" ],
+    "abbreviations": [ "h", "hist" ],
     "books": [ "Joshua", "Judges", "Ruth", "1 Samuel", "2 Samuel", "1 Kings", "2 Kings", "1 Chronicles", "2 Chronicles", "Ezra", "Nehemiah", "Esther" ]
   },
   {
+    "title": "OT Narrative",
+    "abbreviations": [ "n", "nar", "narrative", "historical narrative" ],
+    "subcategories": [ "Pentateuch", "History" ]
+  },
+  {
     "title": "Wisdom",
-    "abbreviations": [ "wis" ],
+    "abbreviations": [ "w", "wis" ],
     "books": [ "Job", "Proverbs", "Ecclesiastes" ]
   },
   {
@@ -41,7 +46,7 @@
   },
   {
     "title": "Gospels",
-    "abbreviations": [ "gos", "gospel" ],
+    "abbreviations": [ "g", "gos", "gospel" ],
     "books": [ "Matthew", "Mark", "Luke", "John" ]
   },
   {
@@ -66,7 +71,7 @@
   },
   {
     "title": "Epistles",
-    "abbreviations": [ "ep" ],
+    "abbreviations": [ "ep", "epistle" ],
     "subcategories": [ "Pauline Epistles", "General Epistles" ]
   }
 ]
