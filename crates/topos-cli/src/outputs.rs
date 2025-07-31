@@ -1,7 +1,7 @@
 use std::time::Instant;
 
 use clap::ValueEnum;
-use topos_lib::matcher::matcher::BibleMatcher;
+use topos_lib::{error::AnyResult, matcher::matcher::BibleMatcher};
 
 use crate::matches::PathMatches;
 
@@ -31,7 +31,11 @@ impl OutputMode {
     This type should implement [`OutputEntryFormat`]
     This is so that I can do different kinds of JSON outputs for example, based on the verbosity that the user requests (like context, ..)
     */
-    pub fn write(&self, matcher: &BibleMatcher, results: impl Iterator<Item = PathMatches>) {
+    pub fn write(
+        &self,
+        matcher: &BibleMatcher,
+        results: impl Iterator<Item = AnyResult<PathMatches>>,
+    ) {
         match self {
             OutputMode::Count => print_time(matcher, results),
             OutputMode::JSON => print_json(matcher, results),
@@ -44,11 +48,11 @@ impl OutputMode {
 /// BUG: The problem is that I am running the timer at the wrong spot, I think once the iterator is
 /// created, it means all items have been sent
 /// Here's an idea: pass the OutputMode to the matcher and call it on each iteration
-fn print_time(matcher: &BibleMatcher, results: impl Iterator<Item = PathMatches>) {
+fn print_time(matcher: &BibleMatcher, results: impl Iterator<Item = AnyResult<PathMatches>>) {
     let start = Instant::now();
     let mut count = 0;
     // i think it skips this completely because there is code after it
-    for PathMatches { path, matches } in results {
+    for PathMatches { path, matches } in results.filter_map(Result::ok) {
         let path = path
             .map(|p| p.to_string_lossy().into_owned())
             .unwrap_or_default();
@@ -58,8 +62,8 @@ fn print_time(matcher: &BibleMatcher, results: impl Iterator<Item = PathMatches>
     println!("Elapsed: {}ms", start.elapsed().as_millis());
 }
 
-fn print_json(matcher: &BibleMatcher, results: impl Iterator<Item = PathMatches>) {
-    for PathMatches { path, matches } in results {
+fn print_json(matcher: &BibleMatcher, results: impl Iterator<Item = AnyResult<PathMatches>>) {
+    for PathMatches { path, matches } in results.filter_map(Result::ok) {
         let path = path
             .map(|p| p.to_string_lossy().into_owned())
             .unwrap_or_default();
@@ -88,8 +92,11 @@ fn print_json(matcher: &BibleMatcher, results: impl Iterator<Item = PathMatches>
     }
 }
 
-fn print_qf_list<'a>(matcher: &BibleMatcher, results: impl Iterator<Item = PathMatches>) {
-    for PathMatches { path, matches } in results {
+fn print_qf_list<'a>(
+    matcher: &BibleMatcher,
+    results: impl Iterator<Item = AnyResult<PathMatches>>,
+) {
+    for PathMatches { path, matches } in results.filter_map(Result::ok) {
         let path = path
             .map(|p| p.to_string_lossy().into_owned())
             .unwrap_or_default();
@@ -115,10 +122,10 @@ fn print_qf_list<'a>(matcher: &BibleMatcher, results: impl Iterator<Item = PathM
     }
 }
 
-fn print_table<'a>(matcher: &BibleMatcher, results: impl Iterator<Item = PathMatches>) {
+fn print_table<'a>(matcher: &BibleMatcher, results: impl Iterator<Item = AnyResult<PathMatches>>) {
     println!("| File | Line | Col | Verse |");
     println!("| ---- | ---- | --- | ----- |");
-    for PathMatches { path, matches } in results {
+    for PathMatches { path, matches } in results.filter_map(Result::ok) {
         let path = path
             .map(|p| p.to_string_lossy().into_owned())
             .unwrap_or_default();
