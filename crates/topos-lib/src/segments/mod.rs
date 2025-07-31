@@ -1,3 +1,4 @@
+pub mod autocomplete;
 pub mod parse;
 pub mod segment;
 pub mod segments;

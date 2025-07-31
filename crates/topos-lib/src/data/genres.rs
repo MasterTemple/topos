@@ -1,5 +1,6 @@
 use std::collections::{BTreeMap, BTreeSet};
 
+use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
 
 use crate::data::books::{BookId, Books};
@@ -124,12 +125,12 @@ impl Genres {
             .to_string()
     }
 
-    // pub fn base() -> &'static Self {
-    //     &DEFAULT_GENRES
-    // }
+    pub fn base() -> &'static Self {
+        &DEFAULT_GENRES
+    }
 }
 
-// static DEFAULT_GENRES: Lazy<Genres> = Lazy::new(|| Genres::default());
+static DEFAULT_GENRES: Lazy<Genres> = Lazy::new(|| Genres::default());
 
 impl Default for Genres {
     fn default() -> Self {
