@@ -68,6 +68,31 @@ impl<'a> InputAutoCompleter<'a> {
 
 pub struct SegmentAutoCompleter(BookChapterVerses);
 
+/**
+But thinking about this and I am realizing that even with this, I fail because how do I parse `John 1:1-3:`?
+I think it is `John 1:1-3`, but I need to recognize that it is a chapter, not a verse
+Perhaps I need to do some trimming before matching?
+*/
+pub struct CompletionSegments {
+    /// all of the segments
+    segments: Segments,
+    /// trailing characters
+    trailing: Option<&'static str>,
+}
+
+impl CompletionSegments {
+    pub fn new(segments: Segments) -> Self {
+        Self {
+            segments,
+            trailing: None,
+        }
+    }
+    pub fn with_trailing(mut self, trailing: &'static str) -> Self {
+        self.trailing = Some(trailing);
+        self
+    }
+}
+
 impl SegmentAutoCompleter {
     pub fn suggest(
         &self,

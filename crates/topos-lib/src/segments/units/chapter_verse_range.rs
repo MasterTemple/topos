@@ -2,13 +2,11 @@ use super::range_pair::RangePair;
 use crate::segments::{
     parse::{ParsableSegment, SegmentParseMethods},
     segment::{ChapterlessFormat, Segment},
+    units::chapter_verse::ChapterVerse,
     verse_bounds::VerseBounds,
 };
 use serde::{Deserialize, Serialize, de::Visitor};
-use std::{
-    fmt::{Debug, Display},
-    str::FromStr,
-};
+use std::{fmt::Display, str::FromStr};
 
 /// - This is a range of verse references within a single chapter
 /// - Ex: `1:2-3` `John 1:2-3`
@@ -18,19 +16,37 @@ pub struct ChapterVerseRange {
     pub verses: RangePair<u8>,
 }
 
+impl ChapterVerseRange {
+    pub fn as_chapter_verse(&self) -> Option<ChapterVerse> {
+        if self.verses.start == self.verses.end {
+            Some(ChapterVerse::new(self.chapter, self.verses.start))
+        } else {
+            None
+        }
+    }
+}
+
 impl Display for ChapterVerseRange {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "{}:{}-{}",
-            self.chapter, self.verses.start, self.verses.end
-        )
+        if let Some(cv) = self.as_chapter_verse() {
+            cv.fmt(f)
+        } else {
+            write!(
+                f,
+                "{}:{}-{}",
+                self.chapter, self.verses.start, self.verses.end
+            )
+        }
     }
 }
 
 impl ChapterlessFormat for ChapterVerseRange {
     fn chapterless_format(&self) -> String {
-        format!("{}-{}", self.verses.start, self.verses.end)
+        if let Some(cv) = self.as_chapter_verse() {
+            cv.chapterless_format()
+        } else {
+            format!("{}-{}", self.verses.start, self.verses.end)
+        }
     }
 }
 

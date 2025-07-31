@@ -112,7 +112,12 @@ impl Segment {
     }
 
     pub fn chapter_verse_range(chapter: u8, start_verse: u8, end_verse: u8) -> Self {
-        Self::ChapterVerseRange(ChapterVerseRange::new(chapter, start_verse, end_verse))
+        let cvr = ChapterVerseRange::new(chapter, start_verse, end_verse);
+        if let Some(cv) = cvr.as_chapter_verse() {
+            Self::ChapterVerse(cv)
+        } else {
+            Self::ChapterVerseRange(cvr)
+        }
     }
 
     pub fn chapter_range(
@@ -121,12 +126,12 @@ impl Segment {
         end_chapter: u8,
         end_verse: u8,
     ) -> Self {
-        Self::ChapterRange(ChapterRange::new(
-            start_chapter,
-            start_verse,
-            end_chapter,
-            end_verse,
-        ))
+        let cr = ChapterRange::new(start_chapter, start_verse, end_chapter, end_verse);
+        if let Some(ChapterVerseRange { chapter, verses }) = cr.as_chapter_verse_range() {
+            Self::chapter_verse_range(chapter, verses.start, verses.end)
+        } else {
+            Self::ChapterRange(cr)
+        }
     }
 
     pub fn full_chapter(chapter: u8) -> Self {
