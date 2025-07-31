@@ -27,7 +27,6 @@ impl PathMatches {
     }
 
     pub fn from_file(path: PathBuf, matcher: &BibleMatcher) -> Result<PathMatches, std::io::Error> {
-        println!("{:?}", path.as_path());
         let text = std::fs::read_to_string(&path)?;
         Ok(Self::from_text(text, matcher).with_path(path))
     }

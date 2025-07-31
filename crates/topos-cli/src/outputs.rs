@@ -1,7 +1,7 @@
 use std::time::Instant;
 
 use clap::ValueEnum;
-use topos_lib::{error::AnyResult, matcher::matcher::BibleMatcher};
+use topos_lib::{error::AnyResult, matcher::matcher::BibleMatcher, segments::segments::Passage};
 
 use crate::matches::PathMatches;
 
@@ -69,18 +69,11 @@ fn print_json(matcher: &BibleMatcher, results: impl Iterator<Item = AnyResult<Pa
             .unwrap_or_default();
         println!(r#"{{ "type": "start", "path": "{}" }}"#, path);
         for m in matches {
-            let psg = m.psg;
+            let Passage { book, segments } = m.psg;
 
-            let Some(book) = matcher.data().books().get_name(psg.book) else {
+            let Some(book) = matcher.data().books().get_name(book) else {
                 continue;
             };
-
-            let segments = psg
-                .segments
-                .iter()
-                .map(|e| e.to_string())
-                .collect::<Vec<_>>()
-                .join(",");
 
             let start = m.location.start;
             let psg = format!("{} {}", book, segments);
@@ -101,18 +94,11 @@ fn print_qf_list<'a>(
             .map(|p| p.to_string_lossy().into_owned())
             .unwrap_or_default();
         for m in matches {
-            let psg = m.psg;
+            let Passage { book, segments } = m.psg;
 
-            let Some(book) = matcher.data().books().get_name(psg.book) else {
+            let Some(book) = matcher.data().books().get_name(book) else {
                 continue;
             };
-
-            let segments = psg
-                .segments
-                .iter()
-                .map(|e| e.to_string())
-                .collect::<Vec<_>>()
-                .join(",");
 
             let start = m.location.start;
             let psg = format!("{} {}", book, segments);
@@ -130,18 +116,11 @@ fn print_table<'a>(matcher: &BibleMatcher, results: impl Iterator<Item = AnyResu
             .map(|p| p.to_string_lossy().into_owned())
             .unwrap_or_default();
         for m in matches {
-            let psg = m.psg;
+            let Passage { book, segments } = m.psg;
 
-            let Some(book) = matcher.data().books().get_name(psg.book) else {
+            let Some(book) = matcher.data().books().get_name(book) else {
                 continue;
             };
-
-            let segments = psg
-                .segments
-                .iter()
-                .map(|e| e.to_string())
-                .collect::<Vec<_>>()
-                .join(",");
 
             let start = m.location.start;
 

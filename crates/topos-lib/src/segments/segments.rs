@@ -52,3 +52,29 @@ impl Segments {
         }
     }
 }
+
+impl Segments {
+    pub fn format(&self, verse_seperator: &str, chapter_seperator: &str) -> String {
+        let mut prev_chapter = None;
+        let mut output = String::new();
+        for seg in self.iter() {
+            let current_chapter = seg.starting_chapter();
+            if let Some(chapter) = prev_chapter {
+                if chapter == current_chapter {
+                    output.push_str(verse_seperator);
+                } else {
+                    output.push_str(chapter_seperator);
+                }
+            }
+            prev_chapter = Some(current_chapter);
+            output.push_str(&seg.to_string());
+        }
+        output
+    }
+}
+
+impl std::fmt::Display for Segments {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.format(",", "; "))
+    }
+}
