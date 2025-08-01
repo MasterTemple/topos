@@ -54,6 +54,12 @@ impl Segments {
             segments: self,
         }
     }
+
+    pub fn with_suggestion(&self, segment: Segment) -> Self {
+        let mut new = self.clone();
+        new.push(segment);
+        new
+    }
 }
 
 impl Segments {

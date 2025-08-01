@@ -16,9 +16,11 @@ pub enum IncompleteSegment {
     /// - Example Segment: ""
     /// - Suggests: chapters or verses
     ChapterOrVerse { start: Option<u8> },
+    // ChapterOrVerse,
     /// - Example Segment: "1-"
     /// - Suggests: chapters or verses
     ChapterTo { start_chapter: u8, end: Option<u8> },
+    // ChapterTo { start_chapter: u8 },
     /// - Example Segment: "1:"
     /// - Suggests: verses
     ChapterVerse {
@@ -80,50 +82,121 @@ impl IncompleteSegment {
     /// This expects to only receive only the unparsed incomplete segment
     pub fn new(input: &str) -> Option<Self> {
         let seg = INCOMPLETE_SEGMENT.captures(input)?;
-        Some(Self::from_captures(seg))
+        // Some(Self::from_captures(seg))
+        dbg!(Some(Self::from_captures(seg)))
     }
 
     /// The groups
+    // fn from_captures<'a>(cap: Captures<'a>) -> Self {
+    //     let parse_cap = |group: &str| -> Option<u8> {
+    //         cap.name(group)
+    //             .map(|c| c.as_str().trim().parse().ok())
+    //             .flatten()
+    //     };
+    //     let start_chapter = parse_cap("sc");
+    //     let start_verse = parse_cap("sv");
+    //     let end_chapter = parse_cap("ec");
+    //     let end_verse = parse_cap("ev");
+    //
+    //     println!("{}", "-".repeat(80));
+    //     println!("{}", cap.get(0).unwrap().as_str());
+    //     dbg!(start_chapter, start_verse, end_chapter, end_verse);
+    //     println!("{}", "-".repeat(80));
+    //     dbg!(match (start_chapter, start_verse, end_chapter, end_verse) {
+    //         // Segment: "1:1-2:" (verse)
+    //         (Some(start_chapter), Some(start_verse), Some(end_chapter), end_verse) => {
+    //             Self::ChapterVerseRangeTo {
+    //                 start_chapter,
+    //                 start_verse,
+    //                 end_chapter,
+    //                 end_verse,
+    //             }
+    //         }
+    //         // Segment: "1-2:" (verse)
+    //         (Some(start_chapter), None, Some(end_chapter), end_verse) => Self::ChapterRangeTo {
+    //             start_chapter,
+    //             end_chapter,
+    //             end_verse,
+    //         },
+    //         // Segment: "1:1-" (chapter or verse)
+    //         (Some(start_chapter), Some(start_verse), end, None) => Self::ChapterVerseTo {
+    //             start_chapter,
+    //             start_verse,
+    //             end,
+    //         },
+    //         // Segment: "1:" (verse)
+    //         (Some(start_chapter), start_verse, None, None) => Self::ChapterVerse {
+    //             start_chapter,
+    //             start_verse,
+    //         },
+    //         // Segment: "1-" (chapter or verse)
+    //         (Some(start_chapter), None, end, None) => Self::ChapterTo { start_chapter, end },
+    //         // Segment: "" (chapter)
+    //         (start, None, None, None) => Self::ChapterOrVerse { start },
+    //         _ => unreachable!(),
+    //     })
+    // }
+
     fn from_captures<'a>(cap: Captures<'a>) -> Self {
-        let parse_cap = |group: &str| -> Option<u8> {
-            cap.name(group).map(|c| c.as_str().parse().ok()).flatten()
+        use ValueOrFocused::*;
+        let parse_cap = |group: &str| -> Option<ValueOrFocused> {
+            cap.name(group).map(|c| match c.as_str().trim().parse() {
+                Ok(v) => Value(v),
+                Err(_) => Focused,
+            })
         };
         let start_chapter = parse_cap("sc");
         let start_verse = parse_cap("sv");
         let end_chapter = parse_cap("ec");
         let end_verse = parse_cap("ev");
 
+        println!("{}", "-".repeat(80));
+        println!("{}", cap.get(0).unwrap().as_str());
+        // dbg!(start_chapter, start_verse, end_chapter, end_verse);
+        println!("{}", "-".repeat(80));
         match (start_chapter, start_verse, end_chapter, end_verse) {
-            // Segment: "" (chapter)
-            (start, None, None, None) => Self::ChapterOrVerse { start },
-            // Segment: "1-" (chapter or verse)
-            (Some(start_chapter), None, end, None) => Self::ChapterTo { start_chapter, end },
-            // Segment: "1:" (verse)
-            (Some(start_chapter), start_verse, None, None) => Self::ChapterVerse {
+            // Segment: "1:1-2:" (verse)
+            (
+                Some(Value(start_chapter)),
+                Some(Value(start_verse)),
+                Some(Value(end_chapter)),
+                Some(end_verse),
+            ) => Self::ChapterVerseRangeTo {
                 start_chapter,
                 start_verse,
-            },
-            // Segment: "1:1-" (chapter or verse)
-            (Some(start_chapter), Some(start_verse), end, None) => Self::ChapterVerseTo {
-                start_chapter,
-                start_verse,
-                end,
+                end_chapter,
+                end_verse: end_verse.as_option(),
             },
             // Segment: "1-2:" (verse)
-            (Some(start_chapter), None, Some(end_chapter), end_verse) => Self::ChapterRangeTo {
-                start_chapter,
-                end_chapter,
-                end_verse,
-            },
-            // Segment: "1:1-2:" (verse)
-            (Some(start_chapter), Some(start_verse), Some(end_chapter), end_verse) => {
-                Self::ChapterVerseRangeTo {
+            (Some(Value(start_chapter)), None, Some(Value(end_chapter)), Some(end_verse)) => {
+                Self::ChapterRangeTo {
                     start_chapter,
-                    start_verse,
                     end_chapter,
-                    end_verse,
+                    end_verse: end_verse.as_option(),
                 }
             }
+            // Segment: "1:1-" (chapter or verse)
+            (Some(Value(start_chapter)), Some(Value(start_verse)), Some(end), None) => {
+                Self::ChapterVerseTo {
+                    start_chapter,
+                    start_verse,
+                    end: end.as_option(),
+                }
+            }
+            // Segment: "1:" (verse)
+            (Some(Value(start_chapter)), Some(start_verse), None, None) => Self::ChapterVerse {
+                start_chapter,
+                start_verse: start_verse.as_option(),
+            },
+            // Segment: "1-" (chapter or verse)
+            (Some(Value(start_chapter)), None, Some(end), None) => Self::ChapterTo {
+                start_chapter,
+                end: end.as_option(),
+            },
+            // Segment: "" (chapter)
+            (Some(start), None, None, None) => Self::ChapterOrVerse {
+                start: start.as_option(),
+            },
             _ => unreachable!(),
         }
     }
@@ -162,10 +235,13 @@ impl IncompleteSegment {
                 verses.into_iter().chain(chapters).collect()
             }
             Self::ChapterTo { start_chapter, end } => {
-                let chapters = (start_chapter..=last_chapter)
+                let verses = (1..=last_verse)
+                    .map(|v| Segment::chapter_verse(start_chapter, v))
+                    .collect_vec();
+                let chapters = (start_chapter + 1..=last_chapter)
                     .map(|c| Segment::full_chapter(c))
                     .collect_vec();
-                chapters
+                verses.into_iter().chain(chapters).collect()
             }
             Self::ChapterVerse {
                 start_chapter,
@@ -184,7 +260,7 @@ impl IncompleteSegment {
                 let verses = (start_verse..=last_verse)
                     .map(|v| Segment::chapter_verse(start_chapter, v))
                     .collect_vec();
-                let chapters = (start_chapter..=last_chapter)
+                let chapters = (start_chapter + 1..=last_chapter)
                     .map(|c| Segment::full_chapter(c))
                     .collect_vec();
                 verses.into_iter().chain(chapters).collect()
@@ -210,6 +286,20 @@ impl IncompleteSegment {
                     .collect_vec();
                 verses
             }
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug)]
+pub enum ValueOrFocused {
+    Value(u8),
+    Focused,
+}
+impl ValueOrFocused {
+    pub fn as_option(self) -> Option<u8> {
+        match self {
+            ValueOrFocused::Value(v) => Some(v),
+            ValueOrFocused::Focused => None,
         }
     }
 }
