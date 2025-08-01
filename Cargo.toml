@@ -2,6 +2,8 @@
 members = [
     "crates/topos-cli",
     "crates/topos-lib",
+    # "crates/topos-ts",
+    "crates/topos-py",
 ]
 resolver = "3"
 
