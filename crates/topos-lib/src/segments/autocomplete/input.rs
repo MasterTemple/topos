@@ -156,9 +156,16 @@ mod tests {
 
         let mut values = vec!["", "1-", "1:", "1:1-", "1-2:", "1:1-2:"];
         // values.extend(["9", "1-9", "1:9", "1:1-9", "1-2:9", "1:1-2:9"]);
-        values.extend(["1:1-2:9,", "1:1-2:9,3", "1:1-2:9,3-", "1:1-2:9,3- hi"]);
+        values.extend([
+            "1:1-2:9,",
+            "1:1-2:9,10",
+            "1:1-2:9,10:",
+            "1:1-2:9,10-",
+            // "1:1-2:9,10-1",
+            // "1:1-2:9,3", "1:1-2:9,3-", "1:1-2:9,3- hi"
+        ]);
         let bk = "Genesis ";
-        for v in values.into_iter().take(8) {
+        for v in values.into_iter().take(10) {
             let input = &format!("{bk}{v}");
             if let Some(result) = completer.suggest(input) {
                 println!("{input}");

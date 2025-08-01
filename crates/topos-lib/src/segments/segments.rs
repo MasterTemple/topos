@@ -67,9 +67,10 @@ impl Segments {
         let mut prev_chapter = None;
         let mut output = String::new();
         for seg in self.iter() {
+            let is_cross_chapter_segment = seg.starting_chapter() != seg.ending_chapter();
             let current_chapter = seg.ending_chapter();
             if let Some(chapter) = prev_chapter {
-                if chapter == current_chapter {
+                if is_cross_chapter_segment || chapter == current_chapter {
                     output.push_str(verse_seperator);
                     output.push_str(&seg.chapterless_format());
                 } else {
