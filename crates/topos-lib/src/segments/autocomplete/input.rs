@@ -158,7 +158,7 @@ mod tests {
         values.extend(["9", "1-9", "1:9", "1:1-9", "1-2:9", "1:1-2:9"]);
         values.extend(["1:1-2:9,", "1:1-2:9,3", "1:1-2:9,3-", "1:1-2:9,3- hi"]);
         let bk = "Genesis ";
-        for v in values.into_iter().take(3) {
+        for v in values.into_iter().take(6) {
             let input = &format!("{bk}{v}");
             if let Some(result) = completer.suggest(input) {
                 println!("{input}");

@@ -221,24 +221,9 @@ impl IncompleteSegment {
                     .map(|ch| Segment::full_chapter(ch))
                     .collect(),
                 Self::ChapterTo { start_chapter, end } => {
-                    // let verses = (1..=chapter_verses.get_last_verse(start_chapter)?)
-                    // let verses = (start_chapter + 1..=last_chapter)
-                    //     // .map(|v| Segment::chapter_verse(start_chapter, v))
-                    //     .filter_map(|c| {
-                    //         Some(Segment::chapter_range(
-                    //             start_chapter,
-                    //             1,
-                    //             c,
-                    //             // TODO: I need to coerce this from `1:1-2:25` to `1-2`
-                    //             chapter_verses.get_last_verse(c)?,
-                    //         ))
-                    //     })
-                    //     .collect_vec();
                     let chapters = (start_chapter + 1..=last_chapter)
                         .map(|c| Segment::full_chapter_range(start_chapter, c))
                         .collect_vec();
-                    // verses.into_iter().chain(chapters).collect()
-                    // chapters.into_iter().chain(verses).collect()
                     chapters
                 }
                 Self::ChapterVerse {
@@ -254,18 +239,37 @@ impl IncompleteSegment {
                     start_chapter,
                     start_verse,
                     end,
-                } => todo!(),
+                } => {
+                    let verses = (start_verse + 1
+                        ..=chapter_verses.get_last_verse(start_chapter)?)
+                        .map(|v| Segment::chapter_verse_range(start_chapter, start_verse, v))
+                        .collect_vec();
+                    let chapters = (start_chapter + 1..=last_chapter)
+                        .map(|c| Segment::chapter_range(start_chapter, start_verse, c, 1))
+                        .collect_vec();
+                    verses.into_iter().chain(chapters).collect()
+                }
                 Self::ChapterRangeTo {
                     start_chapter,
                     end_chapter,
                     end_verse,
-                } => todo!(),
+                } => {
+                    let verses = (1..=chapter_verses.get_last_verse(end_chapter)?)
+                        .map(|v| Segment::chapter_range(start_chapter, 1, end_chapter, v))
+                        .collect_vec();
+                    verses
+                }
                 Self::ChapterVerseRangeTo {
                     start_chapter,
                     start_verse,
                     end_chapter,
                     end_verse,
-                } => todo!(),
+                } => {
+                    let verses = (1..=chapter_verses.get_last_verse(end_chapter)?)
+                        .map(|v| Segment::chapter_range(start_chapter, start_verse, end_chapter, v))
+                        .collect_vec();
+                    verses
+                }
             });
         };
 
@@ -313,7 +317,7 @@ impl IncompleteSegment {
                 start_verse,
                 end,
             } => {
-                let verses = (start_verse..=last_verse)
+                let verses = (start_verse..=chapter_verses.get_last_verse(start_chapter)?)
                     .map(|v| Segment::chapter_verse(start_chapter, v))
                     .collect_vec();
                 let chapters = (start_chapter + 1..=last_chapter)
@@ -326,7 +330,7 @@ impl IncompleteSegment {
                 end_chapter,
                 end_verse,
             } => {
-                let verses = (1..=last_verse)
+                let verses = (1..=chapter_verses.get_last_verse(end_chapter)?)
                     .map(|v| Segment::chapter_verse(end_chapter, v))
                     .collect_vec();
                 verses
@@ -337,7 +341,7 @@ impl IncompleteSegment {
                 end_chapter,
                 end_verse,
             } => {
-                let verses = (1..=last_verse)
+                let verses = (1..=chapter_verses.get_last_verse(end_chapter)?)
                     .map(|v| Segment::chapter_verse(end_chapter, v))
                     .collect_vec();
                 verses
