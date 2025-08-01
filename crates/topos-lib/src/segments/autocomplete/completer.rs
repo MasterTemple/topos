@@ -1,5 +1,3 @@
-use itertools::Itertools;
-
 use crate::{
     data::{
         books::BookId,
@@ -10,134 +8,16 @@ use crate::{
         matcher::BibleMatcher,
     },
     segments::{
+        autocomplete::joiner::SegmentJoiner,
         segment::Segment,
         segments::{Passage, Segments},
         units::chapter_verse::ChapterVerse,
         verse_bounds::VerseBounds,
     },
 };
+use itertools::Itertools;
 
-// pub struct SegmentAutoCompleter {
-//     chapter_verses: BookChapterVerses,
-// }
-
-#[derive(Clone, Copy, Debug, PartialEq)]
-pub enum SegmentJoiner {
-    /// Joined by characters like `-`
-    /// - There should not be 2 of these in a row, must be followed by `,` or `:` and then `,`
-    Range,
-    /// Joined by characters like `,` or `;`
-    /// - There can be as many of these in a row as you would like
-    Separate,
-    /// Joined by characters like `:`
-    /// - There should not be 2 of these in a row
-    Chapter,
-}
-
-pub struct InputAutoCompleter<'a> {
-    matcher: &'a BibleMatcher,
-    completer: &'a SegmentAutoCompleter,
-}
-
-impl<'a> InputAutoCompleter<'a> {
-    pub fn new(matcher: &'a BibleMatcher, completer: &'a SegmentAutoCompleter) -> Self {
-        Self { matcher, completer }
-    }
-    pub fn suggest(&self, input: &str) -> Option<Vec<Segments>> {
-        let mat = self.matcher.find(input)?;
-        dbg!(&mat);
-        let Passage { book, segments } = &mat.psg;
-        let Position { line, column } = &mat.location.end;
-
-        let line = input.lines().nth(line - 1)?;
-        dbg!(&line);
-        let remaining = &line[column - 1..];
-        dbg!(&remaining);
-        let joiner = match remaining.trim() {
-            ":" => Some(SegmentJoiner::Chapter),
-            "-" => Some(SegmentJoiner::Range),
-            // d if ALL_DASHES.contains(d) => Some(SegmentJoiner::Range),
-            "." | "," => Some(SegmentJoiner::Separate),
-            "" => None,
-            _ => None?,
-        };
-
-        self.completer.suggest(book, segments, joiner)
-    }
-}
-
-pub struct SegmentAutoCompleter(BookChapterVerses);
-
-/**
-This comes after complete segments
-*/
-pub enum CompletionSegment {
-    /// `John ?`
-    Chapter,
-    /// `John 1:1,?`
-    ChapterOrVerse,
-    /// `John 1:1,2:?`
-    ChapterVerse { chapter: u8 },
-    /// `John 1:1,2:1-?`
-    ChapterVerseRange { chapter: u8, verse: u8 },
-    /// `John 1:1,2:1-3:?`
-    ChapterRange {
-        start_chapter: u8,
-        start_verse: u8,
-        end_chapter: u8,
-    },
-}
-
-/**
-This is what is returned in response to a set of segments
-*/
-pub enum CompletionSegmentSuggestion {
-    /// `John ?`
-    Chapter(u8),
-    /// `John 1:1,?`
-    ChapterOrVerse(u8),
-    /// `John 1:1,2:?`
-    ChapterVerse { chapter: u8, verse: u8 },
-    /// `John 1:1,2:1-?`
-    ChapterVerseRange {
-        chapter: u8,
-        verse: u8,
-        /// chapter or verse
-        end: u8,
-    },
-    /// `John 1:1,2:1-3:?`
-    ChapterRange {
-        start_chapter: u8,
-        start_verse: u8,
-        end_chapter: u8,
-        end_verse: u8,
-    },
-}
-
-/**
-But thinking about this and I am realizing that even with this, I fail because how do I parse `John 1:1-3:`?
-I think it is `John 1:1-3`, but I need to recognize that it is a chapter, not a verse
-Perhaps I need to do some trimming before matching?
-*/
-pub struct CompletionSegments {
-    /// all of the segments
-    segments: Segments,
-    /// trailing characters
-    trailing: Option<&'static str>,
-}
-
-impl CompletionSegments {
-    pub fn new(segments: Segments) -> Self {
-        Self {
-            segments,
-            trailing: None,
-        }
-    }
-    pub fn with_trailing(mut self, trailing: &'static str) -> Self {
-        self.trailing = Some(trailing);
-        self
-    }
-}
+pub struct SegmentAutoCompleter(pub BookChapterVerses);
 
 impl SegmentAutoCompleter {
     pub fn suggest(
@@ -287,6 +167,8 @@ impl SegmentAutoCompleter {
 
 #[cfg(test)]
 mod tests {
+    use crate::segments::autocomplete::input::InputAutoCompleter;
+
     use super::*;
     #[test]
     fn complete() {
