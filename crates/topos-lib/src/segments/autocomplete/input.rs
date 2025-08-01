@@ -43,7 +43,11 @@ impl<'a> InputAutoCompleter<'a> {
         let incomplete_segments_input = &segments_input[mat.end()..];
         let incomplete_segment = IncompleteSegment::new(incomplete_segments_input)?;
 
-        let chapter_verses = todo!();
+        let chapter_verses = self
+            .matcher
+            .data()
+            .chapter_verses()
+            .get_chapter_verses(&book_id)?;
         let suggestions = incomplete_segment.suggest(chapter_verses, full_segments.last());
 
         Some(CompletionOutput::new(book_id, full_segments, suggestions))

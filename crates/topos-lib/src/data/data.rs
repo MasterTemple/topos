@@ -2,7 +2,7 @@ use itertools::Itertools;
 use once_cell::sync::Lazy;
 use regex::Regex;
 
-use crate::segments::segments::Passage;
+use crate::{data::chapter_verses::BookChapterVerses, segments::segments::Passage};
 
 use super::{books::Books, genres::Genres};
 
@@ -10,15 +10,20 @@ use super::{books::Books, genres::Genres};
 pub struct BibleData {
     books: Books,
     genres: Genres,
-    // testaments: Test
+    chapter_verses: BookChapterVerses, // testaments: Test
 }
 
 impl BibleData {
     pub fn books(&self) -> &Books {
         &self.books
     }
+
     pub fn genres(&self) -> &Genres {
         &self.genres
+    }
+
+    pub fn chapter_verses(&self) -> &BookChapterVerses {
+        &self.chapter_verses
     }
 
     pub fn create_book_regex(&self) -> Result<Regex, String> {
@@ -44,6 +49,7 @@ impl Default for BibleData {
         Self {
             books: Default::default(),
             genres: Default::default(),
+            chapter_verses: Default::default(),
         }
     }
 }

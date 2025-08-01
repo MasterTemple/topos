@@ -1,4 +1,7 @@
-use crate::{data::books::BookId, segments::segment::Segment};
+use crate::{
+    data::books::BookId,
+    segments::{segment::Segment, segments::Segments},
+};
 
 pub struct CompletionOutput {
     pub book: BookId,
@@ -7,7 +10,7 @@ pub struct CompletionOutput {
 }
 
 impl CompletionOutput {
-    pub fn new(book: BookId, segments: Segments, suggestions: Vec<Segments>) -> Self {
+    pub fn new(book: BookId, segments: Segments, suggestions: Vec<Segment>) -> Self {
         Self {
             book,
             segments,
