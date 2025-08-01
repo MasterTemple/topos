@@ -8,6 +8,7 @@ use crate::{
         instance::BibleMatch,
         matches::{ComplexFilter, FilteredBibleMatches},
     },
+    segments::autocomplete::input::InputAutoCompleter,
 };
 
 #[derive(Clone, Debug)]
@@ -80,6 +81,10 @@ impl BibleMatcher {
 
     pub fn data(&self) -> &BibleData {
         &self.data
+    }
+
+    pub fn completer(&self) -> InputAutoCompleter {
+        InputAutoCompleter::new(self)
     }
 }
 

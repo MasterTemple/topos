@@ -29,6 +29,8 @@ impl Passage {
     }
 }
 
+/// TODO: I need Segments and PartialSegments/Incomplete segments to be unified under a large
+/// Segment type that I can use for auto-completions
 #[derive(Clone, Debug, Deref, DerefMut, Serialize, Deserialize, IntoIterator)]
 pub struct Segments(pub Vec<Segment>);
 

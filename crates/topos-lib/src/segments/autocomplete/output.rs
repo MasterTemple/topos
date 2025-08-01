@@ -3,6 +3,10 @@ use crate::{
     segments::{segment::Segment, segments::Segments},
 };
 
+/// TODO: I want to be able to suggest incomplete segments, for example `1:1-` and then suggest
+/// `1:1-2:`
+///
+/// TODO: For LSP purposes, I should include start location from input
 pub struct CompletionOutput {
     pub book: BookId,
     pub segments: Segments,

@@ -29,37 +29,6 @@ use crate::outputs::OutputMode;
 pub struct Args {
     #[clap(help = "The input can be a directory path, a file path, or text.")]
     pub input: Option<String>,
-    // // Input source: text or file
-    // #[clap(
-    //     long = "text",
-    //     long = "input",
-    //     // group = "input",
-    //     // These have to be 2 separate groups, because I do want the user to be able to specify
-    //     // files and directories
-    //     group = "input_or_files",
-    //     group = "input_or_dirs",
-    //     help = "Text to search within (instead of files)"
-    // )]
-    // pub input: Option<String>,
-    //
-    // // File and directory paths
-    // #[clap(
-    //     long = "file",
-    //     short,
-    //     // group = "input",
-    //     group = "input_or_files",
-    //     help = "One or more files to search"
-    // )]
-    // pub files: Vec<PathBuf>,
-    //
-    // #[clap(
-    //     long = "dir",
-    //     short,
-    //     // group = "input",
-    //     group = "input_or_dirs",
-    //     help = "One or more directories to search recursively"
-    // )]
-    // pub dirs: Vec<PathBuf>,
 
     // Testament filters
     #[clap(
@@ -112,31 +81,15 @@ pub struct Args {
         help = "Forbid search from matching a verse range (e.g. John 3:4-5)"
     )]
     pub outside: Option<Vec<String>>,
-    // // Verse match mode
-    // #[clap(long = "matches", help = "Check if the input is a valid Bible verse")]
-    // pub matches: Option<String>,
-    //
-    // // Boolean flags
-    // #[clap(
-    //     long = "check",
-    //     group = "operation",
-    //     help = "Return true/false (or 0/1) if a verse is present"
-    // )]
-    // pub check: bool,
-    //
-    // // Boolean flags
-    // #[clap(long = "first", group = "operation", help = "Get first verse")]
-    // pub first: bool,
-    //
-    // #[clap(
-    //     long = "config",
-    //     // parse(from_os_str),
-    //     help = "Use a custom configuration file"
-    // )]
-    // pub config: Option<PathBuf>,
-    //
+
+    // TODO: actually implement this
+    #[clap(long = "config", help = "Use a custom configuration file")]
+    pub config: Option<PathBuf>,
+
     // #[clap(long = "igonre", help = "Ignore when non-real books/genres are given")]
     // pub ignore_non_existent: bool,
+
+    // TODO: actually implement this
     #[clap(
         long = "mode",
         short = 'm',
@@ -153,6 +106,7 @@ pub struct Args {
     )]
     pub versbose: bool,
 
+    // TODO: actually implement this
     #[clap(
         long = "context",
         short = 'c',
@@ -161,9 +115,11 @@ pub struct Args {
     )]
     pub context: u64,
 
+    // TODO: actually implement this
     #[clap(long = "before", help = "Context: Specify units before match")]
     pub before_context: Option<u64>,
 
+    // TODO: actually implement this
     #[clap(long = "after", help = "Context: Specify units after match")]
     pub after_context: Option<u64>,
 }

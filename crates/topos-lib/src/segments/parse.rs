@@ -23,6 +23,7 @@ pub static NON_SEGMENT_CHARACTERS: Lazy<Regex> = Lazy::new(|| Regex::new(r"[^\d,
 
 pub static TRAILING_NON_DIGITS: Lazy<Regex> = Lazy::new(|| Regex::new(r"(\D+$)").unwrap());
 
+/// TODO: Use the new parser logic from auto-complete full-segments
 /// This is a separate struct so that way I can see how much of the remaining str are actual segments (to get the corresponding end position)
 pub struct SegmentInput<'a> {
     input: &'a str,
