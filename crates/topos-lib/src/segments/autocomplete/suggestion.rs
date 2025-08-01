@@ -2,109 +2,90 @@ use regex::Captures;
 
 use crate::segments::segment::Segment;
 
-pub enum SuggestionType {
-    Chapter,
-    Verse,
-    Both,
+pub enum IncompleteSegment {
+    // - Example Segment: ""
+    // - Suggests: chapters
+    Chapter {
+        start_chapter: Option<u8>,
+    },
+    // - Example Segment: "1-"
+    // - Suggests: chapters or verses
+    ChapterTo {
+        start_chapter: u8,
+        end: Option<u8>,
+    },
+    // - Example Segment: "1:"
+    // - Suggests: verses
+    ChapterVerse {
+        start_chapter: u8,
+        start_verse: Option<u8>,
+    },
+    // - Example Segment: "1:1-"
+    // - Suggests: chapters or verses
+    ChapterVerseTo {
+        start_chapter: u8,
+        start_verse: u8,
+        end: Option<u8>,
+    },
+    // - Example Segment: "1-2:"
+    // - Suggests: verses
+    ChapterRangeTo {
+        start_chapter: u8,
+        end_chapter: u8,
+        end_verse: Option<u8>,
+    },
+    // - Example Segment: "1:1-2:"
+    // - Suggests: verses
+    ChapterVerseRangeTo {
+        start_chapter: u8,
+        start_verse: u8,
+        end_chapter: u8,
+        end_verse: Option<u8>,
+    },
 }
-
-pub struct IncompleteSegment {
-    ty: SuggestionType,
-    prev: Option<Segment>,
-    start_chapter: Option<u8>,
-    start_verse: Option<u8>,
-    end_chapter: Option<u8>,
-    end_verse: Option<u8>,
-}
-
-pub enum ValueOrFocused {
-    Value(u8),
-    Focused,
-}
-
-impl ValueOrFocused {
-    pub fn try_new<'a>(cap: Captures<'a>, group: &str) -> Option<Self> {
-        cap.name(group).map(|c| match c.as_str().parse() {
-            Ok(v) => ValueOrFocused::Value(v),
-            Err(_) => ValueOrFocused::Focused,
-        })
-    }
-}
-
+//
 impl IncompleteSegment {
     pub fn new<'a>(cap: Captures<'a>) -> Self {
-        let parse_cap = |group: &str| -> Option<ValueOrFocused> {
-            cap.name(group).map(|c| match c.as_str().parse() {
-                Ok(v) => ValueOrFocused::Value(v),
-                Err(_) => ValueOrFocused::Focused,
-            })
+        let parse_cap = |group: &str| -> Option<u8> {
+            cap.name(group).map(|c| c.as_str().parse().ok()).flatten()
         };
         let start_chapter = parse_cap("sc");
         let start_verse = parse_cap("sv");
         let end_chapter = parse_cap("ec");
         let end_verse = parse_cap("ev");
 
-        use ValueOrFocused::*;
-
         match (start_chapter, start_verse, end_chapter, end_verse) {
-            // Segment: ""
-            (Some(Focused), None, None, None) => {
-                //
-            }
-            // Segment: "1-"
-            (Some(Value(start_chapter)), None, Some(Focused), None) => {
-                //
-            }
-            // Segment: "1:"
-            (Some(Value(start_chapter)), Some(Focused), None, None) => {
-                //
-            }
-            // Segment: "1:1-"
-            (Some(Value(start_chapter)), Some(Value(start_verse)), Some(Focused), None) => {
-                //
-            }
-            // Segment: "1-2:"
-            (Some(Value(start_chapter)), None, Some(Value(end_chapter)), Some(Focused)) => {
-                //
-            }
-            // Segment: "1:1-2:"
-            (
-                Some(Value(start_chapter)),
-                Some(Value(start_verse)),
-                Some(Value(end_chapter)),
-                Some(Focused),
-            ) => {
-                //
+            // Segment: "" (chapter)
+            (start_chapter, None, None, None) => Self::Chapter { start_chapter },
+            // Segment: "1-" (chapter or verse)
+            (Some(start_chapter), None, end, None) => Self::ChapterTo { start_chapter, end },
+            // Segment: "1:" (verse)
+            (Some(start_chapter), start_verse, None, None) => Self::ChapterVerse {
+                start_chapter,
+                start_verse,
+            },
+            // Segment: "1:1-" (chapter or verse)
+            (Some(start_chapter), Some(start_verse), end, None) => Self::ChapterVerseTo {
+                start_chapter,
+                start_verse,
+                end,
+            },
+            // Segment: "1-2:" (verse)
+            (Some(start_chapter), None, Some(end_chapter), end_verse) => Self::ChapterRangeTo {
+                start_chapter,
+                end_chapter,
+                end_verse,
+            },
+            // Segment: "1:1-2:" (verse)
+            (Some(start_chapter), Some(start_verse), Some(end_chapter), end_verse) => {
+                Self::ChapterVerseRangeTo {
+                    start_chapter,
+                    start_verse,
+                    end_chapter,
+                    end_verse,
+                }
             }
             _ => unreachable!(),
-        };
-
-        todo!()
+        }
     }
-}
-
-/**
-This is what is returned in response to a set of segments
-*/
-pub enum CompletionSegmentSuggestion {
-    /// `John ?`
-    Chapter(u8),
-    /// `John 1:1,?`
-    ChapterOrVerse(u8),
-    /// `John 1:1,2:?`
-    ChapterVerse { chapter: u8, verse: u8 },
-    /// `John 1:1,2:1-?`
-    ChapterVerseRange {
-        chapter: u8,
-        verse: u8,
-        /// chapter or verse
-        end: u8,
-    },
-    /// `John 1:1,2:1-3:?`
-    ChapterRange {
-        start_chapter: u8,
-        start_verse: u8,
-        end_chapter: u8,
-        end_verse: u8,
-    },
 }

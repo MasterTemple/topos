@@ -231,10 +231,9 @@ impl<'a> InputAutoCompleter<'a> {
         // println!("re: '{}'", re.to_string());
         let incomplete_segment = re.captures(incomplete_segments_input)?;
 
-        println!("{}", "-".repeat(20));
-        println!("{input}");
-        println!("Valid: {}", valid_segments);
-        println!("Incomplete: {:#?}", incomplete_segment);
+        println!("Input: '{input}'");
+        println!("Valid: '{}'", valid_segments);
+        println!("Incomplete: '{}'", incomplete_segment.get(0)?.as_str());
         println!("{}", "-".repeat(20));
 
         None
@@ -358,9 +357,10 @@ mod tests {
 
         let mut values = vec!["", "1-", "1:", "1:1-", "1-2:", "1:1-2:"];
         values.extend(["9", "1-9", "1:9", "1:1-9", "1-2:9", "1:1-2:9"]);
+        values.extend(["1:1-2:9,", "1:1-2:9,3", "1:1-2:9,3-", "1:1-2:9,3- hi"]);
         for v in values {
-            // completer.complete(&format!("Genesis {v}"));
+            completer.complete(&format!("Genesis {v}"));
         }
-        completer.complete(&format!("Genesis 1:1-2,3:"));
+        // completer.complete(&format!("Genesis 1:1-2,3:"));
     }
 }
