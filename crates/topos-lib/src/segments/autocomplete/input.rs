@@ -8,7 +8,9 @@ use crate::{
         matcher::BibleMatcher,
     },
     segments::{
-        autocomplete::{completer::SegmentAutoCompleter, joiner::SegmentJoiner},
+        autocomplete::{
+            completer::SegmentAutoCompleter, incomplete::IncompleteSegment, joiner::SegmentJoiner,
+        },
         segments::{Passage, Segments},
     },
 };
@@ -17,75 +19,15 @@ use crate::{
 /// - https://stackoverflow.com/questions/267399/how-do-you-match-only-valid-roman-numerals-with-a-regular-expression
 ///
 /// Currently just parses a 3-character long set of digits
-const DIGITS: &str = r"\d{1,3}";
+pub const DIGITS: &str = r"\d{1,3}";
 /// Various dashes
-const RANGE_DELIMETER: &str = r"[\-–——⸺]";
+pub const RANGE_DELIMETER: &str = r"[\-–——⸺]";
 /// `.` or `:`
-const CHAPTER_DELIMETER: &'static str = r"[\.:]";
+pub const CHAPTER_DELIMETER: &'static str = r"[\.:]";
 /// `,` or `;`
-const SEGMENT_DELIMETER: &'static str = r"[,;]";
+pub const SEGMENT_DELIMETER: &'static str = r"[,;]";
 /// Any whitespace
-const WS: &str = r"\s*";
-
-// /// `\d+`
-// const CHAPTER: &'static str = concat!(DIGITS);
-//
-// /// `\d+:\d+`
-// const CHAPTER_VERSE: &'static str = concat!(DIGITS, CHAPTER_DELIMETER, DIGITS);
-//
-// /// `\d+:\d+-\d+`
-// const CHAPTER_VERSE_RANGE: &'static str =
-//     concat!(DIGITS, CHAPTER_DELIMETER, DIGITS, RANGE_DELIMETER, DIGITS);
-//
-// /// `\d+-\d+:\d+`
-// const CHAPTER_VERSE_RANGE_ALT: &'static str =
-//     concat!(DIGITS, RANGE_DELIMETER, DIGITS, CHAPTER_DELIMETER, DIGITS);
-//
-// /// `\d+:\d+-\d+:\d+`
-// const CHAPTER_RANGE: &'static str = concat!(
-//     DIGITS,
-//     CHAPTER_VERSE,
-//     DIGITS,
-//     RANGE_DELIMETER,
-//     DIGITS,
-//     CHAPTER_VERSE,
-//     DIGITS
-// );
-//
-// /// `\d+-\d+`
-// const FULL_CHAPTER_RANGE: &'static str = concat!(DIGITS, RANGE_DELIMETER, DIGITS);
-//
-// /**
-// At runtime would be:
-// ```ignore
-// let any_segment = format!("({})", [CHAPTER, CHAPTER_VERSE, CHAPTER_VERSE_RANGE, CHAPTER_VERSE_RANGE_ALT, CHAPTER_RANGE, FULL_CHAPTER_RANGE].join("|"));
-// ```
-// */
-// const ANY_SEGMENT: &'static str = concat!(
-//     "((?:)",
-//     CHAPTER,
-//     "|",
-//     CHAPTER_VERSE,
-//     "|",
-//     CHAPTER_VERSE_RANGE,
-//     "|",
-//     CHAPTER_VERSE_RANGE_ALT,
-//     "|",
-//     CHAPTER_RANGE,
-//     "|",
-//     FULL_CHAPTER_RANGE,
-//     ")",
-// );
-
-// const VALID_SEGMENTS: &'static str = concat!("((?:)", ANY_SEGMENT, SEGMENT_DELIMETER, ")*",);
-
-// static VALID_SEGMENTS: Lazy<Regex> =
-//     // Lazy::new(|| Regex::new(r"^ *\d+( *[\.,:;\-–——⸺] *\d+)*").unwrap());
-//     // let valid_segments = format!("({}{})*", ANY_SEGMENT, SEGMENT_DELIMETER);
-//     Lazy::new(|| {
-//         let valid_segments = format!("({}{})*", ANY_SEGMENT, SEGMENT_DELIMETER);
-//         Regex::new(r"^ *\d{1,3}( *[\.,:;\-–——⸺] *\d{1,3})*").unwrap()
-//     });
+pub const WS: &str = r"\s*";
 
 /// This will match any book up to the segments
 const BOOK: &'static str = r"^\d?\D+";
@@ -214,27 +156,15 @@ impl<'a> InputAutoCompleter<'a> {
             .unwrap()
             .captures(segments_input)?
             .get(0)?;
-        // dbg!(&valid_segments);
+
         let mut incomplete_segments_input = &segments_input[valid_segments.end()..];
-        // dbg!(&incomplete_segments_input);
-        let valid_segments = if valid_segments.as_str().len() == 0 {
+
+        let full_segments = if valid_segments.as_str().len() == 0 {
             Segments::new()
         } else {
             Segments::parse_str(valid_segments.as_str())?
         };
-        // dbg!(&valid_segments.to_string());
-        // dbg!(&incomplete_segments_input);
-        // if incomplete_segments_input.ends_with(char::is_numeric) {
-        //     incomplete_segments_input = incomplete_segments_input.trim_end_matches()
-        // }
-        let re = Regex::new(&format!("^({INCOMPLETE_SEGMENT})$")).unwrap();
-        // println!("re: '{}'", re.to_string());
-        let incomplete_segment = re.captures(incomplete_segments_input)?;
-
-        println!("Input: '{input}'");
-        println!("Valid: '{}'", valid_segments);
-        println!("Incomplete: '{}'", incomplete_segment.get(0)?.as_str());
-        println!("{}", "-".repeat(20));
+        let incomplete_segment = IncompleteSegment::new(incomplete_segments_input)?;
 
         None
     }
