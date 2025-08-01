@@ -5,7 +5,7 @@ use regex::{Captures, Regex};
 use crate::{
     data::chapter_verses::ChapterVerses,
     segments::{
-        autocomplete::input::{CHAPTER_DELIMETER, RANGE_DELIMETER, WS},
+        autocomplete::full::{CHAPTER_DELIMETER, RANGE_DELIMETER, WS},
         segment::Segment,
         verse_bounds::VerseBounds,
     },
@@ -132,12 +132,11 @@ impl IncompleteSegment {
     This will suggest segments that can be added to the input segments
     These segments can be suggesting chapters or verses or both
     */
-    pub fn suggest(&self, chapter_verses: &ChapterVerses, prev: Option<Segment>) -> Vec<Segment> {
+    pub fn suggest(&self, chapter_verses: &ChapterVerses, prev: Option<&Segment>) -> Vec<Segment> {
         let last_chapter = chapter_verses.get_chapter_count();
 
         // extract prev/last segment, but if there is not one, suggest every chapter
         let Some(prev) = prev else {
-            let first_chapter = 1;
             return (1..=last_chapter)
                 .map(|ch| Segment::full_chapter(ch))
                 .collect();
@@ -153,7 +152,7 @@ impl IncompleteSegment {
         let last_verse = chapter_verses.get_last_verse(current_chapter).unwrap();
 
         match self.clone() {
-            IncompleteSegment::ChapterOrVerse { start } => {
+            Self::ChapterOrVerse { start } => {
                 let verses = (next_verse..=last_verse)
                     .map(|v| Segment::chapter_verse(current_chapter, v))
                     .collect_vec();
@@ -162,13 +161,13 @@ impl IncompleteSegment {
                     .collect_vec();
                 verses.into_iter().chain(chapters).collect()
             }
-            IncompleteSegment::ChapterTo { start_chapter, end } => {
+            Self::ChapterTo { start_chapter, end } => {
                 let chapters = (start_chapter..=last_chapter)
                     .map(|c| Segment::full_chapter(c))
                     .collect_vec();
                 chapters
             }
-            IncompleteSegment::ChapterVerse {
+            Self::ChapterVerse {
                 start_chapter,
                 start_verse,
             } => {
@@ -177,7 +176,7 @@ impl IncompleteSegment {
                     .collect_vec();
                 verses
             }
-            IncompleteSegment::ChapterVerseTo {
+            Self::ChapterVerseTo {
                 start_chapter,
                 start_verse,
                 end,
@@ -190,7 +189,7 @@ impl IncompleteSegment {
                     .collect_vec();
                 verses.into_iter().chain(chapters).collect()
             }
-            IncompleteSegment::ChapterRangeTo {
+            Self::ChapterRangeTo {
                 start_chapter: _,
                 end_chapter,
                 end_verse,
@@ -200,7 +199,7 @@ impl IncompleteSegment {
                     .collect_vec();
                 verses
             }
-            IncompleteSegment::ChapterVerseRangeTo {
+            Self::ChapterVerseRangeTo {
                 start_chapter: _,
                 start_verse: _,
                 end_chapter,
