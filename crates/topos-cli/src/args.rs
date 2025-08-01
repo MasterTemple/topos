@@ -23,11 +23,11 @@ use crate::outputs::OutputMode;
 #[derive(Parser, Debug)]
 #[clap(
     name = "topos",
-    about = "A Bible verse-aware search tool inspired by ripgrep",
+    about = "A Bible passage search tool inspired by ripgrep",
     version = "0.1.0"
 )]
 pub struct Args {
-    #[clap(help = "The input can be a directory path, a file path, or text.")]
+    #[clap(help = "The input can be a directory path, a file path, text, or stdin.")]
     pub input: Option<String>,
 
     // Testament filters
@@ -116,11 +116,17 @@ pub struct Args {
     pub context: u64,
 
     // TODO: actually implement this
-    #[clap(long = "before", help = "Context: Specify units before match")]
+    #[clap(
+        long = "before",
+        help = "Specify units of context before match to provide"
+    )]
     pub before_context: Option<u64>,
 
     // TODO: actually implement this
-    #[clap(long = "after", help = "Context: Specify units after match")]
+    #[clap(
+        long = "after",
+        help = "Specify units of context after match to provide"
+    )]
     pub after_context: Option<u64>,
 }
 

@@ -7,14 +7,14 @@ use crate::matches::PathMatches;
 
 #[derive(Copy, Clone, Debug, Default, ValueEnum)]
 pub enum OutputMode {
-    #[value(alias = "find", help = "Find matches and print total time")]
+    #[value(alias = "c", help = "Count total matches")]
     Count,
     #[value(alias = "j", help = "Output matches as JSON")]
     JSON,
     #[default]
-    #[value(alias = "t", help = "Output matches as a table (unaligned)")]
+    #[value(alias = "t", help = "Output matches as a table")]
     Table,
-    #[value(alias = "qf", help = "A format for the Neovim Quickfix List")]
+    #[value(alias = "qf", help = "Output matches for the Neovim Quickfix List")]
     Quickfix,
 }
 
