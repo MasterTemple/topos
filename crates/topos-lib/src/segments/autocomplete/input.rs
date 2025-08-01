@@ -155,10 +155,10 @@ mod tests {
         let completer = InputAutoCompleter::new(&matcher);
 
         let mut values = vec!["", "1-", "1:", "1:1-", "1-2:", "1:1-2:"];
-        values.extend(["9", "1-9", "1:9", "1:1-9", "1-2:9", "1:1-2:9"]);
+        // values.extend(["9", "1-9", "1:9", "1:1-9", "1-2:9", "1:1-2:9"]);
         values.extend(["1:1-2:9,", "1:1-2:9,3", "1:1-2:9,3-", "1:1-2:9,3- hi"]);
         let bk = "Genesis ";
-        for v in values.into_iter().take(6) {
+        for v in values.into_iter().take(8) {
             let input = &format!("{bk}{v}");
             if let Some(result) = completer.suggest(input) {
                 println!("{input}");

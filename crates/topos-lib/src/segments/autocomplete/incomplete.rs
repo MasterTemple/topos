@@ -19,7 +19,7 @@ pub enum IncompleteSegment {
     // ChapterOrVerse,
     /// - Example Segment: "1-"
     /// - Suggests: chapters or verses
-    ChapterTo { start_chapter: u8, end: Option<u8> },
+    ChapterOrVerseTo { start: u8, end: Option<u8> },
     // ChapterTo { start_chapter: u8 },
     /// - Example Segment: "1:"
     /// - Suggests: verses
@@ -160,8 +160,8 @@ impl IncompleteSegment {
                 start: start.as_option(),
             },
             // Segment: "1-" (chapter or verse)
-            (Some(Value(start_chapter)), None, Some(end), None) => Self::ChapterTo {
-                start_chapter,
+            (Some(Value(start_chapter)), None, Some(end), None) => Self::ChapterOrVerseTo {
+                start: start_chapter,
                 end: end.as_option(),
             },
             // Segment: "1:" (verse)
@@ -212,137 +212,99 @@ impl IncompleteSegment {
     ) -> Option<Vec<Segment>> {
         let last_chapter = chapter_verses.get_chapter_count();
 
-        // BUG: this is the problem
-        // extract prev/last segment, but if there is not one, suggest every chapter
-        let Some(prev) = prev else {
-            return Some(match self.clone() {
-                // the first number of all segments is always and only a chapter
-                Self::ChapterOrVerse { start } => (1..=last_chapter)
-                    .map(|ch| Segment::full_chapter(ch))
-                    .collect(),
-                Self::ChapterTo { start_chapter, end } => {
-                    let chapters = (start_chapter + 1..=last_chapter)
-                        .map(|c| Segment::full_chapter_range(start_chapter, c))
+        Some(match self.clone() {
+            // the first number of all segments is always and only a chapter
+            Self::ChapterOrVerse { start } => {
+                if let Some(prev) = prev {
+                    let next_verse = match prev.ending_verse() {
+                        Some(cur) => cur + 1,
+                        None => 1,
+                    };
+                    let current_chapter = prev.ending_chapter();
+                    let next_chapter = current_chapter + 1;
+                    let verses = (next_verse..=chapter_verses.get_last_verse(current_chapter)?)
+                        .map(|v| Segment::chapter_verse(current_chapter, v))
+                        .collect_vec();
+                    verses
+                } else {
+                    (1..=last_chapter)
+                        .map(|ch| Segment::full_chapter(ch))
+                        .collect()
+                }
+            }
+
+            Self::ChapterOrVerseTo { start, end } => {
+                // I can use context to determine if start is a chapter or a verse
+                if let Some(prev) = prev {
+                    let is_chapter = prev.ending_verse().is_some();
+                    if is_chapter {
+                        let chapters = (start + 1..=last_chapter)
+                            .map(|c| Segment::full_chapter_range(start, c))
+                            .collect_vec();
+                        chapters
+                    } else {
+                        let next_verse = match prev.ending_verse() {
+                            Some(cur) => cur + 1,
+                            None => 1,
+                        };
+                        let current_chapter = prev.ending_chapter();
+                        let verses = (next_verse
+                            ..=chapter_verses.get_last_verse(current_chapter)?)
+                            .map(|v| Segment::chapter_verse(current_chapter, v))
+                            .collect_vec();
+                        verses
+                    }
+                } else {
+                    let chapters = (start + 1..=last_chapter)
+                        .map(|c| Segment::full_chapter_range(start, c))
                         .collect_vec();
                     chapters
                 }
-                Self::ChapterVerse {
-                    start_chapter,
-                    start_verse,
-                } => {
-                    let verses = (1..=chapter_verses.get_last_verse(start_chapter)?)
-                        .map(|v| Segment::chapter_verse(start_chapter, v))
-                        .collect_vec();
-                    verses
-                }
-                Self::ChapterVerseTo {
-                    start_chapter,
-                    start_verse,
-                    end,
-                } => {
-                    let verses = (start_verse + 1
-                        ..=chapter_verses.get_last_verse(start_chapter)?)
-                        .map(|v| Segment::chapter_verse_range(start_chapter, start_verse, v))
-                        .collect_vec();
-                    let chapters = (start_chapter + 1..=last_chapter)
-                        .map(|c| Segment::chapter_range(start_chapter, start_verse, c, 1))
-                        .collect_vec();
-                    verses.into_iter().chain(chapters).collect()
-                }
-                Self::ChapterRangeTo {
-                    start_chapter,
-                    end_chapter,
-                    end_verse,
-                } => {
-                    let verses = (1..=chapter_verses.get_last_verse(end_chapter)?)
-                        .map(|v| Segment::chapter_range(start_chapter, 1, end_chapter, v))
-                        .collect_vec();
-                    verses
-                }
-                Self::ChapterVerseRangeTo {
-                    start_chapter,
-                    start_verse,
-                    end_chapter,
-                    end_verse,
-                } => {
-                    let verses = (1..=chapter_verses.get_last_verse(end_chapter)?)
-                        .map(|v| Segment::chapter_range(start_chapter, start_verse, end_chapter, v))
-                        .collect_vec();
-                    verses
-                }
-            });
-        };
-
-        let current_verse = prev.ending_verse();
-        let next_verse = match current_verse {
-            Some(cur) => cur + 1,
-            None => 1,
-        };
-        let current_chapter = prev.ending_chapter();
-        let next_chapter = current_chapter + 1;
-        let last_verse = chapter_verses.get_last_verse(current_chapter)?;
-
-        Some(match self.clone() {
-            Self::ChapterOrVerse { start } => {
-                let verses = (next_verse..=last_verse)
-                    .map(|v| Segment::chapter_verse(current_chapter, v))
-                    .collect_vec();
-                let chapters = (next_chapter..=last_chapter)
-                    .map(|c| Segment::full_chapter(c))
-                    .collect_vec();
-                verses.into_iter().chain(chapters).collect()
             }
-            Self::ChapterTo { start_chapter, end } => {
-                let verses = (1..=last_verse)
-                    // TODO: i need 1:1-2 represented
-                    .map(|v| Segment::chapter_verse(start_chapter, v))
-                    .collect_vec();
-                let chapters = (start_chapter + 1..=last_chapter)
-                    // .map(|c| Segment::full_chapter(c))
-                    .map(|c| Segment::full_chapter_range(start_chapter, c))
-                    .collect_vec();
-                verses.into_iter().chain(chapters).collect()
-            }
+
             Self::ChapterVerse {
                 start_chapter,
                 start_verse,
             } => {
-                let verses = (next_verse..=last_verse)
+                let verses = (1..=chapter_verses.get_last_verse(start_chapter)?)
                     .map(|v| Segment::chapter_verse(start_chapter, v))
                     .collect_vec();
                 verses
             }
+
             Self::ChapterVerseTo {
                 start_chapter,
                 start_verse,
                 end,
             } => {
-                let verses = (start_verse..=chapter_verses.get_last_verse(start_chapter)?)
-                    .map(|v| Segment::chapter_verse(start_chapter, v))
+                let verses = (start_verse + 1..=chapter_verses.get_last_verse(start_chapter)?)
+                    .map(|v| Segment::chapter_verse_range(start_chapter, start_verse, v))
                     .collect_vec();
                 let chapters = (start_chapter + 1..=last_chapter)
-                    .map(|c| Segment::full_chapter(c))
+                    .map(|c| Segment::chapter_range(start_chapter, start_verse, c, 1))
                     .collect_vec();
                 verses.into_iter().chain(chapters).collect()
             }
+
             Self::ChapterRangeTo {
-                start_chapter: _,
+                start_chapter,
                 end_chapter,
                 end_verse,
             } => {
                 let verses = (1..=chapter_verses.get_last_verse(end_chapter)?)
-                    .map(|v| Segment::chapter_verse(end_chapter, v))
+                    .map(|v| Segment::chapter_range(start_chapter, 1, end_chapter, v))
                     .collect_vec();
                 verses
             }
+
             Self::ChapterVerseRangeTo {
-                start_chapter: _,
-                start_verse: _,
+                start_chapter,
+                start_verse,
                 end_chapter,
                 end_verse,
             } => {
                 let verses = (1..=chapter_verses.get_last_verse(end_chapter)?)
-                    .map(|v| Segment::chapter_verse(end_chapter, v))
+                    .map(|v| Segment::chapter_range(start_chapter, start_verse, end_chapter, v))
                     .collect_vec();
                 verses
             }
