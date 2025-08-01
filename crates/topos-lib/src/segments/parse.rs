@@ -16,12 +16,12 @@ static POST_BOOK_VALID_REFERENCE_SEGMENT_CHARACTERS: Lazy<Regex> =
     Lazy::new(|| Regex::new(r"^ *\d{1,3}( *[\.,:;\-–——⸺] *\d{1,3})*").unwrap());
 // Lazy::new(|| Regex::new(r"^( *[\.,:;\-–——⸺] *\d+)*").unwrap());
 
-const ALL_DASHES: [char; 5] = ['-', '–', '—', '—', '⸺'];
-const SEGMENT_SPLITTERS: [char; 2] = [',', ';'];
+pub const ALL_DASHES: [char; 5] = ['-', '–', '—', '—', '⸺'];
+pub const SEGMENT_SPLITTERS: [char; 2] = [',', ';'];
 
-static NON_SEGMENT_CHARACTERS: Lazy<Regex> = Lazy::new(|| Regex::new(r"[^\d,:;-]+").unwrap());
+pub static NON_SEGMENT_CHARACTERS: Lazy<Regex> = Lazy::new(|| Regex::new(r"[^\d,:;-]+").unwrap());
 
-static TRAILING_NON_DIGITS: Lazy<Regex> = Lazy::new(|| Regex::new(r"(\D+$)").unwrap());
+pub static TRAILING_NON_DIGITS: Lazy<Regex> = Lazy::new(|| Regex::new(r"(\D+$)").unwrap());
 
 /// This is a separate struct so that way I can see how much of the remaining str are actual segments (to get the corresponding end position)
 pub struct SegmentInput<'a> {

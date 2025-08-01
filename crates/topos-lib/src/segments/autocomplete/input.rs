@@ -13,63 +13,71 @@ use crate::{
     },
 };
 
-// with surrounding spaces
-const DIGITS: &str = r" *\d{1,3} *";
+/// TODO: parse Roman Numerals
+/// - https://stackoverflow.com/questions/267399/how-do-you-match-only-valid-roman-numerals-with-a-regular-expression
+///
+/// Currently just parses a 3-character long set of digits
+const DIGITS: &str = r"\d{1,3}";
+/// Various dashes
 const RANGE_DELIMETER: &str = r"[\-–——⸺]";
+/// `.` or `:`
 const CHAPTER_DELIMETER: &'static str = r"[\.:]";
+/// `,` or `;`
 const SEGMENT_DELIMETER: &'static str = r"[,;]";
+/// Any whitespace
+const WS: &str = r"\s*";
 
-/// `\d+`
-const CHAPTER: &'static str = concat!(DIGITS);
+// /// `\d+`
+// const CHAPTER: &'static str = concat!(DIGITS);
+//
+// /// `\d+:\d+`
+// const CHAPTER_VERSE: &'static str = concat!(DIGITS, CHAPTER_DELIMETER, DIGITS);
+//
+// /// `\d+:\d+-\d+`
+// const CHAPTER_VERSE_RANGE: &'static str =
+//     concat!(DIGITS, CHAPTER_DELIMETER, DIGITS, RANGE_DELIMETER, DIGITS);
+//
+// /// `\d+-\d+:\d+`
+// const CHAPTER_VERSE_RANGE_ALT: &'static str =
+//     concat!(DIGITS, RANGE_DELIMETER, DIGITS, CHAPTER_DELIMETER, DIGITS);
+//
+// /// `\d+:\d+-\d+:\d+`
+// const CHAPTER_RANGE: &'static str = concat!(
+//     DIGITS,
+//     CHAPTER_VERSE,
+//     DIGITS,
+//     RANGE_DELIMETER,
+//     DIGITS,
+//     CHAPTER_VERSE,
+//     DIGITS
+// );
+//
+// /// `\d+-\d+`
+// const FULL_CHAPTER_RANGE: &'static str = concat!(DIGITS, RANGE_DELIMETER, DIGITS);
+//
+// /**
+// At runtime would be:
+// ```ignore
+// let any_segment = format!("({})", [CHAPTER, CHAPTER_VERSE, CHAPTER_VERSE_RANGE, CHAPTER_VERSE_RANGE_ALT, CHAPTER_RANGE, FULL_CHAPTER_RANGE].join("|"));
+// ```
+// */
+// const ANY_SEGMENT: &'static str = concat!(
+//     "((?:)",
+//     CHAPTER,
+//     "|",
+//     CHAPTER_VERSE,
+//     "|",
+//     CHAPTER_VERSE_RANGE,
+//     "|",
+//     CHAPTER_VERSE_RANGE_ALT,
+//     "|",
+//     CHAPTER_RANGE,
+//     "|",
+//     FULL_CHAPTER_RANGE,
+//     ")",
+// );
 
-/// `\d+:\d+`
-const CHAPTER_VERSE: &'static str = concat!(DIGITS, CHAPTER_DELIMETER, DIGITS);
-
-/// `\d+:\d+-\d+`
-const CHAPTER_VERSE_RANGE: &'static str =
-    concat!(DIGITS, CHAPTER_DELIMETER, DIGITS, RANGE_DELIMETER, DIGITS);
-
-/// `\d+-\d+:\d+`
-const CHAPTER_VERSE_RANGE_ALT: &'static str =
-    concat!(DIGITS, RANGE_DELIMETER, DIGITS, CHAPTER_DELIMETER, DIGITS);
-
-/// `\d+:\d+-\d+:\d+`
-const CHAPTER_RANGE: &'static str = concat!(
-    DIGITS,
-    CHAPTER_VERSE,
-    DIGITS,
-    RANGE_DELIMETER,
-    DIGITS,
-    CHAPTER_VERSE,
-    DIGITS
-);
-
-/// `\d+-\d+`
-const FULL_CHAPTER_RANGE: &'static str = concat!(DIGITS, RANGE_DELIMETER, DIGITS);
-
-/**
-At runtime would be:
-```ignore
-let any_segment = format!("({})", [CHAPTER, CHAPTER_VERSE, CHAPTER_VERSE_RANGE, CHAPTER_VERSE_RANGE_ALT, CHAPTER_RANGE, FULL_CHAPTER_RANGE].join("|"));
-```
-*/
-const ANY_SEGMENT: &'static str = concat!(
-    "((?:)",
-    CHAPTER,
-    "|",
-    CHAPTER_VERSE,
-    "|",
-    CHAPTER_VERSE_RANGE,
-    "|",
-    CHAPTER_VERSE_RANGE_ALT,
-    "|",
-    CHAPTER_RANGE,
-    "|",
-    FULL_CHAPTER_RANGE,
-    ")",
-);
-
-const VALID_SEGMENTS: &'static str = concat!("((?:)", ANY_SEGMENT, SEGMENT_DELIMETER, ")*",);
+// const VALID_SEGMENTS: &'static str = concat!("((?:)", ANY_SEGMENT, SEGMENT_DELIMETER, ")*",);
 
 // static VALID_SEGMENTS: Lazy<Regex> =
 //     // Lazy::new(|| Regex::new(r"^ *\d+( *[\.,:;\-–——⸺] *\d+)*").unwrap());
@@ -84,31 +92,103 @@ const BOOK: &'static str = r"^\d?\D+";
 
 /// This is basically `\d+(:\d+)?(-\d+(:\d+)?)?`
 const ANY_VALID_SEGMENT_STR: &'static str = concat!(
+    WS,
     DIGITS,
+    WS,
     "(",
     CHAPTER_DELIMETER,
+    WS,
     DIGITS,
+    WS,
     ")?",
     "(",
     RANGE_DELIMETER,
+    WS,
     DIGITS,
+    WS,
     "(",
     CHAPTER_DELIMETER,
+    WS,
     DIGITS,
+    WS,
     ")?",
     ")?"
 );
+
+const VALID_SEGMENTS: &'static str =
+    concat!("((?:)", ANY_VALID_SEGMENT_STR, SEGMENT_DELIMETER, ")*",);
+
 static ANY_VALID_SEGMENT: Lazy<Regex> =
     // Lazy::new(|| Regex::new(r#"\d+(:\d+)?(-\d+(:\d+)?)?"#).unwrap());
     Lazy::new(|| Regex::new(ANY_VALID_SEGMENT_STR).unwrap());
+
+const OPT_DIGITS: &str = r"\d*";
+/// BUG: these DIGITS dont work
+///
+/// This is basically `(?<sc>\d*)(:(?<sv>\d*))?(-(?<ec>\d*)(:(?<ev>\d*))?)?`
+#[rustfmt::skip]
+const INCOMPLETE_SEGMENT: &'static str = concat!(
+    // `(?<sc>\d*)`
+    "(?<sc>", WS, OPT_DIGITS, WS, ")",
+    // `(:(?<sv>\d*))?`
+    "(", CHAPTER_DELIMETER, "(?<sv>", WS, OPT_DIGITS, WS, "))?",
+    // `(-(?<ec>\d*)(:(?<ev>\d*))?)?`
+    "(",
+        RANGE_DELIMETER, "(?<ec>", WS, OPT_DIGITS, WS, ")",
+        "(", CHAPTER_DELIMETER, "(?<ev>", WS, OPT_DIGITS, WS, "))?",
+    ")?"
+);
+
+pub struct GroupedMatchStr<'a> {
+    book: &'a str,
+    valid: &'a str,
+    incomplete: &'a str,
+}
+
+impl<'a> GroupedMatchStr<'a> {
+    pub fn new(input: &'a str) -> Option<Self> {
+        let cap = GROUP_MATCH.captures_iter(input).next()?;
+        let book = cap.name("book")?.as_str();
+        let valid = cap.name("valid")?.as_str();
+        let incomplete = cap.name("incomplete")?.as_str();
+        Some(Self {
+            book,
+            valid,
+            incomplete,
+        })
+    }
+}
 
 /// This will group a match into a book, valid segments, and incomplete segments (which leaves off
 /// final set of digits)
 static GROUP_MATCH: Lazy<Regex> = Lazy::new(|| {
     // "\d+(:\d+)?(-)?(\d+(:\d+)?)";
     //
-    Regex::new(format!("({})({})(.*){}", BOOK, VALID_SEGMENTS, DIGITS).as_str()).unwrap()
+    // Regex::new(
+    //     format!(
+    //         "({})({})({}){}",
+    //         BOOK, VALID_SEGMENTS, INCOMPLETE_SEGMENT, DIGITS
+    //     )
+    //     .as_str(),
+    // )
+    // .unwrap()
+    Regex::new(
+        // FIX: I shouldn't even need to match the incomplete part, i should just match book and
+        // valid segments and then from there, try matching an incomplete segment
+        // but how do i get rid of the last digits? i can just remove them from the end of the
+        // input, and then the rest should parse exactly into an incomplete segment
+        // if they are beyond it like `John 3:16, is a verse that ..' then I don't need to be auto
+        // completeting
+        format!(
+            r#"^(?<book>{})(?<valid>{})(?<incomplete>.*)\d*"#,
+            BOOK, VALID_SEGMENTS
+        )
+        .as_str(),
+    )
+    .unwrap()
 });
+
+static TRAILING_DIGITS: Lazy<Regex> = Lazy::new(|| Regex::new(r"\d*$").unwrap());
 
 pub struct InputAutoCompleter<'a> {
     matcher: &'a BibleMatcher,
@@ -119,6 +199,47 @@ impl<'a> InputAutoCompleter<'a> {
     pub fn new(matcher: &'a BibleMatcher, completer: &'a SegmentAutoCompleter) -> Self {
         Self { matcher, completer }
     }
+
+    /// - This assumes your cursor is at the end of the input
+    pub fn complete(&self, input: &str) -> Option<Vec<Segments>> {
+        // cache this later
+        let re = self.matcher.data().create_book_regex().unwrap();
+        let cap = re.captures_iter(input).last()?;
+        let book_match = cap.get(1).unwrap();
+        // dbg!(&book_match.as_str());
+        let book_id = self.matcher.data().books().search(book_match.as_str())?;
+        let segments_input = &input[book_match.end()..];
+        // dbg!(&segments_input);
+        let valid_segments = Regex::new(&format!("^{VALID_SEGMENTS}"))
+            .unwrap()
+            .captures(segments_input)?
+            .get(0)?;
+        // dbg!(&valid_segments);
+        let mut incomplete_segments_input = &segments_input[valid_segments.end()..];
+        // dbg!(&incomplete_segments_input);
+        let valid_segments = if valid_segments.as_str().len() == 0 {
+            Segments::new()
+        } else {
+            Segments::parse_str(valid_segments.as_str())?
+        };
+        // dbg!(&valid_segments.to_string());
+        // dbg!(&incomplete_segments_input);
+        // if incomplete_segments_input.ends_with(char::is_numeric) {
+        //     incomplete_segments_input = incomplete_segments_input.trim_end_matches()
+        // }
+        let re = Regex::new(&format!("^({INCOMPLETE_SEGMENT})$")).unwrap();
+        // println!("re: '{}'", re.to_string());
+        let incomplete_segment = re.captures(incomplete_segments_input)?;
+
+        println!("{}", "-".repeat(20));
+        println!("{input}");
+        println!("Valid: {}", valid_segments);
+        println!("Incomplete: {:#?}", incomplete_segment);
+        println!("{}", "-".repeat(20));
+
+        None
+    }
+
     pub fn suggest(&self, input: &str) -> Option<Vec<Segments>> {
         // self.matcher.data().
         let mat = self.matcher.find(input)?;
@@ -130,11 +251,11 @@ impl<'a> InputAutoCompleter<'a> {
         // let Passage { book, segments } = &psg;
         // let Position { line, column } = &mat.location.end;
 
-        let line = input.lines().nth(start.line - 1)?;
-        dbg!(&line);
-        let match_to_end_of_line = &line[start.column - 1..];
-        let result = GROUP_MATCH.captures_iter(match_to_end_of_line).next();
-        dbg!(result);
+        // let line = input.lines().nth(start.line - 1)?;
+        // dbg!(&line);
+        // let match_to_end_of_line = &line[start.column - 1..];
+        // let result = GROUP_MATCH.captures_iter(match_to_end_of_line).next();
+        // dbg!(result);
 
         let line = input.lines().nth(end.line - 1)?;
         let remaining = &line[end.column - 1..];
@@ -160,7 +281,10 @@ mod tests {
         data::chapter_verses::BookChapterVerses,
         matcher::matcher::BibleMatcher,
         segments::{
-            autocomplete::{completer::SegmentAutoCompleter, input::InputAutoCompleter},
+            autocomplete::{
+                completer::SegmentAutoCompleter,
+                input::{GROUP_MATCH, InputAutoCompleter},
+            },
             segment::Segment,
         },
     };
@@ -170,15 +294,49 @@ mod tests {
         let completer = SegmentAutoCompleter(BookChapterVerses::default());
         let matcher = BibleMatcher::default();
         let completer = InputAutoCompleter::new(&matcher, &completer);
-        completer.suggest("Genesis 1:1");
+        // completer.suggest("Genesis 1:1");
+        let values = vec![
+            "Genesis",
+            "Genesis ",
+            "Genesis 1",
+            "Genesis 1:",
+            "Genesis 1:1",
+            "Genesis 1:1,",
+            "Genesis 1:1-",
+            "Genesis 1:1,2",
+            "Genesis 1:1-2",
+            "Genesis 1:1,2,",
+            "Genesis 1:1-2:",
+            "Genesis 1:1-2:3",
+            "Genesis 1:1-2:3,",
+        ];
+        for val in values {
+            let cap = GROUP_MATCH.captures_iter(val).next().unwrap();
+            println!("Value: {:?}", val);
+            println!("book: {:?}", cap.name("book").map(|c| c.as_str()));
+            println!("valid: {:?}", cap.name("valid").map(|c| c.as_str()));
+            println!(
+                "incomplete: {:?}",
+                cap.name("incomplete").map(|c| c.as_str())
+            );
+            // println!(
+            //     "incomplete: {:?}",
+            //     cap.name("incomplete")
+            //         .map(|c| c.as_str().trim_end_matches(char::is_numeric))
+            // );
+            println!("----------------------");
+        }
     }
 
     #[test]
     fn test_regex() {
         // let re = Regex::new(r#"(?<sc>\d*)(?<sv>:\d*)?((?:)(?<ec>-\d*)(?<ev>:\d*)?)?"#).unwrap();
-        let re = Regex::new(r#"(?<sc>\d*)(:(?<sv>\d*))?(-(?<ec>\d*)(:(?<ev>\d*))?)?"#).unwrap();
+        // let re = Regex::new(r#"(?<sc>\d*)(:(?<sv>\d*))?(-(?<ec>\d*)(:(?<ev>\d*))?)?"#).unwrap();
+        let re = Regex::new(r#"^(?<sc>\d*)(:(?<sv>\d*))?(-(?<ec>\d*)(:(?<ev>\d*))?)?\d*"#).unwrap();
 
-        let values = vec!["", "1-", "1:", "1:1-", "1-2:", "1:1-2:"];
+        let mut values = vec!["", "1-", "1:", "1:1-", "1-2:", "1:1-2:"];
+        // let values = vec!["9", "1-9", "1:9", "1:1-9", "1-2:9", "1:1-2:9"];
+        values.extend(["9", "1-9", "1:9", "1:1-9", "1-2:9", "1:1-2:9"]);
         for v in values {
             if let Some(cap) = re.captures_iter(v).next() {
                 // println!("Segment: {:?}", cap.get(0));
@@ -190,5 +348,19 @@ mod tests {
             }
             println!("----------------------");
         }
+    }
+
+    #[test]
+    fn test_complete() {
+        let completer = SegmentAutoCompleter(BookChapterVerses::default());
+        let matcher = BibleMatcher::default();
+        let completer = InputAutoCompleter::new(&matcher, &completer);
+
+        let mut values = vec!["", "1-", "1:", "1:1-", "1-2:", "1:1-2:"];
+        values.extend(["9", "1-9", "1:9", "1:1-9", "1-2:9", "1:1-2:9"]);
+        for v in values {
+            // completer.complete(&format!("Genesis {v}"));
+        }
+        completer.complete(&format!("Genesis 1:1-2,3:"));
     }
 }

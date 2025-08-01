@@ -1,4 +1,6 @@
+use itertools::Itertools;
 use once_cell::sync::Lazy;
+use regex::Regex;
 
 use crate::segments::segments::Passage;
 
@@ -17,6 +19,19 @@ impl BibleData {
     }
     pub fn genres(&self) -> &Genres {
         &self.genres
+    }
+
+    pub fn create_book_regex(&self) -> Result<Regex, String> {
+        let books_pattern: String = self
+            .books()
+            .iter_keys_and_ids()
+            .map(|(key, id)| (key))
+            .join("|");
+
+        let book_regex = Regex::new(format!(r"\b(((?:)(?i){books_pattern}))\b\.?").as_str())
+            .map_err(|e| format!("Failed to compile book_regex because of bad user input.\n{e}"))?;
+
+        Ok(book_regex)
     }
 
     // pub fn parse(&self, input: &str) -> Option<BookSegments> {
