@@ -48,7 +48,7 @@ impl<'a> InputAutoCompleter<'a> {
             .data()
             .chapter_verses()
             .get_chapter_verses(&book_id)?;
-        let suggestions = incomplete_segment.suggest(chapter_verses, full_segments.last());
+        let suggestions = incomplete_segment.suggest(chapter_verses, full_segments.last())?;
 
         Some(CompletionOutput::new(book_id, full_segments, suggestions))
     }
@@ -154,15 +154,14 @@ mod tests {
         let matcher = BibleMatcher::default();
         let completer = InputAutoCompleter::new(&matcher);
 
-        let mut values = vec!["", "1-"];
-        // let mut values = vec!["", "1-", "1:", "1:1-", "1-2:", "1:1-2:"];
-        // values.extend(["9", "1-9", "1:9", "1:1-9", "1-2:9", "1:1-2:9"]);
-        // values.extend(["1:1-2:9,", "1:1-2:9,3", "1:1-2:9,3-", "1:1-2:9,3- hi"]);
+        let mut values = vec!["", "1-", "1:", "1:1-", "1-2:", "1:1-2:"];
+        values.extend(["9", "1-9", "1:9", "1:1-9", "1-2:9", "1:1-2:9"]);
+        values.extend(["1:1-2:9,", "1:1-2:9,3", "1:1-2:9,3-", "1:1-2:9,3- hi"]);
         let bk = "Genesis ";
-        for v in values {
+        for v in values.into_iter().take(3) {
             let input = &format!("{bk}{v}");
-            println!("{input}");
             if let Some(result) = completer.suggest(input) {
+                println!("{input}");
                 let total = result.suggestions.len();
                 for (idx, sug) in result.suggestions.into_iter().enumerate() {
                     let segs = result.segments.with_suggestion(sug);

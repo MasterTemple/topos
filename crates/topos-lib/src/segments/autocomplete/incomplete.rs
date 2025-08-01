@@ -82,8 +82,8 @@ impl IncompleteSegment {
     /// This expects to only receive only the unparsed incomplete segment
     pub fn new(input: &str) -> Option<Self> {
         let seg = INCOMPLETE_SEGMENT.captures(input)?;
-        // Some(Self::from_captures(seg))
-        dbg!(Some(Self::from_captures(seg)))
+        Some(Self::from_captures(seg))
+        // dbg!(Some(Self::from_captures(seg)))
     }
 
     /// The groups
@@ -150,11 +150,41 @@ impl IncompleteSegment {
         let end_chapter = parse_cap("ec");
         let end_verse = parse_cap("ev");
 
-        println!("{}", "-".repeat(80));
-        println!("{}", cap.get(0).unwrap().as_str());
+        // println!("{}", "-".repeat(80));
+        // println!("{}", cap.get(0).unwrap().as_str());
         // dbg!(start_chapter, start_verse, end_chapter, end_verse);
-        println!("{}", "-".repeat(80));
+        // println!("{}", "-".repeat(80));
         match (start_chapter, start_verse, end_chapter, end_verse) {
+            // Segment: "" (chapter)
+            (Some(start), None, None, None) => Self::ChapterOrVerse {
+                start: start.as_option(),
+            },
+            // Segment: "1-" (chapter or verse)
+            (Some(Value(start_chapter)), None, Some(end), None) => Self::ChapterTo {
+                start_chapter,
+                end: end.as_option(),
+            },
+            // Segment: "1:" (verse)
+            (Some(Value(start_chapter)), Some(start_verse), None, None) => Self::ChapterVerse {
+                start_chapter,
+                start_verse: start_verse.as_option(),
+            },
+            // Segment: "1:1-" (chapter or verse)
+            (Some(Value(start_chapter)), Some(Value(start_verse)), Some(end), None) => {
+                Self::ChapterVerseTo {
+                    start_chapter,
+                    start_verse,
+                    end: end.as_option(),
+                }
+            }
+            // Segment: "1-2:" (verse)
+            (Some(Value(start_chapter)), None, Some(Value(end_chapter)), Some(end_verse)) => {
+                Self::ChapterRangeTo {
+                    start_chapter,
+                    end_chapter,
+                    end_verse: end_verse.as_option(),
+                }
+            }
             // Segment: "1:1-2:" (verse)
             (
                 Some(Value(start_chapter)),
@@ -167,36 +197,6 @@ impl IncompleteSegment {
                 end_chapter,
                 end_verse: end_verse.as_option(),
             },
-            // Segment: "1-2:" (verse)
-            (Some(Value(start_chapter)), None, Some(Value(end_chapter)), Some(end_verse)) => {
-                Self::ChapterRangeTo {
-                    start_chapter,
-                    end_chapter,
-                    end_verse: end_verse.as_option(),
-                }
-            }
-            // Segment: "1:1-" (chapter or verse)
-            (Some(Value(start_chapter)), Some(Value(start_verse)), Some(end), None) => {
-                Self::ChapterVerseTo {
-                    start_chapter,
-                    start_verse,
-                    end: end.as_option(),
-                }
-            }
-            // Segment: "1:" (verse)
-            (Some(Value(start_chapter)), Some(start_verse), None, None) => Self::ChapterVerse {
-                start_chapter,
-                start_verse: start_verse.as_option(),
-            },
-            // Segment: "1-" (chapter or verse)
-            (Some(Value(start_chapter)), None, Some(end), None) => Self::ChapterTo {
-                start_chapter,
-                end: end.as_option(),
-            },
-            // Segment: "" (chapter)
-            (Some(start), None, None, None) => Self::ChapterOrVerse {
-                start: start.as_option(),
-            },
             _ => unreachable!(),
         }
     }
@@ -205,14 +205,68 @@ impl IncompleteSegment {
     This will suggest segments that can be added to the input segments
     These segments can be suggesting chapters or verses or both
     */
-    pub fn suggest(&self, chapter_verses: &ChapterVerses, prev: Option<&Segment>) -> Vec<Segment> {
+    pub fn suggest(
+        &self,
+        chapter_verses: &ChapterVerses,
+        prev: Option<&Segment>,
+    ) -> Option<Vec<Segment>> {
         let last_chapter = chapter_verses.get_chapter_count();
 
+        // BUG: this is the problem
         // extract prev/last segment, but if there is not one, suggest every chapter
         let Some(prev) = prev else {
-            return (1..=last_chapter)
-                .map(|ch| Segment::full_chapter(ch))
-                .collect();
+            return Some(match self.clone() {
+                // the first number of all segments is always and only a chapter
+                Self::ChapterOrVerse { start } => (1..=last_chapter)
+                    .map(|ch| Segment::full_chapter(ch))
+                    .collect(),
+                Self::ChapterTo { start_chapter, end } => {
+                    // let verses = (1..=chapter_verses.get_last_verse(start_chapter)?)
+                    // let verses = (start_chapter + 1..=last_chapter)
+                    //     // .map(|v| Segment::chapter_verse(start_chapter, v))
+                    //     .filter_map(|c| {
+                    //         Some(Segment::chapter_range(
+                    //             start_chapter,
+                    //             1,
+                    //             c,
+                    //             // TODO: I need to coerce this from `1:1-2:25` to `1-2`
+                    //             chapter_verses.get_last_verse(c)?,
+                    //         ))
+                    //     })
+                    //     .collect_vec();
+                    let chapters = (start_chapter + 1..=last_chapter)
+                        .map(|c| Segment::full_chapter_range(start_chapter, c))
+                        .collect_vec();
+                    // verses.into_iter().chain(chapters).collect()
+                    // chapters.into_iter().chain(verses).collect()
+                    chapters
+                }
+                Self::ChapterVerse {
+                    start_chapter,
+                    start_verse,
+                } => {
+                    let verses = (1..=chapter_verses.get_last_verse(start_chapter)?)
+                        .map(|v| Segment::chapter_verse(start_chapter, v))
+                        .collect_vec();
+                    verses
+                }
+                Self::ChapterVerseTo {
+                    start_chapter,
+                    start_verse,
+                    end,
+                } => todo!(),
+                Self::ChapterRangeTo {
+                    start_chapter,
+                    end_chapter,
+                    end_verse,
+                } => todo!(),
+                Self::ChapterVerseRangeTo {
+                    start_chapter,
+                    start_verse,
+                    end_chapter,
+                    end_verse,
+                } => todo!(),
+            });
         };
 
         let current_verse = prev.ending_verse();
@@ -222,9 +276,9 @@ impl IncompleteSegment {
         };
         let current_chapter = prev.ending_chapter();
         let next_chapter = current_chapter + 1;
-        let last_verse = chapter_verses.get_last_verse(current_chapter).unwrap();
+        let last_verse = chapter_verses.get_last_verse(current_chapter)?;
 
-        match self.clone() {
+        Some(match self.clone() {
             Self::ChapterOrVerse { start } => {
                 let verses = (next_verse..=last_verse)
                     .map(|v| Segment::chapter_verse(current_chapter, v))
@@ -236,10 +290,12 @@ impl IncompleteSegment {
             }
             Self::ChapterTo { start_chapter, end } => {
                 let verses = (1..=last_verse)
+                    // TODO: i need 1:1-2 represented
                     .map(|v| Segment::chapter_verse(start_chapter, v))
                     .collect_vec();
                 let chapters = (start_chapter + 1..=last_chapter)
-                    .map(|c| Segment::full_chapter(c))
+                    // .map(|c| Segment::full_chapter(c))
+                    .map(|c| Segment::full_chapter_range(start_chapter, c))
                     .collect_vec();
                 verses.into_iter().chain(chapters).collect()
             }
@@ -286,7 +342,7 @@ impl IncompleteSegment {
                     .collect_vec();
                 verses
             }
-        }
+        })
     }
 }
 
