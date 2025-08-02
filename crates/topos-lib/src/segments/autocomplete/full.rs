@@ -4,11 +4,24 @@ use regex::{Match, Regex};
 
 use crate::segments::segments::Segments;
 
+macro_rules! padded {
+    ($input:ident) => {
+        constcat::concat!(
+            crate::segments::autocomplete::full::WS,
+            $input,
+            crate::segments::autocomplete::full::WS
+        );
+    };
+}
+
 /// TODO: parse Roman Numerals
 /// - https://stackoverflow.com/questions/267399/how-do-you-match-only-valid-roman-numerals-with-a-regular-expression
-///
+/// - To parse `((?<numeral>[ivxlc])|(?<decimal>\d+)[abc])`
 /// Currently just parses a 3-character long set of digits
 pub const DIGITS: &str = r"\d{1,3}";
+pub const PADDED_DIGITS: &str = padded!(DIGITS);
+/// To support verses like `Matthew 28:18b-20`
+pub const SUBVERSE: &str = r"[abc]";
 /// Various dashes
 pub const RANGE_DELIMETER: &str = r"[\-–——⸺]";
 /// `.` or `:`

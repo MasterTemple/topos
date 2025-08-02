@@ -1,11 +1,6 @@
 use once_cell::sync::Lazy;
-use topos_lib::matcher::{instance::BibleMatch, matcher::BibleMatcher};
+use topos_lib::matcher::matcher::BibleMatcher;
 use wasm_bindgen::prelude::*;
-
-#[wasm_bindgen]
-pub fn greet(name: &str) -> String {
-    format!("Hello, {} from Rust!", name)
-}
 
 static BIBLE: Lazy<BibleMatcher> = Lazy::new(|| BibleMatcher::default());
 
@@ -21,4 +16,20 @@ pub fn search(input: &str) -> Vec<String> {
             format!("[{}:{}] {name} {segments}", start.line, start.column)
         })
         .collect()
+}
+
+#[wasm_bindgen]
+pub fn autocomplete(input: &str) -> Option<Vec<String>> {
+    let m = &*BIBLE;
+    let comp = m.completer().suggest(input)?;
+    let book = m.data().books().get_name(comp.book)?;
+    Some(
+        comp.suggestions
+            .iter()
+            .map(|sug| {
+                let segs = comp.segments.with_suggestion(sug.clone());
+                format!("{} {}", book, segs)
+            })
+            .collect(),
+    )
 }

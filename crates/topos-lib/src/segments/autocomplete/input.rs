@@ -50,7 +50,13 @@ impl<'a> InputAutoCompleter<'a> {
             .get_chapter_verses(&book_id)?;
         let suggestions = incomplete_segment.suggest(chapter_verses, full_segments.last())?;
 
-        Some(CompletionOutput::new(book_id, full_segments, suggestions))
+        let start = book_match.start();
+        Some(CompletionOutput::new(
+            start,
+            book_id,
+            full_segments,
+            suggestions,
+        ))
     }
 }
 

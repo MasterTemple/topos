@@ -40,7 +40,7 @@ npx tsc --init
 Install in TypeScript
 
 ```bash
-npm install /home/dgmastertemple/Development/typescript/topos-ts/pkg/
+npm install /home/dgmastertemple/Documents/GitHub/topos/crates/topos-ts/pkg/
 ```
 
 Transpile

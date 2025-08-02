@@ -8,14 +8,16 @@ use crate::{
 ///
 /// TODO: For LSP purposes, I should include start location from input
 pub struct CompletionOutput {
+    pub start: usize,
     pub book: BookId,
     pub segments: Segments,
     pub suggestions: Vec<Segment>,
 }
 
 impl CompletionOutput {
-    pub fn new(book: BookId, segments: Segments, suggestions: Vec<Segment>) -> Self {
+    pub fn new(start: usize, book: BookId, segments: Segments, suggestions: Vec<Segment>) -> Self {
         Self {
+            start,
             book,
             segments,
             suggestions,
