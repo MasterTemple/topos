@@ -114,13 +114,24 @@ impl From<MinimalSegments> for Segments {
                 }
             } else {
                 if let Some(end) = seg.end {
-                    let start_chapter = seg.start;
                     if let Some(end_verse) = end.1 {
+                        let start_chapter = seg.start;
                         let end_chapter = end.0;
                         Segment::chapter_range(start_chapter, 1, end_chapter, end_verse)
                     } else {
-                        let end_chapter = end.0;
-                        Segment::full_chapter_range(start_chapter, end_chapter)
+                        if let Some(prev) = segments.last() {
+                            let start_verse = seg.start;
+                            let end_verse = end.0;
+                            Segment::chapter_verse_range(
+                                prev.ending_chapter(),
+                                start_verse,
+                                end_verse,
+                            )
+                        } else {
+                            let start_chapter = seg.start;
+                            let end_chapter = end.0;
+                            Segment::full_chapter_range(start_chapter, end_chapter)
+                        }
                     }
                 } else {
                     if let Some(prev) = segments.last() {
