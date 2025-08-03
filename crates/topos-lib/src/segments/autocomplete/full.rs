@@ -16,7 +16,7 @@ macro_rules! padded {
 
 /// TODO: parse Roman Numerals
 /// - https://stackoverflow.com/questions/267399/how-do-you-match-only-valid-roman-numerals-with-a-regular-expression
-/// - To parse `((?<numeral>[ivxlc])|(?<decimal>\d+)[abc])`
+/// - To parse `((?<numeral>[ivxlc])|(?<decimal>\d+)[abc]?)`
 /// Currently just parses a 3-character long set of digits
 pub const DIGITS: &str = r"\d{1,3}";
 pub const PADDED_DIGITS: &str = padded!(DIGITS);

@@ -2,6 +2,7 @@
 members = [
     "crates/topos-cli",
     "crates/topos-lib",
+    "crates/topos-parser",
     "crates/topos-ts",
     "crates/topos-py",
 ]
