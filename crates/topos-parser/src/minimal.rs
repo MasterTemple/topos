@@ -31,28 +31,63 @@ impl MinimalSegments {
         // PERF: Should I make this into a static value?
         minimal_full_segments_parser().parse(input).into_output()
     }
+    pub fn len(&self) -> usize {
+        self.span.end - self.span.start
+    }
 }
 
-/// Just parse or fail, no context
-fn only_decimals<'a>() -> impl Parser<'a, &'a str, u8> {
+// /// Just parse or fail, no context
+// fn only_decimals<'a>() -> impl Parser<'a, &'a str, u8> {
+//     whitespace()
+//         .ignore_then(decimal())
+//         .then_ignore(whitespace())
+// }
+
+/// Only take leading whitespace
+fn only_numbers<'a>() -> impl Parser<'a, &'a str, u8> {
     whitespace()
         .ignore_then(decimal())
-        .then_ignore(whitespace())
-}
-
-fn only_numbers<'a>() -> impl Parser<'a, &'a str, u8> {
-    only_decimals()
         .or(only_roman_numerals())
         .then_ignore(optional_subverse())
 }
 
+// fn minimal_full_segment_parser<'a>() -> impl Parser<'a, &'a str, MinimalSegment> {
+//     only_numbers()
+//         .then(delim_chapter().ignore_then(only_numbers()).or_not())
+//         .then(
+//             delim_range()
+//                 .ignore_then(only_numbers())
+//                 .then(delim_chapter().ignore_then(only_numbers()).or_not())
+//                 .or_not(),
+//         )
+//         .map(|((start, explicit_start_verse), end)| MinimalSegment {
+//             start,
+//             explicit_start_verse,
+//             end,
+//         })
+// }
+
+/// WARNING: This will not tolerate trailing white-space, this is to be handled by the segment
+/// delimeter in the multi-segment parser: [`minimal_full_segments_parser`]
+///
+/// - There is a pattern where I take whitespace before a delimeter, but if I don't match the
+/// delimeter, I do not take the whitespace (this means I won't pick up trailing whitespace)
 fn minimal_full_segment_parser<'a>() -> impl Parser<'a, &'a str, MinimalSegment> {
     only_numbers()
-        .then(delim_chapter().ignore_then(only_numbers()).or_not())
         .then(
-            delim_range()
-                .ignore_then(only_numbers())
-                .then(delim_chapter().ignore_then(only_numbers()).or_not())
+            whitespace()
+                .ignore_then(delim_chapter().ignore_then(only_numbers()))
+                .or_not(),
+        )
+        .then(
+            whitespace()
+                .ignore_then(
+                    delim_range().ignore_then(only_numbers()).then(
+                        whitespace()
+                            .ignore_then(delim_chapter().ignore_then(only_numbers()))
+                            .or_not(),
+                    ),
+                )
                 .or_not(),
         )
         .map(|((start, explicit_start_verse), end)| MinimalSegment {
@@ -64,7 +99,7 @@ fn minimal_full_segment_parser<'a>() -> impl Parser<'a, &'a str, MinimalSegment>
 
 fn minimal_full_segments_parser<'a>() -> impl Parser<'a, &'a str, MinimalSegments> {
     minimal_full_segment_parser()
-        .separated_by(delim_segment())
+        .separated_by(whitespace().ignore_then(delim_segment()))
         .at_least(1)
         .allow_trailing()
         .collect::<Vec<_>>()
@@ -87,7 +122,13 @@ mod tests {
         assert!(p("1-2:1").is_ok());
         assert!(p("1:1-2").is_ok());
         assert!(p("1:1-2:3").is_ok());
-        assert!(p(" 1 : 1- 2:   3  ").is_ok());
+        assert!(p("1:1-2:3").is_ok());
+        assert!(p("1:1-2:3").is_ok());
+        assert!(p("1:1-2:   3").is_ok());
+        assert!(p("1:1- 2:   3").is_ok());
+        assert!(p("1: 1- 2:   3").is_ok());
+        assert!(p("1 : 1- 2:   3").is_ok());
+        assert!(p(" 1 : 1- 2:   3").is_ok());
     }
 
     #[test]
@@ -98,6 +139,7 @@ mod tests {
                 .into_result()
                 .is_ok_and(|v| v.segments.len() == len)
         };
+        assert!(p(" 1 : 1- 2:   3  ", 1));
         assert!(p(" 1 : 1- 2:   3  , 4", 2));
         assert!(p(" 1 : 1- 2:   3  , 4:5", 2));
         assert!(p(" 1 : 1- 2:   3  , 4:5-7", 2));
@@ -107,6 +149,7 @@ mod tests {
     #[test]
     fn test_minimal_span() {
         let p = |input: &str| minimal_full_segments_parser().parse(input).into_result();
+        _ = dbg!(p(" 1 : 1- 2:   3  ,"));
         _ = dbg!(p(" 1 : 1- 2:   3  , 4"));
         _ = dbg!(p(" 1 : 1- 2:   3  , 4:5"));
         _ = dbg!(p(" 1 : 1- 2:   3  , 4:5-7"));
@@ -114,5 +157,17 @@ mod tests {
         _ = dbg!(p(" 1 : 1a- 2:   3  , 4:5-7 this ends here"));
         // err
         _ = dbg!(p("hi ok but yes 1 : 1a- 2:   3  , 4:5-7 this ends here"));
+    }
+
+    #[test]
+    fn test_len() {
+        let p = |input: &str, len: usize| {
+            minimal_full_segments_parser()
+                .parse(input)
+                .into_result()
+                .is_ok_and(|r| dbg!(r.len()) == len)
+        };
+        assert!(p("1:1", 3));
+        assert!(p("1:1 ", 3));
     }
 }

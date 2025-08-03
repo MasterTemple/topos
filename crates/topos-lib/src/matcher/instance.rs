@@ -1,5 +1,6 @@
 use line_col::LineColLookup;
 use regex::Match;
+use topos_parser::minimal::MinimalSegments;
 
 use crate::{
     data::{books::BookId, data::BibleData},
@@ -100,13 +101,17 @@ impl BibleMatch {
             &input[cur.end()..]
         };
 
-        let segment_input = SegmentInput::try_extract(segment_window)?;
+        // TODO: I need to change all of this
+        let old_segment_input = SegmentInput::try_extract(segment_window)?;
+        let segment_input = MinimalSegments::parse(segment_window)?;
+        eprintln!("{} vs {}", old_segment_input.len(), segment_input.len());
 
         let start = cur.start();
         let end = cur.end() + segment_input.len();
         let location = Location::new(&lookup, start, end);
 
-        let segments = Segments::parse(segment_input)?;
+        // let segments = Segments::parse(segment_input)?;
+        let segments = Segments::from(segment_input);
 
         Some(BibleMatch::new(location, book_id, segments))
     }

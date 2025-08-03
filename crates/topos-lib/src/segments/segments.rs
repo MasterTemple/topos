@@ -1,5 +1,6 @@
 use derive_more::{Deref, DerefMut, IntoIterator};
 use serde::{Deserialize, Serialize};
+use topos_parser::minimal::MinimalSegments;
 
 use crate::{
     data::books::BookId,
@@ -91,5 +92,46 @@ impl Segments {
 impl std::fmt::Display for Segments {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.format(",", "; "))
+    }
+}
+
+impl From<MinimalSegments> for Segments {
+    fn from(value: MinimalSegments) -> Self {
+        let mut segments = Segments::new();
+        for seg in value.segments {
+            let new = if let Some(start_verse) = seg.explicit_start_verse {
+                let start_chapter = seg.start;
+                if let Some(end) = seg.end {
+                    if let Some(end_verse) = end.1 {
+                        let end_chapter = end.0;
+                        Segment::chapter_range(start_chapter, start_verse, end_chapter, end_verse)
+                    } else {
+                        let end_verse = end.0;
+                        Segment::chapter_verse_range(start_chapter, start_verse, end_verse)
+                    }
+                } else {
+                    Segment::chapter_verse(start_chapter, start_verse)
+                }
+            } else {
+                if let Some(end) = seg.end {
+                    let start_chapter = seg.start;
+                    if let Some(end_verse) = end.1 {
+                        let end_chapter = end.0;
+                        Segment::chapter_range(start_chapter, 1, end_chapter, end_verse)
+                    } else {
+                        let end_chapter = end.0;
+                        Segment::full_chapter_range(start_chapter, end_chapter)
+                    }
+                } else {
+                    if let Some(prev) = segments.last() {
+                        Segment::chapter_verse(prev.ending_chapter(), seg.start)
+                    } else {
+                        Segment::full_chapter(seg.start)
+                    }
+                }
+            };
+            segments.push(new);
+        }
+        segments
     }
 }
