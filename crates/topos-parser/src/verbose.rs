@@ -1,8 +1,9 @@
 use chumsky::span::SimpleSpan;
 use chumsky::text::whitespace;
 use chumsky::{prelude::*, text::inline_whitespace};
+use from_nested_tuple::FromTuple;
 
-use crate::components::{delim_chapter, delim_range, delim_segment};
+use crate::components::{SUBVERSE, delim_chapter, delim_range, delim_segment};
 use crate::roman_numerals::{ROMAN_NUMERALS, parse_roman_numeral};
 use crate::{
     components::{Delimeter, decimal, optional_subverse},
@@ -28,6 +29,10 @@ pub struct Spanned<T> {
 impl<T> Spanned<T> {
     pub fn new(value: T, span: SimpleSpan) -> Self {
         Self { value, span }
+    }
+
+    pub fn parser<'a>(child: impl Parser<'a, &'a str, T>) -> impl Parser<'a, &'a str, Self> {
+        child.map_with(|value, e| Self::new(value, e.span()))
     }
 }
 
@@ -116,7 +121,7 @@ impl<'a> VerboseNumberKind<'a> {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, FromTuple)]
 pub struct VerboseNumber<'a> {
     pub number: VerboseNumberKind<'a>,
     pub subverse: Option<Spanned<char>>,
@@ -137,11 +142,8 @@ impl<'a> FullSpan for VerboseNumber<'a> {
 impl<'a> VerboseNumber<'a> {
     pub fn parser() -> impl Parser<'a, &'a str, Self> {
         VerboseNumberKind::parser()
-            .then(optional_subverse())
-            .map_with(|(number, subverse), e| Self {
-                number,
-                subverse: subverse.map(|c| Spanned::new(c, e.span())),
-            })
+            .then(Spanned::parser(one_of(SUBVERSE)).or_not())
+            .map(FromTuple::from_tuple)
     }
 }
 
@@ -158,9 +160,7 @@ impl<'a> FullSpan for VerboseSpace<'a> {
 
 impl<'a> VerboseSpace<'a> {
     pub fn parser() -> impl Parser<'a, &'a str, Self> {
-        whitespace().to_slice().map_with(|space, e| Self {
-            actual: Spanned::new(space, e.span()),
-        })
+        Spanned::parser(whitespace().to_slice()).map(|actual| Self { actual })
     }
 }
 
@@ -236,7 +236,7 @@ impl<'a> DelimitedNumber<'a> {
 pub type FrontPaddedDelimetedNumber<'a> = FrontPadded<'a, DelimitedNumber<'a>>;
 
 /// Each atomic unit should be front-padded
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, FromTuple)]
 pub struct FrontPadded<'a, T: FullSpan> {
     pub space: VerboseSpace<'a>,
     pub value: T,
@@ -254,7 +254,7 @@ impl<'a, T: FullSpan> FrontPadded<'a, T> {
     pub fn parser(child: impl Parser<'a, &'a str, T>) -> impl Parser<'a, &'a str, Self> {
         VerboseSpace::parser()
             .then(child)
-            .map(|(space, value)| Self { space, value })
+            .map(FromTuple::from_tuple)
     }
 }
 
@@ -303,12 +303,12 @@ impl<'a> VerboseFullSegment<'a> {
         // `\s*\d+`
         let start = VerboseSpace::parser()
             .then(VerboseNumber::parser())
-            .map(|(space, value)| FrontPadded { space, value });
+            .map(FromTuple::from_tuple);
 
         // `(\s*:\d+)?`
         let explicit_start_verse = VerboseSpace::parser()
             .then(DelimitedNumber::by_chapter())
-            .map(|(space, value)| FrontPaddedDelimetedNumber { space, value })
+            .map(FromTuple::from_tuple)
             .or_not();
 
         // `(\s*-\d+(\s*:\d+)?)?`
