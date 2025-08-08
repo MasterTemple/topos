@@ -249,6 +249,16 @@ impl<'a> VerboseSpace<'a> {
     pub fn parser() -> impl Parser<'a, &'a str, Self> {
         Spanned::parser(whitespace().to_slice()).map(|actual| Self { actual })
     }
+
+    pub fn optional_parser() -> impl Parser<'a, &'a str, Option<Self>> {
+        Spanned::parser(whitespace().to_slice()).map(|actual| {
+            if actual.value.len() == 0 {
+                None
+            } else {
+                Some(Self { actual })
+            }
+        })
+    }
 }
 
 #[derive(Clone, Debug)]
@@ -319,21 +329,27 @@ pub type FrontPaddedDelimetedNumber<'a> = FrontPadded<'a, DelimitedNumber<'a>>;
 /// Each atomic unit should be front-padded
 #[derive(Clone, Debug, FromTuple)]
 pub struct FrontPadded<'a, T: FullSpan> {
-    pub space: VerboseSpace<'a>,
+    // TODO: this should [`Option<T>`] to more clearly indicate if there is space or not
+    // but if I do that, then I break [`FullSpan`] on [`VerboseSpace<'a>`]
+    pub space: Option<VerboseSpace<'a>>,
     pub value: T,
 }
 
 impl<'a, T: FullSpan> FullSpan for FrontPadded<'a, T> {
     fn full_span(&self) -> SimpleSpan {
-        let start = self.space.full_span_start();
-        let end = self.value.full_span_end();
-        SimpleSpan::from(start..end)
+        if let Some(ref space) = self.space {
+            let start = space.full_span_start();
+            let end = self.value.full_span_end();
+            SimpleSpan::from(start..end)
+        } else {
+            self.value.full_span()
+        }
     }
 }
 
 impl<'a, T: FullSpan> FrontPadded<'a, T> {
     pub fn parser(child: impl Parser<'a, &'a str, T>) -> impl Parser<'a, &'a str, Self> {
-        VerboseSpace::parser()
+        VerboseSpace::optional_parser()
             .then(child)
             .map(FromTuple::from_tuple)
     }
@@ -361,7 +377,8 @@ pub struct VerboseFullSegment<'a> {
     /// entry, (unless of course the last entry is necessarily delimeted by the segment delimeter
     /// and there is a separate "incomplete segment" that is always the last one)
     /// BUG: This can now parse `1:2-3:4 5:6-7:8` as valid
-    pub closing: Option<FrontPadded<'a, VerboseDelimeter>>,
+    // pub closing: Option<FrontPadded<'a, VerboseDelimeter>>,
+    pub closing: FrontPadded<'a, VerboseDelimeter>,
 }
 
 impl<'a> FullSpan for VerboseFullSegment<'a> {
@@ -387,33 +404,33 @@ impl<'a> FullSpan for VerboseFullSegment<'a> {
 impl<'a> VerboseFullSegment<'a> {
     pub fn parser() -> impl Parser<'a, &'a str, Self> {
         // `\s*\d+`
-        let start = VerboseSpace::parser()
+        let start = VerboseSpace::optional_parser()
             .then(VerboseNumber::parser())
             .map(FromTuple::from_tuple);
 
         // `(\s*:\d+)?`
-        let explicit_start_verse = VerboseSpace::parser()
+        let explicit_start_verse = VerboseSpace::optional_parser()
             .then(DelimitedNumber::by_chapter())
             // .from_tuple()
             .map(FromTuple::from_tuple)
             .or_not();
 
         // `(\s*-\d+(\s*:\d+)?)?`
-        let end = VerboseSpace::parser()
+        let end = VerboseSpace::optional_parser()
             .then(DelimitedNumber::by_range())
             .map(FromTuple::from_tuple)
             .then(
-                VerboseSpace::parser()
+                VerboseSpace::optional_parser()
                     .then(DelimitedNumber::by_chapter())
                     .map(FromTuple::from_tuple)
                     .or_not(),
             )
             .or_not();
 
-        let closing = VerboseSpace::parser()
+        let closing = VerboseSpace::optional_parser()
             .then(VerboseDelimeter::segment_delimeter())
-            .map(FromTuple::from_tuple)
-            .or_not();
+            .map(FromTuple::from_tuple);
+        // .or_not();
 
         start
             .then(explicit_start_verse)
@@ -424,12 +441,21 @@ impl<'a> VerboseFullSegment<'a> {
 }
 
 #[derive(Clone, Debug)]
-pub struct VerboseFullSegments<'a> {
+pub enum VerboseIncompleteSegment<'a> {
+    Start(Option<FrontPadded<'a, VerboseNumber<'a>>>),
+    Continued {
+        start: FrontPadded<'a, VerboseNumber<'a>>,
+    },
+}
+
+#[derive(Clone, Debug)]
+pub struct VerboseSegments<'a> {
     pub segments: Vec<VerboseFullSegment<'a>>,
+    // pub incomplete: VerboseIncompleteSegment<'a>,
     pub span: SimpleSpan,
 }
 
-impl<'a> VerboseFullSegments<'a> {
+impl<'a> VerboseSegments<'a> {
     pub fn parser() -> impl Parser<'a, &'a str, Self> {
         VerboseFullSegment::parser()
             .repeated()
@@ -461,34 +487,35 @@ mod tests {
                 .parse(input)
                 .into_result()
         };
-        assert!(p("1").is_ok());
-        assert!(p("1:1").is_ok());
-        assert!(p("1-2:1").is_ok());
-        assert!(p("1:1-2").is_ok());
-        assert!(p("1:1-2:3").is_ok());
-        assert!(p("1:1-2:3").is_ok());
-        assert!(p("1:1-2:3").is_ok());
-        assert!(p("1:1-2:   3").is_ok());
-        assert!(p("1:1- 2:   3").is_ok());
-        assert!(p("1: 1- 2:   3").is_ok());
-        assert!(p("1 : 1- 2:   3").is_ok());
-        assert!(p(" 1 : 1- 2:   3").is_ok());
-        assert!(p(" 1 : 1 - 2:   3").is_ok());
+        assert!(p("1,").is_ok());
+        assert!(p("1:1,").is_ok());
+        assert!(p("1-2:1,").is_ok());
+        assert!(p("1:1-2,").is_ok());
+        assert!(p("1:1-2:3,").is_ok());
+        assert!(p("1:1-2:3,").is_ok());
+        assert!(p("1:1-2:3,").is_ok());
+        assert!(p("1:1-2:   3,").is_ok());
+        assert!(p("1:1- 2:   3,").is_ok());
+        assert!(p("1: 1- 2:   3,").is_ok());
+        assert!(p("1 : 1- 2:   3,").is_ok());
+        assert!(p(" 1 : 1- 2:   3,").is_ok());
+        assert!(p(" 1 : 1 - 2:   3,").is_ok());
     }
 
     #[test]
     fn test_minimal_list<'a>() {
         let p = |input: &'a str, len: usize| {
-            VerboseFullSegments::parser()
+            VerboseSegments::parser()
                 .parse(input)
                 .into_result()
                 .is_ok_and(|v| v.segments.len() == len)
         };
-        assert!(p(" 1 : 1- 2:   3  ", 1));
-        assert!(p(" 1 : 1- 2:   3  , 4", 2));
-        assert!(p(" 1 : 1- 2:   3  , 4:5", 2));
-        assert!(p(" 1 : 1- 2:   3  , 4:5-7", 2));
-        assert!(p(" 1 : 1a- 2:   3  , 4:5-7", 2));
-        assert!(p(" 1 : 1a- 2:   3   4:5-7", 2));
+        assert!(p(" 1 : 1- 2:   3  ,", 1));
+        assert!(p(" 1 : 1- 2:   3  , 4,", 2));
+        assert!(p(" 1 : 1- 2:   3  , 4:5,", 2));
+        assert!(p(" 1 : 1- 2:   3  , 4:5-7,", 2));
+        assert!(p(" 1 : 1a- 2:   3  , 4:5-7,", 2));
+        // BUG: This should not be
+        // assert!(p(" 1 : 1a- 2:   3   4:5-7", 2));
     }
 }
