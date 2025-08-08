@@ -213,11 +213,25 @@ impl<'a> FullSpan for DelimitedNumber<'a> {
     }
 }
 
-// impl<'a> DelimitedNumber {
-//     pub fn parser() -> impl Parser<'a, &'a str, Self> {
-//         VerboseDelimeter::parser
-//     }
-// }
+impl<'a> DelimitedNumber<'a> {
+    pub fn by_chapter() -> impl Parser<'a, &'a str, Self> {
+        VerboseDelimeter::chapter_delimeter()
+            .then(FrontPadded::parser(VerboseNumber::parser()))
+            .map(|(delimeter, padded_number)| Self {
+                delimeter,
+                padded_number,
+            })
+    }
+
+    pub fn by_range() -> impl Parser<'a, &'a str, Self> {
+        VerboseDelimeter::range_delimeter()
+            .then(FrontPadded::parser(VerboseNumber::parser()))
+            .map(|(delimeter, padded_number)| Self {
+                delimeter,
+                padded_number,
+            })
+    }
+}
 
 pub type FrontPaddedDelimetedNumber<'a> = FrontPadded<'a, DelimitedNumber<'a>>;
 
@@ -233,6 +247,14 @@ impl<'a, T: FullSpan> FullSpan for FrontPadded<'a, T> {
         let start = self.space.full_span_start();
         let end = self.value.full_span_end();
         SimpleSpan::from(start..end)
+    }
+}
+
+impl<'a, T: FullSpan> FrontPadded<'a, T> {
+    pub fn parser(child: impl Parser<'a, &'a str, T>) -> impl Parser<'a, &'a str, Self> {
+        VerboseSpace::parser()
+            .then(child)
+            .map(|(space, value)| Self { space, value })
     }
 }
 
@@ -282,27 +304,15 @@ impl<'a> VerboseFullSegment<'a> {
         let start = VerboseSpace::parser()
             .then(VerboseNumber::parser())
             .map(|(space, value)| FrontPadded { space, value });
+
         // `(\s*:\d+)?`
         let explicit_start_verse = VerboseSpace::parser()
-            .then(VerboseDelimeter::chapter_delimeter())
-            .then(VerboseSpace::parser())
-            .then(VerboseNumber::parser())
-            .map(|(((delim_space, delimeter), number_space), number)| {
-                let padded_number = FrontPadded {
-                    space: number_space,
-                    value: number,
-                };
-                FrontPaddedDelimetedNumber {
-                    space: delim_space,
-                    value: DelimitedNumber {
-                        delimeter,
-                        padded_number,
-                    },
-                }
-            })
+            .then(DelimitedNumber::by_chapter())
+            .map(|(space, value)| FrontPaddedDelimetedNumber { space, value })
             .or_not();
+
         // `(\s*-\d+(\s*:\d+)?)?`
-        let end = todo!();
+        let end = todo();
 
         start
             .then(explicit_start_verse)
