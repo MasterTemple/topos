@@ -32,7 +32,7 @@ fn roman_numeral_value(ch: char) -> u8 {
 
 /// Only pass it valid values, or it will panic
 /// I didn't write this, but it works
-fn parse_roman_numeral(s: &str) -> u8 {
+pub(crate) fn parse_roman_numeral(s: &str) -> u8 {
     let mut res: u8 = 0;
     let mut i = 0;
 
