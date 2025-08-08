@@ -394,7 +394,16 @@ impl<'a> VerboseFullSegment<'a> {
             .or_not();
 
         // `(\s*-\d+(\s*:\d+)?)?`
-        let end = todo();
+        let end = VerboseSpace::parser()
+            .then(DelimitedNumber::by_range())
+            .map(FromTuple::from_tuple)
+            .then(
+                VerboseSpace::parser()
+                    .then(DelimitedNumber::by_chapter())
+                    .map(FromTuple::from_tuple)
+                    .or_not(),
+            )
+            .or_not();
 
         start
             .then(explicit_start_verse)
@@ -404,5 +413,34 @@ impl<'a> VerboseFullSegment<'a> {
                 explicit_start_verse,
                 end,
             })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use chumsky::Parser;
+
+    use crate::verbose::VerboseFullSegment;
+
+    #[test]
+    fn test_full_segment<'a>() {
+        let p = |input: &'a str| {
+            VerboseFullSegment::<'a>::parser()
+                .parse(input)
+                .into_result()
+        };
+        assert!(p("1").is_ok());
+        assert!(p("1:1").is_ok());
+        assert!(p("1-2:1").is_ok());
+        assert!(p("1:1-2").is_ok());
+        assert!(p("1:1-2:3").is_ok());
+        assert!(p("1:1-2:3").is_ok());
+        assert!(p("1:1-2:3").is_ok());
+        assert!(p("1:1-2:   3").is_ok());
+        assert!(p("1:1- 2:   3").is_ok());
+        assert!(p("1: 1- 2:   3").is_ok());
+        assert!(p("1 : 1- 2:   3").is_ok());
+        assert!(p(" 1 : 1- 2:   3").is_ok());
+        assert!(p(" 1 : 1 - 2:   3").is_ok());
     }
 }

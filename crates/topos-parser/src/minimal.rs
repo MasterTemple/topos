@@ -109,6 +109,7 @@ mod tests {
         assert!(p("1: 1- 2:   3").is_ok());
         assert!(p("1 : 1- 2:   3").is_ok());
         assert!(p(" 1 : 1- 2:   3").is_ok());
+        assert!(p(" 1 : 1 - 2:   3").is_ok());
     }
 
     #[test]
