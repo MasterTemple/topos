@@ -3,6 +3,7 @@ use chumsky::text::whitespace;
 use chumsky::{prelude::*, text::inline_whitespace};
 
 use crate::components::{delim_chapter, delim_range, delim_segment};
+use crate::roman_numerals::{ROMAN_NUMERALS, parse_roman_numeral};
 use crate::{
     components::{Delimeter, decimal, optional_subverse},
     roman_numerals::only_roman_numerals,
@@ -26,37 +27,73 @@ pub struct VerboseDecimal<'a> {
 }
 
 impl<'a> VerboseDecimal<'a> {
-    pub fn verbose_decimal() -> impl Parser<'a, &'a str, Self> {
+    pub fn parser() -> impl Parser<'a, &'a str, Self> {
         any()
             .filter(|c: &char| c.is_numeric())
             .repeated()
             .at_least(1)
             .at_most(3)
             .to_slice()
-            .map_with(|slice, e| {
-                let actual = Spanned::<&str>::new(slice, e.span());
-                let parsed = slice.parse().unwrap_or(u8::MAX);
-                Self { actual, parsed }
+            .try_map(|slice, span| {
+                let actual = Spanned::<&str>::new(slice, span);
+                let parsed = slice.parse().map_err(|_| EmptyErr::default())?;
+                Ok(Self { actual, parsed })
             })
     }
 }
 
 #[derive(Clone, Debug)]
-pub struct VerboseNumber<'a> {
+pub struct VerboseRomanNumeral<'a> {
     pub actual: Spanned<&'a str>,
     pub parsed: u8,
-    pub subverse: Option<Spanned<&'a str>>,
 }
 
-// impl<'a> VerboseNumber<'a> {
-//     pub fn parser() -> impl Parser<'a, &'a str, Self> {
-//         decimal().or(only_roman_numerals())
-//         .then(optional_subverse())
-//         .to_slice().map_with(|(space), e| Self {
-//             actual: Spanned::new(space, e.span()),
-//         })
-//     }
-// }
+impl<'a> VerboseRomanNumeral<'a> {
+    pub fn parser() -> impl Parser<'a, &'a str, Self> {
+        any()
+            .filter(|c: &char| ROMAN_NUMERALS.contains(c))
+            .repeated()
+            .at_least(1)
+            .at_most(9) // Just to keep the parser from getting trolled
+            .to_slice()
+            .try_map(|slice, span| {
+                let actual = Spanned::<&str>::new(slice, span);
+                let parsed = parse_roman_numeral(slice); //.map_err(|_| EmptyErr::default())?;
+                Ok(Self { actual, parsed })
+            })
+    }
+}
+
+#[derive(Clone, Debug)]
+pub enum VerboseNumberKind<'a> {
+    Decimal(VerboseDecimal<'a>),
+    Roman(VerboseRomanNumeral<'a>),
+}
+
+impl<'a> VerboseNumberKind<'a> {
+    pub fn parser() -> impl Parser<'a, &'a str, Self> {
+        VerboseDecimal::parser()
+            .map(Self::Decimal)
+            .or(VerboseRomanNumeral::parser().map(Self::Roman))
+    }
+}
+
+#[derive(Clone, Debug)]
+pub struct VerboseNumber<'a> {
+    pub number: VerboseNumberKind<'a>,
+    pub subverse: Option<Spanned<char>>,
+}
+
+impl<'a> VerboseNumber<'a> {
+    pub fn parser() -> impl Parser<'a, &'a str, Self> {
+        VerboseNumberKind::parser()
+            .then(optional_subverse())
+            .map_with(|(number, subverse), e| Self {
+                number,
+                subverse: subverse.map(|c| Spanned::new(c, e.span())),
+            })
+    }
+}
 
 #[derive(Clone, Debug)]
 pub struct VerboseSpace<'a> {
