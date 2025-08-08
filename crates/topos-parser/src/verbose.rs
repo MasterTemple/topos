@@ -10,6 +10,93 @@ use crate::{
     roman_numerals::only_roman_numerals,
 };
 
+// pub trait ChumskyExt<'src, I, T, E>: Parser<'src, I, T, E> + Sized
+// where
+//     I: Input<'src, Span = SimpleSpan>,
+//     E: extra::ParserExtra<'src, I>,
+// {
+//     fn spanned(self) -> impl Parser<'src, I, Spanned<T>, E> {
+//         self.map_with(|value, e| Spanned::new(value, e.span()))
+//     }
+// }
+
+// pub trait ChumskyExt<'a, T>: Parser<'a, &'a str, T> + Sized {
+//     fn spanned(self) -> impl Parser<'a, &'a str, Spanned<T>> {
+//         self.map_with(|value, e| Spanned::new(value, e.span()))
+//     }
+// }
+//
+// // impl<'src, I, T, E> ChumskyExt<'src, I, T, E> for T
+// // where
+// //     I: Input<'src, Span = SimpleSpan>,
+// //     E: extra::ParserExtra<'src, I>,
+// //     T: Parser<'src, I, T, E>,
+// // {
+// // }
+//
+// impl<'a, T> ChumskyExt<'a, T> for T
+// where
+//     // I: Input<'src, Token = u8>,
+//     // E: extra::ParserExtra<'src, &'src str>,
+//     T: Parser<'a, &'a str, T>,
+// {
+//     // fn spanned(self) -> impl Parser<'src, &'src str, Spanned<T>> {
+//     //     Spanned::parser(self)
+//     // }
+// }
+//
+// pub trait FromTupleChumskyExt<'src, I, T, E>: Parser<'src, I, T, E> + Sized
+// where
+//     I: Input<'src, Span = SimpleSpan>,
+//     E: extra::ParserExtra<'src, I>,
+// {
+//     fn from_tuple<O>(self) -> impl Parser<'src, I, O, E>
+//     where
+//         O: FromTuple<Tuple = T>,
+//         Self: Sized,
+//     {
+//         self.map(FromTuple::from_tuple)
+//     }
+// }
+//
+// // impl<'src, I, T, E> ChumskyExt<'src, I, T, E> for T
+// // where
+// //     I: Input<'src, Token = u8>,
+// //     E: extra::ParserExtra<'src, I>,
+// //     T: Parser<'src, I, T, E>,
+// // {
+// //     fn spanned(self) -> impl Parser<'src, I, Spanned<T>, E> {
+// //         Spanned::parser(self)
+// //     }
+// // }
+//
+// impl<'src, I, T, E> FromTupleChumskyExt<'src, I, T, E> for T
+// where
+//     I: Input<'src, Span = SimpleSpan>,
+//     E: extra::ParserExtra<'src, I>,
+//     T: Parser<'src, I, T, E>,
+// {
+// }
+//
+// // impl<'src, T> ChumskyExt<'src, &'src str, T, extra::Default> for T
+// // where
+// //     // I: Input<'src, Token = u8>,
+// //     // E: extra::ParserExtra<'src, &'src str>,
+// //     T: Parser<'src, &'src str, T>,
+// // {
+// //     // fn spanned(self) -> impl Parser<'src, &'src str, Spanned<T>> {
+// //     //     Spanned::parser(self)
+// //     // }
+// // }
+//
+// // impl<'src, I, E, T> ChumskyExt for T
+// // where
+// //     I: Input<'src, Token = u8>,
+// //     E: extra::ParserExtra<'src, I>,
+// //     T: Parser<'src, I, E>,
+// // {
+// // }
+
 pub trait FullSpan {
     fn full_span(&self) -> SimpleSpan;
     fn full_span_start(&self) -> usize {
@@ -192,10 +279,18 @@ impl VerboseDelimeter {
     }
 
     pub fn range_delimeter<'a>() -> impl Parser<'a, &'a str, Self> {
-        delim_range().map_with(|ch, e| Self {
-            actual: Spanned::new(ch, e.span()),
+        // delim_range().map_with(|ch, e| Self {
+        //     actual: Spanned::new(ch, e.span()),
+        //     parsed: Delimeter::Range,
+        // })
+        Spanned::parser(delim_range()).map(|actual| Self {
+            actual,
             parsed: Delimeter::Range,
         })
+        // delim_range().spanned().map(|actual| Self {
+        //     actual,
+        //     parsed: Delimeter::Range,
+        // })
     }
 }
 
@@ -308,6 +403,7 @@ impl<'a> VerboseFullSegment<'a> {
         // `(\s*:\d+)?`
         let explicit_start_verse = VerboseSpace::parser()
             .then(DelimitedNumber::by_chapter())
+            // .from_tuple()
             .map(FromTuple::from_tuple)
             .or_not();
 
