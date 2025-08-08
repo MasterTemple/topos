@@ -36,13 +36,6 @@ impl MinimalSegments {
     }
 }
 
-// /// Just parse or fail, no context
-// fn only_decimals<'a>() -> impl Parser<'a, &'a str, u8> {
-//     whitespace()
-//         .ignore_then(decimal())
-//         .then_ignore(whitespace())
-// }
-
 /// Only take leading whitespace
 fn only_numbers<'a>() -> impl Parser<'a, &'a str, u8> {
     whitespace()
@@ -50,22 +43,6 @@ fn only_numbers<'a>() -> impl Parser<'a, &'a str, u8> {
         .or(only_roman_numerals())
         .then_ignore(optional_subverse())
 }
-
-// fn minimal_full_segment_parser<'a>() -> impl Parser<'a, &'a str, MinimalSegment> {
-//     only_numbers()
-//         .then(delim_chapter().ignore_then(only_numbers()).or_not())
-//         .then(
-//             delim_range()
-//                 .ignore_then(only_numbers())
-//                 .then(delim_chapter().ignore_then(only_numbers()).or_not())
-//                 .or_not(),
-//         )
-//         .map(|((start, explicit_start_verse), end)| MinimalSegment {
-//             start,
-//             explicit_start_verse,
-//             end,
-//         })
-// }
 
 /// WARNING: This will not tolerate trailing white-space, this is to be handled by the segment
 /// delimeter in the multi-segment parser: [`minimal_full_segments_parser`]
@@ -169,5 +146,6 @@ mod tests {
         };
         assert!(p("1:1", 3));
         assert!(p("1:1 ", 3));
+        assert!(p(" 1:1", 4));
     }
 }

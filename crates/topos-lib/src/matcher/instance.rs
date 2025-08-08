@@ -102,9 +102,9 @@ impl BibleMatch {
         };
 
         // TODO: I need to change all of this
-        let old_segment_input = SegmentInput::try_extract(segment_window)?;
+        // let old_segment_input = SegmentInput::try_extract(segment_window)?;
         let segment_input = MinimalSegments::parse(segment_window)?;
-        eprintln!("{} vs {}", old_segment_input.len(), segment_input.len());
+        // eprintln!("{} vs {}", old_segment_input.len(), segment_input.len());
 
         let start = cur.start();
         let end = cur.end() + segment_input.len();

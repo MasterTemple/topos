@@ -1,5 +1,8 @@
+use std::u8;
+
 use chumsky::prelude::*;
 
+/// TODO: What is the most graceful way to fail when a 3-digit number given than 256 is given?
 pub(crate) fn decimal<'a>() -> impl Parser<'a, &'a str, u8> {
     any()
         .filter(|c: &char| c.is_numeric())
@@ -8,7 +11,16 @@ pub(crate) fn decimal<'a>() -> impl Parser<'a, &'a str, u8> {
         .at_most(3)
         .to_slice()
         .from_str()
-        .unwrapped()
+        // .map_err(|e| EmptyErr::default())
+        .map(|v| v.unwrap_or(u8::MAX))
+    // .unwrapped()
+}
+
+#[derive(Clone, Copy, Debug)]
+pub enum Delimeter {
+    Segment,
+    Chapter,
+    Range,
 }
 
 /// To support verses like `Matthew 28:18b-20`
