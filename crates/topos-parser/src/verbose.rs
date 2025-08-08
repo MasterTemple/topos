@@ -251,13 +251,9 @@ impl<'a> VerboseSpace<'a> {
     }
 
     pub fn optional_parser() -> impl Parser<'a, &'a str, Option<Self>> {
-        Spanned::parser(whitespace().to_slice()).map(|actual| {
-            if actual.value.len() == 0 {
-                None
-            } else {
-                Some(Self { actual })
-            }
-        })
+        Spanned::parser(whitespace().at_least(1).to_slice())
+            .or_not()
+            .map(|actual| actual.map(|actual| Self { actual }))
     }
 }
 
