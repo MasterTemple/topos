@@ -38,9 +38,12 @@ impl MinimalSegments {
 
 /// Only take leading whitespace
 fn only_numbers<'a>() -> impl Parser<'a, &'a str, u8> {
+    // whitespace()
+    //     .ignore_then(decimal())
+    //     .or(only_roman_numerals())
+    //     .then_ignore(optional_subverse())
     whitespace()
-        .ignore_then(decimal())
-        .or(only_roman_numerals())
+        .ignore_then(decimal().or(only_roman_numerals()))
         .then_ignore(optional_subverse())
 }
 

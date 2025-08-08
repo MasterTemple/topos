@@ -24,7 +24,7 @@ pub enum Delimeter {
 }
 
 /// To support verses like `Matthew 28:18b-20`
-const SUBVERSE: &str = r"abc";
+const SUBVERSE: &str = r"abcd";
 pub(crate) fn optional_subverse<'a>() -> impl Parser<'a, &'a str, Option<char>> {
     one_of(SUBVERSE).or_not()
 }
