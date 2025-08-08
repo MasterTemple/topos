@@ -343,7 +343,7 @@ impl<'a, T: FullSpan> FrontPadded<'a, T> {
 - The reason leading whitespace is included is that this is to be used on the segments that come *right after* a matched book name
 - This is a full segment, which all segments but potentially the last one are (it may be incomplete, as the user is still typing it)
 */
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, FromTuple)]
 pub struct VerboseFullSegment<'a> {
     /// `\s*\d+(\s*:\d+)?(\s*-\d+(\s*:\d+)?)?`
     /// `\s*\d+`
@@ -357,6 +357,11 @@ pub struct VerboseFullSegment<'a> {
         FrontPaddedDelimetedNumber<'a>,
         Option<FrontPaddedDelimetedNumber<'a>>,
     )>,
+    /// TODO: I don't know if I like this, because it should always be present, except for the last
+    /// entry, (unless of course the last entry is necessarily delimeted by the segment delimeter
+    /// and there is a separate "incomplete segment" that is always the last one)
+    /// BUG: This can now parse `1:2-3:4 5:6-7:8` as valid
+    pub closing: Option<FrontPadded<'a, VerboseDelimeter>>,
 }
 
 impl<'a> FullSpan for VerboseFullSegment<'a> {
@@ -405,19 +410,46 @@ impl<'a> VerboseFullSegment<'a> {
             )
             .or_not();
 
+        let closing = VerboseSpace::parser()
+            .then(VerboseDelimeter::segment_delimeter())
+            .map(FromTuple::from_tuple)
+            .or_not();
+
         start
             .then(explicit_start_verse)
             .then(end)
-            .map(|((start, explicit_start_verse), end)| Self {
-                start,
-                explicit_start_verse,
-                end,
+            .then(closing)
+            .map(FromTuple::from_tuple)
+    }
+}
+
+#[derive(Clone, Debug)]
+pub struct VerboseFullSegments<'a> {
+    pub segments: Vec<VerboseFullSegment<'a>>,
+    pub span: SimpleSpan,
+}
+
+impl<'a> VerboseFullSegments<'a> {
+    pub fn parser() -> impl Parser<'a, &'a str, Self> {
+        VerboseFullSegment::parser()
+            .repeated()
+            .at_least(1)
+            .collect()
+            .lazy()
+            .map_with(|segments, e| {
+                let span = e.span();
+                Self { segments, span }
             })
+    }
+
+    pub fn parse(input: &'a str) -> Option<Self> {
+        Self::parser().parse(input).into_output()
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use super::*;
     use chumsky::Parser;
 
     use crate::verbose::VerboseFullSegment;
@@ -442,5 +474,21 @@ mod tests {
         assert!(p("1 : 1- 2:   3").is_ok());
         assert!(p(" 1 : 1- 2:   3").is_ok());
         assert!(p(" 1 : 1 - 2:   3").is_ok());
+    }
+
+    #[test]
+    fn test_minimal_list<'a>() {
+        let p = |input: &'a str, len: usize| {
+            VerboseFullSegments::parser()
+                .parse(input)
+                .into_result()
+                .is_ok_and(|v| v.segments.len() == len)
+        };
+        assert!(p(" 1 : 1- 2:   3  ", 1));
+        assert!(p(" 1 : 1- 2:   3  , 4", 2));
+        assert!(p(" 1 : 1- 2:   3  , 4:5", 2));
+        assert!(p(" 1 : 1- 2:   3  , 4:5-7", 2));
+        assert!(p(" 1 : 1a- 2:   3  , 4:5-7", 2));
+        assert!(p(" 1 : 1a- 2:   3   4:5-7", 2));
     }
 }
