@@ -213,6 +213,12 @@ impl<'a> FullSpan for DelimitedNumber<'a> {
     }
 }
 
+// impl<'a> DelimitedNumber {
+//     pub fn parser() -> impl Parser<'a, &'a str, Self> {
+//         VerboseDelimeter::parser
+//     }
+// }
+
 pub type FrontPaddedDelimetedNumber<'a> = FrontPadded<'a, DelimitedNumber<'a>>;
 
 /// Each atomic unit should be front-padded
@@ -267,5 +273,44 @@ impl<'a> FullSpan for VerboseFullSegment<'a> {
             }
         };
         SimpleSpan::from(start..end)
+    }
+}
+
+impl<'a> VerboseFullSegment<'a> {
+    pub fn parser() -> impl Parser<'a, &'a str, Self> {
+        // `\s*\d+`
+        let start = VerboseSpace::parser()
+            .then(VerboseNumber::parser())
+            .map(|(space, value)| FrontPadded { space, value });
+        // `(\s*:\d+)?`
+        let explicit_start_verse = VerboseSpace::parser()
+            .then(VerboseDelimeter::chapter_delimeter())
+            .then(VerboseSpace::parser())
+            .then(VerboseNumber::parser())
+            .map(|(((delim_space, delimeter), number_space), number)| {
+                let padded_number = FrontPadded {
+                    space: number_space,
+                    value: number,
+                };
+                FrontPaddedDelimetedNumber {
+                    space: delim_space,
+                    value: DelimitedNumber {
+                        delimeter,
+                        padded_number,
+                    },
+                }
+            })
+            .or_not();
+        // `(\s*-\d+(\s*:\d+)?)?`
+        let end = todo!();
+
+        start
+            .then(explicit_start_verse)
+            .then(end)
+            .map(|((start, explicit_start_verse), end)| Self {
+                start,
+                explicit_start_verse,
+                end,
+            })
     }
 }
