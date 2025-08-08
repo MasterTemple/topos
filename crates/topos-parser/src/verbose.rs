@@ -1,13 +1,12 @@
+use chumsky::prelude::*;
 use chumsky::span::SimpleSpan;
 use chumsky::text::whitespace;
-use chumsky::{prelude::*, text::inline_whitespace};
 use from_nested_tuple::FromTuple;
 
 use crate::components::{SUBVERSE, delim_chapter, delim_range, delim_segment};
-use crate::roman_numerals::{ROMAN_NUMERALS, parse_roman_numeral};
 use crate::{
-    components::{Delimeter, decimal, optional_subverse},
-    roman_numerals::only_roman_numerals,
+    components::Delimeter,
+    roman_numerals::{ROMAN_NUMERALS, parse_roman_numeral},
 };
 
 // pub trait ChumskyExt<'src, I, T, E>: Parser<'src, I, T, E> + Sized
@@ -320,11 +319,53 @@ impl<'a> DelimitedNumber<'a> {
     }
 }
 
-pub type FrontPaddedDelimetedNumber<'a> = FrontPadded<'a, DelimitedNumber<'a>>;
+#[derive(Clone, Debug)]
+pub enum IncompleteDelimitedNumber<'a> {
+    Empty,
+    Delimeter(VerboseDelimeter),
+    Both {
+        delimeter: VerboseDelimeter,
+        padded_number: FrontPadded<'a, Option<VerboseNumber<'a>>>,
+    },
+}
+
+impl<'a> IncompleteDelimitedNumber<'a> {
+    fn parse_delimeter(
+        delim: impl Parser<'a, &'a str, VerboseDelimeter>,
+    ) -> impl Parser<'a, &'a str, Self> {
+        delim
+            .then(FrontPadded::parser(VerboseNumber::parser().or_not()).or_not())
+            .or_not()
+            .map(|opt| {
+                if let Some((delimeter, padded_number)) = opt {
+                    if let Some(padded_number) = padded_number {
+                        Self::Both {
+                            delimeter,
+                            padded_number,
+                        }
+                    } else {
+                        Self::Delimeter(delimeter)
+                    }
+                } else {
+                    Self::Empty
+                }
+            })
+    }
+
+    pub fn by_chapter() -> impl Parser<'a, &'a str, Self> {
+        Self::parse_delimeter(VerboseDelimeter::chapter_delimeter())
+    }
+
+    pub fn by_range() -> impl Parser<'a, &'a str, Self> {
+        Self::parse_delimeter(VerboseDelimeter::range_delimeter())
+    }
+}
+
+// pub type FrontPaddedDelimetedNumber<'a> = FrontPadded<'a, DelimitedNumber<'a>>;
 
 /// Each atomic unit should be front-padded
 #[derive(Clone, Debug, FromTuple)]
-pub struct FrontPadded<'a, T: FullSpan> {
+pub struct FrontPadded<'a, T> {
     // TODO: this should [`Option<T>`] to more clearly indicate if there is space or not
     // but if I do that, then I break [`FullSpan`] on [`VerboseSpace<'a>`]
     pub space: Option<VerboseSpace<'a>>,
@@ -343,7 +384,7 @@ impl<'a, T: FullSpan> FullSpan for FrontPadded<'a, T> {
     }
 }
 
-impl<'a, T: FullSpan> FrontPadded<'a, T> {
+impl<'a, T> FrontPadded<'a, T> {
     pub fn parser(child: impl Parser<'a, &'a str, T>) -> impl Parser<'a, &'a str, Self> {
         VerboseSpace::optional_parser()
             .then(child)
@@ -355,6 +396,12 @@ impl<'a, T: FullSpan> FrontPadded<'a, T> {
 - The reason leading whitespace is included is that this is to be used on the segments that come *right after* a matched book name
 - This is a full segment, which all segments but potentially the last one are (it may be incomplete, as the user is still typing it)
 */
+// PERF: If I just store spans (and not any str's), I can probably massively cut the size of this
+// struct.
+// However it is fine for now as:
+// 1. It is written in Rust
+// 2. This is only used for auto-completing 1 verse
+// TODO: You can use enums instead of nesting
 #[derive(Clone, Debug, FromTuple)]
 pub struct VerboseFullSegment<'a> {
     /// `\s*\d+(\s*:\d+)?(\s*-\d+(\s*:\d+)?)?`
@@ -362,12 +409,12 @@ pub struct VerboseFullSegment<'a> {
     pub start: FrontPadded<'a, VerboseNumber<'a>>,
     /// `\s*\d+(\s*:\d+)?(\s*-\d+(\s*:\d+)?)?`
     /// ----->`(\s*:\d+)?`
-    pub explicit_start_verse: Option<FrontPaddedDelimetedNumber<'a>>,
+    pub explicit_start_verse: Option<FrontPadded<'a, DelimitedNumber<'a>>>,
     /// `\s*\d+(\s*:\d+)?(\s*-\d+(\s*:\d+)?)?`
     /// --------------->`(\s*-\d+(\s*:\d+)?)?`
     pub end: Option<(
-        FrontPaddedDelimetedNumber<'a>,
-        Option<FrontPaddedDelimetedNumber<'a>>,
+        FrontPadded<'a, DelimitedNumber<'a>>,
+        Option<FrontPadded<'a, DelimitedNumber<'a>>>,
     )>,
     /// TODO: I don't know if I like this, because it should always be present, except for the last
     /// entry, (unless of course the last entry is necessarily delimeted by the segment delimeter
@@ -436,12 +483,46 @@ impl<'a> VerboseFullSegment<'a> {
     }
 }
 
+/**
+```bash
+John
+John 1
+John 1:
+John 1:1
+John 1:1-
+John 1:1-2
+John 1:1-2:2
+
+John 1
+John 1-2
+John 1-2:
+John 1-2:2
+```
+*/
 #[derive(Clone, Debug)]
 pub enum VerboseIncompleteSegment<'a> {
-    Start(Option<FrontPadded<'a, VerboseNumber<'a>>>),
-    Continued {
-        start: FrontPadded<'a, VerboseNumber<'a>>,
+    // `John `
+    // `John 1`
+    Start(Option<FrontPadded<'a, Option<VerboseNumber<'a>>>>),
+    // `John 1:`
+    // `John 1:1`
+    StartVerse {
+        start_chapter: FrontPadded<'a, VerboseNumber<'a>>,
+        start_verse: FrontPadded<'a, IncompleteDelimitedNumber<'a>>,
     },
+    // `John 1:1-`
+    // `John 1:1-2`
+    // `John 1-2`
+    End {
+        start_chapter: FrontPadded<'a, VerboseNumber<'a>>,
+        start_verse: Option<FrontPadded<'a, DelimitedNumber<'a>>>,
+        // TODO: I need a different type that can have incomplete delimeter and number
+        end: FrontPadded<'a, IncompleteDelimitedNumber<'a>>,
+    },
+    // `John 1-2:`
+    // `John 1:1-2:2`
+    // `John 1-2:2`
+    EndVerse {},
 }
 
 #[derive(Clone, Debug)]
