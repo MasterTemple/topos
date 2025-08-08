@@ -265,36 +265,28 @@ impl FullSpan for VerboseDelimeter {
 
 impl VerboseDelimeter {
     pub fn segment_delimeter<'a>() -> impl Parser<'a, &'a str, Self> {
-        delim_segment().map_with(|ch, e| Self {
-            actual: Spanned::new(ch, e.span()),
+        Spanned::parser(delim_segment()).map(|actual| Self {
+            actual,
             parsed: Delimeter::Segment,
         })
     }
 
     pub fn chapter_delimeter<'a>() -> impl Parser<'a, &'a str, Self> {
-        delim_chapter().map_with(|ch, e| Self {
-            actual: Spanned::new(ch, e.span()),
+        Spanned::parser(delim_chapter()).map(|actual| Self {
+            actual,
             parsed: Delimeter::Chapter,
         })
     }
 
     pub fn range_delimeter<'a>() -> impl Parser<'a, &'a str, Self> {
-        // delim_range().map_with(|ch, e| Self {
-        //     actual: Spanned::new(ch, e.span()),
-        //     parsed: Delimeter::Range,
-        // })
         Spanned::parser(delim_range()).map(|actual| Self {
             actual,
             parsed: Delimeter::Range,
         })
-        // delim_range().spanned().map(|actual| Self {
-        //     actual,
-        //     parsed: Delimeter::Range,
-        // })
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, FromTuple)]
 pub struct DelimitedNumber<'a> {
     pub delimeter: VerboseDelimeter,
     pub padded_number: FrontPadded<'a, VerboseNumber<'a>>,
@@ -312,19 +304,13 @@ impl<'a> DelimitedNumber<'a> {
     pub fn by_chapter() -> impl Parser<'a, &'a str, Self> {
         VerboseDelimeter::chapter_delimeter()
             .then(FrontPadded::parser(VerboseNumber::parser()))
-            .map(|(delimeter, padded_number)| Self {
-                delimeter,
-                padded_number,
-            })
+            .map(FromTuple::from_tuple)
     }
 
     pub fn by_range() -> impl Parser<'a, &'a str, Self> {
         VerboseDelimeter::range_delimeter()
             .then(FrontPadded::parser(VerboseNumber::parser()))
-            .map(|(delimeter, padded_number)| Self {
-                delimeter,
-                padded_number,
-            })
+            .map(FromTuple::from_tuple)
     }
 }
 
