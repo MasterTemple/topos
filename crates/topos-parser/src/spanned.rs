@@ -81,13 +81,13 @@ impl VerboseNumberKind {
 #[derive(Clone, Debug, FromTuple)]
 pub struct VerboseNumber {
     pub number: VerboseNumberKind,
-    pub subverse: Option<Spanned<char>>,
+    pub subverse: Option<char>,
 }
 
 impl VerboseNumber {
     pub fn parser<'a>() -> impl Parser<'a, &'a str, Self> {
         VerboseNumberKind::parser()
-            .then(Spanned::parser(one_of(SUBVERSE)).or_not())
+            .then(one_of(SUBVERSE).or_not())
             .map(FromTuple::from_tuple)
     }
 }
@@ -113,27 +113,27 @@ impl VerboseSpace {
 
 #[derive(Clone, Debug)]
 pub struct VerboseDelimeter {
-    pub actual: Spanned<char>,
+    pub actual: char,
     pub parsed: Delimeter,
 }
 
 impl VerboseDelimeter {
     pub fn segment_delimeter<'a>() -> impl Parser<'a, &'a str, Self> {
-        Spanned::parser(delim_segment()).map(|actual| Self {
+        delim_segment().map(|actual| Self {
             actual,
             parsed: Delimeter::Segment,
         })
     }
 
     pub fn chapter_delimeter<'a>() -> impl Parser<'a, &'a str, Self> {
-        Spanned::parser(delim_chapter()).map(|actual| Self {
+        delim_chapter().map(|actual| Self {
             actual,
             parsed: Delimeter::Chapter,
         })
     }
 
     pub fn range_delimeter<'a>() -> impl Parser<'a, &'a str, Self> {
-        Spanned::parser(delim_range()).map(|actual| Self {
+        delim_range().map(|actual| Self {
             actual,
             parsed: Delimeter::Range,
         })
