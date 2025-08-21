@@ -455,6 +455,12 @@ pub enum RomanNumeralOptions {
 pub enum DelimeterOptions {
     DontTouch,
     Normalize,
+    NormalizeWith {
+        chapter: Option<String>,
+        range: Option<String>,
+        chapter_segment: Option<String>,
+        verse_segment: Option<String>,
+    },
 }
 
 pub struct RangeOptions {
@@ -467,8 +473,32 @@ pub struct RangeOptions {
 }
 
 pub struct FormatOptions {
-    pub spacing: SpaceOptions,
+    /// have spacing for numbers and each type of delimeter that overwrite this
+    pub general_spacing: SpaceOptions,
     pub include_subverse: bool,
+    pub roman: RomanNumeralOptions,
+    pub delim: DelimeterOptions,
+    pub range: RangeOptions,
+}
+
+pub enum VerseFormatContext {
+    None,
+    PrevChapter {
+        previous_chapter: u8,
+    },
+    PrevChapterVerse {
+        previous_chapter: u8,
+        previous_verse: u8,
+    },
+}
+
+pub struct FullFormatContext {
+    // TODO: this really should be a parsed segment.. this leads me to realize that the formatter
+    // should be a part of `topos-lib`
+    pub segment: VerboseFullSegment,
+    pub start: usize,
+    pub is_after_range: bool,
+    pub verse: VerseFormatContext,
 }
 
 pub enum FormattableToken {
@@ -494,48 +524,47 @@ impl FormattableToken {
     }
 }
 
-pub enum VerseFormatContext {
-    None,
-    PrevChapter {
-        previous_chapter: u8,
-    },
-    PrevChapterVerse {
-        previous_chapter: u8,
-        previous_verse: u8,
-    },
-}
-
-pub struct TokenFormatContext {
-    // previous_chapter: Option<u8>,
-    // // perhaps should be nested within previous_chapter (but should probably be its own type)
-    // previous_verse: Option<u8>,
-    pub verse: VerseFormatContext,
-}
-
-pub struct FullFormatContext<'a> {
-    pub input: &'a str,
-    pub start: usize,
-    // token: TokenFormatContext,
-    pub verse: VerseFormatContext,
-}
-
-pub struct ContextualToken<'a> {
-    pub ctx: &'a FullFormatContext<'a>,
-    pub token: FormattableToken,
-}
-
-impl<'a> std::fmt::Display for ContextualToken<'a> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match &self.token {
+impl FormattableToken {
+    pub fn format(
+        self,
+        input: &str,
+        cx: &mut FullFormatContext,
+        options: &FormatOptions,
+    ) -> String {
+        let actual = self.get_contents(input, cx.start);
+        cx.start += self.span_len();
+        match self {
             FormattableToken::Delimeter(token) => {
-                todo!()
+                match token.parsed {
+                    Delimeter::Segment => {
+                        cx.is_after_range = false;
+                        match &options.delim {
+                            DelimeterOptions::DontTouch => token.actual.to_string(),
+                            // BUG: I need to know upcoming / current segment type, so I can
+                            // specify ',' or ';'
+                            DelimeterOptions::Normalize => ",".to_string(),
+                            DelimeterOptions::NormalizeWith { verse_segment, .. } => {
+                                verse_segment.clone().unwrap_or(String::from(","))
+                            }
+                        }
+                    }
+                    Delimeter::Chapter => match &options.delim {
+                        DelimeterOptions::DontTouch => token.actual.to_string(),
+                        DelimeterOptions::Normalize => todo!(),
+                        DelimeterOptions::NormalizeWith { chapter, range, .. } => todo!(),
+                    },
+                    Delimeter::Range => {
+                        cx.is_after_range = true;
+                        todo!()
+                    }
+                }
             }
-            FormattableToken::Number(token) => {
-                todo!()
-            }
-            FormattableToken::Space(token) => {
-                todo!()
-            }
+            FormattableToken::Number(token) => todo!(),
+            FormattableToken::Space(token) => match options.general_spacing {
+                SpaceOptions::DontTouch => actual.to_string(),
+                SpaceOptions::RemoveAll => String::new(),
+                SpaceOptions::Normalize => String::from(" "),
+            },
         }
     }
 }
