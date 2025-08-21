@@ -1,4 +1,4 @@
-use chumsky::{prelude::*, span::Span, text::whitespace};
+use chumsky::{prelude::*, text::whitespace};
 use from_nested_tuple::FromTuple;
 
 use crate::{
@@ -112,7 +112,7 @@ impl VerboseRomanNumeral {
                 .at_least(1)
                 .at_most(9) // Just to keep the parser from getting trolled
                 .to_slice()
-                .try_map(|slice, span| {
+                .try_map(|slice, _| {
                     // BUG: This should fail on bad parsing
                     Ok(parse_roman_numeral(slice)) //.map_err(|_| EmptyErr::default())?;
                 }),
@@ -393,5 +393,149 @@ impl VerboseSegments {
 impl SpanLen for VerboseSegments {
     fn span_len(&self) -> usize {
         self.segments.iter().map(|s| s.span_len()).sum()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use chumsky::Parser;
+
+    #[test]
+    fn test_full_segment<'a>() {
+        let p = |input: &'a str| VerboseFullSegment::parser().parse(input).into_result();
+        assert!(p("1,").is_ok());
+        assert!(p("1:1,").is_ok());
+        assert!(p("1-2:1,").is_ok());
+        assert!(p("1:1-2,").is_ok());
+        assert!(p("1:1-2:3,").is_ok());
+        assert!(p("1:1-2:3,").is_ok());
+        assert!(p("1:1-2:3,").is_ok());
+        assert!(p("1:1-2:   3,").is_ok());
+        assert!(p("1:1- 2:   3,").is_ok());
+        assert!(p("1: 1- 2:   3,").is_ok());
+        assert!(p("1 : 1- 2:   3,").is_ok());
+        assert!(p(" 1 : 1- 2:   3,").is_ok());
+        assert!(p(" 1 : 1 - 2:   3,").is_ok());
+    }
+
+    #[test]
+    fn test_minimal_list<'a>() {
+        let p = |input: &'a str, len: usize| {
+            VerboseSegments::parser()
+                .parse(input)
+                .into_result()
+                .is_ok_and(|v| v.segments.len() == len)
+        };
+        assert!(p(" 1 : 1- 2:   3  ,", 1));
+        assert!(p(" 1 : 1- 2:   3  , 4,", 2));
+        assert!(p(" 1 : 1- 2:   3  , 4:5,", 2));
+        assert!(p(" 1 : 1- 2:   3  , 4:5-7,", 2));
+        assert!(p(" 1 : 1a- 2:   3  , 4:5-7,", 2));
+        // BUG: This should not be
+        // assert!(p(" 1 : 1a- 2:   3   4:5-7", 2));
+    }
+}
+
+pub enum SpaceOptions {
+    DontTouch,
+    RemoveAll,
+    Normalize,
+}
+
+pub enum RomanNumeralOptions {
+    DontTouch,
+    MakeUppercase,
+    MakeLowercase,
+    MakeAllDecimal,
+    MakeChaptersDecimal,
+    MakeVersesDecimal,
+}
+
+pub enum DelimeterOptions {
+    DontTouch,
+    Normalize,
+}
+
+pub struct RangeOptions {
+    /// `1-2:1` instead of `1:1-2:1`
+    pub exclude_verse_1_for_chapter_range: bool,
+    /// `1:1-2` instead of `1:1,2`
+    pub join_adjacent_verses: bool,
+    /// `Jude 1:1` instead of `Jude 1`
+    pub use_chapter_in_single_chapter_books: bool,
+}
+
+pub struct FormatOptions {
+    pub spacing: SpaceOptions,
+    pub include_subverse: bool,
+}
+
+pub enum FormattableToken {
+    Delimeter(VerboseDelimeter),
+    Number(VerboseNumber),
+    Space(VerboseSpace),
+}
+
+impl SpanLen for FormattableToken {
+    fn span_len(&self) -> usize {
+        match self {
+            FormattableToken::Delimeter(t) => t.span_len(),
+            FormattableToken::Number(t) => t.span_len(),
+            FormattableToken::Space(t) => t.span_len(),
+        }
+    }
+}
+
+impl FormattableToken {
+    pub fn get_contents<'a>(&'_ self, s: &'a str, start: usize) -> &'a str {
+        let span = self.as_span(start);
+        &s[span.start..span.end]
+    }
+}
+
+pub enum VerseFormatContext {
+    None,
+    PrevChapter {
+        previous_chapter: u8,
+    },
+    PrevChapterVerse {
+        previous_chapter: u8,
+        previous_verse: u8,
+    },
+}
+
+pub struct TokenFormatContext {
+    // previous_chapter: Option<u8>,
+    // // perhaps should be nested within previous_chapter (but should probably be its own type)
+    // previous_verse: Option<u8>,
+    pub verse: VerseFormatContext,
+}
+
+pub struct FullFormatContext<'a> {
+    pub input: &'a str,
+    pub start: usize,
+    // token: TokenFormatContext,
+    pub verse: VerseFormatContext,
+}
+
+pub struct ContextualToken<'a> {
+    pub ctx: &'a FullFormatContext<'a>,
+    pub token: FormattableToken,
+}
+
+impl<'a> std::fmt::Display for ContextualToken<'a> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match &self.token {
+            FormattableToken::Delimeter(token) => {
+                todo!()
+            }
+            FormattableToken::Number(token) => {
+                todo!()
+            }
+            FormattableToken::Space(token) => {
+                todo!()
+            }
+        }
     }
 }
