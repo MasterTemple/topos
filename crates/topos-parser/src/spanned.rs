@@ -6,6 +6,22 @@ use crate::{
     roman_numerals::{ROMAN_NUMERALS, parse_roman_numeral},
 };
 
+pub trait FullSpan {
+    fn full_span(&self) -> SimpleSpan;
+    fn full_span_start(&self) -> usize {
+        self.full_span().start
+    }
+    fn full_span_end(&self) -> usize {
+        self.full_span().end
+    }
+}
+
+impl FullSpan for SimpleSpan {
+    fn full_span(&self) -> SimpleSpan {
+        self.clone()
+    }
+}
+
 #[derive(Clone, Debug)]
 pub struct Spanned<T> {
     pub value: T,
@@ -19,6 +35,12 @@ impl<T> Spanned<T> {
 
     pub fn parser<'a>(child: impl Parser<'a, &'a str, T>) -> impl Parser<'a, &'a str, Self> {
         child.map_with(|value, e| Self::new(value, e.span()))
+    }
+}
+
+impl<T> FullSpan for Spanned<T> {
+    fn full_span(&self) -> SimpleSpan {
+        self.span
     }
 }
 
@@ -43,6 +65,12 @@ impl VerboseDecimal {
     }
 }
 
+impl FullSpan for VerboseDecimal {
+    fn full_span(&self) -> SimpleSpan {
+        self.span.full_span()
+    }
+}
+
 #[derive(Clone, Debug)]
 pub struct VerboseRomanNumeral {
     pub span: SimpleSpan,
@@ -64,6 +92,12 @@ impl VerboseRomanNumeral {
     }
 }
 
+impl FullSpan for VerboseRomanNumeral {
+    fn full_span(&self) -> SimpleSpan {
+        self.span.full_span()
+    }
+}
+
 #[derive(Clone, Debug)]
 pub enum VerboseNumberKind {
     Decimal(VerboseDecimal),
@@ -75,6 +109,15 @@ impl VerboseNumberKind {
         VerboseDecimal::parser()
             .map(Self::Decimal)
             .or(VerboseRomanNumeral::parser().map(Self::Roman))
+    }
+}
+
+impl FullSpan for VerboseNumberKind {
+    fn full_span(&self) -> SimpleSpan {
+        match self {
+            VerboseNumberKind::Decimal(num) => num.full_span(),
+            VerboseNumberKind::Roman(num) => num.full_span(),
+        }
     }
 }
 
@@ -92,6 +135,19 @@ impl VerboseNumber {
     }
 }
 
+impl FullSpan for VerboseNumber {
+    fn full_span(&self) -> SimpleSpan {
+        if let Some(_) = &self.subverse {
+            let start = self.number.full_span_start();
+            let end = self.number.full_span_end() + 1;
+            SimpleSpan::from(start..end)
+        } else {
+            self.number.full_span()
+        }
+    }
+}
+
+// TODO: I technically don't need to store the span of spaces, since I can calculate them between non-space characters
 #[derive(Clone, Debug)]
 pub struct VerboseSpace {
     pub span: SimpleSpan,
@@ -108,6 +164,12 @@ impl VerboseSpace {
             .to_span()
             .or_not()
             .map(|span| span.map(|span| Self { span }))
+    }
+}
+
+impl FullSpan for VerboseSpace {
+    fn full_span(&self) -> SimpleSpan {
+        self.span.full_span()
     }
 }
 
@@ -140,6 +202,41 @@ impl VerboseDelimeter {
     }
 }
 
+// #[derive(Clone, Debug)]
+// pub struct VerboseDelimeter {
+//     pub actual: SimpleSpan,
+//     pub parsed: Delimeter,
+// }
+//
+// impl VerboseDelimeter {
+//     pub fn segment_delimeter<'a>() -> impl Parser<'a, &'a str, Self> {
+//         delim_segment().to_span().map(|actual| Self {
+//             actual,
+//             parsed: Delimeter::Segment,
+//         })
+//     }
+//
+//     pub fn chapter_delimeter<'a>() -> impl Parser<'a, &'a str, Self> {
+//         delim_chapter().to_span().map(|actual| Self {
+//             actual,
+//             parsed: Delimeter::Chapter,
+//         })
+//     }
+//
+//     pub fn range_delimeter<'a>() -> impl Parser<'a, &'a str, Self> {
+//         delim_range().to_span().map(|actual| Self {
+//             actual,
+//             parsed: Delimeter::Range,
+//         })
+//     }
+// }
+
+// impl FullSpan for VerboseDelimeter {
+//     fn full_span(&self) -> SimpleSpan {
+//         self.actual.full_span()
+//     }
+// }
+
 #[derive(Clone, Debug, FromTuple)]
 pub struct DelimitedNumber {
     pub delimeter: VerboseDelimeter,
@@ -160,6 +257,15 @@ impl DelimitedNumber {
     }
 }
 
+impl FullSpan for DelimitedNumber {
+    fn full_span(&self) -> SimpleSpan {
+        // let start = self.delimeter.full_span_start();
+        let start = self.padded_number.full_span_start() - 1;
+        let end = self.padded_number.full_span_end();
+        SimpleSpan::from(start..end)
+    }
+}
+
 /// Each atomic unit should be front-padded
 #[derive(Clone, Debug, FromTuple)]
 pub struct FrontPadded<T> {
@@ -174,6 +280,18 @@ impl<T> FrontPadded<T> {
         VerboseSpace::optional_parser()
             .then(child)
             .map(FromTuple::from_tuple)
+    }
+}
+
+impl<T: FullSpan> FullSpan for FrontPadded<T> {
+    fn full_span(&self) -> SimpleSpan {
+        if let Some(ref space) = self.space {
+            let start = space.full_span_start();
+            let end = self.value.full_span_end();
+            SimpleSpan::from(start..end)
+        } else {
+            self.value.full_span()
+        }
     }
 }
 
@@ -207,6 +325,26 @@ pub struct VerboseFullSegment {
     /// BUG: This can now parse `1:2-3:4 5:6-7:8` as valid
     // pub closing: Option<FrontPadded<'a, VerboseDelimeter>>,
     pub closing: FrontPadded<VerboseDelimeter>,
+}
+
+impl FullSpan for VerboseFullSegment {
+    fn full_span(&self) -> SimpleSpan {
+        let start = self.start.full_span_start();
+        let end = if let Some(end) = &self.end {
+            if let Some(end) = &end.1 {
+                end.full_span_end()
+            } else {
+                end.0.full_span_end()
+            }
+        } else {
+            if let Some(end) = &self.explicit_start_verse {
+                end.full_span_end()
+            } else {
+                self.start.full_span_end()
+            }
+        };
+        SimpleSpan::from(start..end)
+    }
 }
 
 impl VerboseFullSegment {
@@ -245,5 +383,41 @@ impl VerboseFullSegment {
             .then(end)
             .then(closing)
             .map(FromTuple::from_tuple)
+    }
+}
+
+#[derive(Clone, Debug)]
+pub struct VerboseSegments {
+    pub segments: Vec<VerboseFullSegment>,
+}
+
+impl VerboseSegments {
+    pub fn parser<'a>() -> impl Parser<'a, &'a str, Self> {
+        VerboseFullSegment::parser()
+            .repeated()
+            .at_least(1)
+            .collect()
+            .lazy()
+            .map(|segments| Self { segments })
+    }
+
+    pub fn parse(input: &str) -> Option<Self> {
+        Self::parser().parse(input).into_output()
+    }
+}
+
+impl FullSpan for VerboseSegments {
+    fn full_span(&self) -> SimpleSpan {
+        let start = self
+            .segments
+            .first()
+            .expect("There is always at least 1 segment parsed")
+            .full_span_start();
+        let end = self
+            .segments
+            .last()
+            .expect("There is always at least 1 segment parsed")
+            .full_span_end();
+        SimpleSpan::from(start..end)
     }
 }
