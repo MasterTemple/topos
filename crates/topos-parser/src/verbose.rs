@@ -319,11 +319,17 @@ impl<'a> DelimitedNumber<'a> {
     }
 }
 
+/**
+This is equivalent to
+```ignore
+pub type IncompleteDelimitedNumber<'a> = Option<(VerboseDelimeter, FrontPadded<'a, Option<VerboseNumber<'a>>>)>;
+}
+```
+*/
 #[derive(Clone, Debug)]
 pub enum IncompleteDelimitedNumber<'a> {
-    Empty,
-    Delimeter(VerboseDelimeter),
-    Both {
+    OnDelimeter(Option<VerboseDelimeter>),
+    OnNumber {
         delimeter: VerboseDelimeter,
         padded_number: FrontPadded<'a, Option<VerboseNumber<'a>>>,
     },
@@ -339,15 +345,15 @@ impl<'a> IncompleteDelimitedNumber<'a> {
             .map(|opt| {
                 if let Some((delimeter, padded_number)) = opt {
                     if let Some(padded_number) = padded_number {
-                        Self::Both {
+                        Self::OnNumber {
                             delimeter,
                             padded_number,
                         }
                     } else {
-                        Self::Delimeter(delimeter)
+                        Self::OnDelimeter(Some(delimeter))
                     }
                 } else {
-                    Self::Empty
+                    Self::OnDelimeter(None)
                 }
             })
     }
