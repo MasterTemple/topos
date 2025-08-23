@@ -140,6 +140,9 @@ impl TryFrom<Segment> for ChapterVerse {
             Segment::FullChapterRange(_) => {
                 Err(format!("Cannot coerce FullChapterRange into ChapterVerse"))?
             }
+            Segment::FullChapterVerseRange(_) => Err(format!(
+                "Cannot coerce FullChapterVerseRange into ChapterVerse"
+            ))?,
         })
     }
 }

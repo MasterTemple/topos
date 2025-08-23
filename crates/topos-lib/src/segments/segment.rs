@@ -6,7 +6,7 @@ use crate::segments::{
     units::{
         chapter_range::ChapterRange, chapter_verse::ChapterVerse,
         chapter_verse_range::ChapterVerseRange, full_chapter::FullChapter,
-        full_chapter_range::FullChapterRange,
+        full_chapter_range::FullChapterRange, full_chapter_verse_range::FullChapterVerseRange,
     },
     verse_bounds::VerseBounds,
 };
@@ -46,9 +46,12 @@ pub enum Segment {
     /// - This is a single chapter reference
     /// - Ex: `1` in `John 1`
     FullChapter(FullChapter),
-    /// - This is a chapter range reference
+    /// - This is a full chapter range reference
     /// - Ex: `1-2` in `John 1-2`
     FullChapterRange(FullChapterRange),
+    /// - This is a full chapter to chapter-verse range reference
+    /// - Ex: `1-2:3` in `John 1-2:3`
+    FullChapterVerseRange(FullChapterVerseRange),
 }
 
 impl PartialOrd for Segment {
@@ -71,6 +74,7 @@ impl VerseBounds for Segment {
             Segment::ChapterRange(book_range) => book_range.starting_chapter(),
             Segment::FullChapter(full_chapter) => full_chapter.starting_chapter(),
             Segment::FullChapterRange(full_chapter_range) => full_chapter_range.starting_chapter(),
+            Segment::FullChapterVerseRange(v) => v.starting_chapter(),
         }
     }
 
@@ -81,6 +85,7 @@ impl VerseBounds for Segment {
             Segment::ChapterRange(book_range) => book_range.starting_verse(),
             Segment::FullChapter(full_chapter) => full_chapter.starting_verse(),
             Segment::FullChapterRange(full_chapter_range) => full_chapter_range.starting_verse(),
+            Segment::FullChapterVerseRange(v) => v.starting_verse(),
         }
     }
 
@@ -91,6 +96,7 @@ impl VerseBounds for Segment {
             Segment::ChapterRange(book_range) => book_range.ending_chapter(),
             Segment::FullChapter(full_chapter) => full_chapter.ending_chapter(),
             Segment::FullChapterRange(full_chapter_range) => full_chapter_range.ending_chapter(),
+            Segment::FullChapterVerseRange(v) => v.ending_chapter(),
         }
     }
 
@@ -101,6 +107,7 @@ impl VerseBounds for Segment {
             Segment::ChapterRange(book_range) => book_range.ending_verse(),
             Segment::FullChapter(full_chapter) => full_chapter.ending_verse(),
             Segment::FullChapterRange(full_chapter_range) => full_chapter_range.ending_verse(),
+            Segment::FullChapterVerseRange(v) => v.ending_verse(),
         }
     }
 }
@@ -151,7 +158,8 @@ impl Segment {
             Segment::ChapterVerse(_) | Segment::FullChapter(_) => false,
             Segment::ChapterVerseRange(_)
             | Segment::ChapterRange(_)
-            | Segment::FullChapterRange(_) => true,
+            | Segment::FullChapterRange(_)
+            | Segment::FullChapterVerseRange(_) => true,
         }
     }
 }
@@ -172,6 +180,7 @@ impl ChapterlessFormat for Segment {
             Segment::FullChapterRange(full_chapter_range) => {
                 full_chapter_range.chapterless_format()
             }
+            Segment::FullChapterVerseRange(v) => v.chapterless_format(),
         }
     }
 }
@@ -188,6 +197,7 @@ impl Display for Segment {
                 Segment::ChapterRange(chapter_range) => chapter_range.to_string(),
                 Segment::FullChapter(full_chapter) => full_chapter.to_string(),
                 Segment::FullChapterRange(full_chapter_range) => full_chapter_range.to_string(),
+                Segment::FullChapterVerseRange(v) => v.to_string(),
             }
         )
     }

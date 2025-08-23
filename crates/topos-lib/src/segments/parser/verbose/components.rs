@@ -54,6 +54,13 @@ impl VerboseNumberKind {
             .map(Self::Decimal)
             .or(VerboseRomanNumeral::parser().map(Self::Roman))
     }
+
+    pub fn parsed(&self) -> u8 {
+        match self {
+            VerboseNumberKind::Decimal(v) => v.parsed.value,
+            VerboseNumberKind::Roman(v) => v.parsed.value,
+        }
+    }
 }
 
 impl SpanLen for VerboseNumberKind {
@@ -76,6 +83,10 @@ impl VerboseNumber {
         VerboseNumberKind::parser()
             .then(Subverse::optional_parser())
             .map(FromTuple::from_tuple)
+    }
+
+    pub fn parsed(&self) -> u8 {
+        self.number.parsed()
     }
 }
 
@@ -171,6 +182,10 @@ impl DelimitedNumber {
             .then(FrontPadded::parser(VerboseNumber::parser()))
             .map(FromTuple::from_tuple)
     }
+
+    pub fn parsed(&self) -> u8 {
+        self.padded_number.value.parsed()
+    }
 }
 
 impl SpanLen for DelimitedNumber {
@@ -188,6 +203,14 @@ pub struct FrontPadded<T> {
     pub value: T,
 }
 
+impl<T> std::ops::Deref for FrontPadded<T> {
+    type Target = T;
+
+    fn deref(&self) -> &Self::Target {
+        &self.value
+    }
+}
+
 impl<T> FrontPadded<T> {
     pub fn parser<'a>(child: impl Parser<'a, &'a str, T>) -> impl Parser<'a, &'a str, Self> {
         VerboseSpace::optional_parser()
@@ -203,3 +226,40 @@ impl<T: SpanLen> SpanLen for FrontPadded<T> {
         space_len + value_len
     }
 }
+
+impl FrontPadded<DelimitedNumber> {
+    pub fn parsed_value(&self) -> u8 {
+        self.value.parsed()
+    }
+}
+
+impl FrontPadded<VerboseNumber> {
+    pub fn parsed(&self) -> u8 {
+        self.value.parsed()
+    }
+}
+/*
+let new = if let Some(start_verse) = seg
+    .explicit_start_verse
+    .as_ref()
+    .map(FrontPadded::parsed_value)
+{
+    // let start_verse = value.parsed();
+    let start_chapter = seg.start.parsed();
+    if let Some(end) = seg.end {
+        // `1:2-3:4`
+        if let Some(end_verse) = end.1.as_ref().map(FrontPadded::parsed_value) {
+            let end_chapter = end.0.parsed_value();
+            Segment::chapter_range(start_chapter, start_verse, end_chapter, end_verse)
+        }
+        // `1:2-3`
+        else {
+            let end_verse = end.0.parsed_value();
+            Segment::chapter_verse_range(start_chapter, start_verse, end_verse)
+        }
+    // `1:2`
+    } else {
+        Segment::chapter_verse(start_chapter, start_verse)
+    }
+} else {
+*/

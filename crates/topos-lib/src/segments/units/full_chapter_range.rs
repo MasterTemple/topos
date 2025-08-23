@@ -165,6 +165,9 @@ impl TryFrom<Segment> for FullChapterRange {
                 FullChapterRange::new(full_chapter.chapter, full_chapter.chapter)
             }
             Segment::FullChapterRange(full_chapter_range) => full_chapter_range,
+            Segment::FullChapterVerseRange(_) => Err(format!(
+                "Cannot coerce FullChapterVerseRange into FullChapterRange"
+            ))?,
         })
     }
 }
