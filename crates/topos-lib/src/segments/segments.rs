@@ -1,10 +1,10 @@
 use derive_more::{Deref, DerefMut, IntoIterator};
 use serde::{Deserialize, Serialize};
-use topos_parser::minimal::MinimalSegments;
 
 use crate::{
     data::books::BookId,
     segments::{
+        parser::minimal::MinimalSegments,
         segment::{ChapterlessFormat, Segment},
         verse_bounds::VerseBounds,
     },

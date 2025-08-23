@@ -1,10 +1,12 @@
 use line_col::LineColLookup;
 use regex::Match;
-use topos_parser::minimal::MinimalSegments;
 
 use crate::{
     data::{books::BookId, data::BibleData},
-    segments::segments::{Passage, Segments},
+    segments::{
+        parser::minimal::MinimalSegments,
+        segments::{Passage, Segments},
+    },
 };
 
 #[derive(Copy, Clone, Debug)]
