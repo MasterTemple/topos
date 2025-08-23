@@ -234,7 +234,7 @@ impl FrontPadded<DelimitedNumber> {
 }
 
 impl FrontPadded<VerboseNumber> {
-    pub fn parsed(&self) -> u8 {
+    pub fn parsed_value(&self) -> u8 {
         self.value.parsed()
     }
 }

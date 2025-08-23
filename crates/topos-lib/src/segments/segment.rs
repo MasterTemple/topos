@@ -51,6 +51,8 @@ pub enum Segment {
     FullChapterRange(FullChapterRange),
     /// - This is a full chapter to chapter-verse range reference
     /// - Ex: `1-2:3` in `John 1-2:3`
+    // Actually this might not even have to exist if I have `FullChapterVerseRange` on
+    // `VerboseSegmentPair`
     FullChapterVerseRange(FullChapterVerseRange),
 }
 
