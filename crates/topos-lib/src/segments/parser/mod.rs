@@ -1,3 +1,4 @@
-pub(super) mod components;
+pub mod components;
 pub mod minimal;
-pub(super) mod roman_numeral;
+pub mod roman_numeral;
+pub mod verbose;
