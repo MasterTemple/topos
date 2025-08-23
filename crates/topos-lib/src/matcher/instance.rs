@@ -4,10 +4,7 @@ use topos_parser::minimal::MinimalSegments;
 
 use crate::{
     data::{books::BookId, data::BibleData},
-    segments::{
-        parse::SegmentInput,
-        segments::{Passage, Segments},
-    },
+    segments::segments::{Passage, Segments},
 };
 
 #[derive(Copy, Clone, Debug)]
@@ -101,8 +98,6 @@ impl BibleMatch {
             &input[cur.end()..]
         };
 
-        // TODO: I need to change all of this
-        // let old_segment_input = SegmentInput::try_extract(segment_window)?;
         let segment_input = MinimalSegments::parse(segment_window)?;
         // eprintln!("{} vs {}", old_segment_input.len(), segment_input.len());
 

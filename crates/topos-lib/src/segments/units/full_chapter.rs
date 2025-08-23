@@ -1,7 +1,7 @@
 use crate::segments::{
-    parse::{ParsableSegment, SegmentParseMethods},
     segment::{ChapterlessFormat, Segment},
     units::chapter_verse::ChapterVerse,
+    units::parse::{ParsableSegment, SegmentParseMethods},
     verse_bounds::VerseBounds,
 };
 use serde::{Deserialize, Serialize, de::Visitor};

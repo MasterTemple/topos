@@ -192,3 +192,26 @@ impl Display for Segment {
         )
     }
 }
+
+impl Segment {
+    pub fn parse(input: &str) -> Result<Self, String> {
+        input.parse::<Self>()
+    }
+}
+
+impl std::str::FromStr for Segment {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let segments =
+            Segments::parse(s).ok_or_else(|| format!("Could not parse any segments."))?;
+        if segments.is_empty() {
+            Err(String::from("No segments found"))?
+        }
+        if segments.len() == 1 {
+            Ok(segments[0])
+        } else {
+            Err(String::from("Multiple segments found"))?
+        }
+    }
+}

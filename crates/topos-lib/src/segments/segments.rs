@@ -89,6 +89,20 @@ impl Segments {
     }
 }
 
+impl Segments {
+    pub fn parse(segment_window: &str) -> Option<Self> {
+        MinimalSegments::parse(segment_window).map(Segments::from)
+    }
+}
+
+impl std::str::FromStr for Segments {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Self::parse(s).ok_or_else(|| String::from("Failed to parse segments"))
+    }
+}
+
 impl std::fmt::Display for Segments {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.format(",", "; "))

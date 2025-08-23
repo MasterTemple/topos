@@ -70,7 +70,7 @@ pub(super) fn parse_full_segments<'a>(input: &'a str) -> Option<(Match<'a>, Segm
     let full_segments = if mat.as_str().len() == 0 {
         Segments::new()
     } else {
-        Segments::parse_str(mat.as_str())?
+        Segments::parse(mat.as_str())?
     };
 
     Some((mat, full_segments))

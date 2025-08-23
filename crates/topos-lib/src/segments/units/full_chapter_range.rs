@@ -1,7 +1,7 @@
 use crate::segments::{
-    parse::{ParsableSegment, SegmentParseMethods},
     segment::{ChapterlessFormat, Segment},
     units::chapter_verse_range::ChapterVerseRange,
+    units::parse::{ParsableSegment, SegmentParseMethods},
     verse_bounds::VerseBounds,
 };
 

@@ -1,6 +1,6 @@
 use crate::segments::{
-    parse::{ParsableSegment, SegmentParseMethods},
     segment::{ChapterlessFormat, Segment},
+    units::parse::{ParsableSegment, SegmentParseMethods},
     verse_bounds::VerseBounds,
 };
 use serde::{Deserialize, Serialize, de::Visitor};

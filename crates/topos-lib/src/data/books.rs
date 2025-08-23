@@ -116,7 +116,7 @@ impl Books {
         let book = m.get(1)?.as_str();
         let book = self.search(book)?;
         let segments = m.get(2)?.as_str();
-        let segments = Segments::parse_str(segments)?;
+        let segments = Segments::parse(segments)?;
         Some(segments.with_book(book))
     }
 
