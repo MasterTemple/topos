@@ -30,15 +30,15 @@ pub enum VerboseSegmentPair {
     /// - This is a range of verse references across a multiple chapters
     /// - Ex: `John 1:2-3:4`
     ChapterRange(VerbosePair<VerboseChapterRange, ChapterRange>),
-    // /// - This is a single chapter reference
-    // /// - Ex: `1` in `John 1`
-    // FullChapter { parsed: FullChapter },
-    // /// - This is a full chapter range reference
-    // /// - Ex: `1-2` in `John 1-2`
-    // FullChapterRange { parsed: FullChapterRange },
-    // /// - This is a full chapter to chapter-verse range reference
-    // /// - Ex: `1-2:3` in `John 1-2:3`
-    // FullChapterVerseRange { parsed: FullChapterVerseRange },
+    /// - This is a single chapter reference
+    /// - Ex: `1` in `John 1`
+    FullChapter(VerbosePair<VerboseFullChapter, FullChapter>),
+    /// - This is a full chapter range reference
+    /// - Ex: `1-2` in `John 1-2`
+    FullChapterRange(VerbosePair<VerboseFullChapterRange, FullChapterRange>),
+    /// - This is a full chapter to chapter-verse range reference
+    /// - Ex: `1-2:3` in `John 1-2:3`
+    FullChapterVerseRange(VerbosePair<VerboseFullChapterVerseRange, FullChapterVerseRange>),
 }
 
 pub struct VerbosePair<Raw, Parsed> {
@@ -60,8 +60,12 @@ pub struct VerboseChapterVerse {
 pub struct VerboseChapterVerseRange {
     // pub chapter: FrontPadded<VerboseNumber>,
     // pub verses: RangePair<FrontPadded<DelimitedNumber>>,
-    pub start_chapter: FrontPadded<VerboseNumber>,
     pub start_verse: FrontPadded<DelimitedNumber>,
+    pub end_verse: FrontPadded<DelimitedNumber>,
+}
+
+pub struct ContextVerboseChapterVerseRange {
+    pub start_verse: FrontPadded<VerboseNumber>,
     pub end_verse: FrontPadded<DelimitedNumber>,
 }
 
@@ -83,7 +87,9 @@ pub struct VerboseFullChapterRange {
 
 pub struct VerboseFullChapterVerseRange {
     pub start_chapter: FrontPadded<VerboseNumber>,
-    pub end: RangePair<FrontPadded<DelimitedNumber>>,
+    // pub end: RangePair<FrontPadded<DelimitedNumber>>,
+    pub end_chapter: FrontPadded<DelimitedNumber>,
+    pub end_verse: FrontPadded<DelimitedNumber>,
 }
 
 pub struct FormattableSegments {
@@ -92,7 +98,7 @@ pub struct FormattableSegments {
 
 impl From<VerboseSegments> for FormattableSegments {
     fn from(value: VerboseSegments) -> Self {
-        let mut segments = Vec::new();
+        let mut segments: Vec<VerboseSegmentPair> = Vec::new();
         for seg in value.segments {
             let VerboseFullSegment {
                 start,
@@ -167,7 +173,80 @@ impl From<VerboseSegments> for FormattableSegments {
                     VerboseSegmentPair::ChapterVerse(VerbosePair::new(raw, parsed))
                 }
             } else {
-                todo!()
+                if let Some(end) = end {
+                    match end {
+                        // `1-2:3`
+                        (end_chapter, Some(end_verse)) => {
+                            let start_chapter = start;
+                            let parsed = {
+                                let start_chapter = start_chapter.parsed_value();
+                                let end_chapter = end_chapter.parsed_value();
+                                let end_verse = end_verse.parsed_value();
+
+                                FullChapterVerseRange::new(start_chapter, end_chapter, end_verse)
+                            };
+
+                            let raw = VerboseFullChapterVerseRange {
+                                start_chapter,
+                                end_chapter,
+                                end_verse,
+                            };
+
+                            VerboseSegmentPair::FullChapterVerseRange(VerbosePair::new(raw, parsed))
+                        }
+                        (end_verse, None) => {
+                            // `4-5`
+                            if let Some(prev) = segments.last() {
+                                let start_verse = start;
+                                let start_chapter = prev.clone();
+                                let parsed = {
+                                    let start_chapter = 1; // TODO: start_chapter
+                                    let start_verse = start_verse.parsed_value();
+                                    let end_verse = end_verse.parsed_value();
+
+                                    ChapterVerseRange::new(start_chapter, start_verse, end_verse)
+                                };
+
+                                let raw = ContextVerboseChapterVerseRange {
+                                    start_verse,
+                                    end_verse,
+                                };
+
+                                todo!()
+                                // VerboseSegmentPair::ChapterVerseRange(VerbosePair::new(raw, parsed))
+                            }
+                            // `1-25`
+                            else {
+                                todo!()
+                            }
+                        }
+                    }
+                //     // `1:2-3:4`
+                //     if let Some(end_verse) = end.1 {
+                //         let start_chapter = seg.start;
+                //         let end_chapter = end.0;
+                //         Segment::chapter_range(start_chapter, 1, end_chapter, end_verse)
+                //     } else {
+                //         // `3:4-5`
+                //         if let Some(prev) = segments.last() {
+                //             let start_verse = seg.start;
+                //             let end_verse = end.0;
+                //             Segment::chapter_verse_range(
+                //                 prev.ending_chapter(),
+                //                 start_verse,
+                //                 end_verse,
+                //             )
+                //         }
+                //         // `1-25`
+                //         else {
+                //             let start_chapter = seg.start;
+                //             let end_chapter = end.0;
+                //             Segment::full_chapter_range(start_chapter, end_chapter)
+                //         }
+                //     }
+                } else {
+                    todo!()
+                }
                 // if let Some(end) = seg.end {
                 //     // `1:2-3:4`
                 //     if let Some(end_verse) = end.1 {
