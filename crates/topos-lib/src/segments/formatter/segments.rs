@@ -21,12 +21,12 @@ use crate::segments::{
 pub struct LeadingSpace {}
 
 pub enum VerboseSegmentPair {
-    // /// - This is a single chapter/verse reference
-    // /// - Ex: `1:2` in `John 1:2`
-    // ChapterVerse { parsed: ChapterVerse },
-    // /// - This is a range of verse references within a single chapter
-    // /// - Ex: `1:2-3` `John 1:2-3`
-    // ChapterVerseRange { parsed: ChapterVerseRange },
+    /// - This is a single chapter/verse reference
+    /// - Ex: `1:2` in `John 1:2`
+    ChapterVerse(VerbosePair<VerboseChapterVerse, ChapterVerse>),
+    /// - This is a range of verse references within a single chapter
+    /// - Ex: `1:2-3` `John 1:2-3`
+    ChapterVerseRange(VerbosePair<VerboseChapterVerseRange, ChapterVerseRange>),
     /// - This is a range of verse references across a multiple chapters
     /// - Ex: `John 1:2-3:4`
     ChapterRange(VerbosePair<VerboseChapterRange, ChapterRange>),
@@ -53,13 +53,16 @@ impl<Raw, Parsed> VerbosePair<Raw, Parsed> {
 }
 
 pub struct VerboseChapterVerse {
-    pub chapter: FrontPadded<VerboseNumber>,
-    pub verse: FrontPadded<DelimitedNumber>,
+    pub start_chapter: FrontPadded<VerboseNumber>,
+    pub start_verse: FrontPadded<DelimitedNumber>,
 }
 
 pub struct VerboseChapterVerseRange {
-    pub chapter: FrontPadded<VerboseNumber>,
-    pub verses: RangePair<FrontPadded<DelimitedNumber>>,
+    // pub chapter: FrontPadded<VerboseNumber>,
+    // pub verses: RangePair<FrontPadded<DelimitedNumber>>,
+    pub start_chapter: FrontPadded<VerboseNumber>,
+    pub start_verse: FrontPadded<DelimitedNumber>,
+    pub end_verse: FrontPadded<DelimitedNumber>,
 }
 
 pub struct VerboseChapterRange {
@@ -99,40 +102,69 @@ impl From<VerboseSegments> for FormattableSegments {
             } = seg.clone();
 
             let new = if let Some(start_verse) = explicit_start_verse {
+                let start_chapter = start;
                 if let Some(end) = end {
-                    // `1:2-3:4`
-                    if let Some(end_verse) = end.1 {
-                        let start_chapter = start;
-                        let end_chapter = end.0;
+                    match end {
+                        // `1:2-3:4`
+                        (end_chapter, Some(end_verse)) => {
+                            let parsed = {
+                                let start_chapter = start_chapter.parsed_value();
+                                let start_verse = start_verse.parsed_value();
+                                let end_verse = end_verse.parsed_value();
+                                let end_chapter = end_chapter.parsed_value();
 
-                        let parsed = {
-                            let start_chapter = start_chapter.parsed_value();
-                            let start_verse = start_verse.parsed_value();
-                            let end_verse = end_verse.parsed_value();
-                            let end_chapter = end_chapter.parsed_value();
+                                ChapterRange::new(
+                                    start_chapter,
+                                    start_verse,
+                                    end_chapter,
+                                    end_verse,
+                                )
+                            };
 
-                            ChapterRange::new(start_chapter, start_verse, end_chapter, end_verse)
-                        };
+                            let raw = VerboseChapterRange {
+                                start_chapter,
+                                start_verse,
+                                end_chapter,
+                                end_verse,
+                            };
 
-                        let raw = VerboseChapterRange {
-                            start_chapter,
-                            start_verse,
-                            end_chapter,
-                            end_verse,
-                        };
+                            VerboseSegmentPair::ChapterRange(VerbosePair::new(raw, parsed))
+                        }
+                        // `1:2-3`
+                        (end_verse, None) => {
+                            let parsed = {
+                                let start_chapter = start_chapter.parsed_value();
+                                let start_verse = start_verse.parsed_value();
+                                let end_verse = end_verse.parsed_value();
 
-                        VerboseSegmentPair::ChapterRange(VerbosePair::new(raw, parsed))
+                                ChapterVerseRange::new(start_chapter, start_verse, end_verse)
+                            };
+
+                            let raw = VerboseChapterVerseRange {
+                                start_chapter,
+                                start_verse,
+                                end_verse,
+                            };
+
+                            VerboseSegmentPair::ChapterVerseRange(VerbosePair::new(raw, parsed))
+                        }
                     }
-                    // `1:2-3`
-                    else {
-                        // let end_verse = end.0.parsed_value();
-                        // Segment::chapter_verse_range(start_chapter, start_verse, end_verse)
-                        todo!()
-                    }
+                }
                 // `1:2`
-                } else {
-                    // Segment::chapter_verse(start_chapter, start_verse)
-                    todo!()
+                else {
+                    let parsed = {
+                        let start_chapter = start_chapter.parsed_value();
+                        let start_verse = start_verse.parsed_value();
+
+                        ChapterVerse::new(start_chapter, start_verse)
+                    };
+
+                    let raw = VerboseChapterVerse {
+                        start_chapter,
+                        start_verse,
+                    };
+
+                    VerboseSegmentPair::ChapterVerse(VerbosePair::new(raw, parsed))
                 }
             } else {
                 todo!()
