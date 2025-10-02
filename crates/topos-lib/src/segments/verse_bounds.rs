@@ -44,8 +44,22 @@ pub trait VerseBounds: Copy + Sized + std::fmt::Debug + Into<Segment> {
         )
     }
 
+    fn ends_at_or_before(&self, other: &impl VerseBounds) -> bool {
+        // it finishes in a chapter before the other one
+        self.ending_chapter() < other.starting_chapter()
+        // or it is in the same chapter and this ending verse < other starting verse
+        || (
+            self.ending_chapter() == other.starting_chapter()
+            && self.ending_verse().is_some_and(|ending_verse| ending_verse <= other.starting_verse())
+        )
+    }
+
     fn starts_after(&self, other: &impl VerseBounds) -> bool {
         other.ends_before(self)
+    }
+
+    fn starts_at_or_after(&self, other: &impl VerseBounds) -> bool {
+        other.ends_at_or_before(self)
     }
 
     // If:
@@ -56,6 +70,41 @@ pub trait VerseBounds: Copy + Sized + std::fmt::Debug + Into<Segment> {
     // - This segment does NOT overlap with the other segment
     fn overlaps_with(&self, other: &impl VerseBounds) -> bool {
         !(self.ends_before(other) || self.starts_after(other))
+    }
+
+    fn fully_contains(&self, other: &impl VerseBounds) -> bool {
+        (
+            // starting chapter is before
+            self.starting_chapter() < other.starting_chapter()
+            // or starting chapter is same and starting verse is before
+            || (
+                // starting chapter is same
+                self.starting_chapter() == other.starting_chapter()
+                // starting verse is before
+                && self.starting_verse() <= other.starting_verse()
+            )
+        ) && (
+            // ending chapter is before
+            other.ending_chapter() < self.ending_chapter()
+            // or ending chapter is same and ending verse is after
+            || (
+                // ending chapter is same
+                self.ending_chapter() == other.ending_chapter()
+                // ending verse is before
+                && match (other.ending_verse(), self.ending_verse()) {
+                    // perform comparison
+                    (Some(other), Some(this)) => other <= this,
+                    // other is unbounded, self is bounded => self doesn't contain other
+                    // TODO: what about when the user specifies 1 John 1:1-10 and 1 John 1 is found,
+                    // since they cover the same range
+                    (None, Some(_)) => false,
+                    // other is bounded, self is unbounded => self contain other
+                    (Some(_), None) => true,
+                    // both are chapter ends
+                    (None, None) => true,
+                }
+            )
+        )
     }
 
     // /// determines what kind of passage segment this really is
@@ -104,4 +153,31 @@ pub trait VerseBounds: Copy + Sized + std::fmt::Debug + Into<Segment> {
     //         segment: *self,
     //     }
     // }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::{
+        error::AnyResult,
+        segments::{segment::Segment, verse_bounds::VerseBounds},
+    };
+
+    #[test]
+    fn fully_contains() -> AnyResult<()> {
+        let psg = |s: &str| Segment::parse(s);
+
+        assert_eq!(psg("2:2")?.fully_contains(&psg("2:2")?), true);
+        assert_eq!(psg("2:1-2")?.fully_contains(&psg("2:2")?), true);
+        assert_eq!(psg("2:2-3")?.fully_contains(&psg("2:2")?), true);
+        assert_eq!(psg("2:1-3")?.fully_contains(&psg("2:2")?), true);
+
+        assert_eq!(psg("2:1-2")?.fully_contains(&psg("2:1-2")?), true);
+        assert_eq!(psg("2:2-3")?.fully_contains(&psg("2:1-2")?), false);
+        assert_eq!(psg("2:1-3")?.fully_contains(&psg("2:1-2")?), true);
+
+        assert_eq!(psg("2:1-2")?.fully_contains(&psg("2")?), false);
+        assert_eq!(psg("2")?.fully_contains(&psg("2:1-2")?), true);
+
+        Ok(())
+    }
 }

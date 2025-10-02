@@ -147,7 +147,7 @@ impl From<VerboseSegments> for FormattableSegments {
                             };
 
                             let raw = VerboseChapterVerseRange {
-                                start_chapter,
+                                // start_chapter,
                                 start_verse,
                                 end_verse,
                             };

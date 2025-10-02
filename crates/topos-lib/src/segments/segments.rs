@@ -32,7 +32,11 @@ impl Passage {
 
     /// TODO: check if passage entirely contains the other passage
     pub fn contains(&self, other: &Passage) -> bool {
-        todo!()
+        if self.book != other.book {
+            return false;
+        }
+        // todo!()
+        self.segments.contains_overlap(&other.segments)
     }
 }
 
@@ -55,6 +59,11 @@ impl Segments {
     /// - I just need some way to order the segments and do it in linear time
     pub fn contains_overlap(&self, other: &Segments) -> bool {
         self.iter().any(|this| other.overlaps_with(this))
+    }
+
+    pub fn fully_contains(&self, other: &Segments) -> bool {
+        self.iter()
+            .any(|this| other.iter().any(|o| o.fully_contains(this)))
     }
 
     pub fn with_book(self, book_id: BookId) -> Passage {
@@ -178,76 +187,76 @@ impl From<MinimalSegments> for Segments {
     }
 }
 
-impl From<VerboseSegments> for Segments {
-    fn from(value: VerboseSegments) -> Self {
-        let mut segments = Segments::new();
-        for seg in value.segments {
-            let VerboseFullSegment {
-                start,
-                explicit_start_verse,
-                end,
-                closing,
-            } = seg.clone();
-
-            let new = if let Some(start_verse) =
-                explicit_start_verse.as_ref().map(FrontPadded::parsed_value)
-            {
-                // let start_verse = value.parsed();
-                let start_chapter = start.parsed();
-                if let Some(end) = end {
-                    // `1:2-3:4`
-                    if let Some(end_verse) = end.1.as_ref().map(FrontPadded::parsed_value) {
-                        let end_chapter = end.0.parsed_value();
-                        Segment::chapter_range(start_chapter, start_verse, end_chapter, end_verse)
-                    }
-                    // `1:2-3`
-                    else {
-                        let end_verse = end.0.parsed_value();
-                        Segment::chapter_verse_range(start_chapter, start_verse, end_verse)
-                    }
-                // `1:2`
-                } else {
-                    Segment::chapter_verse(start_chapter, start_verse)
-                }
-            } else {
-                todo!()
-                // if let Some(end) = seg.end {
-                //     // `1:2-3:4`
-                //     if let Some(end_verse) = end.1 {
-                //         let start_chapter = seg.start;
-                //         let end_chapter = end.0;
-                //         Segment::chapter_range(start_chapter, 1, end_chapter, end_verse)
-                //     } else {
-                //         // `3:4-5`
-                //         if let Some(prev) = segments.last() {
-                //             let start_verse = seg.start;
-                //             let end_verse = end.0;
-                //             Segment::chapter_verse_range(
-                //                 prev.ending_chapter(),
-                //                 start_verse,
-                //                 end_verse,
-                //             )
-                //         }
-                //         // `1-25`
-                //         else {
-                //             let start_chapter = seg.start;
-                //             let end_chapter = end.0;
-                //             Segment::full_chapter_range(start_chapter, end_chapter)
-                //         }
-                //     }
-                // } else {
-                //     // `1:1`
-                //     if let Some(prev) = segments.last() {
-                //         Segment::chapter_verse(prev.ending_chapter(), seg.start)
-                //     }
-                //     // `1`
-                //     else {
-                //         Segment::full_chapter(seg.start)
-                //     }
-                // }
-            };
-            segments.push(new);
-        }
-        segments
-    }
-}
+// impl From<VerboseSegments> for Segments {
+//     fn from(value: VerboseSegments) -> Self {
+//         let mut segments = Segments::new();
+//         for seg in value.segments {
+//             let VerboseFullSegment {
+//                 start,
+//                 explicit_start_verse,
+//                 end,
+//                 closing,
+//             } = seg.clone();
+//
+//             let new = if let Some(start_verse) =
+//                 explicit_start_verse.as_ref().map(FrontPadded::parsed_value)
+//             {
+//                 // let start_verse = value.parsed();
+//                 let start_chapter = start.parsed_value();
+//                 if let Some(end) = end {
+//                     // `1:2-3:4`
+//                     if let Some(end_verse) = end.1.as_ref().map(FrontPadded::parsed_value) {
+//                         let end_chapter = end.0.parsed_value();
+//                         Segment::chapter_range(start_chapter, start_verse, end_chapter, end_verse)
+//                     }
+//                     // `1:2-3`
+//                     else {
+//                         let end_verse = end.0.parsed_value();
+//                         Segment::chapter_verse_range(start_chapter, start_verse, end_verse)
+//                     }
+//                 // `1:2`
+//                 } else {
+//                     Segment::chapter_verse(start_chapter, start_verse)
+//                 }
+//             } else {
+//                 todo!()
+//                 // if let Some(end) = seg.end {
+//                 //     // `1:2-3:4`
+//                 //     if let Some(end_verse) = end.1 {
+//                 //         let start_chapter = seg.start;
+//                 //         let end_chapter = end.0;
+//                 //         Segment::chapter_range(start_chapter, 1, end_chapter, end_verse)
+//                 //     } else {
+//                 //         // `3:4-5`
+//                 //         if let Some(prev) = segments.last() {
+//                 //             let start_verse = seg.start;
+//                 //             let end_verse = end.0;
+//                 //             Segment::chapter_verse_range(
+//                 //                 prev.ending_chapter(),
+//                 //                 start_verse,
+//                 //                 end_verse,
+//                 //             )
+//                 //         }
+//                 //         // `1-25`
+//                 //         else {
+//                 //             let start_chapter = seg.start;
+//                 //             let end_chapter = end.0;
+//                 //             Segment::full_chapter_range(start_chapter, end_chapter)
+//                 //         }
+//                 //     }
+//                 // } else {
+//                 //     // `1:1`
+//                 //     if let Some(prev) = segments.last() {
+//                 //         Segment::chapter_verse(prev.ending_chapter(), seg.start)
+//                 //     }
+//                 //     // `1`
+//                 //     else {
+//                 //         Segment::full_chapter(seg.start)
+//                 //     }
+//                 // }
+//             };
+//             segments.push(new);
+//         }
+//         segments
+//     }
+// }
