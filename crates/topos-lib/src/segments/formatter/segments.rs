@@ -96,194 +96,194 @@ pub struct FormattableSegments {
     pub segments: Vec<VerboseSegmentPair>,
 }
 
-impl From<VerboseSegments> for FormattableSegments {
-    fn from(value: VerboseSegments) -> Self {
-        let mut segments: Vec<VerboseSegmentPair> = Vec::new();
-        for seg in value.segments {
-            let VerboseFullSegment {
-                start,
-                explicit_start_verse,
-                end,
-                closing,
-            } = seg.clone();
-
-            let new = if let Some(start_verse) = explicit_start_verse {
-                let start_chapter = start;
-                if let Some(end) = end {
-                    match end {
-                        // `1:2-3:4`
-                        (end_chapter, Some(end_verse)) => {
-                            let parsed = {
-                                let start_chapter = start_chapter.parsed_value();
-                                let start_verse = start_verse.parsed_value();
-                                let end_verse = end_verse.parsed_value();
-                                let end_chapter = end_chapter.parsed_value();
-
-                                ChapterRange::new(
-                                    start_chapter,
-                                    start_verse,
-                                    end_chapter,
-                                    end_verse,
-                                )
-                            };
-
-                            let raw = VerboseChapterRange {
-                                start_chapter,
-                                start_verse,
-                                end_chapter,
-                                end_verse,
-                            };
-
-                            VerboseSegmentPair::ChapterRange(VerbosePair::new(raw, parsed))
-                        }
-                        // `1:2-3`
-                        (end_verse, None) => {
-                            let parsed = {
-                                let start_chapter = start_chapter.parsed_value();
-                                let start_verse = start_verse.parsed_value();
-                                let end_verse = end_verse.parsed_value();
-
-                                ChapterVerseRange::new(start_chapter, start_verse, end_verse)
-                            };
-
-                            let raw = VerboseChapterVerseRange {
-                                // start_chapter,
-                                start_verse,
-                                end_verse,
-                            };
-
-                            VerboseSegmentPair::ChapterVerseRange(VerbosePair::new(raw, parsed))
-                        }
-                    }
-                }
-                // `1:2`
-                else {
-                    let parsed = {
-                        let start_chapter = start_chapter.parsed_value();
-                        let start_verse = start_verse.parsed_value();
-
-                        ChapterVerse::new(start_chapter, start_verse)
-                    };
-
-                    let raw = VerboseChapterVerse {
-                        start_chapter,
-                        start_verse,
-                    };
-
-                    VerboseSegmentPair::ChapterVerse(VerbosePair::new(raw, parsed))
-                }
-            } else {
-                if let Some(end) = end {
-                    match end {
-                        // `1-2:3`
-                        (end_chapter, Some(end_verse)) => {
-                            let start_chapter = start;
-                            let parsed = {
-                                let start_chapter = start_chapter.parsed_value();
-                                let end_chapter = end_chapter.parsed_value();
-                                let end_verse = end_verse.parsed_value();
-
-                                FullChapterVerseRange::new(start_chapter, end_chapter, end_verse)
-                            };
-
-                            let raw = VerboseFullChapterVerseRange {
-                                start_chapter,
-                                end_chapter,
-                                end_verse,
-                            };
-
-                            VerboseSegmentPair::FullChapterVerseRange(VerbosePair::new(raw, parsed))
-                        }
-                        (end_verse, None) => {
-                            // `4-5`
-                            if let Some(prev) = segments.last() {
-                                let start_verse = start;
-                                let start_chapter = prev.clone();
-                                let parsed = {
-                                    let start_chapter = 1; // TODO: start_chapter
-                                    let start_verse = start_verse.parsed_value();
-                                    let end_verse = end_verse.parsed_value();
-
-                                    ChapterVerseRange::new(start_chapter, start_verse, end_verse)
-                                };
-
-                                let raw = ContextVerboseChapterVerseRange {
-                                    start_verse,
-                                    end_verse,
-                                };
-
-                                todo!()
-                                // VerboseSegmentPair::ChapterVerseRange(VerbosePair::new(raw, parsed))
-                            }
-                            // `1-25`
-                            else {
-                                todo!()
-                            }
-                        }
-                    }
-                //     // `1:2-3:4`
-                //     if let Some(end_verse) = end.1 {
-                //         let start_chapter = seg.start;
-                //         let end_chapter = end.0;
-                //         Segment::chapter_range(start_chapter, 1, end_chapter, end_verse)
-                //     } else {
-                //         // `3:4-5`
-                //         if let Some(prev) = segments.last() {
-                //             let start_verse = seg.start;
-                //             let end_verse = end.0;
-                //             Segment::chapter_verse_range(
-                //                 prev.ending_chapter(),
-                //                 start_verse,
-                //                 end_verse,
-                //             )
-                //         }
-                //         // `1-25`
-                //         else {
-                //             let start_chapter = seg.start;
-                //             let end_chapter = end.0;
-                //             Segment::full_chapter_range(start_chapter, end_chapter)
-                //         }
-                //     }
-                } else {
-                    todo!()
-                }
-                // if let Some(end) = seg.end {
-                //     // `1:2-3:4`
-                //     if let Some(end_verse) = end.1 {
-                //         let start_chapter = seg.start;
-                //         let end_chapter = end.0;
-                //         Segment::chapter_range(start_chapter, 1, end_chapter, end_verse)
-                //     } else {
-                //         // `3:4-5`
-                //         if let Some(prev) = segments.last() {
-                //             let start_verse = seg.start;
-                //             let end_verse = end.0;
-                //             Segment::chapter_verse_range(
-                //                 prev.ending_chapter(),
-                //                 start_verse,
-                //                 end_verse,
-                //             )
-                //         }
-                //         // `1-25`
-                //         else {
-                //             let start_chapter = seg.start;
-                //             let end_chapter = end.0;
-                //             Segment::full_chapter_range(start_chapter, end_chapter)
-                //         }
-                //     }
-                // } else {
-                //     // `1:1`
-                //     if let Some(prev) = segments.last() {
-                //         Segment::chapter_verse(prev.ending_chapter(), seg.start)
-                //     }
-                //     // `1`
-                //     else {
-                //         Segment::full_chapter(seg.start)
-                //     }
-                // }
-            };
-            segments.push(new);
-        }
-        Self { segments }
-    }
-}
+// impl From<VerboseSegments> for FormattableSegments {
+//     fn from(value: VerboseSegments) -> Self {
+//         let mut segments: Vec<VerboseSegmentPair> = Vec::new();
+//         for seg in value.segments {
+//             let VerboseFullSegment {
+//                 start,
+//                 explicit_start_verse,
+//                 end,
+//                 closing,
+//             } = seg.clone();
+//
+//             let new = if let Some(start_verse) = explicit_start_verse {
+//                 let start_chapter = start;
+//                 if let Some(end) = end {
+//                     match end {
+//                         // `1:2-3:4`
+//                         (end_chapter, Some(end_verse)) => {
+//                             let parsed = {
+//                                 let start_chapter = start_chapter.parsed_value();
+//                                 let start_verse = start_verse.parsed_value();
+//                                 let end_verse = end_verse.parsed_value();
+//                                 let end_chapter = end_chapter.parsed_value();
+//
+//                                 ChapterRange::new(
+//                                     start_chapter,
+//                                     start_verse,
+//                                     end_chapter,
+//                                     end_verse,
+//                                 )
+//                             };
+//
+//                             let raw = VerboseChapterRange {
+//                                 start_chapter,
+//                                 start_verse,
+//                                 end_chapter,
+//                                 end_verse,
+//                             };
+//
+//                             VerboseSegmentPair::ChapterRange(VerbosePair::new(raw, parsed))
+//                         }
+//                         // `1:2-3`
+//                         (end_verse, None) => {
+//                             let parsed = {
+//                                 let start_chapter = start_chapter.parsed_value();
+//                                 let start_verse = start_verse.parsed_value();
+//                                 let end_verse = end_verse.parsed_value();
+//
+//                                 ChapterVerseRange::new(start_chapter, start_verse, end_verse)
+//                             };
+//
+//                             let raw = VerboseChapterVerseRange {
+//                                 start_chapter,
+//                                 start_verse,
+//                                 end_verse,
+//                             };
+//
+//                             VerboseSegmentPair::ChapterVerseRange(VerbosePair::new(raw, parsed))
+//                         }
+//                     }
+//                 }
+//                 // `1:2`
+//                 else {
+//                     let parsed = {
+//                         let start_chapter = start_chapter.parsed_value();
+//                         let start_verse = start_verse.parsed_value();
+//
+//                         ChapterVerse::new(start_chapter, start_verse)
+//                     };
+//
+//                     let raw = VerboseChapterVerse {
+//                         start_chapter,
+//                         start_verse,
+//                     };
+//
+//                     VerboseSegmentPair::ChapterVerse(VerbosePair::new(raw, parsed))
+//                 }
+//             } else {
+//                 if let Some(end) = end {
+//                     match end {
+//                         // `1-2:3`
+//                         (end_chapter, Some(end_verse)) => {
+//                             let start_chapter = start;
+//                             let parsed = {
+//                                 let start_chapter = start_chapter.parsed_value();
+//                                 let end_chapter = end_chapter.parsed_value();
+//                                 let end_verse = end_verse.parsed_value();
+//
+//                                 FullChapterVerseRange::new(start_chapter, end_chapter, end_verse)
+//                             };
+//
+//                             let raw = VerboseFullChapterVerseRange {
+//                                 start_chapter,
+//                                 end_chapter,
+//                                 end_verse,
+//                             };
+//
+//                             VerboseSegmentPair::FullChapterVerseRange(VerbosePair::new(raw, parsed))
+//                         }
+//                         (end_verse, None) => {
+//                             // `4-5`
+//                             if let Some(prev) = segments.last() {
+//                                 let start_verse = start;
+//                                 let start_chapter = prev.clone();
+//                                 let parsed = {
+//                                     let start_chapter = 1; // TODO: start_chapter
+//                                     let start_verse = start_verse.parsed_value();
+//                                     let end_verse = end_verse.parsed_value();
+//
+//                                     ChapterVerseRange::new(start_chapter, start_verse, end_verse)
+//                                 };
+//
+//                                 let raw = ContextVerboseChapterVerseRange {
+//                                     start_verse,
+//                                     end_verse,
+//                                 };
+//
+//                                 todo!()
+//                                 // VerboseSegmentPair::ChapterVerseRange(VerbosePair::new(raw, parsed))
+//                             }
+//                             // `1-25`
+//                             else {
+//                                 todo!()
+//                             }
+//                         }
+//                     }
+//                 //     // `1:2-3:4`
+//                 //     if let Some(end_verse) = end.1 {
+//                 //         let start_chapter = seg.start;
+//                 //         let end_chapter = end.0;
+//                 //         Segment::chapter_range(start_chapter, 1, end_chapter, end_verse)
+//                 //     } else {
+//                 //         // `3:4-5`
+//                 //         if let Some(prev) = segments.last() {
+//                 //             let start_verse = seg.start;
+//                 //             let end_verse = end.0;
+//                 //             Segment::chapter_verse_range(
+//                 //                 prev.ending_chapter(),
+//                 //                 start_verse,
+//                 //                 end_verse,
+//                 //             )
+//                 //         }
+//                 //         // `1-25`
+//                 //         else {
+//                 //             let start_chapter = seg.start;
+//                 //             let end_chapter = end.0;
+//                 //             Segment::full_chapter_range(start_chapter, end_chapter)
+//                 //         }
+//                 //     }
+//                 } else {
+//                     todo!()
+//                 }
+//                 // if let Some(end) = seg.end {
+//                 //     // `1:2-3:4`
+//                 //     if let Some(end_verse) = end.1 {
+//                 //         let start_chapter = seg.start;
+//                 //         let end_chapter = end.0;
+//                 //         Segment::chapter_range(start_chapter, 1, end_chapter, end_verse)
+//                 //     } else {
+//                 //         // `3:4-5`
+//                 //         if let Some(prev) = segments.last() {
+//                 //             let start_verse = seg.start;
+//                 //             let end_verse = end.0;
+//                 //             Segment::chapter_verse_range(
+//                 //                 prev.ending_chapter(),
+//                 //                 start_verse,
+//                 //                 end_verse,
+//                 //             )
+//                 //         }
+//                 //         // `1-25`
+//                 //         else {
+//                 //             let start_chapter = seg.start;
+//                 //             let end_chapter = end.0;
+//                 //             Segment::full_chapter_range(start_chapter, end_chapter)
+//                 //         }
+//                 //     }
+//                 // } else {
+//                 //     // `1:1`
+//                 //     if let Some(prev) = segments.last() {
+//                 //         Segment::chapter_verse(prev.ending_chapter(), seg.start)
+//                 //     }
+//                 //     // `1`
+//                 //     else {
+//                 //         Segment::full_chapter(seg.start)
+//                 //     }
+//                 // }
+//             };
+//             segments.push(new);
+//         }
+//         Self { segments }
+//     }
+// }

@@ -94,11 +94,14 @@ impl BibleMatch {
     ) -> Option<Self> {
         let book_id = data.books().search(cur.as_str())?;
 
-        let segment_window = if let Some(next_start) = next_start {
+        let mut segment_window = if let Some(next_start) = next_start {
             &input[cur.end()..next_start]
         } else {
             &input[cur.end()..]
         };
+        if segment_window.starts_with('.') {
+            segment_window = &segment_window[1..];
+        }
 
         let segment_input = MinimalSegments::parse(segment_window)?;
         // eprintln!("{} vs {}", old_segment_input.len(), segment_input.len());

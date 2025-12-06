@@ -10,7 +10,7 @@ macro_rules! padded {
             crate::segments::autocomplete::full::WS,
             $input,
             crate::segments::autocomplete::full::WS
-        );
+        )
     };
 }
 

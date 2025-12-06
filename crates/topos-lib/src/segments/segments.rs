@@ -202,7 +202,7 @@ impl From<MinimalSegments> for Segments {
 //                 explicit_start_verse.as_ref().map(FrontPadded::parsed_value)
 //             {
 //                 // let start_verse = value.parsed();
-//                 let start_chapter = start.parsed_value();
+//                 let start_chapter = start.parsed();
 //                 if let Some(end) = end {
 //                     // `1:2-3:4`
 //                     if let Some(end_verse) = end.1.as_ref().map(FrontPadded::parsed_value) {
