@@ -1,4 +1,4 @@
-use mupdf::Document;
+use mupdf::{Document, Page, Rect};
 use topos_lib::{
     error::AnyResult,
     matcher::{matcher::BibleMatcher, matches::ComplexFilter},
@@ -12,6 +12,31 @@ pub enum PDFLocation {
     // Rectangle,
 }
 
+impl PDFLocation {
+    pub fn page(&self) -> usize {
+        match self {
+            PDFLocation::Page(p) => *p,
+        }
+    }
+}
+
+pub struct MyRect {
+    x: f32,
+    y: f32,
+    w: f32,
+    h: f32,
+}
+
+impl MyRect {
+    pub fn from_rects(page: Rect, line: Rect) -> Self {
+        let x = line.x0;
+        let y = page.y1 - line.y1;
+        let w = line.x1;
+        let h = page.y1 - line.y0;
+        Self { x, y, w, h }
+    }
+}
+
 #[derive(Clone, Debug)]
 pub struct PDFBibleMatch {
     psg: Passage,
@@ -20,17 +45,17 @@ pub struct PDFBibleMatch {
 
 #[derive(Clone, Debug)]
 pub struct PDFBibleMatcher(BibleMatcher);
-impl Default for PDFBibleMatcher {
-    fn default() -> Self {
-        Self(Default::default())
-    }
-}
 
 impl std::ops::Deref for PDFBibleMatcher {
     type Target = BibleMatcher;
 
     fn deref(&self) -> &Self::Target {
         &self.0
+    }
+}
+impl Default for PDFBibleMatcher {
+    fn default() -> Self {
+        Self(Default::default())
     }
 }
 
@@ -82,6 +107,10 @@ mod tests {
         let doc = Document::open(PATH)?;
         // let page = doc.load_page(3)?; // page 3?
         let page = doc.pages()?.nth(2).unwrap()?; // page 3
+        //
+        // page.to_display_list
+        dbg!(page.bounds()?);
+        let page_bounds = page.bounds()?;
 
         let text = page.to_text()?;
         let matcher = BibleMatcher::default();
@@ -96,37 +125,47 @@ mod tests {
         let text_page = page.to_text_page(TextPageOptions::BLOCK_TEXT)?;
         dbg!(page.search("Hebrews", 3));
         // dbg!(&text_page);
+        let mut blocks = 0;
+        let mut lines = 0;
         for block in text_page.blocks() {
+            blocks += 1;
             // to understand bounds/rect: https://pymupdf.readthedocs.io/en/latest/rect.html
             // dbg!(&block.bounds());
             for line in block.lines() {
+                lines += 1;
                 // dbg!(&line.bounds());
                 let line_text = line.chars().filter_map(|c| c.char()).collect::<String>();
                 if line_text.contains("Hebrews") {
-                    dbg!(&block.bounds());
-                    dbg!(&line);
-                    dbg!(&line.bounds());
-
-                    let bounds = line.bounds();
-                    dbg!(block.ctm());
-
-                    let x = bounds.x0;
-                    let y = bounds.y0;
-
-                    let x = bounds.origin().x;
-                    let y = bounds.origin().y;
-
-                    let w = bounds.width();
-                    let h = bounds.height();
+                    let MyRect { x, y, w, h } = MyRect::from_rects(page_bounds, line.bounds());
                     println!(
-                        "![[01. O Perfect Redemption! - by Mike Riccardi - 117201843484205.pdf#page=3&rect={},{},{},{}&color=yellow|01. O Perfect Redemption! - by Mike Riccardi - 117201843484205, p.3]]",
+                        "![[test.pdf#page=3&rect={},{},{},{}&color=yellow|test, p.3]]",
                         x, y, w, h
                     );
                 }
-                // println!("{}", &line_text);
             }
         }
 
+        Ok(())
+    }
+
+    #[test]
+    fn find_all_references() -> topos_lib::error::AnyResult<()> {
+        let path = PATH;
+        let path = "/home/dgmastertemple/Dropbox/Apps/remotely-save/Dropbox Library/Books/PDF/The Dorean Principle - by Conley Owens.pdf";
+        let doc = Document::open(path)?;
+        let matcher = PDFBibleMatcher::default();
+        let matches = matcher.search(doc);
+        dbg!(&matches);
+        println!("");
+        println!("| Page | Reference |");
+        println!("| ---- | --------- |");
+        for m in matches? {
+            let page = m.location.page() + 1;
+            let book = matcher.data().books().get_name(m.psg.book).unwrap();
+            let segments = m.psg.segments;
+
+            println!("| {} | {} {} |", page, book, segments);
+        }
         Ok(())
     }
 }
