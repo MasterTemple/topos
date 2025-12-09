@@ -8,26 +8,37 @@ use topos_lib::{
 #[derive(Clone, Debug)]
 pub enum PDFLocation {
     Page(usize),
+    // The Obsidian PDF++ selection (using PDF.js backend) is unstable
     // Selection,
-    // Rectangle,
+    Rectangle { page: usize, rect: PDFRect },
+    Rectangles { page: usize, rect: Vec<PDFRect> },
+    Search { page: usize, query: String },
 }
 
 impl PDFLocation {
     pub fn page(&self) -> usize {
         match self {
-            PDFLocation::Page(p) => *p,
+            PDFLocation::Page(page) => *page,
+            PDFLocation::Rectangle { page, .. } => *page,
+            PDFLocation::Rectangles { page, .. } => *page,
+            PDFLocation::Search { page, .. } => *page,
         }
     }
 }
 
-pub struct MyRect {
-    x: f32,
-    y: f32,
-    w: f32,
-    h: f32,
+/**
+- This is in the normal PDF coordinate space
+- MuPDF coordinate space: https://mupdf.readthedocs.io/en/latest/reference/common/coordinate-system.html
+*/
+#[derive(Clone, Debug)]
+pub struct PDFRect {
+    pub x: f32,
+    pub y: f32,
+    pub w: f32,
+    pub h: f32,
 }
 
-impl MyRect {
+impl PDFRect {
     pub fn from_rects(page: Rect, line: Rect) -> Self {
         let x = line.x0;
         let y = page.y1 - line.y1;
@@ -136,7 +147,7 @@ mod tests {
                 // dbg!(&line.bounds());
                 let line_text = line.chars().filter_map(|c| c.char()).collect::<String>();
                 if line_text.contains("Hebrews") {
-                    let MyRect { x, y, w, h } = MyRect::from_rects(page_bounds, line.bounds());
+                    let PDFRect { x, y, w, h } = PDFRect::from_rects(page_bounds, line.bounds());
                     println!(
                         "![[test.pdf#page=3&rect={},{},{},{}&color=yellow|test, p.3]]",
                         x, y, w, h
