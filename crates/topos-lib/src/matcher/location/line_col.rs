@@ -1,0 +1,91 @@
+use line_col::LineColLookup;
+use regex::Match;
+
+use crate::matcher::{
+    instance::BibleMatch,
+    matcher::{BibleMatcher, Matcher},
+};
+
+#[derive(Copy, Clone, Debug)]
+pub struct Position {
+    pub line: usize,
+    pub column: usize,
+}
+
+impl Position {
+    pub fn new(line: usize, column: usize) -> Self {
+        Self { line, column }
+    }
+    pub fn new_pair((line, column): (usize, usize)) -> Self {
+        Self::new(line, column)
+    }
+}
+
+#[derive(Copy, Clone, Debug)]
+pub struct LineColLocation {
+    pub start: Position,
+    pub end: Position,
+}
+
+impl LineColLocation {
+    pub fn new(lookup: &LineColLookup, start: usize, end: usize) -> Self {
+        let start = Position::new_pair(lookup.get(start));
+        let end = Position::new_pair(lookup.get(end));
+        Self { start, end }
+    }
+}
+
+impl Matcher for LineColLocation {
+    type Input<'a> = &'a str;
+
+    fn search<'a>(matcher: &BibleMatcher<Self>, input: Self::Input<'a>) -> Vec<BibleMatch<Self>> {
+        let mut filtered = matcher.filter();
+
+        let mut prev: Option<Match<'_>> = None;
+        let lookup = LineColLookup::new(input);
+        // basically execute behind by 1 iteration (so I can see the start of the next match)
+        for cur in matcher.filtered_books.captures_iter(input) {
+            // this is just the book name
+            let cur = cur.get(1).unwrap();
+            if let Some(prev) = prev {
+                if let Some(m) = BibleMatch::try_match(
+                    &lookup,
+                    // self.data.as_ref(),
+                    matcher.data(),
+                    input,
+                    prev,
+                    Some(cur.start()),
+                ) {
+                    filtered.try_add(m);
+                }
+            }
+            prev = Some(cur);
+        }
+
+        // handle last one
+        if let Some(prev) = prev {
+            if let Some(m) = BibleMatch::try_match(&lookup, matcher.data(), input, prev, None) {
+                filtered.try_add(m);
+            }
+        }
+
+        return filtered.matches();
+    }
+
+    fn find<'a>(matcher: &BibleMatcher<Self>, input: Self::Input<'a>) -> Option<BibleMatch<Self>> {
+        let mut filtered = matcher.filter();
+        let lookup = LineColLookup::new(input);
+
+        let first = matcher.filtered_books.captures_iter(input).next()?.get(1)?;
+
+        filtered.try_add(BibleMatch::try_match(
+            &lookup,
+            matcher.data(),
+            input,
+            first,
+            None,
+        )?);
+
+        return filtered.matches().into_iter().next();
+    }
+}

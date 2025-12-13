@@ -4,10 +4,7 @@ use regex::Regex;
 
 use crate::{
     data::chapter_verses::BookChapterVerses,
-    matcher::{
-        instance::{BibleMatch, Location, Position},
-        matcher::BibleMatcher,
-    },
+    matcher::{instance::BibleMatch, matcher::BibleMatcher},
     segments::{
         autocomplete::{
             full::parse_full_segments, incomplete::IncompleteSegment, output::CompletionOutput,

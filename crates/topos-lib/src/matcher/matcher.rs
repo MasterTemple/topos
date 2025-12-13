@@ -1,3 +1,5 @@
+use std::marker::PhantomData;
+
 use line_col::LineColLookup;
 use regex::{Match, Regex};
 
@@ -6,85 +8,64 @@ use crate::{
     filter::filter::BibleFilter,
     matcher::{
         instance::BibleMatch,
+        location::line_col::LineColLocation,
         matches::{ComplexFilter, FilteredBibleMatches},
     },
     segments::autocomplete::input::InputAutoCompleter,
 };
 
 #[derive(Clone, Debug)]
-pub struct BibleMatcher {
+pub struct BibleMatcher<L = LineColLocation> {
     data: BibleData,
-    /// The books to **not** match on aren't in this RegEx, so I won't process unnecessary books
-    filtered_books: Regex,
+    /// The books to **not** match on **aren't** in this RegEx, so I won't process unnecessary books
+    pub filtered_books: Regex,
     /// These are so I can check if the matches overlap with these
     complex_filter: ComplexFilter,
+    _phantom: PhantomData<L>,
 }
 
+// TODO: I should have a search method for each type of Location
 impl BibleMatcher {
     pub fn new(data: BibleData, filtered_books: Regex, complex_filter: ComplexFilter) -> Self {
         Self {
             data,
             filtered_books,
             complex_filter,
+            _phantom: PhantomData,
         }
-    }
-
-    /// How can I make it so that I can iter over lines and take a string input or a BufReader
-    /// input (I don't want to convert BufReader to a string because of performance overhead)
-    pub fn search(&self, input: &str) -> Vec<BibleMatch> {
-        // let mut matches: Vec<BibleMatch> = vec![];
-        let mut filtered = FilteredBibleMatches::new(&self.complex_filter);
-
-        let mut prev: Option<Match<'_>> = None;
-        let lookup = LineColLookup::new(input);
-        // basically execute behind by 1 iteration (so I can see the start of the next match)
-        for cur in self.filtered_books.captures_iter(input) {
-            // this is just the book name
-            let cur = cur.get(1).unwrap();
-            if let Some(prev) = prev {
-                if let Some(m) = BibleMatch::try_match(
-                    &lookup,
-                    // self.data.as_ref(),
-                    &self.data,
-                    input,
-                    prev,
-                    Some(cur.start()),
-                ) {
-                    filtered.try_add(m);
-                }
-            }
-            prev = Some(cur);
-        }
-
-        // handle last one
-        if let Some(prev) = prev {
-            if let Some(m) = BibleMatch::try_match(&lookup, &self.data, input, prev, None) {
-                filtered.try_add(m);
-            }
-        }
-
-        return filtered.matches();
-    }
-
-    pub fn find(&self, input: &str) -> Option<BibleMatch> {
-        let mut filtered = FilteredBibleMatches::new(&self.complex_filter);
-        let lookup = LineColLookup::new(input);
-
-        let first = self.filtered_books.captures_iter(input).next()?.get(1)?;
-
-        filtered.try_add(BibleMatch::try_match(
-            &lookup, &self.data, input, first, None,
-        )?);
-
-        return filtered.matches().into_iter().next();
     }
 
     pub fn data(&self) -> &BibleData {
         &self.data
     }
 
+    pub fn filter(&self) -> FilteredBibleMatches<'_> {
+        self.complex_filter.as_filter()
+    }
+
     pub fn completer(&self) -> InputAutoCompleter {
         InputAutoCompleter::new(self)
+    }
+}
+
+/**
+This is a trait that allows for generic location matching
+*/
+pub trait Matcher: Sized {
+    type Input<'a>;
+    fn search<'a>(matcher: &BibleMatcher<Self>, input: Self::Input<'a>) -> Vec<BibleMatch<Self>>;
+    fn find<'a>(matcher: &BibleMatcher<Self>, input: Self::Input<'a>) -> Option<BibleMatch<Self>> {
+        Self::search(matcher, input).into_iter().next()
+    }
+}
+
+impl<L: Matcher> BibleMatcher<L> {
+    pub fn search<'a>(&self, input: L::Input<'a>) -> Vec<BibleMatch<L>> {
+        L::search(self, input)
+    }
+
+    pub fn find<'a>(&self, input: L::Input<'a>) -> Option<BibleMatch<L>> {
+        L::find(self, input)
     }
 }
 

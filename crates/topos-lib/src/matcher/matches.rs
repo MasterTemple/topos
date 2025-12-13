@@ -40,6 +40,10 @@ impl ComplexFilter {
 
         is_outside
     }
+
+    pub fn as_filter<'a>(&'a self) -> FilteredBibleMatches<'a> {
+        FilteredBibleMatches::new(self)
+    }
 }
 
 pub struct FilteredBibleMatches<'a> {
