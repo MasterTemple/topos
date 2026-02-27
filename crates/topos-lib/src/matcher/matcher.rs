@@ -53,7 +53,7 @@ pub enum MatchError {
     #[error("HTML: {0}")]
     HTML(#[from] HTMLMatchError),
     #[error("PDF: {0}")]
-    PDF(PDFMatchError),
+    PDF(#[from] PDFMatchError),
     #[error("{0}")]
     Unknown(Box<dyn std::error::Error>),
 }

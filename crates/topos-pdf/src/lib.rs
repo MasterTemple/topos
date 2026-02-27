@@ -107,7 +107,7 @@ Page: 3
 #[cfg(test)]
 mod tests {
     use mupdf::{Document, TextPageOptions};
-    use topos_lib::matcher::matcher::BibleMatcher;
+    use topos_lib::matcher::{location::line_col::LineColLocation, matcher::BibleMatcher};
 
     use super::*;
 
@@ -128,7 +128,7 @@ mod tests {
 
         // println!("```\n{}\n```", &text);
 
-        let matches = matcher.search(&text);
+        let matches = matcher.search::<LineColLocation>(&text).unwrap_or_default();
         // dbg!(&matches);
         let heb = &matches[0];
         dbg!(&heb);
