@@ -18,6 +18,8 @@ regex = { workspace = true }
 itertools = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
+htmloc = { workspace = true }
+thiserror = { workspace = true }
 
 # optional dependencies
 mupdf = { version = "0.4.4", optional = true }

@@ -29,6 +29,9 @@ impl PDFRect {
     }
 }
 
+#[derive(thiserror::Error, Debug)]
+pub enum PDFMatchError {}
+
 #[derive(Clone, Debug)]
 pub enum PDFLocation {
     Page(usize),
@@ -39,26 +42,26 @@ pub enum PDFLocation {
     Search { page: usize, query: String },
 }
 
-impl Matcher for PDFLocation {
-    type Input<'a> = &'a Document;
-
-    // TODO: Should I have a BibleLocater instead? Where the BibleMatcher deals only with plaintext
-    // and the BibleLocater deals with file types?
-    // Or perhaps a `FileMatcher` that takes a path...
-    // **NO** because what if the user has an XML string or something?
-    fn search<'a>(matcher: &BibleMatcher<Self>, input: Self::Input<'a>) -> Vec<BibleMatch<Self>> {
-        let mut matches = vec![];
-
-        for (idx, page) in doc.pages()?.enumerate() {
-            let page = page?;
-            let text = page.to_text()?;
-            let results = matcher.search(&text);
-            matches.extend(results.into_iter().map(|r| PDFBibleMatch {
-                psg: r.psg,
-                location: PDFLocation::Page(idx),
-            }));
-        }
-
-        Ok(matches)
-    }
-}
+// impl Matcher for PDFLocation {
+//     type Input<'a> = &'a Document;
+//
+//     // TODO: Should I have a BibleLocater instead? Where the BibleMatcher deals only with plaintext
+//     // and the BibleLocater deals with file types?
+//     // Or perhaps a `FileMatcher` that takes a path...
+//     // **NO** because what if the user has an XML string or something?
+//     fn search<'a>(matcher: &BibleMatcher<Self>, input: Self::Input<'a>) -> Vec<BibleMatch<Self>> {
+//         let mut matches = vec![];
+//
+//         for (idx, page) in doc.pages()?.enumerate() {
+//             let page = page?;
+//             let text = page.to_text()?;
+//             let results = matcher.search(&text);
+//             matches.extend(results.into_iter().map(|r| PDFBibleMatch {
+//                 psg: r.psg,
+//                 location: PDFLocation::Page(idx),
+//             }));
+//         }
+//
+//         Ok(matches)
+//     }
+// }

@@ -13,6 +13,9 @@
 5. Reduce false positives (such as `"is"` for Isaiah) from searches, but keep for explicit parsing [#3](https://github.com/MasterTemple/topos/issues/3)
 6. Contextual parsing: recognize verse headings when a document is about a particular book [#6](https://github.com/MasterTemple/topos/issues/6)
 7. Provide user specified formatting options [#4](https://github.com/MasterTemple/topos/issues/4)
-8. Cache search results [#2](https://github.com/MasterTemple/topos/issues/2)
-9. Create a standard format for specifying segment ranges
+8. Complete/Improve CLI
+    - Add grep-like commands (highlight, show context, ..)
+9. Cache search results [#2](https://github.com/MasterTemple/topos/issues/2)
+10. Add incremental parsing
+11. Create a standard format for specifying segment ranges
 

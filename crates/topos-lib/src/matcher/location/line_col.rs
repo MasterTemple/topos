@@ -3,7 +3,7 @@ use regex::Match;
 
 use crate::matcher::{
     instance::BibleMatch,
-    matcher::{BibleMatcher, Matcher},
+    matcher::{BibleMatcher, MatchResult, Matcher},
 };
 
 #[derive(Copy, Clone, Debug)]
@@ -38,7 +38,12 @@ impl LineColLocation {
 impl Matcher for LineColLocation {
     type Input<'a> = &'a str;
 
-    fn search<'a>(matcher: &BibleMatcher<Self>, input: Self::Input<'a>) -> Vec<BibleMatch<Self>> {
+    /// - This always returns the [`Ok`] variant
+    /// - Using the [`Result::unwrap_or_default()`] method results in an empty [`Vec`], so just do that
+    fn search<'a>(
+        matcher: &BibleMatcher,
+        input: Self::Input<'a>,
+    ) -> MatchResult<Vec<BibleMatch<Self>>> {
         let mut filtered = matcher.filter();
 
         let mut prev: Option<Match<'_>> = None;
@@ -69,10 +74,10 @@ impl Matcher for LineColLocation {
             }
         }
 
-        return filtered.matches();
+        return Ok(filtered.matches());
     }
 
-    fn find<'a>(matcher: &BibleMatcher<Self>, input: Self::Input<'a>) -> Option<BibleMatch<Self>> {
+    fn find<'a>(matcher: &BibleMatcher, input: Self::Input<'a>) -> Option<BibleMatch<Self>> {
         let mut filtered = matcher.filter();
         let lookup = LineColLookup::new(input);
 

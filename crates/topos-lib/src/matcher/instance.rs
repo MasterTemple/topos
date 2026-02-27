@@ -85,6 +85,12 @@ impl<L> BibleMatch<L> {
             psg: segments.with_book(book_id),
         }
     }
+    pub fn map_loc<N>(self, f: impl FnOnce(L) -> N) -> BibleMatch<N> {
+        BibleMatch {
+            location: f(self.location),
+            psg: self.psg,
+        }
+    }
 }
 
 impl BibleMatch {
