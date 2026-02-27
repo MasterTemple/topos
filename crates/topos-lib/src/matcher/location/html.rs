@@ -18,6 +18,7 @@ impl From<Selection> for LineColLocation {
                 line: value.end.line,
                 column: value.end.column,
             },
+            bytes: todo!(),
         }
     }
 }

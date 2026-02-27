@@ -23,6 +23,7 @@ thiserror = { workspace = true }
 
 # optional dependencies
 mupdf = { version = "0.4.4", optional = true }
+unicode-normalization = "0.1.25"
 
 [features]
 default = ["pdf"]

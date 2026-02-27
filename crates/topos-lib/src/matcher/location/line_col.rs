@@ -7,6 +7,18 @@ use crate::matcher::{
 };
 
 #[derive(Copy, Clone, Debug)]
+pub struct ByteIndex {
+    pub start: usize,
+    pub end: usize,
+}
+
+impl ByteIndex {
+    pub fn new(start: usize, end: usize) -> Self {
+        Self { start, end }
+    }
+}
+
+#[derive(Copy, Clone, Debug)]
 pub struct Position {
     pub line: usize,
     pub column: usize,
@@ -21,17 +33,20 @@ impl Position {
     }
 }
 
+// TODO: I need start byte
 #[derive(Copy, Clone, Debug)]
 pub struct LineColLocation {
     pub start: Position,
     pub end: Position,
+    pub bytes: ByteIndex,
 }
 
 impl LineColLocation {
     pub fn new(lookup: &LineColLookup, start: usize, end: usize) -> Self {
+        let bytes = ByteIndex::new(start, end);
         let start = Position::new_pair(lookup.get(start));
         let end = Position::new_pair(lookup.get(end));
-        Self { start, end }
+        Self { start, end, bytes }
     }
 }
 
