@@ -120,7 +120,7 @@ impl BibleFilter {
 
         // let book_regex = Regex::new(format!(r"\b(((?:)(?i){books_pattern})[A-z]*)\.?").as_str())
         // I am including a chapter number to reduce false positives on abbreviations
-        let book_regex = Regex::new(format!(r"\b(((?:)(?i){books_pattern}))\.?\s*\d").as_str())
+        let book_regex = Regex::new(format!(r"\b(((?:)(?i){books_pattern})\.?)\s*\d").as_str())
             .map_err(|e| format!("Failed to compile book_regex because of bad user input.\n{e}"))?;
 
         Ok(book_regex)

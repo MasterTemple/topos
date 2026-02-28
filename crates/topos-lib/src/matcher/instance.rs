@@ -108,9 +108,11 @@ impl BibleMatch {
         } else {
             &input[cur.end()..]
         };
-        if segment_window.starts_with('.') {
-            segment_window = &segment_window[1..];
-        }
+
+        // This adds an off-by-one error!!
+        // if segment_window.starts_with('.') {
+        //     segment_window = &segment_window[1..];
+        // }
 
         let segment_input = MinimalSegments::parse(segment_window)?;
         // eprintln!("{} vs {}", old_segment_input.len(), segment_input.len());

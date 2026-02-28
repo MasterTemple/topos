@@ -325,12 +325,13 @@ impl<'a> PDFTextPageMatcher<'a> {
 
     pub fn current_str(&self) -> &str {
         let loc = self.current_loc();
-        &self.text[loc.bytes.start..=loc.bytes.end]
+        &self.text[loc.bytes.start..loc.bytes.end]
     }
 
     pub fn char_not_found(&mut self) {
         self.char_idx = 0;
         // self.reset_chars();
+        self.char_rects.clear();
         self.line_rects.clear();
     }
 
@@ -374,45 +375,7 @@ impl Matcher for PDFLocation {
         {
             let page_num = idx + 1;
             let page = page.map_err(|_| PDFMatchError::ReadPage(page_num))?;
-            // TODO: remove this later, it is just for testing
-            // if matches.len() > 0 {
-            //     break;
-            // }
             let results = search_pdf_page2(matcher, page_num, &page)?;
-
-            for result in &results {
-                println!(
-                    "'{} {}'",
-                    matcher.data().books().get_name(result.psg.book).unwrap(),
-                    result.psg.segments
-                );
-                match &result.location {
-                    PDFLocation::Page(_) => todo!(),
-                    PDFLocation::Rectangles { page, rect } => {
-                        for rect in rect {
-                            println!(
-                                "![[The Dorean Principle - by Conley Owens.pdf#page={}&rect={},{},{},{}&color=yellow|The Dorean Principle - by Conley Owens, p.iii]]",
-                                page,
-                                rect.x,
-                                rect.y,
-                                rect.x + rect.w,
-                                rect.y + rect.h,
-                            )
-                        }
-                    }
-                    PDFLocation::Search { page, query } => todo!(),
-                    PDFLocation::Rectangle { page, rect } => {
-                        println!(
-                            "![[The Dorean Principle - by Conley Owens.pdf#page={}&rect={},{},{},{}&color=yellow|The Dorean Principle - by Conley Owens, p.iii]]",
-                            page,
-                            rect.x,
-                            rect.y,
-                            rect.x + rect.w,
-                            rect.y + rect.h,
-                        )
-                    }
-                }
-            }
 
             matches.extend(results);
         }
@@ -423,6 +386,8 @@ impl Matcher for PDFLocation {
 
 #[cfg(test)]
 mod tests {
+    use mupdf::pdf::{PdfFilterOptions, PdfPage};
+
     use crate::error::AnyResult;
 
     use super::*;
@@ -435,13 +400,29 @@ mod tests {
         let results = m.search::<PDFLocation>(&doc)?;
 
         for result in &results {
+            let name = format!(
+                "'{} {}'",
+                m.data().books().get_name(result.psg.book).unwrap(),
+                result.psg.segments
+            );
             match &result.location {
                 PDFLocation::Page(_) => todo!(),
-                PDFLocation::Rectangles { page, rect } => todo!(),
+                PDFLocation::Rectangles { page, rect } => {
+                    for rect in rect {
+                        println!(
+                            "[[The Dorean Principle - by Conley Owens.pdf#page={}&rect={},{},{},{}&color=yellow|p.{page} - {name}]]",
+                            page,
+                            rect.x,
+                            rect.y,
+                            rect.x + rect.w,
+                            rect.y + rect.h,
+                        )
+                    }
+                }
                 PDFLocation::Search { page, query } => todo!(),
                 PDFLocation::Rectangle { page, rect } => {
                     println!(
-                        "![[The Dorean Principle - by Conley Owens.pdf#page={}&rect={},{},{},{}&color=yellow|The Dorean Principle - by Conley Owens, p.iii]]",
+                        "[[The Dorean Principle - by Conley Owens.pdf#page={}&rect={},{},{},{}&color=yellow|p.{page} - {name}]]",
                         page,
                         rect.x,
                         rect.y,
@@ -452,9 +433,18 @@ mod tests {
             }
         }
 
-        // println!("{:#?}", &result);
-        // println!("{:#?}", &result[0]);
-
         Ok(())
     }
+    // #[test]
+    // fn add_annotation() {
+    //     let path = "/home/dgmastertemple/Dropbox/Apps/remotely-save/Dropbox Library/Books/PDF/The Dorean Principle - by Conley Owens.pdf";
+    //     let doc = Document::open(path)?;
+    // }
+    // fn create_an(p: &mut PdfPage) {
+    //     use mupdf::pdf::PdfAnnotationType;
+    //     let mut an = p.create_annotation(PdfAnnotationType::Text).unwrap();
+    //     an.filter(PdfFilterOptions::default());
+    //     let mut an = p.create_annotation(PdfAnnotationType::Highlight).unwrap();
+    //     an.set_author("Person");
+    // }
 }
