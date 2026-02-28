@@ -37,18 +37,21 @@ pub enum Delimeter {
 impl Delimeter {
     /// `,` or `;`
     const SEGMENT_DELIMETER: &'static str = r",;";
+    /// `,` or `;`
     pub fn segment_parser<'a>() -> impl Parser<'a, &'a str, char> {
         one_of(Self::SEGMENT_DELIMETER)
     }
 
     /// `.` or `:`
     const CHAPTER_DELIMETER: &'static str = r".:";
+    /// `.` or `:`
     pub fn chapter_parser<'a>() -> impl Parser<'a, &'a str, char> {
         one_of(Self::CHAPTER_DELIMETER)
     }
 
     /// Various dashes
     const RANGE_DELIMETER: &str = r"-–——⸺";
+    /// Various dashes
     pub fn range_parser<'a>() -> impl Parser<'a, &'a str, char> {
         one_of(Self::RANGE_DELIMETER)
     }

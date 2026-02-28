@@ -1,6 +1,9 @@
+use std::str::Chars;
+
 use line_col::LineColLookup;
 use mupdf::{Document, Rect, TextChar, TextPageOptions, pdf::PdfDocument};
 use regex::Match;
+use unicode_normalization::UnicodeNormalization;
 
 use crate::matcher::{
     instance::BibleMatch,
@@ -11,6 +14,14 @@ use crate::matcher::{
 /**
 - This is in the normal PDF coordinate space (origin is at the bottom left) used by PDF.js
 - MuPDF coordinate space is at the top left: https://mupdf.readthedocs.io/en/latest/reference/common/coordinate-system.html
+
+From PDF++
+```ts
+/**
+ * [x1, y1, x2, y2], where [x1, y1] is the bottom-left corner and [x2, y2] is the top-right corner
+ */
+type Rect = [number, number, number, number];
+```
 */
 // TODO: Do I want to store page bounds?
 #[derive(Clone, Debug)]
@@ -23,16 +34,28 @@ pub struct PDFRect {
 
 impl PDFRect {
     pub fn from_rects(page: Rect, line: Rect) -> Self {
-        // let x = line.x0;
-        // let y = page.y1 - line.y1;
-        // let w = line.x1;
-        // let h = page.y1 - line.y0;
         let x = line.x0;
         let y = page.y1 - line.y1;
         let w = line.x1 - line.x0;
         let h = line.y1 - line.y0;
         Self { x, y, w, h }
     }
+}
+
+fn merge_rects(rects: &[Rect]) -> Rect {
+    let mut x0 = f32::MAX;
+    let mut y0 = f32::MAX;
+    let mut x1 = f32::MIN;
+    let mut y1 = f32::MIN;
+
+    for r in rects {
+        x0 = x0.min(r.x0);
+        y0 = y0.min(r.y0);
+        x1 = x1.max(r.x1);
+        y1 = y1.max(r.y1);
+    }
+
+    Rect { x0, y0, x1, y1 }
 }
 
 #[derive(thiserror::Error, Debug)]
@@ -56,403 +79,6 @@ pub enum PDFLocation {
     Rectangles { page: usize, rect: Vec<PDFRect> },
     Search { page: usize, query: String },
 }
-
-// impl Matcher for PDFLocation {
-//     type Input<'a> = &'a Document;
-//
-//     fn search<'a>(
-//         matcher: &BibleMatcher,
-//         doc: Self::Input<'a>,
-//     ) -> MatchResult<Vec<BibleMatch<Self>>> {
-//         let mut matches = vec![];
-//
-//         for (idx, page) in doc
-//             .pages()
-//             .map_err(|_| PDFMatchError::ReadPages)?
-//             .enumerate()
-//         {
-//             let page = page.map_err(|_| PDFMatchError::ReadPage(idx))?;
-//
-//             // If I just want page number
-//             let page_number = true;
-//             if page_number {
-//                 let text = page.to_text().map_err(|_| PDFMatchError::ReadText(idx))?;
-//
-//                 let results = matcher.search::<LineColLocation>(&text)?;
-//
-//                 matches.extend(
-//                     results
-//                         .into_iter()
-//                         .map(|m| m.map_loc(|_| PDFLocation::Page(idx))),
-//                 );
-//             }
-//             // TODO: Even if I want the rect, I should still just do all matches on the big text block, but then find their rects (otherwise I have to find matches across rects, which is significantly harder)
-//             else {
-//                 let page_bounds = page.bounds().map_err(|_| PDFMatchError::PageBounds(idx))?;
-//                 page.to_text_page(TextPageOptions::into_iter)
-//                 let text_page = page
-//                     .to_text_page(TextPageOptions::BLOCK_TEXT)
-//                     .map_err(|_| PDFMatchError::ReadText(idx))?;
-//
-//                 for block in text_page.blocks() {
-//                     // To understand bounds/rect: https://pymupdf.readthedocs.io/en/latest/rect.html
-//                     for line in block.lines() {
-//                         let line_text = line.chars().filter_map(|c| c.char()).collect::<String>();
-//                         // TODO: Match it somehow
-//                         if line_text.contains("Hebrews") {
-//                             let rect = PDFRect::from_rects(page_bounds, line.bounds());
-//                             let loc = PDFLocation::Rectangle { page: idx, rect };
-//                             // TODO: finish
-//                             // matches.push(value);
-//                         }
-//                     }
-//                 }
-//             }
-//         }
-//
-//         Ok(matches)
-//     }
-// }
-
-// impl Matcher for PDFLocation {
-//     type Input<'a> = &'a Document;
-//
-//     fn search<'a>(
-//         matcher: &BibleMatcher,
-//         doc: Self::Input<'a>,
-//     ) -> MatchResult<Vec<BibleMatch<Self>>> {
-//         let mut matches = vec![];
-//
-//         for (idx, page) in doc
-//             .pages()
-//             .map_err(|_| PDFMatchError::ReadPages)?
-//             .enumerate()
-//         {
-//             let page = page.map_err(|_| PDFMatchError::ReadPage(idx))?;
-//
-//             // If I just want page number
-//             let text = page.to_text().map_err(|_| PDFMatchError::ReadText(idx))?;
-//
-//             let text_page = page
-//                 .to_text_page(TextPageOptions::BLOCK_TEXT)
-//                 .map_err(|_| PDFMatchError::ReadText(idx))?;
-//
-//             // for block in text_page.blocks() {
-//             //     // To understand bounds/rect: https://pymupdf.readthedocs.io/en/latest/rect.html
-//             //     for line in block.lines() {
-//             //         let c = line.chars().next().unwrap();
-//             //         c.quad().
-//             //         let line_text = line.chars().filter_map(|c| c.char()).collect::<String>();
-//             //         // TODO: Match it somehow
-//             //         if line_text.contains("Hebrews") {
-//             //             let rect = PDFRect::from_rects(page_bounds, line.bounds());
-//             //             let loc = PDFLocation::Rectangle { page: idx, rect };
-//             //             // TODO: finish
-//             //             // matches.push(value);
-//             //         }
-//             //     }
-//             // }
-//
-//             let results = matcher.search::<LineColLocation>(&text)?;
-//
-//             let page_bounds = page.bounds().map_err(|_| PDFMatchError::PageBounds(idx))?;
-//
-//             matches.extend(
-//                 results
-//                     .into_iter()
-//                     // .map(|m| m.map_loc(|_| PDFLocation::Page(idx))),
-//                     .map(|m| convert_match(idx, page_bounds, chars, lines, m)),
-//             );
-//         }
-//
-//         Ok(matches)
-//     }
-// }
-
-struct PageChar {
-    line: usize,
-    column: usize,
-    rect: Rect, // MuPDF rect or quad
-}
-struct LineIndex {
-    line: usize,
-    start_idx: usize,
-    end_idx: usize,
-}
-fn merge_rects(rects: &[Rect]) -> Rect {
-    let mut x0 = f32::MAX;
-    let mut y0 = f32::MAX;
-    let mut x1 = f32::MIN;
-    let mut y1 = f32::MIN;
-
-    for r in rects {
-        x0 = x0.min(r.x0);
-        y0 = y0.min(r.y0);
-        x1 = x1.max(r.x1);
-        y1 = y1.max(r.y1);
-    }
-
-    Rect { x0, y0, x1, y1 }
-}
-// fn convert_match(
-//     page_idx: usize,
-//     page_bounds: Rect,
-//     chars: &[PageChar],
-//     lines: &[LineIndex],
-//     m: BibleMatch<LineColLocation>,
-// ) -> BibleMatch<PDFLocation> {
-//     let start = m.location.start;
-//     let end = m.location.end;
-//
-//     let mut line_rects = vec![];
-//
-//     for line in start.line..=end.line {
-//         let line_info = &lines[line];
-//
-//         let start_col = if line == start.line { start.column } else { 0 };
-//
-//         let end_col = if line == end.line {
-//             end.column
-//         } else {
-//             line_info.end_idx - line_info.start_idx
-//         };
-//
-//         let start_idx = line_info.start_idx + start_col;
-//         let end_idx = line_info.start_idx + end_col;
-//
-//         let rect = merge_rects(
-//             &chars[start_idx..end_idx]
-//                 .iter()
-//                 .map(|c| c.rect)
-//                 .collect::<Vec<_>>(),
-//         );
-//
-//         line_rects.push(PDFRect::from_rects(page_bounds, rect));
-//     }
-//
-//     let loc = if line_rects.len() == 1 {
-//         PDFLocation::Rectangle {
-//             page: page_idx,
-//             rect: line_rects.remove(0),
-//         }
-//     } else {
-//         PDFLocation::Rectangles {
-//             page: page_idx,
-//             rect: line_rects,
-//         }
-//     };
-//
-//     m.map_loc(|_| loc)
-// }
-
-use unicode_normalization::UnicodeNormalization;
-
-pub fn search_pdf_page(
-    matcher: &BibleMatcher,
-    page_idx: usize,
-    page: &mupdf::Page,
-) -> MatchResult<Vec<BibleMatch<PDFLocation>>> {
-    // ------------------------------------------------------------
-    // 1. Extract normalized plain text for matching
-    // ------------------------------------------------------------
-
-    let raw_text = page
-        .to_text()
-        .map_err(|_| PDFMatchError::ReadText(page_idx))?;
-
-    // Normalize to NFC to match glyph iteration
-    let normalized_text: String = raw_text.nfc().collect();
-
-    let mut matches: Vec<BibleMatch<LineColLocation>> =
-        matcher.search::<LineColLocation>(&normalized_text)?;
-
-    if matches.is_empty() {
-        return Ok(vec![]);
-    }
-
-    // Matches must be sorted
-    matches.sort_by_key(|m| (m.location.start.line, m.location.start.column));
-
-    // ------------------------------------------------------------
-    // 2. Extract structured text (glyphs with geometry)
-    // ------------------------------------------------------------
-
-    let text_page = page
-        // TODO: Should I preserve ligatures? What are they
-        .to_text_page(TextPageOptions::PRESERVE_WHITESPACE)
-        .map_err(|_| PDFMatchError::ReadText(page_idx))?;
-
-    let page_bounds = page
-        .bounds()
-        .map_err(|_| PDFMatchError::PageBounds(page_idx))?;
-    println!("{:#?}", page_bounds);
-
-    let mut results = Vec::with_capacity(matches.len());
-
-    let mut current_match_idx = 0;
-    let mut current_match = &matches[current_match_idx];
-    let mut current_match_str =
-        &normalized_text[current_match.location.bytes.start..=current_match.location.bytes.end];
-    let mut current_match_char_idx = 0;
-    // let mut current_match_str = normalized_text.lines().nth(current_match.location.start.line)
-    //     .map(|l| l.chars().skip(current_match.location.start.column).tak.collect())
-    // ;
-    // let mut current_match_str = "2 Tim. 3:2";
-    dbg!(current_match_str);
-
-    let mut current_line: usize = 0;
-    let mut current_column: usize = 0;
-
-    // Accumulator for multi-line rects
-    let mut line_rects: Vec<PDFRect> = Vec::new();
-    let mut current_line_char_rects: Vec<mupdf::Rect> = Vec::new();
-
-    // ------------------------------------------------------------
-    // 3. Single-pass glyph iteration
-    // ------------------------------------------------------------
-
-    for block in text_page.blocks() {
-        for line in block.lines() {
-            current_column = 0;
-
-            for ch in line.chars() {
-                if current_match_idx >= matches.len() {
-                    break;
-                }
-
-                let pos_line = current_line;
-                let pos_col = current_column;
-
-                let start = current_match.location.start;
-                let end = current_match.location.end;
-
-                // ----------------------------------------------------
-                // Start of match
-                // ----------------------------------------------------
-                let this_char = ch.char().unwrap();
-                // current_match_str.get(current_match_char_idx)
-                if pos_line == start.line && pos_col == start.column {
-                    current_line_char_rects.clear();
-                    line_rects.clear();
-                }
-
-                // ----------------------------------------------------
-                // If inside active match, accumulate glyph rect
-                // ----------------------------------------------------
-                let in_match = (pos_line > start.line
-                    || (pos_line == start.line && pos_col >= start.column))
-                    && (pos_line < end.line || (pos_line == end.line && pos_col < end.column));
-
-                if in_match {
-                    let q = ch.quad();
-                    // if current_match_str
-                    dbg!(ch.char());
-                    // assert_eq!(q.ll, ch.origin());
-                    // current_line_char_rects.push(ch.quad());
-                    current_line_char_rects.push(mupdf::Rect {
-                        x0: q.ll.x,
-                        y0: q.ll.y,
-                        x1: q.ur.x,
-                        y1: q.ur.y,
-                    });
-                }
-
-                // ----------------------------------------------------
-                // End of match
-                // ----------------------------------------------------
-                if pos_line == end.line && pos_col == end.column {
-                    if !current_line_char_rects.is_empty() {
-                        let merged = merge_rects(&current_line_char_rects);
-
-                        line_rects.push(PDFRect::from_rects(page_bounds, merged));
-                    }
-
-                    let location = if line_rects.len() == 1 {
-                        PDFLocation::Rectangle {
-                            page: page_idx,
-                            rect: line_rects.remove(0),
-                        }
-                    } else {
-                        PDFLocation::Rectangles {
-                            page: page_idx,
-                            rect: line_rects.clone(),
-                        }
-                    };
-
-                    results.push(current_match.clone().map_loc(|_| location));
-
-                    // Advance to next match
-                    current_match_idx += 1;
-                    if current_match_idx >= matches.len() {
-                        break;
-                    }
-
-                    current_match = &matches[current_match_idx];
-                    current_line_char_rects.clear();
-                    line_rects.clear();
-                }
-
-                current_column += 1;
-            }
-
-            // If match spans lines, finalize this line’s rect
-            if !current_line_char_rects.is_empty() {
-                let merged = merge_rects(&current_line_char_rects);
-                line_rects.push(PDFRect::from_rects(page_bounds, merged));
-                current_line_char_rects.clear();
-            }
-
-            current_line += 1;
-        }
-    }
-
-    for result in &results {
-        match &result.location {
-            PDFLocation::Page(_) => todo!(),
-            PDFLocation::Rectangles { page, rect } => todo!(),
-            PDFLocation::Search { page, query } => todo!(),
-            PDFLocation::Rectangle { page, rect } => {
-                println!(
-                    "![[The Dorean Principle - by Conley Owens.pdf#page={}&rect={},{},{},{}&color=yellow|The Dorean Principle - by Conley Owens, p.iii]]",
-                    page,
-                    rect.x,
-                    rect.y,
-                    rect.x + rect.w,
-                    rect.y + rect.h,
-                )
-            }
-        }
-    }
-
-    Ok(results)
-}
-
-// impl Matcher for PDFLocation {
-//     type Input<'a> = &'a Document;
-//
-//     fn search<'a>(
-//         matcher: &BibleMatcher,
-//         doc: Self::Input<'a>,
-//     ) -> MatchResult<Vec<BibleMatch<Self>>> {
-//         let mut matches = vec![];
-//
-//         for (idx, page) in doc
-//             .pages()
-//             .map_err(|_| PDFMatchError::ReadPages)?
-//             .enumerate()
-//         {
-//             let page_num = idx + 1;
-//             let page = page.map_err(|_| PDFMatchError::ReadPage(page_num))?;
-//             // TODO: remove this later, it is just for testing
-//             if matches.len() > 0 {
-//                 break;
-//             }
-//             matches.extend(search_pdf_page(matcher, page_num, &page)?);
-//         }
-//
-//         Ok(matches)
-//     }
-// }
 
 pub fn search_pdf_page2(
     matcher: &BibleMatcher,
@@ -485,7 +111,11 @@ pub fn search_pdf_page2(
     // ------------------------------------------------------------
     let text_page = page
         // TODO: Should I preserve ligatures? What are they
-        .to_text_page(TextPageOptions::PRESERVE_WHITESPACE)
+        .to_text_page(
+            TextPageOptions::empty()
+                .union(TextPageOptions::PRESERVE_WHITESPACE)
+                .union(TextPageOptions::PRESERVE_LIGATURES),
+        )
         .map_err(|_| PDFMatchError::ReadText(page_idx))?;
 
     let page_bounds = page
@@ -493,6 +123,14 @@ pub fn search_pdf_page2(
         .map_err(|_| PDFMatchError::PageBounds(page_idx))?;
 
     let mut results: Vec<BibleMatch<PDFLocation>> = Vec::with_capacity(matches.len());
+
+    for result in &matches {
+        // println!(
+        //     "'{} {}'",
+        //     matcher.data().books().get_name(result.psg.book).unwrap(),
+        //     result.psg.segments
+        // );
+    }
 
     let mut m = PDFTextPageMatcher::new(&matches, &normalized_text, page_bounds, page_idx);
 
@@ -512,6 +150,7 @@ pub fn search_pdf_page2(
         }
     }
     // This is actually an error: I did not find them all
+    // or maybe I have none?
     Ok(m.results)
 }
 
@@ -523,6 +162,7 @@ pub struct PDFTextPageMatcher<'a> {
     page_num: usize,
     match_idx: usize,
     char_idx: usize,
+    // chars: Option<Chars<'a>>,
     line_rects: Vec<PDFRect>,
     char_rects: Vec<mupdf::Rect>,
     results: Vec<BibleMatch<PDFLocation>>,
@@ -542,6 +182,8 @@ impl<'a> PDFTextPageMatcher<'a> {
             page_num,
             match_idx: 0,
             char_idx: 0,
+            // chars: matches[0].chars(),
+            // chars: None,
             line_rects: vec![],
             char_rects: vec![],
             results: vec![],
@@ -563,17 +205,67 @@ impl<'a> PDFTextPageMatcher<'a> {
     }
 
     /// Returns `true` if all matches have been found
+    // pub fn try_next_char(&mut self, ch: TextChar<'_>) -> bool {
+    //     if let Some(c) = ch.char() {
+    //         let current_char = self.current_char();
+    //         if current_char.is_none() {
+    //             dbg!(&self);
+    //             dbg!(self.current_str());
+    //             dbg!(c);
+    //         }
+    //         if current_char.unwrap() == c {
+    //             let q = ch.quad();
+    //             let did_last_char = self.char_found(c);
+    //             let rect = mupdf::Rect {
+    //                 x0: q.ll.x,
+    //                 y0: q.ll.y,
+    //                 x1: q.ur.x,
+    //                 y1: q.ur.y,
+    //             };
+    //             if self.page_num == 16 {
+    //                 dbg!(c, c.len_utf8(), &rect);
+    //             }
+    //             self.char_rects.push(rect);
+    //             if did_last_char {
+    //                 self.finish_match()
+    //             } else {
+    //                 false
+    //             }
+    //         } else {
+    //             self.char_not_found();
+    //             false
+    //         }
+    //     } else {
+    //         false
+    //     }
+    // }
     pub fn try_next_char(&mut self, ch: TextChar<'_>) -> bool {
         if let Some(c) = ch.char() {
-            if self.current_char() == c {
+            let current_char = self.current_char();
+            // if current_char.is_none() {
+            //     dbg!(&self);
+            //     dbg!(self.current_str());
+            //     dbg!(c);
+            // }
+            let current_char = match current_char {
+                Some(current_char) => current_char,
+                // IDK
+                None => return self.finish_match(),
+            };
+            if current_char == c {
                 let q = ch.quad();
-                let did_last_char = self.char_found();
-                self.char_rects.push(mupdf::Rect {
+                // let ch = self.chars.unwrap().next();
+                let did_last_char = self.char_found(c);
+                let rect = mupdf::Rect {
                     x0: q.ll.x,
                     y0: q.ll.y,
                     x1: q.ur.x,
                     y1: q.ur.y,
-                });
+                };
+                // if self.page_num == 16 {
+                //     dbg!(c, c.len_utf8(), &rect);
+                // }
+                self.char_rects.push(rect);
                 if did_last_char {
                     self.finish_match()
                 } else {
@@ -587,12 +279,14 @@ impl<'a> PDFTextPageMatcher<'a> {
             false
         }
     }
+
     /// Returns `true` if all matches have been found
     pub fn finish_match(&mut self) -> bool {
         if !self.char_rects.is_empty() {
             self.finish_line();
         }
 
+        // println!("{:?}", self.current_str());
         let location = if self.line_rects.len() == 1 {
             PDFLocation::Rectangle {
                 page: self.page_num,
@@ -613,14 +307,22 @@ impl<'a> PDFTextPageMatcher<'a> {
         // Reset
         self.match_idx += 1;
         self.char_idx = 0;
+        // self.reset_chars();
         self.is_done()
     }
+
+    // pub fn reset_chars(&'a mut self) {
+    //     self.chars = Some(self.current_str().chars());
+    // }
+
     pub fn current_match(&self) -> Option<&BibleMatch> {
         self.matches.get(self.match_idx)
     }
+
     pub fn current_loc(&self) -> LineColLocation {
         self.current_match().expect("current_loc").location
     }
+
     pub fn current_str(&self) -> &str {
         let loc = self.current_loc();
         &self.text[loc.bytes.start..=loc.bytes.end]
@@ -628,23 +330,31 @@ impl<'a> PDFTextPageMatcher<'a> {
 
     pub fn char_not_found(&mut self) {
         self.char_idx = 0;
+        // self.reset_chars();
+        self.line_rects.clear();
     }
+
     /// True if did last character
-    pub fn char_found(&mut self) -> bool {
+    pub fn char_found(&mut self, c: char) -> bool {
         self.char_idx += 1;
         self.char_idx > self.max_char_idx()
+        // self.chars.unwrap().peek
+        // self.char_idx += c.len_utf8();
     }
-    // True if done with all matches
-    // pub fn match_found(&mut self) -> bool {
-    //     self.match_idx += 1;
-    //     self.match_idx >= self.matches.len()
-    // }
+
     pub fn max_char_idx(&self) -> usize {
         let loc = self.current_loc();
         loc.bytes.end - loc.bytes.start
+        // self.current_str()
+        //     .chars()
+        //     .map(|c| c.len_utf8())
+        //     .sum::<usize>()
+        // - 1
     }
-    pub fn current_char(&self) -> char {
-        self.current_str().chars().nth(self.char_idx).unwrap()
+
+    pub fn current_char(&mut self) -> Option<char> {
+        // self.chars?.next()
+        self.current_str().chars().nth(self.char_idx)
     }
 }
 
@@ -665,10 +375,46 @@ impl Matcher for PDFLocation {
             let page_num = idx + 1;
             let page = page.map_err(|_| PDFMatchError::ReadPage(page_num))?;
             // TODO: remove this later, it is just for testing
-            if matches.len() > 0 {
-                break;
+            // if matches.len() > 0 {
+            //     break;
+            // }
+            let results = search_pdf_page2(matcher, page_num, &page)?;
+
+            for result in &results {
+                println!(
+                    "'{} {}'",
+                    matcher.data().books().get_name(result.psg.book).unwrap(),
+                    result.psg.segments
+                );
+                match &result.location {
+                    PDFLocation::Page(_) => todo!(),
+                    PDFLocation::Rectangles { page, rect } => {
+                        for rect in rect {
+                            println!(
+                                "![[The Dorean Principle - by Conley Owens.pdf#page={}&rect={},{},{},{}&color=yellow|The Dorean Principle - by Conley Owens, p.iii]]",
+                                page,
+                                rect.x,
+                                rect.y,
+                                rect.x + rect.w,
+                                rect.y + rect.h,
+                            )
+                        }
+                    }
+                    PDFLocation::Search { page, query } => todo!(),
+                    PDFLocation::Rectangle { page, rect } => {
+                        println!(
+                            "![[The Dorean Principle - by Conley Owens.pdf#page={}&rect={},{},{},{}&color=yellow|The Dorean Principle - by Conley Owens, p.iii]]",
+                            page,
+                            rect.x,
+                            rect.y,
+                            rect.x + rect.w,
+                            rect.y + rect.h,
+                        )
+                    }
+                }
             }
-            matches.extend(search_pdf_page2(matcher, page_num, &page)?);
+
+            matches.extend(results);
         }
 
         Ok(matches)

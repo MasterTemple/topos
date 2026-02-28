@@ -89,7 +89,8 @@ impl Matcher for LineColLocation {
             }
         }
 
-        return Ok(filtered.matches());
+        let matches = filtered.matches();
+        return Ok(matches);
     }
 
     fn find<'a>(matcher: &BibleMatcher, input: Self::Input<'a>) -> Option<BibleMatch<Self>> {

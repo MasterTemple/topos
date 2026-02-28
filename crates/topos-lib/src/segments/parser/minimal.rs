@@ -75,9 +75,12 @@ fn minimal_full_segment_parser<'a>() -> impl Parser<'a, &'a str, MinimalSegment>
 
 fn minimal_full_segments_parser<'a>() -> impl Parser<'a, &'a str, MinimalSegments> {
     minimal_full_segment_parser()
-        .separated_by(whitespace().ignore_then(Delimeter::segment_parser()))
+        // .separated_by(whitespace().ignore_then(Delimeter::segment_parser()))
+        .separated_by(Delimeter::segment_parser().padded())
         .at_least(1)
-        .allow_trailing()
+        // I think this was for autocomplete, but I'm realizing that adds the
+        // ending/trailing delimeters when I don't want them
+        // .allow_trailing()
         .collect::<Vec<_>>()
         .map_with(|segments, e| MinimalSegments {
             segments,
