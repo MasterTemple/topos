@@ -1,22 +1,32 @@
+use itertools::Itertools;
+use std::cmp::Ordering;
+
 use chumsky::{
     prelude::*,
     text::{Char, digits, inline_whitespace, newline},
 };
 use from_nested_tuple::FromTuple;
 
+use crate::matcher::{
+    location::{html::HTMLLocation, line_col::LineColLocation},
+    matcher::Matcher,
+};
+
 // TODO: Make this more general
-#[derive(FromTuple)]
+#[derive(Clone, Copy, Debug, FromTuple)]
 pub struct SRTLocation {
-    start: f32,
-    end: f32,
+    id: u32,
+    // TODO: Make this f32
+    start: SRTTimeStamp,
+    end: SRTTimeStamp,
 }
 
-#[derive(FromTuple)]
+#[derive(Clone, Debug, FromTuple)]
 pub struct SRTDocument<'a> {
-    segments: Vec<SRTSegment<'a>>,
+    segments: Vec<Spanned<SRTSegment<'a>>>,
 }
 
-#[derive(FromTuple)]
+#[derive(Clone, Debug, FromTuple)]
 pub struct SRTSegment<'a> {
     id: u32,
     start: SRTTimeStamp,
@@ -24,11 +34,12 @@ pub struct SRTSegment<'a> {
     text: &'a str,
 }
 
-#[derive(FromTuple)]
+#[derive(Clone, Copy, Debug, FromTuple)]
 pub struct SRTTimeStamp {
-    h: u32,
-    m: u32,
-    s: u32,
+    pub hours: u32,
+    pub minutes: u32,
+    pub seconds: u32,
+    pub millis: u32,
 }
 
 fn num<'a>() -> impl Parser<'a, &'a str, u32> {
@@ -52,6 +63,8 @@ fn arrow<'a>() -> impl Parser<'a, &'a str, &'a str> {
 impl SRTTimeStamp {
     pub fn parser<'a>() -> impl Parser<'a, &'a str, Self> {
         num()
+            .then_ignore(colon())
+            .then(num())
             .then_ignore(colon())
             .then(num())
             .then_ignore(comma())
@@ -85,8 +98,67 @@ impl<'a> SRTDocument<'a> {
     pub fn parser() -> impl Parser<'a, &'a str, Self> {
         SRTSegment::parser()
             .padded()
+            .spanned()
             .repeated()
             .collect()
             .map(FromTuple::from_tuple)
     }
+
+    pub fn find_containing_segment(&self, byte: usize) -> Option<&Spanned<SRTSegment<'_>>> {
+        let res = self.segments.binary_search_by(|seg| {
+            match (seg.span.start <= byte, byte <= seg.span.end) {
+                (true, true) => Ordering::Equal,
+                (true, false) => Ordering::Less,
+                (false, true) => Ordering::Greater,
+                (false, false) => unreachable!(),
+            }
+        });
+        match res {
+            Ok(idx) => self.segments.get(idx),
+            Err(_) => None,
+        }
+    }
+
+    pub fn find_location(&self, byte: usize) -> Option<SRTLocation> {
+        let seg = self.find_containing_segment(byte)?;
+        Some(SRTLocation {
+            id: seg.id,
+            start: seg.start,
+            end: seg.end,
+        })
+    }
+}
+
+impl Matcher for SRTLocation {
+    type Input<'a> = &'a str;
+
+    fn search<'a>(
+        matcher: &crate::matcher::matcher::BibleMatcher,
+        input: Self::Input<'a>,
+    ) -> crate::matcher::matcher::MatchResult<Vec<crate::matcher::instance::BibleMatch<Self>>> {
+        let results = matcher.search::<LineColLocation>(input)?;
+
+        let doc = SRTDocument::parser()
+            .parse(input)
+            .into_result()
+            .map_err(|_| SRTMatchError::Parse)?;
+
+        results
+            .into_iter()
+            .map(|m| {
+                let segment = doc
+                    .find_location(m.location.bytes.start)
+                    .ok_or(SRTMatchError::FindSegment)?;
+                Ok(m.map_loc(|line_col| segment))
+            })
+            .try_collect()
+    }
+}
+
+#[derive(thiserror::Error, Debug)]
+pub enum SRTMatchError {
+    #[error("Failed to parse")]
+    Parse,
+    #[error("Failed to find segment")]
+    FindSegment,
 }

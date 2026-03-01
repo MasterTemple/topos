@@ -8,7 +8,9 @@ use crate::{
     filter::filter::BibleFilter,
     matcher::{
         instance::BibleMatch,
-        location::{html::HTMLMatchError, line_col::LineColLocation, pdf::PDFMatchError},
+        location::{
+            html::HTMLMatchError, line_col::LineColLocation, pdf::PDFMatchError, srt::SRTMatchError,
+        },
         matches::{ComplexFilter, FilteredBibleMatches},
     },
     segments::autocomplete::input::InputAutoCompleter,
@@ -50,6 +52,8 @@ pub type MatchResult<T> = core::result::Result<T, MatchError>;
 
 #[derive(thiserror::Error, Debug)]
 pub enum MatchError {
+    #[error("SRT: {0}")]
+    SRT(#[from] SRTMatchError),
     #[error("HTML: {0}")]
     HTML(#[from] HTMLMatchError),
     #[error("PDF: {0}")]
