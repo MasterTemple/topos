@@ -3,6 +3,8 @@ pub mod line_col;
 /// This is for text fragments
 pub mod html;
 
+pub mod srt;
+
 #[cfg(feature = "pdf")]
 pub mod pdf;
 // pub mod json;
