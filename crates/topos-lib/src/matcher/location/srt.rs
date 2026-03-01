@@ -69,7 +69,7 @@ impl SRTTimeStamp {
             .then(num())
             .then_ignore(comma())
             .then(num())
-            .map(FromTuple::from_tuple)
+            .from_tuple()
     }
 }
 
@@ -89,7 +89,7 @@ impl<'a> SRTSegment<'a> {
                     .to_slice(),
             )
             .then_ignore(newline())
-            .map(FromTuple::from_tuple)
+            .from_tuple()
     }
 }
 
@@ -101,7 +101,7 @@ impl<'a> SRTDocument<'a> {
             .spanned()
             .repeated()
             .collect()
-            .map(FromTuple::from_tuple)
+            .from_tuple()
     }
 
     pub fn find_containing_segment(&self, byte: usize) -> Option<&Spanned<SRTSegment<'_>>> {

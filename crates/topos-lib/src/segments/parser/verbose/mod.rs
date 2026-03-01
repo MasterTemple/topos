@@ -57,37 +57,37 @@ impl VerboseFullSegment {
         // `\s*\d+`
         let start = VerboseSpace::optional_parser()
             .then(VerboseNumber::parser())
-            .map(FromTuple::from_tuple);
+            .from_tuple();
 
         // `(\s*:\d+)?`
         let explicit_start_verse = VerboseSpace::optional_parser()
             .then(DelimitedNumber::by_chapter())
             // .from_tuple()
-            .map(FromTuple::from_tuple)
+            .from_tuple()
             .or_not();
 
         // `(\s*-\d+(\s*:\d+)?)?`
         let end = VerboseSpace::optional_parser()
             .then(DelimitedNumber::by_range())
-            .map(FromTuple::from_tuple)
+            .from_tuple()
             .then(
                 VerboseSpace::optional_parser()
                     .then(DelimitedNumber::by_chapter())
-                    .map(FromTuple::from_tuple)
+                    .from_tuple()
                     .or_not(),
             )
             .or_not();
 
         let closing = VerboseSpace::optional_parser()
             .then(VerboseDelimeter::segment_delimeter())
-            .map(FromTuple::from_tuple);
+            .from_tuple();
         // .or_not();
 
         start
             .then(explicit_start_verse)
             .then(end)
             .then(closing)
-            .map(FromTuple::from_tuple)
+            .from_tuple()
     }
 }
 

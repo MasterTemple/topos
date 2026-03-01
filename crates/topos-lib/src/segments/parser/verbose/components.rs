@@ -82,7 +82,7 @@ impl VerboseNumber {
     pub fn parser<'a>() -> impl Parser<'a, &'a str, Self> {
         VerboseNumberKind::parser()
             .then(Subverse::optional_parser())
-            .map(FromTuple::from_tuple)
+            .from_tuple()
     }
 
     pub fn parsed(&self) -> u8 {
@@ -174,13 +174,13 @@ impl DelimitedNumber {
     pub fn by_chapter<'a>() -> impl Parser<'a, &'a str, Self> {
         VerboseDelimeter::chapter_delimeter()
             .then(FrontPadded::parser(VerboseNumber::parser()))
-            .map(FromTuple::from_tuple)
+            .from_tuple()
     }
 
     pub fn by_range<'a>() -> impl Parser<'a, &'a str, Self> {
         VerboseDelimeter::range_delimeter()
             .then(FrontPadded::parser(VerboseNumber::parser()))
-            .map(FromTuple::from_tuple)
+            .from_tuple()
     }
 
     pub fn parsed(&self) -> u8 {
@@ -215,7 +215,7 @@ impl<T> FrontPadded<T> {
     pub fn parser<'a>(child: impl Parser<'a, &'a str, T>) -> impl Parser<'a, &'a str, Self> {
         VerboseSpace::optional_parser()
             .then(child)
-            .map(FromTuple::from_tuple)
+            .from_tuple()
     }
 }
 

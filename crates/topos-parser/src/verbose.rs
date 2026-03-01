@@ -54,7 +54,7 @@ use crate::{
 //         O: FromTuple<Tuple = T>,
 //         Self: Sized,
 //     {
-//         self.map(FromTuple::from_tuple)
+//         self.from_tuple()
 //     }
 // }
 //
@@ -229,7 +229,7 @@ impl<'a> VerboseNumber<'a> {
     pub fn parser() -> impl Parser<'a, &'a str, Self> {
         VerboseNumberKind::parser()
             .then(Spanned::parser(one_of(SUBVERSE)).or_not())
-            .map(FromTuple::from_tuple)
+            .from_tuple()
     }
 }
 
@@ -309,13 +309,13 @@ impl<'a> DelimitedNumber<'a> {
     pub fn by_chapter() -> impl Parser<'a, &'a str, Self> {
         VerboseDelimeter::chapter_delimeter()
             .then(FrontPadded::parser(VerboseNumber::parser()))
-            .map(FromTuple::from_tuple)
+            .from_tuple()
     }
 
     pub fn by_range() -> impl Parser<'a, &'a str, Self> {
         VerboseDelimeter::range_delimeter()
             .then(FrontPadded::parser(VerboseNumber::parser()))
-            .map(FromTuple::from_tuple)
+            .from_tuple()
     }
 }
 
@@ -394,7 +394,7 @@ impl<'a, T> FrontPadded<'a, T> {
     pub fn parser(child: impl Parser<'a, &'a str, T>) -> impl Parser<'a, &'a str, Self> {
         VerboseSpace::optional_parser()
             .then(child)
-            .map(FromTuple::from_tuple)
+            .from_tuple()
     }
 }
 
@@ -455,37 +455,37 @@ impl<'a> VerboseFullSegment<'a> {
         // `\s*\d+`
         let start = VerboseSpace::optional_parser()
             .then(VerboseNumber::parser())
-            .map(FromTuple::from_tuple);
+            .from_tuple();
 
         // `(\s*:\d+)?`
         let explicit_start_verse = VerboseSpace::optional_parser()
             .then(DelimitedNumber::by_chapter())
             // .from_tuple()
-            .map(FromTuple::from_tuple)
+            .from_tuple()
             .or_not();
 
         // `(\s*-\d+(\s*:\d+)?)?`
         let end = VerboseSpace::optional_parser()
             .then(DelimitedNumber::by_range())
-            .map(FromTuple::from_tuple)
+            .from_tuple()
             .then(
                 VerboseSpace::optional_parser()
                     .then(DelimitedNumber::by_chapter())
-                    .map(FromTuple::from_tuple)
+                    .from_tuple()
                     .or_not(),
             )
             .or_not();
 
         let closing = VerboseSpace::optional_parser()
             .then(VerboseDelimeter::segment_delimeter())
-            .map(FromTuple::from_tuple);
+            .from_tuple();
         // .or_not();
 
         start
             .then(explicit_start_verse)
             .then(end)
             .then(closing)
-            .map(FromTuple::from_tuple)
+            .from_tuple()
     }
 }
 
