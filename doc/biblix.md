@@ -34,7 +34,8 @@ Obsidian.
 
 ## Status
 
-Step 1 is done in the biblix repository:
+Steps 1 to 3 are done in the biblix repository (`bx init`, `add`, `remove`, `install`,
+`update`, `list`, `show`, `check`, `release`, `diff`, `verify`). Step 1:
 - `biblix.toml`, `Storage`, the USX and USFM sources, packages, the cache, and `bx show`/`bx check`
 - Hand-made packages in `~/Development/biblix-packages/`, as git repositories tagged `v1.0.0`:
   `bsb` (USX, from a DBL bundle) and `kjv` (USFM, from fetch.bible)
@@ -48,6 +49,19 @@ Reading every book of each:
 
 The cache helps most with USFM. A warm open also hashes the whole package (about 30 ms); a git
 package could be keyed by its commit instead.
+
+Steps 2 and 3:
+- **Fetching**: the `git` command for now, behind a `Fetcher` trait.
+- **Lock files**: `biblix.lock` pins each package's commit and checksum. Another library gets the
+  same text from it, and a changed installed file is caught.
+- **Releases**: `bx release` checks the version on real changes:
+  - a note changed: patch
+  - a word changed: minor
+  - two verses' texts swapped: renumbered, so major
+- **Summaries**: `bx show --git` reads a release's summary through a partial clone, without its
+  text.
+- **The hand-made packages** are released again as 1.0.1, with summaries.
+- **Verse hashes**: `biblix.verses.bin` is 373 KB for the KJV (12 bytes a verse).
 - **Versions keep links working**: a link resolves against the version it was made with, and the
   version number says when a change can break links.
 
@@ -143,8 +157,7 @@ headings = 1_870                 # Strong's numbers, ...
 strongs = 0
 ```
 
-Plus, beside it, `biblix.verses.bin`: a short hash of each verse's text (about 250 KB for a
-Bible), published for every package of any kind (commentaries are keyed by verse too).
+Plus, beside it, `biblix.verses.bin`: a short hash of each verse's text (373 KB for the KJV), published for every package of any kind (commentaries are keyed by verse too).
 
 What this gives without installing:
 - **Browsing**: which books (the deuterocanon or not), which features and elements, and how big
@@ -316,9 +329,9 @@ biblix-ffi (BoltFFI, like topos-ffi) has biblix's and topos's API in one package
 
 1. **Create biblix** (done) with `biblix.toml`, the USX source (moved from the LSP and the plugin),
    `Storage`, and the cache. Make packages of the BSB and a KJV by hand.
-2. **`bx` with git and path dependencies**: `add`, `install`, the lock file, side-by-side
+2. **`bx` with git and path dependencies** (done): `add`, `install`, the lock file, side-by-side
    versions, archive downloads, and features that choose formats.
-3. **Summaries**: `bx release` writes them, `bx verify` checks them, `bx show` reads them from a
+3. **Summaries** (done): `bx release` writes them, `bx verify` checks them, `bx show` reads them from a
    tag alone.
 4. **The LSP and topos's config use the library** (`library =`, `bibles = ["bsb"]`).
 5. **biblix-ffi with topos's API**: the plugin moves to it, and it gets the library location
