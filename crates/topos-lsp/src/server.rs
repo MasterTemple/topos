@@ -309,7 +309,8 @@ impl Server {
         }))
     }
 
-    /// A completion with its passage's text as documentation (with a `bible`)
+    /// A completion with its passage's text as documentation (with a `bible`), and what to color
+    /// in it as `data.tokens` (see [`bible::Text::fence`])
     pub fn resolve_completion(&self, mut item: CompletionItem) -> CompletionItem {
         let text = item
             .data
@@ -321,6 +322,10 @@ impl Server {
                 bible.passage(&passage, None, Some(MAX_HOVER_TEXT))
             });
         if let Some(text) = text {
+            // What to color, for editors that draw the documentation themselves
+            if let Some(Value::Object(data)) = &mut item.data {
+                data.insert("tokens".into(), Value::String(text.token_info()));
+            }
             item.documentation = Some(lsp_types::Documentation::MarkupContent(MarkupContent {
                 kind: MarkupKind::Markdown,
                 value: text.fence(false),
@@ -1967,11 +1972,12 @@ to condemn.</char> <verse eid="JHN 3:17"/></para>
         let Some(lsp_types::Documentation::MarkupContent(doc)) = resolved.documentation else {
             panic!("no documentation");
         };
-        // No token list for completion plugins to show
+        // No token list for completion plugins to show; it is in the data instead
         assert_eq!(
             doc.value,
             "```topos-bible\nJesus and Nicodemus\n[16] For God so loved the world.\n```"
         );
+        assert_eq!(resolved.data.unwrap()["tokens"], "0:0:19:3 1:0:4:0");
         let _ = std::fs::remove_dir_all(&dir);
     }
 

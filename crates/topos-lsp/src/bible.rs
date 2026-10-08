@@ -105,14 +105,32 @@ impl Text {
     token within one line)
     - Neovim's hover hides the info string, and the plugin reads it to color the block
     - Without `tokens`, just the language: for completion documentation, which completion
-      plugins (blink.cmp) show with the info string
+      plugins (blink.cmp) show with the info string (the tokens go in the item's `data`)
     */
     pub fn fence(&self, tokens: bool) -> String {
+        let info = match tokens {
+            true => self.token_info(),
+            false => String::new(),
+        };
+        // Backticks in the text would end a shorter fence
+        let mut fence = String::from("```");
+        while self.text.contains(&fence) {
+            fence.push('`');
+        }
+        let info = match info.is_empty() {
+            true => info,
+            false => format!(" {info}"),
+        };
+        format!("{fence}{SCHEME}{info}\n{}\n{fence}", self.text)
+    }
+
+    /// What to color, as in [`Text::fence`]'s info string: `0:0:4:0 0:33:4:2`
+    pub fn token_info(&self) -> String {
         let mut info = vec![];
         let starts: Vec<usize> = std::iter::once(0)
             .chain(self.text.match_indices('\n').map(|(i, _)| i + 1))
             .collect();
-        for (range, token) in self.tokens.iter().filter(|_| tokens) {
+        for (range, token) in &self.tokens {
             let mut start = range.start;
             while start < range.end {
                 let line = starts.partition_point(|&s| s <= start) - 1;
@@ -125,16 +143,7 @@ impl Text {
                 start = end + 1;
             }
         }
-        // Backticks in the text would end a shorter fence
-        let mut fence = String::from("```");
-        while self.text.contains(&fence) {
-            fence.push('`');
-        }
-        let info = match info.is_empty() {
-            true => String::new(),
-            false => format!(" {}", info.join(" ")),
-        };
-        format!("{fence}{SCHEME}{info}\n{}\n{fence}", self.text)
+        info.join(" ")
     }
 }
 

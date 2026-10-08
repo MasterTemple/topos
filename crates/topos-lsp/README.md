@@ -132,7 +132,7 @@ Jesus and Nicodemus
 
 Editors show only the language; the Neovim plugin colors the block from it. Completion
 documentation is the block without the token list, since completion menus (like blink.cmp) show
-the info string. With `markup.width`, a line break replaces a space, so every byte offset (verses,
+the info string; the list is in the resolved item's `data.tokens` instead. With `markup.width`, a line break replaces a space, so every byte offset (verses,
 tokens) is the same as without it.
 
 ## Neovim
