@@ -22,7 +22,8 @@
   "John 3:16"`, and `Reformat all N references in this file` when several differ), or search the
   workspace for it: `Search "John 3:16" for explicit overlap`, `... for any overlap`,
   `... for exact overlap`, and `Search inside "John 3"`. With a `bible`, one action per
-  `insertions` entry (`Insert Callout`) writes the passage's text below the reference
+  `insertions` entry (`Insert Callout`) writes the passage's text below the reference, or in
+  place of its line or of the reference
 - **Diagnostics**, pushed, or pulled when the editor asks for them (`textDocument/diagnostic`, for
   editors that support it): an information diagnostic on each reference with how it's written in your
   format (`John 3:16`, code `reference`), and warnings for references that do not exist, like
@@ -83,7 +84,8 @@ plain text, without their template or color.
 
 Each insertion has a `name` (the action is `Insert {name}`), a `display` (default `{text}`; also
 `{reference}` as formatted and `{osis}`), a `line_prefix` written before each line of `{text}`,
-and its own `markup` over the one above:
+its own `markup` over the one above, and `replace`: `"line"` (the reference's whole line),
+`"inline"` (just the reference, keeping the rest of its line), or nothing (the lines below):
 
 ```toml
 [[insertions]]

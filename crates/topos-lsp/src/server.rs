@@ -34,7 +34,9 @@ use topos_bible::{
 
 use crate::{
     bible::{self, Bible, MAX_HOVER_TEXT, Part, Token},
-    settings::{self, Configured, HoverField, InlayHints, Insertion, ReferenceDiagnostics},
+    settings::{
+        self, Configured, HoverField, InlayHints, Insertion, ReferenceDiagnostics, Replace,
+    },
     workspace,
 };
 
@@ -778,7 +780,8 @@ impl Server {
         actions
     }
 
-    /// `Insert Callout` for each insertion: the passage's text on the lines after the reference
+    /// `Insert Callout` for each insertion: the passage's text on the lines after the reference,
+    /// or in place of its line or of the reference itself (`replace`)
     fn insert_actions(
         &self,
         uri: &Uri,
@@ -791,14 +794,22 @@ impl Server {
         if bible::is_book_uri(uri.as_str()) {
             return vec![];
         }
-        // At the end of the reference's line
-        let end = found.location.bytes.end;
-        let line_end = text[end..].find('\n').map_or(text.len(), |i| end + i);
-        let at = lsp_range(index, line_end, line_end);
+        // The reference, its line, and where the line ends
+        let bytes = found.location.bytes;
+        let line_start = text[..bytes.start].rfind('\n').map_or(0, |i| i + 1);
+        let line_end = text[bytes.end..]
+            .find('\n')
+            .map_or(text.len(), |i| bytes.end + i);
         self.insertions
             .iter()
             .filter_map(|insertion| {
-                let new_text = format!("\n{}", self.insertion_text(bible, insertion, found)?);
+                let inserted = self.insertion_text(bible, insertion, found)?;
+                let (range, new_text) = match insertion.replace {
+                    None => (line_end..line_end, format!("\n{inserted}")),
+                    Some(Replace::Line) => (line_start..line_end, inserted),
+                    Some(Replace::Inline) => (bytes.start..bytes.end, inserted),
+                };
+                let at = lsp_range(index, range.start, range.end);
                 let title = format!("Insert {}", insertion.name);
                 let edits = vec![TextEdit::new(at, new_text)];
                 Some(edit_action(
@@ -1988,7 +1999,9 @@ to condemn.</char> <verse eid="JHN 3:17"/></para>
                     "line_prefix": "> ",
                     "markup": { "headings": { "show": false }, "verse_numbers": { "display": "{verse}" } }
                 },
-                { "name": "Plain", "markup": { "verse_numbers": { "show": false }, "headings": { "show": false } } }
+                { "name": "Plain", "markup": { "verse_numbers": { "show": false }, "headings": { "show": false } } },
+                { "name": "Line", "replace": "line", "display": "> {reference}: {text}", "markup": { "verse_numbers": { "show": false }, "headings": { "show": false } } },
+                { "name": "Inline", "replace": "inline", "display": "“{text}” ({reference})", "markup": { "verse_numbers": { "show": false }, "headings": { "show": false } } }
             ]),
         );
         server.configure(Value::Object(settings)).unwrap();
@@ -2022,6 +2035,22 @@ to condemn.</char> <verse eid="JHN 3:17"/></para>
                 (
                     String::from("Insert Plain"),
                     TextEdit::new(at, "\nFor God so loved the world. Jesus said, I did not come to condemn.".into())
+                ),
+                // The whole line
+                (
+                    String::from("Insert Line"),
+                    TextEdit::new(
+                        Range::new(Position::new(0, 0), Position::new(0, 23)),
+                        "> John 3:16-17: For God so loved the world. Jesus said, I did not come to condemn.".into()
+                    )
+                ),
+                // Just the reference: `Read ` and ` today` stay
+                (
+                    String::from("Insert Inline"),
+                    TextEdit::new(
+                        Range::new(Position::new(0, 5), Position::new(0, 17)),
+                        "“For God so loved the world. Jesus said, I did not come to condemn.” (John 3:16-17)".into()
+                    )
                 ),
             ]
         );

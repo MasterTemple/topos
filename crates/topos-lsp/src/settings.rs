@@ -192,7 +192,7 @@ A way to insert a passage's text, offered as a code action on references (`Inser
 pub struct Insertion {
     /// The action's name: `Insert {name}`
     pub name: String,
-    /// What is inserted on the lines after the reference: `{text}` (the passage), `{reference}`
+    /// What is inserted (on the lines after the reference, or in its place with `replace`): `{text}` (the passage), `{reference}`
     /// (as formatted, like `John 3:16`), and `{osis}` (`John.3.16`); default `{text}`
     pub display: String,
     /// Written before each line of `{text}`, like `> ` for a quote
@@ -200,6 +200,18 @@ pub struct Insertion {
     pub line_prefix: String,
     /// The `markup` settings for this insertion, over the others
     pub markup: MarkupSettings,
+    /// What the insertion replaces; nothing (inserted on the lines below) by default
+    pub replace: Option<Replace>,
+}
+
+/// What an [`Insertion`] replaces
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum Replace {
+    /// The reference's whole line
+    Line,
+    /// The reference itself, keeping the rest of its line
+    Inline,
 }
 
 impl Default for Insertion {
@@ -209,6 +221,7 @@ impl Default for Insertion {
             display: String::from("{text}"),
             line_prefix: String::new(),
             markup: MarkupSettings::default(),
+            replace: None,
         }
     }
 }
