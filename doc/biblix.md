@@ -34,7 +34,7 @@ Obsidian.
 
 ## Status
 
-Steps 1 to 3 are done in the biblix repository (`bx init`, `add`, `remove`, `install`,
+Steps 1 to 4 are done in the biblix repository (`bx init`, `add`, `remove`, `install`,
 `update`, `list`, `show`, `check`, `release`, `diff`, `verify`). Step 1:
 - `biblix.toml`, `Storage`, the USX and USFM sources, packages, the cache, and `bx show`/`bx check`
 - Hand-made packages in `~/Development/biblix-packages/`, as git repositories tagged `v1.0.0`:
@@ -337,7 +337,11 @@ biblix-ffi (BoltFFI, like topos-ffi) has biblix's and topos's API in one package
    versions, archive downloads, and features that choose formats.
 3. **Summaries** (done): `bx release` writes them, `bx verify` checks them, `bx show` reads them from a
    tag alone.
-4. **The LSP and topos's config use the library** (`library =`, `bibles = ["bsb"]`).
+4. **The LSP uses the library** (done, as `biblix-lsp` in the biblix repository):
+   - `bibles = ["bsb"]` names packages from the project's lock.
+   - With no Bible settings, it uses the workspace's `biblix.toml`, else the library's own.
+   - `bible`/`bibles` folders can be packages (USX or USFM) or plain USX folders.
+   - The Neovim plugin runs it and builds it from a biblix checkout.
 5. **biblix-ffi with topos's API**: the plugin moves to it, and it gets the library location
    setting (inside `.obsidian/` to sync) and the Bibles section.
 6. **Versioning tools**: `bx diff` (from summaries) and `ver=` in links.
