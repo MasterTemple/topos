@@ -46,6 +46,16 @@ pub enum IndexOrder {
     Bible,
 }
 
+/// How many of a query's references are in files with an extension
+#[data]
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ExtensionCount {
+    /// Lowercase, without the dot ("" for files without one)
+    pub extension: String,
+    pub references: u32,
+    pub files: u32,
+}
+
 /// A file to write: a pack (`<device>-<number>.bin`) or an EPUB's details (`<name>.bin`)
 #[data]
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -132,6 +142,9 @@ for (const bytes of packs) index.loadPack(bytes);
 if (index.check(path, size, mtime) !== IndexStatus.Fresh) index.indexText(topos, path, size, mtime, text, Date.now());
 const results = index.query(topos, ToposQuery.create().anyOverlap("Romans 8"), IndexScope.All, "", IndexOrder.Bible);
 index.page(topos, results, 0, 100);
+// Only Markdown files, and how many references each kind of file has
+index.queryIn(topos, ToposQuery.create(), IndexScope.All, "", ["md"], IndexOrder.File);
+index.extensionCounts(results);
 for (const file of index.takeDirtyPacks()) write(file.name, file.bytes);
 ```
 */
@@ -393,6 +406,20 @@ impl ToposIndex {
         path: String,
         order: IndexOrder,
     ) -> Result<IndexResults, ToposError> {
+        self.query_in(topos, query, scope, path, vec![], order)
+    }
+
+    /// Like [`ToposIndex::query`], in files with one of `extensions` (without the dot, any case;
+    /// empty for every file)
+    pub fn query_in(
+        &self,
+        topos: &Topos,
+        query: &ToposQuery,
+        scope: IndexScope,
+        path: String,
+        extensions: Vec<String>,
+        order: IndexOrder,
+    ) -> Result<IndexResults, ToposError> {
         let scope = match scope {
             IndexScope::All => Scope::All,
             IndexScope::File => Scope::File(path),
@@ -404,15 +431,28 @@ impl ToposIndex {
         };
         // Building a filter copies the Bible's data, so a query without filters skips it
         let results = if query.is_empty() {
-            self.lock().query(None, None, &scope, order)
+            self.lock().query_in(None, None, &scope, &extensions, order)
         } else {
             let matcher = topos.filter(query)?.create_matcher();
             let books = matcher.possible_books();
             let keep = |p: &CorePassage| matcher.keeps(p);
             self.lock()
-                .query(Some(&keep), books.as_ref(), &scope, order)
+                .query_in(Some(&keep), books.as_ref(), &scope, &extensions, order)
         };
         Ok(IndexResults { inner: results })
+    }
+
+    /// How many of the results are in files with each extension, by extension
+    pub fn extension_counts(&self, results: &IndexResults) -> Vec<ExtensionCount> {
+        self.lock()
+            .extension_counts(&results.inner)
+            .into_iter()
+            .map(|(extension, references, files)| ExtensionCount {
+                extension,
+                references: references as u32,
+                files: files as u32,
+            })
+            .collect()
     }
 
     /// Results `offset` to `offset + limit`

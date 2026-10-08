@@ -594,7 +594,24 @@ impl Index {
         scope: &Scope,
         order: Order,
     ) -> Results {
-        if keep.is_none() && books.is_none() && *scope == Scope::All {
+        self.query_in(keep, books, scope, &[], order)
+    }
+
+    /// Like [`Index::query`], in files with one of `extensions` (without the dot, any case;
+    /// empty for every file)
+    pub fn query_in(
+        &self,
+        keep: Option<&dyn Fn(&Passage) -> bool>,
+        books: Option<&BTreeSet<BookId>>,
+        scope: &Scope,
+        extensions: &[String],
+        order: Order,
+    ) -> Results {
+        let extensions: Vec<String> = extensions
+            .iter()
+            .map(|e| lowercase(e.trim_start_matches('.')))
+            .collect();
+        if keep.is_none() && books.is_none() && *scope == Scope::All && extensions.is_empty() {
             let all = self.ordered(order);
             return Results {
                 generation: self.generation,
@@ -605,17 +622,20 @@ impl Index {
         let in_scope: Vec<bool> = self
             .slots
             .iter()
-            .map(|slot| match scope {
-                Scope::All => true,
-                Scope::File(file) => slot.path == *file,
-                Scope::Folder(folder) => {
-                    let folder = folder.trim_end_matches('/');
-                    folder.is_empty()
-                        || slot
-                            .path
-                            .strip_prefix(folder)
-                            .is_some_and(|rest| rest.starts_with('/'))
-                }
+            .map(|slot| {
+                let in_scope = match scope {
+                    Scope::All => true,
+                    Scope::File(file) => slot.path == *file,
+                    Scope::Folder(folder) => {
+                        let folder = folder.trim_end_matches('/');
+                        folder.is_empty()
+                            || slot
+                                .path
+                                .strip_prefix(folder)
+                                .is_some_and(|rest| rest.starts_with('/'))
+                    }
+                };
+                in_scope && (extensions.is_empty() || extensions.contains(&extension(&slot.path)))
             })
             .collect();
         // References in books the filter can't keep are skipped without testing them
@@ -657,6 +677,28 @@ impl Index {
             items: Arc::new(kept.into_iter().map(|(_, item)| item).collect()),
             files: has_file.iter().filter(|&&f| f).count(),
         }
+    }
+
+    /// How many of the results are in files with each extension (lowercase, without the dot; ""
+    /// for none): (extension, references, files), by extension
+    pub fn extension_counts(&self, results: &Results) -> Vec<(String, usize, usize)> {
+        let mut by_slot: HashMap<u32, usize> = HashMap::new();
+        for &(slot, _) in results.items.iter() {
+            *by_slot.entry(slot).or_default() += 1;
+        }
+        let mut counts: BTreeMap<String, (usize, usize)> = BTreeMap::new();
+        for (slot, references) in by_slot {
+            let Some(slot) = self.slots.get(slot as usize) else {
+                continue;
+            };
+            let count = counts.entry(extension(&slot.path)).or_default();
+            count.0 += references;
+            count.1 += 1;
+        }
+        counts
+            .into_iter()
+            .map(|(extension, (references, files))| (extension, references, files))
+            .collect()
     }
 
     /// Every reference in use, in an order (kept until the index changes)
@@ -744,6 +786,15 @@ impl Index {
         names.sort();
         names.dedup();
         names
+    }
+}
+
+/// A path's extension, lowercase, without the dot ("" if its name has none)
+pub fn extension(path: &str) -> String {
+    let name = path.rsplit('/').next().unwrap_or(path);
+    match name.rfind('.') {
+        Some(dot) if dot > 0 => lowercase(&name[dot + 1..]),
+        _ => String::new(),
     }
 }
 
@@ -901,6 +952,31 @@ mod tests {
             ["Notes/b.md 1:1", "other.md 2:1"]
         );
         assert!(index.is_current(&genesis));
+        let markdown = index.query_in(None, None, &Scope::All, &[".MD".into()], Order::File);
+        assert_eq!((markdown.len(), markdown.file_count()), (4, 3));
+        let notes = index.query_in(
+            Some(&|p: &Passage| p.book.0 == 1),
+            None,
+            &Scope::Folder("Notes".into()),
+            &["md".into(), "txt".into()],
+            Order::File,
+        );
+        assert_eq!(written(index.page(&notes, 0, 10)), ["Notes/b.md 1:1"]);
+        assert!(
+            index
+                .query_in(None, None, &Scope::All, &["txt".into()], Order::File)
+                .is_empty()
+        );
+        index.set("Talk.SRT", entry("Gen 3:1 and Gen 3:2", 1, 1, 1));
+        let all = index.query(None, None, &Scope::All, Order::File);
+        assert_eq!(
+            index.extension_counts(&all),
+            [("md".into(), 4, 3), ("srt".into(), 2, 1)]
+        );
+        index.remove("Talk.SRT");
+        assert_eq!(extension("a.b/c"), "");
+        assert_eq!(extension(".hidden"), "");
+        assert_eq!(extension("x/Book.EPUB"), "epub");
         index.rename("other.md", "moved.md");
         assert!(!index.is_current(&genesis));
         assert_eq!(references(&index, "moved.md"), ["2:1"]);
