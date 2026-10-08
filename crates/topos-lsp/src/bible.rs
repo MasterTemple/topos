@@ -103,14 +103,16 @@ impl Text {
     A Markdown code block of the text, whose info string after the language says what to color:
     ` ```topos-bible 0:0:4:0 0:33:4:2` (line, byte column, byte length, and token type, each
     token within one line)
-    - Editors hide the info string; the Neovim plugin reads it to color the block
+    - Neovim's hover hides the info string, and the plugin reads it to color the block
+    - Without `tokens`, just the language: for completion documentation, which completion
+      plugins (blink.cmp) show with the info string
     */
-    pub fn fence(&self) -> String {
+    pub fn fence(&self, tokens: bool) -> String {
         let mut info = vec![];
         let starts: Vec<usize> = std::iter::once(0)
             .chain(self.text.match_indices('\n').map(|(i, _)| i + 1))
             .collect();
-        for (range, token) in &self.tokens {
+        for (range, token) in self.tokens.iter().filter(|_| tokens) {
             let mut start = range.start;
             while start < range.end {
                 let line = starts.partition_point(|&s| s <= start) - 1;
@@ -128,8 +130,41 @@ impl Text {
         while self.text.contains(&fence) {
             fence.push('`');
         }
-        format!("{fence}{SCHEME} {}\n{}\n{fence}", info.join(" "), self.text)
+        let info = match info.is_empty() {
+            true => String::new(),
+            false => format!(" {}", info.join(" ")),
+        };
+        format!("{fence}{SCHEME}{info}\n{}\n{fence}", self.text)
     }
+}
+
+/**
+Breaks lines longer than `width` characters at their last space that fits (a word longer than
+the line overflows it)
+- Each break replaces a space, so byte offsets (verses, tokens) stay the same
+*/
+pub fn wrap(text: &str, width: usize) -> String {
+    let mut bytes = text.as_bytes().to_vec();
+    // The characters on the line so far, and the last space's byte and column
+    let mut column = 0;
+    let mut space: Option<(usize, usize)> = None;
+    for (i, c) in text.char_indices() {
+        if c == '\n' {
+            (column, space) = (0, None);
+            continue;
+        }
+        if c == ' ' {
+            space = Some((i, column));
+        }
+        column += 1;
+        if column > width
+            && let Some((at, at_column)) = space.take()
+        {
+            bytes[at] = b'\n';
+            column -= at_column + 1;
+        }
+    }
+    String::from_utf8(bytes).unwrap_or_else(|_| text.to_string())
 }
 
 /// What a part of a rendered book is
@@ -402,6 +437,10 @@ impl Bible {
             }
             text.text.push_str(" …");
         }
+        let markup = markup.unwrap_or(&self.markup);
+        if let Some(width) = markup.width.filter(|&w| w > 0) {
+            text.text = wrap(&text.text, width);
+        }
         Some(text)
     }
 
@@ -460,9 +499,13 @@ impl Bible {
                 Part::Chapter(c) => *c = chapter.unwrap_or_default(),
             }
         }
+        let text = match self.markup.width.filter(|&w| w > 0) {
+            Some(width) => wrap(&flat.text, width),
+            None => flat.text.clone(),
+        };
         Rendered {
             tokens: tokens(&flat),
-            text: flat.text,
+            text,
             parts,
         }
     }

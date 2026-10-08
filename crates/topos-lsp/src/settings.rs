@@ -131,6 +131,8 @@ pub struct MarkupSettings {
     pub divine_name: MarkupElement,
     /// Quotations other than words of Jesus
     pub quotes: MarkupElement,
+    /// Lines longer than this many characters break at a space (none by default)
+    pub width: Option<usize>,
 }
 
 impl MarkupSettings {
@@ -162,6 +164,7 @@ impl MarkupSettings {
             added: merge(&self.added, &over.added),
             divine_name: merge(&self.divine_name, &over.divine_name),
             quotes: merge(&self.quotes, &over.quotes),
+            width: over.width.or(self.width),
         }
     }
 }

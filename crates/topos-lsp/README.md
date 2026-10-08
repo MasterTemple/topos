@@ -72,6 +72,7 @@ words_of_jesus = { show = true, display = "{text}" }
 added = { show = true, display = "{text}" }        # translators' additions (KJV italics)
 divine_name = { show = true, display = "{text}" }  # LORD in small capitals
 quotes = { show = true, display = "{text}" }       # quotations other than words of Jesus
+width = 80 # break lines longer than this at a space (none by default)
 ```
 
 Labels (verse and chapter numbers) can use `{verse}` (`16`, or `4-5` for a bridge),
@@ -127,7 +128,10 @@ Jesus and Nicodemus
 ```
 ````
 
-Editors show only the language; the Neovim plugin colors the block from it.
+Editors show only the language; the Neovim plugin colors the block from it. Completion
+documentation is the block without the token list, since completion menus (like blink.cmp) show
+the info string. With `markup.width`, a line break replaces a space, so every byte offset (verses,
+tokens) is the same as without it.
 
 ## Neovim
 

@@ -321,7 +321,7 @@ impl Server {
         if let Some(text) = text {
             item.documentation = Some(lsp_types::Documentation::MarkupContent(MarkupContent {
                 kind: MarkupKind::Markdown,
-                value: text.fence(),
+                value: text.fence(false),
             }));
         }
         item
@@ -448,7 +448,7 @@ impl Server {
                     sections.push(lines.join("\n"));
                     lines.clear();
                 }
-                sections.push(text.fence());
+                sections.push(text.fence(true));
                 continue;
             }
             let Some((label, detail)) = self.hover_line(field, &found, written) else {
@@ -1956,11 +1956,10 @@ to condemn.</char> <verse eid="JHN 3:17"/></para>
         let Some(lsp_types::Documentation::MarkupContent(doc)) = resolved.documentation else {
             panic!("no documentation");
         };
-        assert!(
-            doc.value
-                .ends_with("\nJesus and Nicodemus\n[16] For God so loved the world.\n```"),
-            "{}",
-            doc.value
+        // No token list for completion plugins to show
+        assert_eq!(
+            doc.value,
+            "```topos-bible\nJesus and Nicodemus\n[16] For God so loved the world.\n```"
         );
         let _ = std::fs::remove_dir_all(&dir);
     }
@@ -2026,6 +2025,42 @@ to condemn.</char> <verse eid="JHN 3:17"/></para>
                 ),
             ]
         );
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    /// `markup.width` breaks long lines at spaces, keeping every byte offset
+    #[test]
+    fn width_wraps_at_spaces() {
+        assert_eq!(bible::wrap("aa bb cc dd\nee ff", 5), "aa bb\ncc dd\nee ff");
+        assert_eq!(bible::wrap("a verylongword b", 4), "a\nverylongword\nb");
+        assert_eq!(bible::wrap("“é” ü ö", 3), "“é”\nü ö");
+        let (server, uri, dir) = with_bible("See John 3:16", json!({ "width": 30 }), "width");
+        let book = server
+            .book(BookParams {
+                uri: book_uri().to_string(),
+            })
+            .unwrap();
+        assert!(
+            book.text.lines().all(|l| l.chars().count() <= 30),
+            "{}",
+            book.text
+        );
+        assert!(
+            book.text.contains("\n[16] For God so loved the\nworld."),
+            "{}",
+            book.text
+        );
+        // Go to definition still finds the verse
+        let Some(GotoDefinitionResponse::Scalar(location)) =
+            server.definition(GotoDefinitionParams {
+                text_document_position_params: at(&uri, 0, 6),
+                work_done_progress_params: WorkDoneProgressParams::default(),
+                partial_result_params: PartialResultParams::default(),
+            })
+        else {
+            panic!("no definition");
+        };
+        assert_eq!(location.range.start, Position::new(3, 0));
         let _ = std::fs::remove_dir_all(&dir);
     }
 }
