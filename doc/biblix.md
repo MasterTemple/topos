@@ -89,7 +89,13 @@ Step 5, started:
 - **The core reads and writes through `Storage`** for this: `Fetcher` fetches into any storage,
   and the resolver finds installed packages through a `Packages` trait (the library's folders
   natively).
-- **Still to do**: the plugin's move, its library location setting, and its Bibles section.
+- **The Obsidian plugin is on biblix's package** (one WebAssembly module for the plugin and its
+  worker) and reads the vault's `biblix.toml` and `biblix.lock`: packages add translations with
+  their verse counts and give passage text.
+- **Open: where the plugin's library goes.** The reader, hover previews, and embeds work on vault
+  files, and files in `.obsidian/` aren't vault files. A visible folder (`Bibles/`) works with them
+  now; `.obsidian/biblix` (read for now) needs file-plus-plus to show documents that aren't vault
+  files. The settings (library location, installed Bibles, *Add a Bible*) wait on this.
 
 ## Layers
 
