@@ -80,8 +80,16 @@ Step 5, started:
   `biblix.toml` and `biblix.lock` and says where each package's files are.
 - **Real packages in WebAssembly** (Node, release build): the BSB opens in 150 ms, and the KJV
   (USFM, every book parsed to count verses) in 0.8 s, or 0.09 s from the cache (Python).
-- **Still to do**: the archive fetcher over the host's HTTP (installing in WebAssembly), then the
-  plugin's move, its library location setting, and its Bibles section.
+- **Installing without git**: `BiblixInstaller` runs the same resolver as `bx install` against
+  what the host has downloaded, and asks for what's missing: a repository's refs (git's smart
+  HTTP, `info/refs`, which GitHub, GitLab, Gitea, Forgejo, and Bitbucket serve), a commit's
+  `.tar.gz`, or an installed package's files. An archive's files hash the same as a checkout's,
+  so lock files work both ways: `bx install` accepts a library and lock written in WebAssembly.
+  Installing the KJV and BSB in Node takes 0.4 s, checking them again 0.15 s.
+- **The core reads and writes through `Storage`** for this: `Fetcher` fetches into any storage,
+  and the resolver finds installed packages through a `Packages` trait (the library's folders
+  natively).
+- **Still to do**: the plugin's move, its library location setting, and its Bibles section.
 
 ## Layers
 
@@ -333,10 +341,10 @@ biblix-ffi (BoltFFI, like topos-ffi) has biblix's and topos's API in one package
     through, with a std::fs implementation and a host implementation (the plugin's vault adapter,
     passed in from JavaScript). sword-modules needs this trait, since today it opens a folder on
     disk.
-  - **Fetching without git**: a release is downloaded as an archive (GitHub, GitLab, and Gitea
-    serve one per tag) through the host's HTTP (`requestUrl` in Obsidian, which works on mobile).
-    Native `bx` runs the `git` command (gitoxide could replace it). Either way the result is the
-    same files, checked against the registry's checksum.
+  - **Fetching without git** (done): a repository's refs and a commit's archive are downloaded
+    through the host's HTTP (`requestUrl` in Obsidian, which works on mobile), and biblix
+    resolves and unpacks them. Native `bx` runs the `git` command (gitoxide could replace it).
+    Either way the result is the same files, checked against the lock file's checksum.
 
 ## Managing
 
