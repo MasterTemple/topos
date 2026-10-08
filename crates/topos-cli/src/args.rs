@@ -286,6 +286,13 @@ pub struct Args {
     #[arg(long, value_name = "GLOB")]
     pub iglob: Vec<String>,
 
+    /// Only search files whose path matches a regular expression anywhere (`!` excludes), like
+    /// `--path-regex '20\d\d/' --path-regex '!(?i)drafts'`; paths use `/` and have no leading
+    /// `./`. Can be repeated: a file must match one, and none that exclude. Files named on the
+    /// command line are always searched
+    #[arg(long, value_name = "REGEX")]
+    pub path_regex: Vec<String>,
+
     /// Search hidden files and directories (names starting with `.`)
     #[arg(long, short = '.')]
     pub hidden: bool,
@@ -457,6 +464,7 @@ impl Args {
             one_file_system: self.one_file_system,
             globs: self.glob.clone(),
             iglobs: self.iglob.clone(),
+            path_regexes: self.path_regex.clone(),
             extensions: WalkOptions::extension_list(&self.extensions),
             exclude_extensions: WalkOptions::extension_list(&self.exclude_ext),
             only_epub: self.epub_links.is_some(),

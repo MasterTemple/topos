@@ -738,6 +738,16 @@ fn path_options() {
         files(&["--exclude-ext", "md,dat"]),
         ["extra-ignore", "notes/b.txt"]
     );
+    // Regular expressions match anywhere in the path (with `/`, no `./`); `!` excludes
+    assert_eq!(
+        files(&["--path-regex", "^notes/"]),
+        ["notes/b.txt", "notes/deep/c.md"]
+    );
+    assert_eq!(
+        files(&["--path-regex", r"\.md$", "--path-regex", "!(?i)NOTES|big"]),
+        ["a.md", "none.md"]
+    );
+    assert_ne!(run(&["--files", ".", "--path-regex", "("]).1, Some(0));
     assert_eq!(files(&["-d", "0"]), Vec::<String>::new());
     assert!(!files(&["--max-filesize", "1K"]).contains(&"big.md".to_string()));
     assert!(files(&["--max-filesize", "1M"]).contains(&"big.md".to_string()));

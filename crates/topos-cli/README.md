@@ -361,6 +361,7 @@ always searched.
 | `-u`, `-uu`, `-uuu` | `--no-ignore`, then also `--hidden`, then also `--binary` |
 | `--binary` | Search files that look binary as text |
 | `--glob GLOB`, `--iglob GLOB` | Include (or with `!`, exclude) matching paths; globs override ignore files and hidden |
+| `--path-regex REGEX` | Only walked files whose path matches a regular expression anywhere (`!` excludes) |
 | `--ext md,txt`, `--exclude-ext pdf` | Only, or never, these extensions |
 | `-d NUM`, `--max-depth NUM` | Descend at most this many directories |
 | `--max-filesize SIZE` | Skip larger files (`500K`, `10M`, `1G`) |
@@ -615,6 +616,9 @@ Options:
 
       --iglob <GLOB>
           Like --glob, ignoring case (when a path matches both, the --iglob wins)
+
+      --path-regex <REGEX>
+          Only search files whose path matches a regular expression anywhere (`!` excludes), like `--path-regex '20\d\d/' --path-regex '!(?i)drafts'`; paths use `/` and have no leading `./`. Can be repeated: a file must match one, and none that exclude. Files named on the command line are always searched
 
   -., --hidden
           Search hidden files and directories (names starting with `.`)

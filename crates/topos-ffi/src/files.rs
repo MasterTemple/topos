@@ -32,6 +32,7 @@ pub struct ToposFiles {
     pub one_file_system: bool,
     pub globs: Vec<String>,
     pub iglobs: Vec<String>,
+    pub path_regexes: Vec<String>,
     pub extensions: Vec<String>,
     pub exclude_extensions: Vec<String>,
     pub binary: bool,
@@ -144,6 +145,15 @@ impl ToposFiles {
     pub fn iglob(&self, glob: String) -> Self {
         Self {
             iglobs: with(self.iglobs.clone(), glob),
+            ..self.clone()
+        }
+    }
+
+    /// Only walked files whose path matches a regular expression anywhere, or not with `!`
+    /// (`--path-regex`)
+    pub fn path_regex(&self, regex: String) -> Self {
+        Self {
+            path_regexes: with(self.path_regexes.clone(), regex),
             ..self.clone()
         }
     }
@@ -328,6 +338,7 @@ mod native {
             one_file_system: files.one_file_system,
             globs: files.globs.clone(),
             iglobs: files.iglobs.clone(),
+            path_regexes: files.path_regexes.clone(),
             extensions: WalkOptions::extension_list(&files.extensions),
             exclude_extensions: WalkOptions::extension_list(&files.exclude_extensions),
             only_epub: false,

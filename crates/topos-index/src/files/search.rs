@@ -10,6 +10,7 @@ use std::{
 };
 
 use super::cache::{Cache, Cached};
+use crate::PathFilter;
 use ignore::{WalkBuilder, WalkState, overrides::OverrideBuilder};
 use std::collections::BTreeSet;
 use topos_bible::{
@@ -101,6 +102,9 @@ pub struct WalkOptions {
     pub globs: Vec<String>,
     /// Globs like `globs`, matched without regard to case
     pub iglobs: Vec<String>,
+    /// Regular expressions that walked files' paths must match anywhere (`!` excludes), with
+    /// `/` between folders and no leading `./`
+    pub path_regexes: Vec<String>,
     /// Lowercase extensions to search (empty searches every file)
     pub extensions: Vec<String>,
     /// Lowercase extensions to skip
@@ -159,7 +163,16 @@ impl WalkOptions {
             }
             builder.overrides(overrides.build().map_err(|e| e.to_string())?);
         }
+        self.path_filter()?;
         Ok(builder)
+    }
+
+    /// The path regexes as a filter (an error names one that can't be read)
+    fn path_filter(&self) -> Result<PathFilter, String> {
+        self.path_regexes
+            .iter()
+            .try_fold(PathFilter::new(), |filter, regex| filter.regex(regex))
+            .map_err(|e| format!("--path-regex: {e}"))
     }
 
     /// Extensions as `--ext` takes them (`.md`, `MD`) in the form these options keep them
@@ -170,14 +183,15 @@ impl WalkOptions {
             .collect()
     }
 
-    /// Whether `--ext` and `--exclude-ext` allow this file
-    fn wants(&self, path: &Path) -> bool {
+    /// Whether `--ext`, `--exclude-ext`, and `--path-regex` (`regexes`) allow this file
+    fn wants(&self, path: &Path, regexes: &PathFilter) -> bool {
         let extension = path.extension().and_then(|e| e.to_str());
         let listed = |list: &[String]| {
             extension.is_some_and(|e| list.iter().any(|ext| ext.eq_ignore_ascii_case(e)))
         };
         (self.extensions.is_empty() || listed(&self.extensions))
             && !listed(&self.exclude_extensions)
+            && (regexes.is_empty() || regexes.keeps(&slashed(path)))
     }
 }
 
@@ -213,16 +227,19 @@ fn walk(searcher: Arc<Searcher>, paths: Vec<PathBuf>, sender: mpsc::Sender<FileR
             return;
         }
     };
+    // Checked by the builder
+    let regexes = Arc::new(searcher.walk.path_filter().unwrap_or_default());
     builder.build_parallel().run(|| {
         let searcher = searcher.clone();
         let sender = sender.clone();
+        let regexes = regexes.clone();
         Box::new(move |entry| {
             let result = match entry {
                 Ok(entry) if entry.file_type().is_some_and(|t| t.is_dir()) => {
                     return WalkState::Continue;
                 }
                 // Files named on the command line (depth 0) are always searched
-                Ok(entry) if entry.depth() > 0 && !searcher.walk.wants(entry.path()) => {
+                Ok(entry) if entry.depth() > 0 && !searcher.walk.wants(entry.path(), &regexes) => {
                     return WalkState::Continue;
                 }
                 Ok(entry) if searcher.walk.only_epub && !is_epub(entry.path()) => {
@@ -249,6 +266,12 @@ fn walk(searcher: Arc<Searcher>, paths: Vec<PathBuf>, sender: mpsc::Sender<FileR
             }
         })
     });
+}
+
+/// A path as regexes see it: `/` between folders, without a leading `./`
+fn slashed(path: &Path) -> String {
+    let text = path.to_string_lossy().replace('\\', "/");
+    text.strip_prefix("./").unwrap_or(&text).to_string()
 }
 
 /// The file a walking error is about, and the error without it
