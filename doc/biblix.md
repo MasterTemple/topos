@@ -25,6 +25,9 @@ Obsidian.
 - **A package can hold several formats** (USX and SWORD of the same text), each behind a feature
   the package's owner names.
 - **Summaries with every verse's hash are published for every package**, not only Bibles.
+- **Audio and video are referenced, never stored**: a package lists each media file's URL, size,
+  and SHA-256, with its transcript and timings (see Media). Git keeps only small, diffable files,
+  and the media stays wherever its owner serves it.
 - **biblix is its own repository**: `~/Development/rust/biblix`, next to sword-modules.
 - **USFM is read with usfm3.** On the whole KJV, both usfm3 and
   [usfm-onion](https://github.com/WycliffeAssociates/usfm-onion) gave its 31,102 verses, and
@@ -134,6 +137,23 @@ tsk = { git = "https://github.com/someone/tsk-cross-references", tag = "v1.0.0" 
 - **Importing**: `bx import` turns a download in another format (an eBible.org zip, a SWORD
   module, a Door43 repository, a CCEL ThML file) into a package (a `biblix.toml` around the
   files), which can then be pushed anywhere as a git repository.
+- **Media** (audio, video) is listed, not stored: each file's URL, size, and SHA-256, plus its
+  transcript (what topos searches) and its timings (each verse's start and end). biblix fetches a
+  file when it's first played, checks its hash, and keeps it by hash, so versions share it.
+  Releases are judged by the transcript and timings; a new hash for the same words is a patch.
+  A recording follows one text, so it names that text's package as a dependency.
+
+  ```toml
+  [media]
+  timings = "timings/"           # each verse's start and end, per file
+  transcript = "transcript/"     # USX or USFM, read like any other text
+
+  [[media.files]]
+  path = "JHN.mp3"               # what timings name it by
+  url = "https://example.org/audio/JHN.mp3"
+  size = 31457280
+  sha256 = "…"
+  ```
 - **Registries (later)**: a registry would be a git repository of entries (each version's git URL,
   tag, commit, and checksum), so `bx add bsb` works without a URL. biblix can add `registry =`
   without changing packages, so it waits until someone wants to host one.
