@@ -106,8 +106,12 @@ Catalogs and imports (from step 7):
   `catalog.toml` of git packages (metadata and URLs only, so anyone can host one in a git
   repository; `bx catalog entry <url>` writes an entry), or eBible.org's `translations.csv`
   (1,500 translations; the downloadable, redistributable ones are listed). A vault names its
-  catalogs in `[settings] catalogs`; **without any, eBible.org's own list is searched** (it's
-  eBible.org's listing of its downloads, not a mirror; owner to confirm this default).
+  catalogs in `[settings] catalogs`; **without any, eBible.org's and fetch.bible's own lists are
+  searched** (their listings of their downloads, not mirrors; owner to confirm this default).
+  fetch.bible's `manifest.json` lists 1,400 translations as USX, with SPDX-like licenses.
+- **Importing from fetch.bible**: each book's USX (66 downloads; 12 s one at a time in `bx`,
+  1 s eight at a time in Obsidian) into `usx/`, with its attribution in `COPYRIGHT.txt`. Its BSB
+  has the hand-made package's 31,086 verses.
 - **Importing from eBible.org** (`import.rs`): its `<id>_usfm.zip` becomes a package
   (`biblix.toml`, `usfm/`, `copr.htm` as the license file, versioned by eBible.org's update date,
   `2026.10.8`), used as a path package in `imports/<id>/`. The ASV imports in 0.3 s (`bx`) or 2 s
@@ -407,7 +411,7 @@ biblix-ffi (BoltFFI, like topos-ffi) has biblix's and topos's API in one package
 5. **biblix-ffi with topos's API** (done): the plugin moves to it, and it gets the library location
    setting (a vault folder, `Biblix/` by default) and the Bibles section.
 6. **Versioning tools**: `bx diff` (from summaries) and `ver=` in links.
-7. **Importers**: eBible.org (done, with its catalog), fetch.bible (USX/USFM), Door43 (git), CCEL
+7. **Importers**: eBible.org and fetch.bible (done, with their catalogs), Door43 (git), CCEL
    (ThML), SWORD through sword-modules with `Storage`.
 8. **Media**: `[media]` in `biblix.toml`, the transcript read as a text source, a timings format
    (not chosen yet), files fetched when first played, checked against their hashes, and kept by
