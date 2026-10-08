@@ -176,6 +176,7 @@ fn respond(server: &Server, request: Request) -> Response {
             params(request).map(|p| json(server.semantic_tokens(p)))
         }
         server::BOOK_REQUEST => params(request).and_then(|p| server.book(p).map(json)),
+        server::BIBLES_REQUEST => Ok(json(server.bibles())),
         ExecuteCommand::METHOD => params(request).and_then(|p| server.execute_command(p).map(json)),
         DocumentDiagnosticRequest::METHOD => {
             params(request).map(|p| json(server.pull_diagnostics(p)))

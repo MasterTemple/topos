@@ -4,7 +4,10 @@
 //! Keys are the CLI's option names (`psg-fmt`, `merge-data`, ...; `psg_fmt` works too), so one
 //! config serves both. Keys the server has no use for (`mode`, `cache`, ...) are ignored.
 
-use std::path::{Path, PathBuf};
+use std::{
+    collections::BTreeMap,
+    path::{Path, PathBuf},
+};
 
 use serde::Deserialize;
 use serde_json::{Map, Value};
@@ -20,7 +23,7 @@ use topos_bible::{
 
 use topos_bible_markup::Kind;
 
-use crate::bible::Bible;
+use crate::bible::{Bible, Bibles};
 
 /// What inlay hints show after each reference
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Deserialize)]
@@ -75,7 +78,7 @@ pub enum HoverField {
     Genres,
     /// How many verses the reference covers, and which: `36 (3:1-36)`
     Verses,
-    /// The passage's text, from the `bible` setting
+    /// The passage's text, from the Bible it names (or the default; see `hover-bibles`)
     Text,
     /// Integer keys (`book * 1_000_000 + chapter * 1_000 + verse`): `43003016`
     Bcv,
@@ -226,6 +229,36 @@ impl Default for Insertion {
     }
 }
 
+/**
+A Bible in the `bibles` setting: its folder, or the folder and other ways to write its name
+(`bibles = { BSB = "~/Bibles/BSB", KJV = { path = "~/Bibles/KJV", aliases = ["AV"] } }`)
+*/
+#[derive(Clone, Debug, Deserialize)]
+#[serde(untagged)]
+pub enum BibleSetting {
+    Path(String),
+    Full {
+        path: String,
+        #[serde(default)]
+        aliases: Vec<String>,
+    },
+}
+
+impl BibleSetting {
+    fn path(&self) -> &str {
+        match self {
+            BibleSetting::Path(path) | BibleSetting::Full { path, .. } => path,
+        }
+    }
+
+    fn aliases(&self) -> &[String] {
+        match self {
+            BibleSetting::Path(_) => &[],
+            BibleSetting::Full { aliases, .. } => aliases,
+        }
+    }
+}
+
 /// One value or a list (`merge-data = "a.json"` or `["a.json", "b.json"]`)
 #[derive(Clone, Debug, Default, Deserialize)]
 #[serde(untagged)]
@@ -280,7 +313,16 @@ pub struct Settings {
     /// What the hover shows below the reference (`"osis,book"` or a list; `[]` for none)
     pub hover: Option<OneOrMany>,
     /// A folder of USX files (one book each), for passage text in hover and go-to-definition
+    /// (named after the folder)
     pub bible: Option<String>,
+    /// More Bibles by name (translations): a reference followed by a name or alias
+    /// (`John 3:16 KJV`) shows that Bible's text
+    pub bibles: BTreeMap<String, BibleSetting>,
+    /// The Bible for references that name none: `bible`'s, else the first of `bibles`
+    pub default_bible: Option<String>,
+    /// The Bibles whose text hover shows, after the one the reference names (`["BSB", "KJV"]`);
+    /// only that one (or the default) without it
+    pub hover_bibles: OneOrMany,
     pub markup: MarkupSettings,
     /// Ways to insert a passage's text, offered as code actions (with a `bible`)
     pub insertions: Vec<Insertion>,
@@ -298,7 +340,9 @@ pub struct Configured {
     pub reference_diagnostics: ReferenceDiagnostics,
     pub hover: Vec<HoverField>,
     pub extensions: Vec<String>,
-    pub bible: Option<Bible>,
+    pub bibles: Bibles,
+    /// The `hover-bibles` setting, as the Bibles' names
+    pub hover_bibles: Vec<String>,
     pub insertions: Vec<Insertion>,
 }
 
@@ -439,14 +483,7 @@ impl Settings {
             ),
             (None, None) => None,
         };
-        let bible = match &self.bible {
-            Some(folder) => Some(Bible::load(
-                &expand_home(folder),
-                data.clone(),
-                self.markup.clone(),
-            )?),
-            None => None,
-        };
+        let bibles = self.bibles(&data)?;
         let matcher = BibleFilter::new(data).create_matcher();
         let extensions = self
             .ext
@@ -480,9 +517,49 @@ impl Settings {
             reference_diagnostics: self.reference_diagnostics,
             hover,
             extensions,
-            bible,
+            hover_bibles: (self.hover_bibles.values().iter())
+                .flat_map(|names| names.split(','))
+                .map(str::trim)
+                .filter(|name| !name.is_empty())
+                .map(|name| {
+                    bibles
+                        .get(name)
+                        .map(|bible| bible.name.clone())
+                        .ok_or_else(|| format!("hover-bibles: no Bible is named `{name}`"))
+                })
+                .collect::<Result<_, _>>()?,
+            bibles,
             insertions: self.insertions.clone(),
         })
+    }
+
+    /// `bible`, then each of `bibles`, with `default-bible` (or `bible`) first
+    fn bibles(&self, data: &BibleData) -> Result<Bibles, String> {
+        let mut list = vec![];
+        if let Some(folder) = &self.bible {
+            list.push(Bible::load(
+                &expand_home(folder),
+                None,
+                data.clone(),
+                self.markup.clone(),
+            )?);
+        }
+        for (name, setting) in &self.bibles {
+            let path = expand_home(setting.path());
+            let mut bible = Bible::load(&path, Some(name), data.clone(), self.markup.clone())
+                .map_err(|e| format!("bibles.{name}: {e}"))?;
+            bible.aliases = setting.aliases().to_vec();
+            list.retain(|b: &Bible| b.name != bible.name);
+            list.push(bible);
+        }
+        if let Some(default) = &self.default_bible {
+            let at = (list.iter())
+                .position(|b| b.name.eq_ignore_ascii_case(default) || b.aliases.contains(default))
+                .ok_or_else(|| format!("default-bible: no Bible is named `{default}`"))?;
+            let bible = list.remove(at);
+            list.insert(0, bible);
+        }
+        Ok(Bibles::new(list))
     }
 }
 

@@ -346,6 +346,7 @@ mod verses {
         assert_eq!(numbers, [(1, 1, 1), (1, 2, 3), (1, 4, 4), (2, 1, 1)]);
         // Each chapter's verse count, a bridge counting to its last verse
         assert_eq!(crate::verses::chapter_verses(&spans), [4, 1]);
+        assert_eq!(crate::verses::usx_chapter_verses(USX), [4, 1]);
         let verse = |i: usize| slice(&nodes, &spans[i].start, Some(&spans[i].end));
         // The heading after the chapter marker goes with verse 1, the verse keeps both lines
         let first = verse(0);

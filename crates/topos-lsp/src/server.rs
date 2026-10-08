@@ -21,9 +21,9 @@ use lsp_types::{
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
 use topos_bible::{
-    data::books::BookId,
+    data::{books::BookId, translations::Translation},
     filter::{bible_filter::BibleFilter, filters::testament::TestamentFilter},
-    matcher::{BibleMatch, BibleMatcher, LineIndex},
+    matcher::{BibleMatch, BibleMatcher, LineIndex, TranslatedMatch},
     segments::{
         Passage,
         autocomplete::{CompleteOptions, CompletionKind},
@@ -33,7 +33,7 @@ use topos_bible::{
 };
 
 use crate::{
-    bible::{self, Bible, MAX_HOVER_TEXT, Part, Token},
+    bible::{self, Bible, Bibles, MAX_HOVER_TEXT, Part, Token},
     settings::{
         self, Configured, HoverField, InlayHints, Insertion, ReferenceDiagnostics, Replace,
     },
@@ -50,6 +50,25 @@ pub const BOOK_REQUEST: &str = "topos/book";
 #[derive(Debug, Deserialize)]
 pub struct BookParams {
     pub uri: String,
+}
+
+/// The request for the Bibles: no parameters, gives [`BiblesList`]
+pub const BIBLES_REQUEST: &str = "topos/bibles";
+
+/// The Bibles from the `bible` and `bibles` settings, the default first
+#[derive(Debug, Serialize)]
+pub struct BiblesList {
+    pub bibles: Vec<BibleInfo>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct BibleInfo {
+    /// Its name in `topos-bible://` URIs and after references: `BSB`
+    pub name: String,
+    /// Other ways to write it after a reference
+    pub aliases: Vec<String>,
+    /// The books it has, as USFM codes (`JHN`), in order
+    pub books: Vec<String>,
 }
 
 /// A whole book, for the editor to show as a read-only document
@@ -134,8 +153,10 @@ pub struct Server {
     editor: Map<String, Value>,
     /// Each workspace file's references, reused while it is unchanged
     cache: workspace::Cache,
-    /// The `bible` setting's text
-    bible: Option<Bible>,
+    /// The `bible` and `bibles` settings' text, the default first
+    bibles: Bibles,
+    /// The Bibles whose text hover shows, after the one a reference names
+    hover_bibles: Vec<String>,
     /// Ways to insert a passage's text (code actions)
     insertions: Vec<Insertion>,
 }
@@ -153,7 +174,8 @@ impl Server {
             roots: vec![],
             editor: Map::new(),
             cache: workspace::Cache::default(),
-            bible: None,
+            bibles: Bibles::default(),
+            hover_bibles: vec![],
             insertions: vec![],
         }
     }
@@ -177,10 +199,12 @@ impl Server {
             reference_diagnostics,
             hover,
             extensions,
-            bible,
+            bibles,
+            hover_bibles,
             insertions,
         } = settings::settings(config, &editor)?.configure()?;
-        self.bible = bible;
+        self.bibles = bibles;
+        self.hover_bibles = hover_bibles;
         self.insertions = insertions;
         self.matcher = matcher;
         self.format = format;
@@ -262,9 +286,10 @@ impl Server {
             format: self.format.clone(),
             limit: Some(100),
         };
+        let translations = &self.bibles.translations;
         let items = self
             .matcher
-            .complete(text, cursor, &options)
+            .complete_with_translations(text, cursor, &options, translations)
             .into_iter()
             .enumerate()
             .map(|(idx, completion)| {
@@ -288,12 +313,19 @@ impl Server {
                     filter_text: Some(format!("{} {}", &text[range.clone()], completion.label)),
                     // Keep the order: chapters and verses are in reading order
                     sort_text: Some(format!("{idx:05}")),
-                    // For `completionItem/resolve` to add the passage's text
+                    // For `completionItem/resolve` to add the passage's text (a translation's
+                    // in that Bible)
                     data: completion
                         .passage
                         .as_ref()
-                        .filter(|_| self.bible.is_some())
-                        .map(|p| serde_json::json!({ "passage": self.parseable(p) })),
+                        .filter(|_| !self.bibles.is_empty())
+                        .map(|p| match completion.kind {
+                            CompletionKind::Translation => serde_json::json!({
+                                "passage": self.parseable(p),
+                                "bible": completion.label,
+                            }),
+                            _ => serde_json::json!({ "passage": self.parseable(p) }),
+                        }),
                     text_edit: Some(lsp_types::CompletionTextEdit::Edit(TextEdit {
                         range: lsp_range(&index, range.start, range.end),
                         new_text: completion.edit.text,
@@ -313,15 +345,15 @@ impl Server {
     /// A completion with its passage's text as documentation (with a `bible`), and what to color
     /// in it as `data.tokens` (see [`bible::Text::fence`])
     pub fn resolve_completion(&self, mut item: CompletionItem) -> CompletionItem {
-        let text = item
-            .data
-            .as_ref()
+        let data = item.data.as_ref();
+        let bible = data
+            .and_then(|data| data.get("bible")?.as_str())
+            .and_then(|name| self.bibles.get(name))
+            .or_else(|| self.bibles.default_bible());
+        let text = data
             .and_then(|data| data.get("passage")?.as_str())
             .and_then(|passage| self.matcher.data().parse(passage))
-            .and_then(|passage| {
-                let bible = self.bible.as_ref()?;
-                bible.passage(&passage, None, Some(MAX_HOVER_TEXT))
-            });
+            .and_then(|passage| bible?.passage(&passage, None, Some(MAX_HOVER_TEXT)));
         if let Some(text) = text {
             // What to color, for editors that draw the documentation themselves
             if let Some(Value::Object(data)) = &mut item.data {
@@ -358,7 +390,7 @@ impl Server {
             };
             let mut diagnostics: Vec<Diagnostic> = self
                 .matcher
-                .problems(text)
+                .problems_with_translations(text, &self.bibles.translations)
                 .into_iter()
                 .map(|problem| {
                     let range = lsp_range(&index, problem.bytes.start, problem.bytes.end);
@@ -408,16 +440,42 @@ impl Server {
         )
     }
 
-    /// The reference at a position, with the document's line index
-    fn reference_at(&self, uri: &Uri, position: Position) -> Option<(BibleMatch, LineIndex<'_>)> {
+    /// The reference at a position (or at the translation named after it), with the document's
+    /// line index
+    fn reference_at(
+        &self,
+        uri: &Uri,
+        position: Position,
+    ) -> Option<(TranslatedMatch, LineIndex<'_>)> {
         let text = self.documents.get(uri)?;
         let index = LineIndex::new(text);
         let cursor = index.offset_of_utf16(position.line as usize, position.character as usize)?;
-        let found = self.matcher.search(text).into_iter().find(|m| {
-            let bytes = m.location.bytes;
-            bytes.start <= cursor && cursor <= bytes.end
-        })?;
+        let found = self
+            .matcher
+            .search_with_translations(text, &self.bibles.translations)
+            .into_iter()
+            .find(|m| {
+                let bytes = m.reference.location.bytes;
+                let end = m.translation.as_ref().map_or(bytes.end, |t| t.span.end);
+                bytes.start <= cursor && cursor <= end
+            })?;
         Some((found, index))
+    }
+
+    /// The Bibles whose text hover shows for a reference: the one it names (or the default), then
+    /// the `hover-bibles` setting's
+    fn hover_texts(&self, translation: Option<&Translation>) -> Vec<&Bible> {
+        let mut shown: Vec<&Bible> = self.bibles.named(translation).into_iter().collect();
+        for bible in self
+            .hover_bibles
+            .iter()
+            .filter_map(|name| self.bibles.get(name))
+        {
+            if !shown.iter().any(|b| b.name == bible.name) {
+                shown.push(bible);
+            }
+        }
+        shown
     }
 
     /// The reference under the cursor, normalized, with what the `hover` setting lists about it
@@ -429,7 +487,14 @@ impl Server {
         if let Some(hover) = self.problem_hover(uri, position.position) {
             return Some(hover);
         }
-        let Some((found, index)) = self.reference_at(uri, position.position) else {
+        let Some((
+            TranslatedMatch {
+                reference: found,
+                translation,
+            },
+            index,
+        )) = self.reference_at(uri, position.position)
+        else {
             return self.verse_hover(uri, position.position);
         };
         let bytes = found.location.bytes;
@@ -439,24 +504,31 @@ impl Server {
             .and_then(|text| text.get(bytes.start..bytes.end))
             .unwrap_or_default();
         let title = self.reference(&found);
-        let mut value = format!("**{title}**");
+        let mut value = match &translation {
+            Some(translation) => format!("**{title}** ({})", translation.name),
+            None => format!("**{title}**"),
+        };
         // Lists of lines, and the passage's text between them
         let mut sections: Vec<String> = vec![];
         let mut lines: Vec<String> = vec![];
         for &field in &self.hover {
             if field == HoverField::Text {
-                let Some(text) = self
-                    .bible
-                    .as_ref()
-                    .and_then(|b| b.passage(&found.psg, None, Some(MAX_HOVER_TEXT)))
-                else {
-                    continue;
-                };
-                if !lines.is_empty() {
-                    sections.push(lines.join("\n"));
-                    lines.clear();
+                let bibles = self.hover_texts(translation.as_ref());
+                // Each Bible's name labels its text when there are several
+                let labeled = self.bibles.len() > 1;
+                for bible in bibles {
+                    let Some(text) = bible.passage(&found.psg, None, Some(MAX_HOVER_TEXT)) else {
+                        continue;
+                    };
+                    if !lines.is_empty() {
+                        sections.push(lines.join("\n"));
+                        lines.clear();
+                    }
+                    sections.push(match labeled {
+                        true => format!("*{}*\n{}", bible.name, text.fence(true)),
+                        false => text.fence(true),
+                    });
                 }
-                sections.push(text.fence(true));
                 continue;
             }
             let Some((label, detail)) = self.hover_line(field, &found, written) else {
@@ -608,7 +680,7 @@ impl Server {
         let cursor = index.offset_of_utf16(position.line as usize, position.character as usize)?;
         let problem = self
             .matcher
-            .problems(text)
+            .problems_with_translations(text, &self.bibles.translations)
             .into_iter()
             .find(|p| p.bytes.start <= cursor && cursor <= p.bytes.end)?;
         let value = match &problem.detail {
@@ -703,11 +775,17 @@ impl Server {
     */
     pub fn code_actions(&self, params: CodeActionParams) -> Option<Vec<CodeActionOrCommand>> {
         let uri = &params.text_document.uri;
-        let (found, index) = self.reference_at(uri, params.range.start)?;
+        let (
+            TranslatedMatch {
+                reference: found,
+                translation,
+            },
+            index,
+        ) = self.reference_at(uri, params.range.start)?;
         let reference = self.reference(&found);
         let passage = self.parseable(&found.psg);
         let mut actions = self.reformat_actions(uri, &found, &index);
-        actions.extend(self.insert_actions(uri, &found, &index));
+        actions.extend(self.insert_actions(uri, &found, translation.as_ref(), &index));
         let searches = SearchMode::ALL
             .into_iter()
             .map(|mode| {
@@ -786,29 +864,41 @@ impl Server {
         actions
     }
 
-    /// `Insert Callout` for each insertion: the passage's text on the lines after the reference,
-    /// or in place of its line or of the reference itself (`replace`)
+    /**
+    `Insert Callout` for each insertion: the passage's text on the lines after the reference, or
+    in place of its line or of the reference itself (`replace`)
+    - From the Bible the reference names; else one action per Bible, the default first
+    - With several Bibles, titles name theirs: `Insert Callout (KJV)`
+    */
     fn insert_actions(
         &self,
         uri: &Uri,
         found: &BibleMatch,
+        translation: Option<&Translation>,
         index: &LineIndex,
     ) -> Vec<CodeActionOrCommand> {
-        let (Some(bible), Some(text)) = (self.bible.as_ref(), self.documents.get(uri)) else {
+        let Some(text) = self.documents.get(uri) else {
             return vec![];
         };
         if bible::is_book_uri(uri.as_str()) {
             return vec![];
         }
+        let bibles: Vec<&Bible> = match translation {
+            Some(_) => self.bibles.named(translation).into_iter().collect(),
+            None => self.bibles.iter().collect(),
+        };
         // The reference, its line, and where the line ends
         let bytes = found.location.bytes;
         let line_start = text[..bytes.start].rfind('\n').map_or(0, |i| i + 1);
         let line_end = text[bytes.end..]
             .find('\n')
             .map_or(text.len(), |i| bytes.end + i);
+        // Titles name the Bible when there are several
+        let several = self.bibles.len() > 1;
         self.insertions
             .iter()
-            .filter_map(|insertion| {
+            .flat_map(|insertion| bibles.iter().map(move |bible| (insertion, *bible)))
+            .filter_map(|(insertion, bible)| {
                 let inserted = self.insertion_text(bible, insertion, found)?;
                 let (range, new_text) = match insertion.replace {
                     None => (line_end..line_end, format!("\n{inserted}")),
@@ -816,7 +906,10 @@ impl Server {
                     Some(Replace::Inline) => (bytes.start..bytes.end, inserted),
                 };
                 let at = lsp_range(index, range.start, range.end);
-                let title = format!("Insert {}", insertion.name);
+                let title = match several {
+                    true => format!("Insert {} ({})", insertion.name, bible.name),
+                    false => format!("Insert {}", insertion.name),
+                };
                 let edits = vec![TextEdit::new(at, new_text)];
                 Some(edit_action(
                     uri,
@@ -854,6 +947,7 @@ impl Server {
                 .display
                 .replace("{reference}", &self.reference(found))
                 .replace("{osis}", &osis)
+                .replace("{bible}", &bible.name)
                 .replace("{text}", &text.join("\n")),
         )
     }
@@ -868,14 +962,16 @@ impl Server {
             let (mode, passage) = self.verse_at(uri, position.position)?;
             return self.search(mode, &passage).ok();
         };
-        self.search(SearchMode::ExactOverlap, &self.parseable(&found.psg))
-            .ok()
+        self.search(
+            SearchMode::ExactOverlap,
+            &self.parseable(&found.reference.psg),
+        )
+        .ok()
     }
 
     /// The Bible and book of a whole-book document
     fn book_document(&self, uri: &Uri) -> Option<(&Bible, BookId)> {
-        let bible = self.bible.as_ref()?;
-        Some((bible, bible.book_of(uri.as_str())?))
+        self.bibles.book_of(uri.as_str())
     }
 
     /**
@@ -938,12 +1034,18 @@ impl Server {
         })
     }
 
-    /// Go to definition (and declaration): the reference's text in the `bible` setting's whole book (one location
-    /// per part of the reference)
+    /// Go to definition (and declaration): the reference's text in its whole book (one location
+    /// per part of the reference), in the Bible it names or the default
     pub fn definition(&self, params: GotoDefinitionParams) -> Option<GotoDefinitionResponse> {
         let position = params.text_document_position_params;
-        let (found, _) = self.reference_at(&position.text_document.uri, position.position)?;
-        let bible = self.bible.as_ref()?;
+        let (
+            TranslatedMatch {
+                reference: found,
+                translation,
+            },
+            _,
+        ) = self.reference_at(&position.text_document.uri, position.position)?;
+        let bible = self.bibles.named(translation.as_ref())?;
         let rendered = bible.render(found.psg.book)?;
         let uri = Uri::from_str(&bible.uri(found.psg.book)?).ok()?;
         let index = LineIndex::new(&rendered.text);
@@ -961,13 +1063,13 @@ impl Server {
 
     /// [`BOOK_REQUEST`]: a whole book's text
     pub fn book(&self, params: BookParams) -> Result<BookText, String> {
-        let bible = self
-            .bible
-            .as_ref()
-            .ok_or("no Bible is set (the `bible` setting)")?;
-        let book = bible
-            .book_of(&params.uri)
-            .ok_or_else(|| format!("{} is not a book of {}", params.uri, bible.name))?;
+        if self.bibles.is_empty() {
+            return Err("no Bible is set (the `bible` or `bibles` setting)".into());
+        }
+        let (bible, book) = self.bibles.book_of(&params.uri).ok_or_else(|| {
+            let names: Vec<&str> = self.bibles.iter().map(|b| b.name.as_str()).collect();
+            format!("{} is not a book of {}", params.uri, names.join(", "))
+        })?;
         let rendered = bible
             .render(book)
             .ok_or_else(|| format!("{} can't be read", params.uri))?;
@@ -975,6 +1077,20 @@ impl Server {
             title: bible.book_name(book).unwrap_or_default().to_string(),
             text: rendered.text.clone(),
         })
+    }
+
+    /// [`BIBLES_REQUEST`]: the Bibles, the default first
+    pub fn bibles(&self) -> BiblesList {
+        let bibles = self
+            .bibles
+            .iter()
+            .map(|bible| BibleInfo {
+                name: bible.name.clone(),
+                aliases: bible.aliases.clone(),
+                books: bible.book_codes(),
+            })
+            .collect();
+        BiblesList { bibles }
     }
 
     /// Whole books' verse numbers, chapter labels, words of Jesus, headings, and notes (split at
@@ -1062,7 +1178,7 @@ impl Server {
             &self.extensions,
             &self.matcher,
             &self.cache,
-            self.bible.as_ref().map(|b| b.folder.as_path()),
+            &self.bibles.folders(),
             deadline,
         );
         files.sort_by(|a, b| a.0.as_str().cmp(b.0.as_str()));
@@ -2097,6 +2213,154 @@ to condemn.</char> <verse eid="JHN 3:17"/></para>
             panic!("no definition");
         };
         assert_eq!(location.range.start, Position::new(3, 0));
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    /// A Bible's `JHN.usx` with only John 3:16, worded like the KJV
+    const KJV_JHN: &str = r#"<usx version="3.0"><book code="JHN" style="id">John</book>
+<chapter number="3" style="c" sid="JHN 3"/>
+<para style="p"><verse number="16" style="v" sid="JHN 3:16"/>For God so loved the world, that he gave his only begotten Son.<verse eid="JHN 3:16"/></para>
+<chapter eid="JHN 3"/></usx>"#;
+
+    /// Several Bibles: a reference followed by one's name or alias uses it, others the default
+    #[test]
+    fn several_bibles() {
+        let open = "See John 3:16 KJV and John 3:16.\nJohn 3:17 AV\nJohn 3:16 K";
+        let (mut server, uri, dir) = with_bible(open, json!({}), "several");
+        let kjv = dir.join("Bibles/KJV");
+        std::fs::create_dir_all(&kjv).unwrap();
+        std::fs::write(kjv.join("JHN.usx"), KJV_JHN).unwrap();
+        let mut settings = server.editor.clone();
+        settings.insert(
+            "bibles".into(),
+            json!({ "KJV": { "path": kjv.to_str().unwrap(), "aliases": ["AV"] } }),
+        );
+        let plain = json!({ "verse_numbers": { "show": false }, "headings": { "show": false } });
+        settings.insert(
+            "insertions".into(),
+            json!([{ "name": "Plain", "markup": plain }]),
+        );
+        server.configure(Value::Object(settings.clone())).unwrap();
+
+        let hover = |server: &Server, line, character| {
+            let hover = server.hover(HoverParams {
+                text_document_position_params: at(&uri, line, character),
+                work_done_progress_params: WorkDoneProgressParams::default(),
+            });
+            match hover.map(|h| h.contents) {
+                Some(HoverContents::Markup(markup)) => markup.value,
+                _ => panic!("no hover"),
+            }
+        };
+        // The Bible a reference names, labeled, else the default (the `bible` setting's)
+        let named = hover(&server, 0, 6);
+        assert!(
+            named.starts_with("**John 3:16** (KJV)\n\n*KJV*\n```topos-bible"),
+            "{named}"
+        );
+        assert!(
+            named.contains("that he gave") && !named.contains("*BSB*"),
+            "{named}"
+        );
+        // On the translation's name too
+        assert_eq!(hover(&server, 0, 15), named);
+        let default = hover(&server, 0, 24);
+        assert!(default.starts_with("**John 3:16**\n\n*BSB*\n"), "{default}");
+        assert!(!default.contains("that he gave"), "{default}");
+
+        // The KJV's own verse counts (only 3:16 here), with its name in the message
+        let messages: Vec<String> = server
+            .diagnostics(&uri)
+            .diagnostics
+            .into_iter()
+            .filter(|d| d.severity == Some(DiagnosticSeverity::WARNING))
+            .map(|d| d.message)
+            .collect();
+        assert_eq!(messages, ["John 3:17 does not exist in the KJV"]);
+
+        // Go to definition opens the named Bible's book
+        let Some(GotoDefinitionResponse::Scalar(location)) =
+            server.definition(GotoDefinitionParams {
+                text_document_position_params: at(&uri, 0, 6),
+                work_done_progress_params: WorkDoneProgressParams::default(),
+                partial_result_params: PartialResultParams::default(),
+            })
+        else {
+            panic!("no definition");
+        };
+        assert_eq!(location.uri.as_str(), "topos-bible://KJV/JHN");
+        let book = server
+            .book(BookParams {
+                uri: "topos-bible://KJV/JHN".into(),
+            })
+            .unwrap();
+        assert!(book.text.contains("that he gave"), "{}", book.text);
+
+        // Completing a translation, whose documentation is that Bible's text
+        let Some(CompletionResponse::List(list)) = server.completion(CompletionParams {
+            text_document_position: at(&uri, 2, 11),
+            work_done_progress_params: WorkDoneProgressParams::default(),
+            partial_result_params: PartialResultParams::default(),
+            context: None,
+        }) else {
+            panic!("no completions");
+        };
+        let item = list.items.into_iter().next().unwrap();
+        assert_eq!(item.label, "KJV");
+        let resolved = server.resolve_completion(item);
+        let Some(lsp_types::Documentation::MarkupContent(doc)) = resolved.documentation else {
+            panic!("no documentation");
+        };
+        assert!(doc.value.contains("that he gave"), "{}", doc.value);
+
+        // The Bibles, the default first
+        let bibles = server.bibles().bibles;
+        let names: Vec<(&str, &[String])> = bibles
+            .iter()
+            .map(|b| (b.name.as_str(), b.aliases.as_slice()))
+            .collect();
+        assert_eq!(names, [("BSB", &[][..]), ("KJV", &["AV".to_string()][..])]);
+        assert_eq!(bibles[1].books, ["JHN"]);
+
+        // Insertions: from the named Bible, else one per Bible
+        let inserts = |server: &Server, character| -> Vec<String> {
+            server
+                .code_actions(CodeActionParams {
+                    text_document: TextDocumentIdentifier::new(uri.clone()),
+                    range: Range::new(Position::new(0, character), Position::new(0, character)),
+                    context: lsp_types::CodeActionContext::default(),
+                    work_done_progress_params: WorkDoneProgressParams::default(),
+                    partial_result_params: PartialResultParams::default(),
+                })
+                .unwrap()
+                .into_iter()
+                .filter_map(|a| match a {
+                    CodeActionOrCommand::CodeAction(a) if a.title.starts_with("Insert") => {
+                        Some(a.title)
+                    }
+                    _ => None,
+                })
+                .collect()
+        };
+        assert_eq!(inserts(&server, 6), ["Insert Plain (KJV)"]);
+        assert_eq!(
+            inserts(&server, 24),
+            ["Insert Plain (BSB)", "Insert Plain (KJV)"]
+        );
+
+        // `hover-bibles` adds Bibles after the named one; `default-bible` changes the default
+        settings.insert("hover-bibles".into(), json!(["kjv"]));
+        settings.insert("default-bible".into(), json!("AV"));
+        server.configure(Value::Object(settings.clone())).unwrap();
+        let both = hover(&server, 0, 24);
+        assert!(both.starts_with("**John 3:16**\n\n*KJV*\n"), "{both}");
+        settings.insert("hover-bibles".into(), json!(["BSB"]));
+        server.configure(Value::Object(settings.clone())).unwrap();
+        let both = hover(&server, 0, 24);
+        let (kjv, bsb) = (both.find("*KJV*").unwrap(), both.find("*BSB*").unwrap());
+        assert!(kjv < bsb, "{both}");
+        settings.insert("hover-bibles".into(), json!(["NIV"]));
+        assert!(server.configure(Value::Object(settings)).is_err());
         let _ = std::fs::remove_dir_all(&dir);
     }
 }

@@ -53,12 +53,15 @@ so one file configures both. It uses these keys and ignores the others:
 | `inlay-hints` | `"changed"` (default), `"always"`, `"osis"`, or `"never"` |
 | `reference-diagnostics` | The diagnostic on each reference: `"info"` (default), `"hint"`, or `"never"` |
 | `hover` | What a hover shows below the reference, in order (a list or `"osis,book"`; `[]` for none): `text` (the passage, from `bible`), `written`, `name`, `abbreviation`, `osis`, `book`, `testament`, `genres`, `verses`, `bcv`, `location`. The default is every one but `written` and `bcv`. `name` and `abbreviation` are left out when the reference is already written that way |
-| `bible` | A folder of USX files, one book each (`JHN.usx`, `44JHNBSB.usx`, or any name with a `<book code>` inside), as Paratext, the Digital Bible Library, and eBible.org publish them. Its USX files are left out of workspace searches |
+| `bible` | A folder of USX files, one book each (`JHN.usx`, `44JHNBSB.usx`, or any name with a `<book code>` inside), as Paratext, the Digital Bible Library, and eBible.org publish them, named after the folder. Its USX files are left out of workspace searches |
+| `bibles` | More Bibles by name: `{ KJV = "~/Bibles/KJV" }` or `{ KJV = { path = "~/Bibles/KJV", aliases = ["AV"] } }` (see [Translations](#translations)) |
+| `default-bible` | The Bible for references that name none (a name or alias): `bible`'s by default, else the first of `bibles` by name |
+| `hover-bibles` | Bibles whose text hover also shows, after the one the reference names (`["BSB", "KJV"]`) |
 | `markup` | How Bible text is written (see below) |
 | `insertions` | Code actions that insert a passage's text (see below) |
 
-The CLI skips `inlay-hints`, `reference-diagnostics`, `hover`, `bible`, `markup`, and
-`insertions`, so they can go in the shared `config.toml`.
+The CLI skips `inlay-hints`, `reference-diagnostics`, `hover`, `bible`, `bibles`, `default-bible`,
+`hover-bibles`, `markup`, and `insertions`, so they can go in the shared `config.toml`.
 
 `markup` has a table for each kind of element, with `show` and `display` (the defaults are
 shown; other keys, like an editor's `color`, are ignored):
@@ -82,8 +85,9 @@ is a template with `{text}` (and `{name}`), like `## {text}` or `“{text}”`, 
 words. Headings and notes that aren't shown are left out; other elements that aren't shown are
 plain text, without their template or color.
 
-Each insertion has a `name` (the action is `Insert {name}`), a `display` (default `{text}`; also
-`{reference}` as formatted and `{osis}`), a `line_prefix` written before each line of `{text}`,
+Each insertion has a `name` (the action is `Insert {name}`, or `Insert {name} (KJV)` with several
+Bibles), a `display` (default `{text}`; also `{reference}` as formatted, `{osis}`, and `{bible}`,
+the Bible's name), a `line_prefix` written before each line of `{text}`,
 its own `markup` over the one above, and `replace`: `"line"` (the reference's whole line),
 `"inline"` (just the reference, keeping the rest of its line), or nothing (the lines below):
 
@@ -101,10 +105,29 @@ while the server runs, without a restart). They take the same keys, at the top l
 can also be a whole object, like `psg-fmt`. Settings that can't be used are reported as a
 warning, and the previous ones stay.
 
+## Translations
+
+Each Bible (`bible`, and each of `bibles`) is a translation: its name, or an alias, right after a
+reference (`John 3:16 KJV`, `John 3:16, KJV`, `John 3:16 (AV)`) picks it, ignoring case, and
+other references use `default-bible`. Then:
+
+- Hover (on the reference or the name) shows that Bible's text, and the `hover-bibles` after it;
+  with several Bibles, each text is labeled with its name
+- Go to definition opens its book (`topos-bible://KJV/JHN`)
+- Completion offers the names after a reference (`John 3:16 K` → `KJV`), whose documentation is
+  that Bible's text
+- The reference is checked against that Bible's own verse counts, read from its USX markers when
+  it loads (`3 John 1:15 BSB` exists, while the default counts, the KJV's, end at verse 14), and
+  diagnostics name it: `3 John 1:16 does not exist in the BSB`
+- Insertions use it; a reference without one offers an insertion per Bible
+
+The `topos/bibles` request (no parameters) lists them, the default first: `{ "bibles": [{ "name":
+"BSB", "aliases": [], "books": ["GEN", ...] }] }`.
+
 ## Whole books
 
 With a `bible`, go to definition returns a document named like `topos-bible://BSB/JHN` (the
-folder's name, then the book's USX code), which no file backs. The editor asks for its text with
+Bible's name, then the book's USX code), which no file backs. The editor asks for its text with
 the `topos/book` request (`{ "uri": "topos-bible://BSB/JHN" }` gives `{ "title": "John", "text":
 "..." }`), shows it read-only, and opens it with the server like any document. The server then
 provides:

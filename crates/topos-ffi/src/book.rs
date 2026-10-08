@@ -6,7 +6,7 @@ use boltffi::*;
 use topos_bible_markup::{
     Filter, HtmlOptions, HtmlRenderer, Kind, Markup, Node, TextOptions, find_all, parse,
     plain_text,
-    verses::{VerseSpan, chapter_verses, passage_ranges, slice, verses},
+    verses::{VerseSpan, chapter_verses, passage_ranges, slice, usx_chapter_verses, verses},
 };
 use topos_lib::segments::Passage as CorePassage;
 
@@ -113,6 +113,12 @@ impl ToposBook {
             spans,
             book_id,
         })
+    }
+
+    /// A USX book's verse counts per chapter (like `chapterVerses`), from its chapter and verse
+    /// markers alone: fast enough to count a whole Bible without parsing it
+    pub fn usx_chapter_verses(usx: String) -> Vec<u8> {
+        usx_chapter_verses(&usx)
     }
 
     /// The book (1 for Genesis through 66 for Revelation with the default data), if the markup
@@ -224,6 +230,7 @@ mod tests {
         assert_eq!(book.book_id(), Some(43));
         assert_eq!(book.chapters(), [3, 4]);
         assert_eq!(book.chapter_verses(), [0, 0, 17, 1]);
+        assert_eq!(ToposBook::usx_chapter_verses(USX.into()), [0, 0, 17, 1]);
         assert_eq!(book.verses().len(), 3);
         let parse = |r: &str| topos.parse(r.into(), BookStyle::Name).unwrap();
 

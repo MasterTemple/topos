@@ -3,6 +3,10 @@ A Bible's text: a folder of USX files (one book each, like `JHN.usx`), the same 
 plugin reads. Passages render as plain text for hover, and whole books as read-only documents
 (`topos-bible://BSB/JHN`) that go-to-definition opens.
 
+Several Bibles ([`Bibles`], from the `bible` and `bibles` settings) are translations: a reference
+followed by one's name or alias (`John 3:16 KJV`) shows that Bible's text, and is checked against
+its own verse counts (read from its USX markers when it loads).
+
 A rendered book knows which verse each part of its text is, so references from it can find
 every reference to that verse, and where its verse numbers, chapter labels, words of Jesus, and
 so on are, so the editor can color them (semantic tokens, and in hover the code block's info
@@ -17,14 +21,19 @@ use std::{
 };
 
 use topos_bible::{
-    data::{bible_data::BibleData, books::BookId},
+    data::{
+        bible_data::BibleData,
+        books::BookId,
+        chapter_verses::ChapterVerses,
+        translations::{Translation, Translations},
+    },
     segments::Passage,
 };
 use topos_bible_markup::{
     Filter, Flat, Flattener, Kind, Markup, Node, NodePath, TextOptions,
     flatten::flatten,
     parse,
-    verses::{VerseSpan, passage_ranges, slice, verses},
+    verses::{VerseSpan, passage_ranges, slice, usx_chapter_verses, verses},
 };
 
 use crate::settings::{MarkupElement, MarkupSettings};
@@ -256,8 +265,11 @@ struct Book {
 
 /// A folder of USX files, read as needed
 pub struct Bible {
-    /// The folder's name, which names it in URIs: `BSB`
+    /// Its name in URIs and after references: the `bibles` setting's key, or the folder's name
+    /// (`BSB`)
     pub name: String,
+    /// Other ways to write its name after a reference (`AV` for `KJV`)
+    pub aliases: Vec<String>,
     /// The folder (canonical), whose USX files workspace searches leave out
     pub folder: PathBuf,
     /// Each book's file
@@ -298,8 +310,13 @@ fn code_from_usx(path: &Path, data: &BibleData) -> Option<BookId> {
 }
 
 impl Bible {
-    /// The USX files in a folder (not its subfolders)
-    pub fn load(folder: &Path, data: BibleData, markup: MarkupSettings) -> Result<Bible, String> {
+    /// The USX files in a folder (not its subfolders), named `name` (else after the folder)
+    pub fn load(
+        folder: &Path,
+        name: Option<&str>,
+        data: BibleData,
+        markup: MarkupSettings,
+    ) -> Result<Bible, String> {
         let entries =
             std::fs::read_dir(folder).map_err(|e| format!("bible: {}: {e}", folder.display()))?;
         let mut files = HashMap::new();
@@ -322,13 +339,13 @@ impl Bible {
         if files.is_empty() {
             return Err(format!("bible: no USX books in {}", folder.display()));
         }
-        let name = folder
-            .file_name()
-            .and_then(|n| n.to_str())
+        let name = name
+            .or_else(|| folder.file_name().and_then(|n| n.to_str()))
             .unwrap_or("Bible")
             .to_string();
         Ok(Bible {
             name,
+            aliases: vec![],
             folder: folder
                 .canonicalize()
                 .unwrap_or_else(|_| folder.to_path_buf()),
@@ -338,6 +355,29 @@ impl Bible {
             books: Mutex::default(),
             rendered: Mutex::default(),
         })
+    }
+
+    /// Each book's verse counts, from its USX markers (only the markers are read, so a whole
+    /// Bible takes milliseconds)
+    fn chapter_verses(&self) -> Vec<(BookId, ChapterVerses)> {
+        self.files
+            .iter()
+            .filter_map(|(&id, path)| {
+                let text = std::fs::read_to_string(path).ok()?;
+                let counts = usx_chapter_verses(&text);
+                (!counts.is_empty()).then(|| (id, ChapterVerses::new(counts)))
+            })
+            .collect()
+    }
+
+    /// The books it has, in order, as USFM codes (`JHN`)
+    pub fn book_codes(&self) -> Vec<String> {
+        let books = self.data.books();
+        let mut ids: Vec<BookId> = self.files.keys().copied().collect();
+        ids.sort();
+        ids.into_iter()
+            .filter_map(|id| books.get_usfm(id).cloned())
+            .collect()
     }
 
     fn book(&self, id: BookId) -> Option<Arc<Book>> {
@@ -538,6 +578,75 @@ impl Bible {
     /// A book's name: `John`
     pub fn book_name(&self, book: BookId) -> Option<&str> {
         self.data.books().get_name(book).map(String::as_str)
+    }
+}
+
+/**
+The Bibles from the `bible` and `bibles` settings, the default first, and the translations their
+names and aliases make (with each one's verse counts)
+*/
+#[derive(Default)]
+pub struct Bibles {
+    list: Vec<Bible>,
+    pub translations: Translations,
+}
+
+impl Bibles {
+    /// `list` with its default first
+    pub fn new(list: Vec<Bible>) -> Bibles {
+        let mut translations = Translations::default();
+        for bible in &list {
+            translations = translations.alias(bible.name.clone(), bible.name.clone());
+            for alias in &bible.aliases {
+                translations = translations.alias(alias.clone(), bible.name.clone());
+            }
+            for (book, counts) in bible.chapter_verses() {
+                translations.set_chapter_verses(&bible.name, book, counts);
+            }
+        }
+        Bibles { list, translations }
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.list.is_empty()
+    }
+
+    pub fn len(&self) -> usize {
+        self.list.len()
+    }
+
+    pub fn iter(&self) -> impl Iterator<Item = &Bible> {
+        self.list.iter()
+    }
+
+    /// The Bible references open in when they name none
+    pub fn default_bible(&self) -> Option<&Bible> {
+        self.list.first()
+    }
+
+    /// A Bible by its name or an alias, ignoring case
+    pub fn get(&self, name: &str) -> Option<&Bible> {
+        let name = self.translations.get(name)?;
+        self.list.iter().find(|bible| bible.name == name)
+    }
+
+    /// The Bible a reference names (`John 3:16 KJV`), else the default
+    pub fn named(&self, translation: Option<&Translation>) -> Option<&Bible> {
+        translation
+            .and_then(|t| self.get(&t.name))
+            .or_else(|| self.default_bible())
+    }
+
+    /// The Bible and book of a whole-book document (`topos-bible://KJV/JHN`)
+    pub fn book_of(&self, uri: &str) -> Option<(&Bible, BookId)> {
+        self.list
+            .iter()
+            .find_map(|bible| Some((bible, bible.book_of(uri)?)))
+    }
+
+    /// The Bibles' folders, which workspace searches leave out
+    pub fn folders(&self) -> Vec<&Path> {
+        self.list.iter().map(|b| b.folder.as_path()).collect()
     }
 }
 

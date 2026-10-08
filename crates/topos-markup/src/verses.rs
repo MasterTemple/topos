@@ -292,3 +292,61 @@ pub fn chapter_verses(spans: &[VerseSpan]) -> Vec<u8> {
     }
     counts
 }
+
+/**
+A USX book's verse counts, like [`chapter_verses`], from its `<chapter number>` and
+`<verse number>` markers alone, without parsing the rest (fast enough to count a whole Bible)
+*/
+pub fn usx_chapter_verses(usx: &str) -> Vec<u8> {
+    let mut counts: Vec<u8> = vec![];
+    let mut chapter = 0;
+    for tag in usx.split('<').skip(1) {
+        let tag = tag.split('>').next().unwrap_or_default();
+        let name_end = tag
+            .find(|c: char| c.is_whitespace() || c == '/')
+            .unwrap_or(tag.len());
+        let name = &tag[..name_end];
+        if name != "chapter" && name != "verse" {
+            continue;
+        }
+        let Some(number) = attribute(tag, "number") else {
+            continue;
+        };
+        // `4-5` counts to 5, and `4a` is verse 4
+        let last = number.rsplit(['-', '\u{2013}']).next().unwrap_or_default();
+        let digits = last.trim().split(|c: char| !c.is_ascii_digit()).next();
+        let Some(n) = digits.and_then(|d| d.parse::<u32>().ok()) else {
+            continue;
+        };
+        let n = n.min(u8::MAX as u32) as u8;
+        if name == "chapter" {
+            chapter = n as usize;
+        } else if chapter > 0 {
+            if counts.len() < chapter {
+                counts.resize(chapter, 0);
+            }
+            counts[chapter - 1] = counts[chapter - 1].max(n);
+        }
+    }
+    counts
+}
+
+/// An attribute's value in a tag's text (`number="16"`)
+fn attribute<'a>(tag: &'a str, name: &str) -> Option<&'a str> {
+    let mut rest = tag;
+    while let Some(at) = rest.find(name) {
+        let before = rest[..at].chars().next_back();
+        let after = rest[at + name.len()..].trim_start();
+        rest = &rest[at + name.len()..];
+        if !before.is_some_and(char::is_whitespace) {
+            continue;
+        }
+        let Some(value) = after.strip_prefix('=') else {
+            continue;
+        };
+        let value = value.trim_start();
+        let quote = value.chars().next().filter(|c| *c == '"' || *c == '\'')?;
+        return value[1..].split(quote).next();
+    }
+    None
+}

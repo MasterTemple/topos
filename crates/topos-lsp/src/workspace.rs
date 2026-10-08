@@ -187,7 +187,7 @@ pub fn references(
     extensions: &[String],
     matcher: &BibleMatcher,
     cache: &Cache,
-    bible: Option<&Path>,
+    bibles: &[&Path],
     deadline: Option<Instant>,
 ) -> (Vec<FileReferences>, bool) {
     // Open documents by path: editors may percent-encode their URIs differently
@@ -222,7 +222,7 @@ pub fn references(
             let path = entry.path();
             let wanted = entry.file_type().is_some_and(|t| t.is_file())
                 && !open.contains(path)
-                && bible.is_none_or(|folder| !in_bible(path, folder))
+                && !bibles.iter().any(|folder| in_bible(path, folder))
                 && (extensions.is_empty()
                     || path
                         .extension()

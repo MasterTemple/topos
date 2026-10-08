@@ -169,7 +169,8 @@ a book you bring, through [`topos-bible-markup`](../topos-markup): `ToposBook.pa
 text)` parses a whole book (USX, or OSIS with verse milestones; `null` in JavaScript for an unknown
 markup), `bookId()` says which (from USX's `<book code>` or OSIS's book `div`), and `verses()` and
 `chapters()` list what it has, and `chapterVerses()` its verse counts per chapter (for
-`ToposTranslations.chapterVerses`). `html(passage, options)` and `text(passage, options)` give each part
+`ToposTranslations.chapterVerses`; `ToposBook.usxChapterVerses(text)` counts a USX book's markers
+without parsing it, fast enough for a whole Bible). `html(passage, options)` and `text(passage, options)` give each part
 of a passage (`John 3:16; 4` has two), and `chapterHtml(chapter, options)` a whole chapter;
 `BookTextOptions { notes, headings, classPrefix }` keeps or drops footnotes and headings. A verse
 runs from the end of the one before it, so a heading goes with the verse after it, and paragraphs
