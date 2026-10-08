@@ -19,6 +19,7 @@ use topos_bible::{
     segments::{
         Passage,
         autocomplete::{CompleteOptions, CompletionKind},
+        coverage::VerseRange,
         formatter::{BookStyle, FormatOptions},
     },
 };
@@ -432,7 +433,7 @@ impl Server {
                         let (start, end) = (range.start, range.end);
                         let cv = &self.format.chapter_verse;
                         let to = &self.format.range;
-                        if end.verse == 0 {
+                        if end.verse == VerseRange::END_OF_CHAPTER {
                             start.chapter.to_string()
                         } else if start == end {
                             format!("{}{cv}{}", start.chapter, start.verse)

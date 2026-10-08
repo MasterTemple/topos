@@ -105,8 +105,8 @@ format, limit)` and `formatPassage(passage, format)` take a format directly.
   with `ChapterVerse { chapter, verse }` ends, or `Chapters { start, end }` with chapter numbers.
   `end` is empty for a single verse or chapter, so `John 3:16-18; 5` is verses 3:16 to 3:18
   and chapter 5. Use `verse_ranges` or `verses` for explicit verse numbers
-- `VerseRange { start, end }` always has both ends; `end.verse` is `0` only when a custom config
-  has no verse counts for the book
+- `VerseRange { start, end }` always has both ends; `end.verse` is `255` only when a custom config
+  has no verse counts for the book (verse `0` is a chapter's introduction)
 - `Match { passage, start, end, line, column }`
 - `Completion { label, kind, start, end, text }`: accept it by replacing `start..end` with `text`
 

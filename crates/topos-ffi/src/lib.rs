@@ -100,8 +100,8 @@ pub enum PassageSegment {
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct VerseRange {
     pub start: ChapterVerse,
-    /// A whole chapter ends at its last verse; verse `0` only when a custom config has no verse
-    /// counts for the book
+    /// A whole chapter ends at its last verse; verse `255` only when a custom config has no verse
+    /// counts for the book (verse `0` is a chapter's introduction)
     pub end: ChapterVerse,
 }
 

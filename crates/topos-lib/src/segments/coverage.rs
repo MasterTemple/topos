@@ -14,15 +14,27 @@ const UNKNOWN_CHAPTER_LENGTH: u32 = 999;
 #[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct VerseRange {
     pub start: ChapterVerse,
-    /// A whole chapter ends at its last verse, or verse `0` when its length is unknown
+    /// A whole chapter ends at its last verse, or [`VerseRange::END_OF_CHAPTER`] when its length
+    /// is unknown
     pub end: ChapterVerse,
+}
+
+impl VerseRange {
+    /**
+    The end verse of a whole chapter whose length is unknown (no versification)
+    - Not `0`, which is a real position: SWORD keeps a chapter's introduction at verse 0 and a
+      book's at chapter 0, verse 0
+    - Larger than any real verse (the longest chapter, Psalm 119, has 176), so comparisons still
+      treat it as the end of the chapter
+    */
+    pub const END_OF_CHAPTER: u8 = u8::MAX;
 }
 
 impl Passage {
     /**
     Each segment as an explicit verse range
     - Whole chapters use the versification for their last verse, so `John 3` is 3:1-3:36
-    - Without versification, a whole chapter ends at verse `0`
+    - Without versification, a whole chapter ends at [`VerseRange::END_OF_CHAPTER`]
     */
     pub fn ranges(&self, versification: Option<&ChapterVerses>) -> Vec<VerseRange> {
         self.segments
@@ -32,7 +44,7 @@ impl Passage {
                 let end_verse = seg.ending_verse().unwrap_or_else(|| {
                     versification
                         .and_then(|v| v.get_last_verse(end_chapter))
-                        .unwrap_or(0)
+                        .unwrap_or(VerseRange::END_OF_CHAPTER)
                 });
                 VerseRange {
                     start: ChapterVerse::new(seg.starting_chapter(), seg.starting_verse()),
@@ -46,6 +58,8 @@ impl Passage {
     Every verse in the passage, in order (`John 3:16-18` is 3:16, 3:17, and 3:18)
     - Segments are listed as written, so overlapping segments repeat verses
     - Chapters whose length is unknown (no versification) are left out
+    - Verse 0 and chapter 0 (introductions) are only included when named: `John 3:0` is just 3:0,
+      `John 3` starts at 3:1, and chapter 0 has only verse 0
     */
     pub fn verses(&self, versification: Option<&ChapterVerses>) -> Vec<ChapterVerse> {
         let mut verses = vec![];
@@ -56,8 +70,13 @@ impl Passage {
                 } else {
                     1
                 };
-                let last = if chapter == range.end.chapter && range.end.verse > 0 {
+                let last = if chapter == range.end.chapter
+                    && range.end.verse != VerseRange::END_OF_CHAPTER
+                {
                     range.end.verse
+                } else if chapter == 0 {
+                    // A book's introduction
+                    0
                 } else {
                     match versification.and_then(|v| v.get_last_verse(chapter)) {
                         Some(last) => last,
@@ -189,7 +208,7 @@ mod tests {
         );
         assert_eq!(ranges("John 3-4", versification), [(3, 1, 4, 54)]);
         // Without versification, a whole chapter's end is unknown
-        assert_eq!(ranges("John 3", None), [(3, 1, 3, 0)]);
+        assert_eq!(ranges("John 3", None), [(3, 1, 3, 255)]);
 
         let verses = |reference: &str, versification| {
             passage(reference)
@@ -210,6 +229,53 @@ mod tests {
         // Chapter 3 has an unknown length here, so it is left out
         assert_eq!(verses("John 3:36-4:1", None), [(4, 1)]);
         assert!(verses("John 3", None).is_empty());
+    }
+
+    #[test]
+    fn introductions_at_verse_zero() {
+        use crate::segments::{passage::Segments, segment::Segment};
+        let data = BibleData::default();
+        let versification = data.chapter_verses().get_chapter_verses(&BookId(43));
+        let john = |segments: Vec<Segment>| Segments(segments.into()).with_book(BookId(43));
+        let verses = |passage: &crate::segments::Passage, versification| {
+            passage
+                .verses(versification)
+                .iter()
+                .map(|cv| (cv.chapter, cv.verse))
+                .collect::<Vec<_>>()
+        };
+        // A chapter's introduction is one position, not the whole chapter
+        let intro = john(vec![Segment::chapter_verse(3, 0)]);
+        assert_eq!(verses(&intro, versification), [(3, 0)]);
+        assert_eq!(verses(&intro, None), [(3, 0)]);
+        assert_eq!(
+            verses(
+                &john(vec![Segment::chapter_verse_range(3, 0, 2)]),
+                versification
+            ),
+            [(3, 0), (3, 1), (3, 2)]
+        );
+        // A book's introduction, and a range from it
+        assert_eq!(
+            verses(&john(vec![Segment::chapter_verse(0, 0)]), versification),
+            [(0, 0)]
+        );
+        assert_eq!(
+            verses(
+                &john(vec![Segment::chapter_range(0, 0, 1, 2)]),
+                versification
+            ),
+            [(0, 0), (1, 1), (1, 2)]
+        );
+        // A whole chapter doesn't include its introduction
+        assert_eq!(
+            verses(&john(vec![Segment::full_chapter(3)]), versification)[0],
+            (3, 1)
+        );
+        // An introduction doesn't overlap the chapter's first verse
+        let first = john(vec![Segment::chapter_verse(3, 1)]);
+        assert!(!intro.overlaps_passage(&first, versification));
+        assert!(!john(vec![Segment::full_chapter(3)]).contains_passage(&intro, versification));
     }
 
     #[test]
