@@ -27,8 +27,8 @@ fn test1() {
         },
         // Where the text is in the HTML (resolving the fragment must give it back)
         bytes: ByteIndex {
-            start: 682253,
-            end: 682272,
+            start: 909177,
+            end: 909196,
         },
     };
 
@@ -70,8 +70,8 @@ fn test2() {
         },
         // Where the text is in the HTML (resolving the fragment must give it back)
         bytes: ByteIndex {
-            start: 683330,
-            end: 683593,
+            start: 910555,
+            end: 910818,
         },
     };
     let tf = doc.generate(range, None).unwrap();
@@ -150,8 +150,8 @@ fn test3() {
         },
         // Where the text is in the HTML (resolving the fragment must give it back)
         bytes: ByteIndex {
-            start: 682775,
-            end: 686175,
+            start: 909799,
+            end: 913946,
         },
     };
     let tf = doc.generate(range, None).unwrap();

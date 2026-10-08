@@ -196,37 +196,105 @@ impl<'a> Document<'a> {
         }
     }
 
+    /**
+    The text a browser shows, with maps from source bytes to text bytes and back
+    - Tags are left out, and so is the content of `<script>` and `<style>`
+    - Character references (`&amp;`, `&#8212;`, `&#x2014;`, `&nbsp;`, ...) are decoded
+    - Block elements (`<p>`, `<div>`, `<br>`, `<li>`, headings, ...) start a new line, so words
+      on either side don't run together
+    */
     fn strip_html_and_map(html: &str) -> (String, Vec<usize>, Vec<usize>) {
-        let mut in_tag = false;
         let mut plain_text = String::with_capacity(html.len());
         let mut source_to_plain_map = vec![0; html.len() + 1];
         let mut plain_to_source_map = Vec::with_capacity(html.len());
-
-        for (i, c) in html.char_indices() {
-            if c == '<' {
-                in_tag = true;
+        // The end tag that ends `<script>` or `<style>` content
+        let mut skip_until: Option<&str> = None;
+        let mut i = 0;
+        while i < html.len() {
+            let rest = &html[i..];
+            if let Some(close) = skip_until {
+                let bytes = rest.as_bytes();
+                if bytes.len() >= close.len()
+                    && bytes[..close.len()].eq_ignore_ascii_case(close.as_bytes())
+                {
+                    skip_until = None;
+                } else {
+                    let len = rest.chars().next().map_or(1, char::len_utf8);
+                    source_to_plain_map[i..i + len].fill(plain_text.len());
+                    i += len;
+                    continue;
+                }
             }
-
+            if rest.starts_with('<') {
+                let len = rest.find('>').map_or(rest.len(), |end| end + 1);
+                let tag = &rest[..len];
+                source_to_plain_map[i..i + len].fill(plain_text.len());
+                let name = tag_name(tag);
+                if !tag.starts_with("</") && !tag.ends_with("/>") {
+                    skip_until = match name.as_str() {
+                        "script" => Some("</script"),
+                        "style" => Some("</style"),
+                        _ => None,
+                    };
+                }
+                if BLOCK_TAGS.contains(&name.as_str())
+                    && !plain_text.is_empty()
+                    && !plain_text.ends_with(char::is_whitespace)
+                {
+                    plain_to_source_map.push(i);
+                    plain_text.push('\n');
+                }
+                i += len;
+                continue;
+            }
+            let (c, len) = match character_reference(rest) {
+                Some(decoded) => decoded,
+                None => match rest.chars().next() {
+                    Some(c) => (c, c.len_utf8()),
+                    None => break,
+                },
+            };
+            source_to_plain_map[i..i + len].fill(plain_text.len());
             for byte_offset in 0..c.len_utf8() {
-                if i + byte_offset < source_to_plain_map.len() {
-                    source_to_plain_map[i + byte_offset] = plain_text.len();
-                }
+                // A decoded reference maps every byte to its `&`
+                plain_to_source_map.push(if len == c.len_utf8() {
+                    i + byte_offset
+                } else {
+                    i
+                });
             }
-
-            if !in_tag {
-                for byte_offset in 0..c.len_utf8() {
-                    plain_to_source_map.push(i + byte_offset);
-                }
-                plain_text.push(c);
-            }
-
-            if c == '>' {
-                in_tag = false;
-            }
+            plain_text.push(c);
+            i += len;
         }
 
         source_to_plain_map[html.len()] = plain_text.len();
         (plain_text, source_to_plain_map, plain_to_source_map)
+    }
+
+    /// The source byte where a plain-text byte comes from
+    pub fn source_byte(&self, plain_text_byte: usize) -> Option<usize> {
+        match &self.plain_to_source_map {
+            Some(map) => map.get(plain_text_byte).copied(),
+            None => (plain_text_byte <= self.source.len()).then_some(plain_text_byte),
+        }
+    }
+
+    /**
+    The source byte just after the plain text that ends at `plain_text_end_byte`, before any
+    tags that follow it
+    */
+    pub fn source_end_byte(&self, plain_text_end_byte: usize) -> Option<usize> {
+        if plain_text_end_byte == 0 {
+            return Some(0);
+        }
+        let last_char = self.plain_text.get(..plain_text_end_byte)?.chars().last()?;
+        let start = self.source_byte(plain_text_end_byte - last_char.len_utf8())?;
+        // A decoded character reference (`&amp;`) ends at its `;`
+        let len = match self.source.get(start..).and_then(character_reference) {
+            Some((_, len)) => len,
+            None => last_char.len_utf8(),
+        };
+        Some(start + len)
     }
 
     pub fn resolve_to_plain_text_offset(&self, pos: &Position) -> Option<usize> {
@@ -259,41 +327,86 @@ impl<'a> Document<'a> {
 
     /// Converts a plain text start byte offset back into a line-column pair
     pub fn resolve_start_to_source_position(&self, plain_text_byte: usize) -> Option<Position> {
-        let source_byte = if let Some(map) = &self.plain_to_source_map {
-            *map.get(plain_text_byte)?
-        } else {
-            plain_text_byte
-        };
-
-        let (line, col) = self.lookup.get(source_byte);
+        let (line, col) = self.lookup.get(self.source_byte(plain_text_byte)?);
         Some(Position { line, column: col })
     }
 
     /// Converts a plain text end byte offset back into a line-column pair,
     /// explicitly excluding trailing HTML tags from the boundary.
     pub fn resolve_end_to_source_position(&self, plain_text_end_byte: usize) -> Option<Position> {
-        if plain_text_end_byte == 0 {
-            let (line, col) = self.lookup.get(0);
-            return Some(Position { line, column: col });
-        }
-
-        // Get the last character of the matched plain text
-        let last_char = self.plain_text[..plain_text_end_byte].chars().last()?;
-        let last_char_plain_idx = plain_text_end_byte - last_char.len_utf8();
-
-        let source_byte_start = if let Some(map) = &self.plain_to_source_map {
-            *map.get(last_char_plain_idx)?
-        } else {
-            last_char_plain_idx
-        };
-
-        // Add the UTF-8 length to place the end boundary exactly after the character,
-        // strictly before any subsequent HTML tags (like </span> or </div>)
-        let source_byte_end = source_byte_start + last_char.len_utf8();
-        let (line, col) = self.lookup.get(source_byte_end);
-
+        let (line, col) = self.lookup.get(self.source_end_byte(plain_text_end_byte)?);
         Some(Position { line, column: col })
     }
+}
+
+/// Elements a browser shows on their own lines
+const BLOCK_TAGS: &[&str] = &[
+    "address",
+    "article",
+    "aside",
+    "blockquote",
+    "br",
+    "dd",
+    "div",
+    "dl",
+    "dt",
+    "figcaption",
+    "figure",
+    "footer",
+    "h1",
+    "h2",
+    "h3",
+    "h4",
+    "h5",
+    "h6",
+    "header",
+    "hr",
+    "li",
+    "main",
+    "nav",
+    "ol",
+    "p",
+    "pre",
+    "section",
+    "table",
+    "td",
+    "th",
+    "tr",
+    "ul",
+];
+
+/// A tag's name in lowercase: `<div class="x">` and `</div>` are `div`
+fn tag_name(tag: &str) -> String {
+    tag.trim_start_matches('<')
+        .trim_start_matches('/')
+        .split(|c: char| c.is_whitespace() || c == '>' || c == '/')
+        .next()
+        .unwrap_or_default()
+        .to_ascii_lowercase()
+}
+
+/// A character reference at the start of `text` (`&amp;`, `&#8212;`, `&#x2014;`) and its length
+fn character_reference(text: &str) -> Option<(char, usize)> {
+    let body = text.strip_prefix('&')?;
+    let semi = body.char_indices().take(12).find(|&(_, c)| c == ';')?.0;
+    let name = &body[..semi];
+    let c = match name {
+        "amp" => '&',
+        "lt" => '<',
+        "gt" => '>',
+        "quot" => '"',
+        "apos" => '\'',
+        "nbsp" => '\u{a0}',
+        _ => {
+            let number = name.strip_prefix('#')?;
+            let code = match number.strip_prefix(['x', 'X']) {
+                Some(hex) => u32::from_str_radix(hex, 16).ok()?,
+                None => number.parse().ok()?,
+            };
+            char::from_u32(code)?
+        }
+    };
+    Some((c, semi + 2))
 }
 
 pub struct FragmentEngine<'a> {
@@ -331,10 +444,20 @@ impl<'a> FragmentEngine<'a> {
         selection: Selection,
         options: Option<GenerateOptions>,
     ) -> Option<TextFragment> {
-        let opts = options.unwrap_or_default();
-
         let start_byte = self.doc.resolve_to_plain_text_offset(&selection.start)?;
         let end_byte = self.doc.resolve_to_plain_text_offset(&selection.end)?;
+        self.generate_for_plain_text(start_byte, end_byte, options)
+    }
+
+    /// A text fragment for a byte range of the plain text (as searching
+    /// [`plain_text`](Self::plain_text) gives)
+    pub fn generate_for_plain_text(
+        &self,
+        start_byte: usize,
+        end_byte: usize,
+        options: Option<GenerateOptions>,
+    ) -> Option<TextFragment> {
+        let opts = options.unwrap_or_default();
 
         if start_byte >= end_byte || end_byte > self.doc.plain_text.len() {
             return None;
@@ -416,6 +539,7 @@ impl<'a> FragmentEngine<'a> {
             || suffix_words.len() < opts.min_suffix_words)
             && (!before_words.is_empty() || !after_words.is_empty())
         {
+            let taken = prefix_words.len() + suffix_words.len();
             if let Some(w) = before_words.first()
                 && (prefix_words.len() < opts.min_prefix_words
                     || (!is_unique && prefix_words.len() <= suffix_words.len()))
@@ -429,6 +553,15 @@ impl<'a> FragmentEngine<'a> {
             {
                 suffix_words.push(*w);
                 after_words.remove(0);
+            }
+            if prefix_words.len() + suffix_words.len() == taken {
+                // One side has run out, so the other has to grow (this used to loop forever when
+                // a match near the end of a document needed more context)
+                if !before_words.is_empty() {
+                    prefix_words.insert(0, before_words.remove(0));
+                } else if !after_words.is_empty() {
+                    suffix_words.push(after_words.remove(0));
+                }
             }
 
             let p = prefix_words.join(" ");
@@ -473,7 +606,8 @@ impl<'a> FragmentEngine<'a> {
 
         // 1. Prefix group (optional match, but ensures context if present)
         if let Some(p) = &fragment.prefix {
-            pattern.push_str(&format!("(?P<prefix>{}\\s+)", Self::build_ws_regex(p)));
+            // Context can touch the match (`(John 3:16)`), as the Text Fragments spec allows
+            pattern.push_str(&format!("(?P<prefix>{}\\s*)", Self::build_ws_regex(p)));
         }
 
         // 2. Core group (This captures the actual bounds of the returned text)
@@ -488,7 +622,7 @@ impl<'a> FragmentEngine<'a> {
 
         // 3. Suffix group
         if let Some(s) = &fragment.suffix {
-            pattern.push_str(&format!("(?P<suffix>\\s+{})", Self::build_ws_regex(s)));
+            pattern.push_str(&format!("(?P<suffix>\\s*{})", Self::build_ws_regex(s)));
         }
 
         // Compile and find the first match
@@ -503,7 +637,11 @@ impl<'a> FragmentEngine<'a> {
             .resolve_start_to_source_position(core_match.start())?;
         let end_pos = self.doc.resolve_end_to_source_position(core_match.end())?;
 
-        let bytes = ByteIndex::from(core_match);
+        // Where the text is in the HTML
+        let bytes = ByteIndex::new(
+            self.doc.source_byte(core_match.start())?,
+            self.doc.source_end_byte(core_match.end())?,
+        );
 
         Some(Selection {
             start: start_pos,
