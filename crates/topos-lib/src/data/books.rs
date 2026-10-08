@@ -255,11 +255,15 @@ impl Books {
         })
     }
 
-    /// The book and the text of its chapters and verses in the first reference of `input`
-    pub(crate) fn split_reference<'a>(&self, input: &'a str) -> Option<(BookId, &'a str)> {
+    /**
+    The book and the text of its chapters and verses in the first reference of `input`, with the
+    byte offset where that text starts
+    */
+    pub(crate) fn split_reference<'a>(&self, input: &'a str) -> Option<(BookId, usize, &'a str)> {
         let m = self.regexes.passage.captures_iter(input).next()?;
         let book = self.search(m.get(1)?.as_str())?;
-        Some((book, m.get(2)?.as_str()))
+        let segments = m.get(2)?;
+        Some((book, segments.start(), segments.as_str()))
     }
 
     /**

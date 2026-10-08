@@ -78,3 +78,11 @@ The phases are in order, and each one leaves the repo working.
 - [x] The Neovim plugin moved to its own repository, `topos-bible.nvim`
 - [ ] Incremental parsing (re-scan only the edited lines). Deferred: search runs at about 30 MiB/s, so re-searching a document on each LSP request is fast enough for now
 - [x] Criterion benchmarks (`cargo bench -p topos-lib`)
+
+## Phase 7: Multiple translations
+
+Plan: [doc/translations.md](./doc/translations.md)
+- [x] `BibleData::parse_with_translation` and `Translations`: a reference and the translation named after it (`John 3:16 (KJV)`), as a new `TranslatedPassage`
+- [ ] The FFI's `parseWithTranslation`, then search and completion with translations
+- [ ] A versification per translation
+- [ ] Several Bibles in the LSP (`bibles`), the Neovim plugin, and the Obsidian plugin

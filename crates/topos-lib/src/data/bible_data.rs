@@ -2,10 +2,11 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     data::{
-        books::{Books, BooksInput},
+        books::{BookId, Books, BooksInput},
         chapter_verses::{BookChapterVerses, BookChapterVersesInput},
         genres::{Genres, GenresInput},
         patch::DataPatch,
+        translations::{TranslatedPassage, Translation, Translations},
     },
     error::ToposResult,
     segments::{Passage, grammar::SegmentList, resolve::Resolver},
@@ -62,8 +63,61 @@ impl BibleData {
     exist (`John 3:99`) is [`None`]; parts after one that doesn't exist are ignored, like search
     */
     pub fn parse(&self, input: &str) -> Option<Passage> {
-        let (book, segments) = self.books.split_reference(input)?;
-        let list = SegmentList::parse(segments);
+        let (book, _, segments) = self.books.split_reference(input)?;
+        self.resolve(book, &SegmentList::parse(segments))
+    }
+
+    /**
+    One reference, like [`BibleData::parse`], and the translation named right after it, if any:
+    `John 3:16 ESV`, `John 3:16, ESV`, `John 3:16 (ESV)`, or `John 3:16 [ESV]`
+    - Only the names in `translations` are translations, matched ignoring case
+    - A reference without one is still parsed, with no translation
+    - A name is never read as part of the reference, so `Ps 22, LXX` is Psalm 22 in the LXX
+      (not Psalms 22 and 70)
+
+    ```
+    use topos_bible::data::{BibleData, translations::Translations};
+
+    let data = BibleData::default();
+    let translations = Translations::new(["ESV", "KJV"]);
+    let found = data.parse_with_translation("John 3:16 (kjv)", &translations).unwrap();
+    assert_eq!(found.passage, data.parse("John 3:16").unwrap());
+    assert_eq!(found.translation.unwrap().name, "KJV");
+    let found = data.parse_with_translation("John 3:16", &translations).unwrap();
+    assert_eq!(found.translation, None);
+    ```
+    */
+    pub fn parse_with_translation(
+        &self,
+        input: &str,
+        translations: &Translations,
+    ) -> Option<TranslatedPassage> {
+        let (book, offset, segments) = self.books.split_reference(input)?;
+        // The reference ends where the first translation starts, if only separators come between
+        let named = translations.find(segments).and_then(|(name, range)| {
+            let list = SegmentList::parse(&segments[..range.start]);
+            let (_, following) = translations.following(&segments[list.end()..])?;
+            (list.end() + following.start == range.start).then(|| {
+                let translation = Translation {
+                    name: name.to_string(),
+                    span: offset + range.start..offset + range.end,
+                };
+                (list, translation)
+            })
+        });
+        let (list, translation) = match named {
+            Some((list, translation)) => (list, Some(translation)),
+            None => (SegmentList::parse(segments), None),
+        };
+        let passage = self.resolve(book, &list)?;
+        Some(TranslatedPassage {
+            passage,
+            translation,
+        })
+    }
+
+    /// The segments of a reference to `book`, checked against its chapters and verses
+    fn resolve(&self, book: BookId, list: &SegmentList) -> Option<Passage> {
         let versification = self.chapter_verses.get_chapter_verses(&book);
         let resolved = Resolver::for_book(versification).resolve(&list.nodes);
         (!resolved.segments.is_empty()).then(|| resolved.segments.with_book(book))
@@ -115,6 +169,57 @@ mod tests {
     }
 
     use super::*;
+
+    #[test]
+    fn parses_a_translation_after_a_reference() {
+        let data = BibleData::default();
+        let translations =
+            Translations::new(["ESV", "KJV", "LXX", "New King James Version"]).alias("AV", "KJV");
+        let parse = |input: &str| {
+            let found = data.parse_with_translation(input, &translations)?;
+            let name = data.books().get_name(found.passage.book)?;
+            let translation = found.translation.map(|t| t.name);
+            Some((
+                format!("{name} {}", found.passage.segments),
+                translation.unwrap_or_default(),
+            ))
+        };
+        let both = |reference: &str, translation: &str| {
+            Some((reference.to_string(), translation.to_string()))
+        };
+        assert_eq!(parse("John 3:16 ESV"), both("John 3:16", "ESV"));
+        assert_eq!(parse("see Jn 3:16-18, esv."), both("John 3:16-18", "ESV"));
+        assert_eq!(parse("John 3:16 (AV)"), both("John 3:16", "KJV"));
+        assert_eq!(parse("John 3:16 [KJV] says"), both("John 3:16", "KJV"));
+        assert_eq!(parse("Jude 5 KJV"), both("Jude 1:5", "KJV"));
+        assert_eq!(
+            parse("John 3:16; 4:1 — New King James Version"),
+            both("John 3:16; 4:1", "New King James Version")
+        );
+        // A name that would be a Roman numeral ends the reference
+        assert_eq!(parse("Ps 22, LXX"), both("Psalm 22", "LXX"));
+        // No translation, or one that isn't right after the reference
+        assert_eq!(parse("John 3:16"), both("John 3:16", ""));
+        assert_eq!(parse("John 3:16 NIV"), both("John 3:16", ""));
+        assert_eq!(parse("John 3:16 is in the ESV"), both("John 3:16", ""));
+        assert_eq!(parse("John 3:16 (ESV"), both("John 3:16", ""));
+        // A name glued to the reference isn't one (and the reference reads like `parse`'s)
+        assert_eq!(parse("John 3:16ESV"), both("John 3", ""));
+        // Without a reference, there is nothing
+        assert_eq!(parse("John ESV"), None);
+        assert_eq!(parse("John 3:99 ESV"), None);
+        // The span is in the input
+        let found = data
+            .parse_with_translation("Read Jn 3:16 (kjv)", &translations)
+            .unwrap();
+        assert_eq!(found.translation.unwrap().span, 14..17);
+        // Without translations, it parses like `parse`
+        let found = data
+            .parse_with_translation("Ps 22, LXX", &Translations::default())
+            .unwrap();
+        assert_eq!(Some(found.passage), data.parse("Ps 22, LXX"));
+        assert_eq!(found.translation, None);
+    }
 
     #[test]
     fn custom_data_from_json() {
