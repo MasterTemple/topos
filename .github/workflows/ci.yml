@@ -20,6 +20,7 @@ jobs:
       - run: cargo fmt --check
       - run: cargo test
       - run: cargo test -p topos-bible --no-default-features
+      - run: cargo test -p topos-bible-formats --features markup
       - run: cargo clippy --all-targets
 
   pdf:

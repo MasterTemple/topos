@@ -10,6 +10,8 @@ pub mod html;
 pub mod htmloc;
 #[cfg(feature = "json")]
 pub mod json;
+#[cfg(feature = "markup")]
+pub mod markup;
 #[cfg(feature = "pdf")]
 pub mod pdf;
 #[cfg(feature = "srt")]
