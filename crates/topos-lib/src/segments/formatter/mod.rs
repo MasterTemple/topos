@@ -3,11 +3,14 @@
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    data::bible_data::BibleData,
+    data::{
+        bible_data::BibleData,
+        books::{BookId, Books},
+    },
     segments::{passage::Passage, segment::Segment, verse_bounds::VerseBounds},
 };
 
-/// How the book is written (`"name"`, `"abbreviation"`, or `"osis"` in JSON and TOML)
+/// How the book is written (`"name"`, `"abbreviation"`, `"osis"`, or `"usfm"` in JSON and TOML)
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum BookStyle {
@@ -18,6 +21,20 @@ pub enum BookStyle {
     Abbreviation,
     /// `Gen`
     Osis,
+    /// `GEN` (USFM, as USX and YouVersion write it)
+    Usfm,
+}
+
+impl BookStyle {
+    /// The book written in this style, or [`None`] if the data doesn't have it
+    pub fn book(self, books: &Books, id: BookId) -> Option<&String> {
+        match self {
+            BookStyle::Name => books.get_name(id),
+            BookStyle::Abbreviation => books.get_abbrev(id),
+            BookStyle::Osis => books.get_osis(id),
+            BookStyle::Usfm => books.get_usfm(id),
+        }
+    }
 }
 
 /**
@@ -70,11 +87,7 @@ impl FormatOptions {
     /// `John 3:16-18; 4`, or [`None`] if the book is not in `data`
     pub fn passage(&self, passage: &Passage, data: &BibleData) -> Option<String> {
         let books = data.books();
-        let book = match self.book {
-            BookStyle::Name => books.get_name(passage.book),
-            BookStyle::Abbreviation => books.get_abbrev(passage.book),
-            BookStyle::Osis => books.get_osis(passage.book),
-        }?;
+        let book = self.book.book(books, passage.book)?;
         let single_chapter = data
             .chapter_verses()
             .get_chapter_verses(&passage.book)

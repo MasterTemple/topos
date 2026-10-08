@@ -130,15 +130,9 @@ pub struct Suggestion {
     pub kind: &'static str,
 }
 
-/// A book's name in a style (`John`, `Jn`, `John` in OSIS)
+/// A book's name in a style (`John`, `Jn`, `John` in OSIS, `JHN` in USFM)
 pub fn book_in_style(matcher: &BibleMatcher, id: BookId, style: BookStyle) -> Option<String> {
-    let books = matcher.data().books();
-    match style {
-        BookStyle::Name => books.get_name(id),
-        BookStyle::Abbreviation => books.get_abbrev(id),
-        BookStyle::Osis => books.get_osis(id),
-    }
-    .cloned()
+    style.book(matcher.data().books(), id).cloned()
 }
 
 /**

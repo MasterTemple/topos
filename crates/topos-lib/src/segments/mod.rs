@@ -7,6 +7,7 @@ pub mod passage;
 pub mod resolve;
 pub mod segment;
 pub mod units;
+pub mod usfm;
 pub mod verse_bounds;
 
 pub use passage::{Passage, Segments};

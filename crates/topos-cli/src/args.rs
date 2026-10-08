@@ -404,6 +404,8 @@ pub enum ReferenceFormat {
     Abbreviation,
     /// `Gen.1.1`
     Osis,
+    /// `GEN 1:1`
+    Usfm,
 }
 
 #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, ValueEnum)]
@@ -538,6 +540,7 @@ impl Args {
                 ReferenceFormat::Name => BookStyle::Name,
                 ReferenceFormat::Abbreviation => BookStyle::Abbreviation,
                 ReferenceFormat::Osis => BookStyle::Osis,
+                ReferenceFormat::Usfm => BookStyle::Usfm,
             };
         }
         options

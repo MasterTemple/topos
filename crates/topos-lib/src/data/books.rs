@@ -51,6 +51,10 @@ pub struct Books {
     book_id_to_osis: BTreeMap<BookId, String>,
     /// map of OSIS book id to book id
     osis_to_book_id: BTreeMap<String, BookId>,
+    /// map of book id to USFM book code (`GEN`, `1SA`)
+    book_id_to_usfm: BTreeMap<BookId, String>,
+    /// map of upper-case USFM book code to book id
+    usfm_to_book_id: BTreeMap<String, BookId>,
     /// normalized abbreviations that are also common words (`is`, `am`)
     ambiguous: BTreeSet<String>,
     regexes: BookRegexes,
@@ -128,6 +132,16 @@ impl Books {
     pub fn search_osis(&self, osis: &str) -> Option<BookId> {
         self.osis_to_book_id.get(osis).copied()
     }
+    /// The USFM (Paratext) book code, like `GEN` or `1SA`, which USX and YouVersion use
+    pub fn get_usfm(&self, id: BookId) -> Option<&String> {
+        self.book_id_to_usfm.get(&id)
+    }
+    /// The book for a USFM book code (ignoring case)
+    pub fn search_usfm(&self, usfm: &str) -> Option<BookId> {
+        self.usfm_to_book_id
+            .get(&usfm.to_ascii_uppercase())
+            .copied()
+    }
 
     /**
     - Book names in `text` that are followed by something that could start a chapter (a digit or
@@ -177,6 +191,8 @@ impl Books {
         let mut ambiguous = BTreeSet::new();
         let mut book_id_to_osis = BTreeMap::new();
         let mut osis_to_book_id = BTreeMap::new();
+        let mut book_id_to_usfm = BTreeMap::new();
+        let mut usfm_to_book_id = BTreeMap::new();
 
         // Each name means one book, and each book has one id
         let mut owners: BTreeMap<String, (BookId, String)> = BTreeMap::new();
@@ -210,6 +226,10 @@ impl Books {
                 book_id_to_osis.insert(book.id, osis.clone());
                 osis_to_book_id.insert(osis.clone(), book.id);
             }
+            if let Some(usfm) = &book.usfm {
+                book_id_to_usfm.insert(book.id, usfm.clone());
+                usfm_to_book_id.insert(usfm.to_ascii_uppercase(), book.id);
+            }
             ambiguous.extend(book.ambiguous.iter().map(|a| Books::normalize_book_name(a)));
             abbreviations_to_book_id.insert(Books::normalize_book_name(&book.book), book.id);
             book_id_to_name.insert(book.id, book.book);
@@ -228,6 +248,8 @@ impl Books {
             book_id_to_abbreviation,
             book_id_to_osis,
             osis_to_book_id,
+            book_id_to_usfm,
+            usfm_to_book_id,
             ambiguous,
             regexes,
         })
@@ -324,6 +346,11 @@ pub struct Book {
     /// - used to read and write OSIS references
     #[serde(default)]
     pub(crate) osis: Option<String>,
+
+    /// - the USFM (Paratext) book code, like `GEN`, `1SA`, or `JHN`
+    /// - used to read and write USFM references (`JHN 3:16`), as in USX
+    #[serde(default)]
+    pub(crate) usfm: Option<String>,
 
     /// - does not need to include book name or abbreviation
     /// - meant for matching/parsing references

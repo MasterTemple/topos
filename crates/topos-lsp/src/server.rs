@@ -392,6 +392,7 @@ impl Server {
             HoverField::Name => ("Name", styled(BookStyle::Name)?),
             HoverField::Abbreviation => ("Abbreviation", styled(BookStyle::Abbreviation)?),
             HoverField::Osis => ("OSIS", format!("`{}`", psg.to_osis(data.books())?)),
+            HoverField::Usfm => ("USFM", format!("`{}`", psg.to_usfm(data.books())?)),
             HoverField::Book => {
                 let name = data.books().get_name(psg.book)?;
                 let books = data.books().ids().count();
@@ -555,6 +556,7 @@ impl Server {
                 }
                 let label = match self.inlay_hints {
                     InlayHints::Osis => m.psg.to_osis(self.matcher.data().books())?,
+                    InlayHints::Usfm => m.psg.to_usfm(self.matcher.data().books())?,
                     InlayHints::Changed if self.reference(&m) == text[bytes.start..bytes.end] => {
                         return None;
                     }
@@ -735,6 +737,7 @@ impl Server {
         let data = self.matcher.data();
         let written = match self.format.book {
             BookStyle::Osis => found.psg.to_osis(data.books()),
+            BookStyle::Usfm => found.psg.to_usfm(data.books()),
             _ => self.format.passage(&found.psg, data),
         };
         written.unwrap_or_else(|| found.psg.segments.to_string())

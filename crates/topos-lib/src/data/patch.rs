@@ -54,6 +54,8 @@ pub struct BookPatch {
     pub abbreviation: Option<String>,
     #[serde(default)]
     pub osis: Option<String>,
+    #[serde(default)]
+    pub usfm: Option<String>,
     #[serde(default, alias = "abbrs", alias = "abbrvs", alias = "abbrevs")]
     pub abbreviations: Vec<String>,
     #[serde(default)]
@@ -144,6 +146,9 @@ impl BibleDataInput {
                     if p.osis.is_some() {
                         book.osis = p.osis;
                     }
+                    if p.usfm.is_some() {
+                        book.usfm = p.usfm;
+                    }
                     let name = book.book.clone();
                     add_unique(&mut book.abbreviations, &p.abbreviations, &[&name]);
                     add_unique(&mut book.ambiguous, &p.ambiguous, &[]);
@@ -168,6 +173,7 @@ impl BibleDataInput {
                         abbreviation: p.abbreviation.unwrap_or_else(|| book.clone()),
                         book,
                         osis: p.osis,
+                        usfm: p.usfm,
                         abbreviations,
                         ambiguous,
                     });

@@ -52,6 +52,8 @@ pub enum BookStyle {
     Abbreviation,
     /// `Gen`
     Osis,
+    /// `GEN`
+    Usfm,
 }
 
 /// A book in the data (for listing and filtering)
@@ -63,6 +65,8 @@ pub struct BookInfo {
     pub name: String,
     pub abbreviation: String,
     pub osis: String,
+    /// The USFM code, like `JHN` (empty if the data has none)
+    pub usfm: String,
     /// How many chapters it has (`0` if the data has no verse counts for it)
     pub chapters: u8,
 }
@@ -118,6 +122,8 @@ pub struct Passage {
     pub segments: Vec<PassageSegment>,
     /// `John.3.16-John.3.18 John.3.20-John.4.2`
     pub osis: String,
+    /// `JHN 3:16-18; JHN 3:20-4:2`
+    pub usfm: String,
 }
 
 #[data]
@@ -553,7 +559,7 @@ impl Topos {
         Ok(self.filter(query)?.contradiction())
     }
 
-    /// The first reference in `text`, read as one reference (`Jn 3:16` or `John.3.16`), the
+    /// The first reference in `text`, read as one reference (`Jn 3:16`, `John.3.16`, or USFM `JHN 3:16`), the
     /// way search reads it: `Jude 5` is verse 5, and a reference that doesn't exist is `None`
     pub fn parse(&self, reference: String, style: BookStyle) -> Option<Passage> {
         let data = self.matcher.data();
@@ -561,6 +567,7 @@ impl Topos {
         let passage = data
             .books()
             .parse_osis(&reference)
+            .or_else(|_| data.books().parse_usfm(&reference))
             .ok()
             .or_else(|| data.parse(&reference))?;
         self.passage(&passage, &self.format_with(style))
@@ -577,6 +584,7 @@ impl Topos {
                 name: books.get_name(id).cloned().unwrap_or_default(),
                 abbreviation: books.get_abbrev(id).cloned().unwrap_or_default(),
                 osis: books.get_osis(id).cloned().unwrap_or_default(),
+                usfm: books.get_usfm(id).cloned().unwrap_or_default(),
                 chapters: data
                     .chapter_verses()
                     .get_chapter_verses(&id)
@@ -867,6 +875,7 @@ impl Topos {
             reference: options.passage(passage, data)?,
             segments,
             osis: passage.to_osis(data.books()).unwrap_or_default(),
+            usfm: passage.to_usfm(data.books()).unwrap_or_default(),
         })
     }
 }
@@ -941,6 +950,7 @@ impl From<BookStyle> for CoreBookStyle {
             BookStyle::Name => CoreBookStyle::Name,
             BookStyle::Abbreviation => CoreBookStyle::Abbreviation,
             BookStyle::Osis => CoreBookStyle::Osis,
+            BookStyle::Usfm => CoreBookStyle::Usfm,
         }
     }
 }
@@ -1357,6 +1367,7 @@ mod tests {
                 name: "John".into(),
                 abbreviation: "Jn".into(),
                 osis: "John".into(),
+                usfm: "JHN".into(),
                 chapters: 21
             }
         );

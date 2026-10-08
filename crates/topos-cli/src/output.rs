@@ -294,6 +294,7 @@ impl Printer {
     fn reference(&self, passage: &Passage) -> String {
         let written = match self.options.book {
             BookStyle::Osis => passage.to_osis(self.data.books()),
+            BookStyle::Usfm => passage.to_usfm(self.data.books()),
             _ => self.options.passage(passage, &self.data),
         };
         written.unwrap_or_else(|| passage.segments.to_string())

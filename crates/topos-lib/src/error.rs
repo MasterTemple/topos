@@ -25,6 +25,8 @@ pub enum ToposError {
     UnknownTestament(String),
     #[error("invalid OSIS reference {0:?}")]
     InvalidOsis(String),
+    #[error("invalid USFM reference {0:?}")]
+    InvalidUsfm(String),
     #[error("invalid book data: {0}")]
     InvalidData(String),
 }

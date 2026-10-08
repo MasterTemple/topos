@@ -29,6 +29,8 @@ pub enum InlayHints {
     Always,
     /// The OSIS id (`John.3.16`)
     Osis,
+    /// The USFM reference (`JHN 3:16`)
+    Usfm,
     Never,
 }
 
@@ -58,6 +60,8 @@ pub enum HoverField {
     Abbreviation,
     /// The OSIS id: `John.3.16`
     Osis,
+    /// The USFM reference: `JHN 3:16`
+    Usfm,
     /// The book: its name, its number, and how many chapters it has
     Book,
     /// Old or New Testament

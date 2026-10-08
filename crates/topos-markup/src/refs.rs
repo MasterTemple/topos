@@ -19,8 +19,8 @@ pub struct TaggedReference {
 Every reference element, with the passages it points to
 
 The target is read as OSIS (`John.3.16-John.3.18 Rom.8.28`, with or without a work prefix like
-`Bible:`), then as a written reference (`John 3:16`, USX `JHN 3:16`); failing both, the element's
-text is
+`Bible:`), then as USFM (USX's `JHN 3:16-18`), then as a written reference (`John 3:16`); failing
+all three, the element's text is
 ```
 use topos_bible::data::BibleData;
 use topos_bible_markup::{Markup, parse, refs::tagged_references};
@@ -65,6 +65,9 @@ pub fn passages(e: &Element, data: &BibleData) -> Vec<Passage> {
             if let Some(passages) = osis(candidate, data) {
                 return passages;
             }
+        }
+        if let Ok(passage) = data.books().parse_usfm(target) {
+            return vec![passage];
         }
         if let Some(passage) = data.parse(target) {
             return vec![passage];

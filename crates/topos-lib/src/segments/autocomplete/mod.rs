@@ -13,11 +13,7 @@ use crate::{
         books::{BookId, Books},
     },
     matcher::BibleMatcher,
-    segments::{
-        formatter::{BookStyle, FormatOptions},
-        passage::Passage,
-        segment::Segment,
-    },
+    segments::{formatter::FormatOptions, passage::Passage, segment::Segment},
 };
 
 /// How completions are written
@@ -216,11 +212,7 @@ fn book_completions(data: &BibleData, before: &str, format: &FormatOptions) -> V
         .into_iter()
         .filter_map(|book| {
             let books = data.books();
-            let name = match format.book {
-                BookStyle::Name => books.get_name(book),
-                BookStyle::Abbreviation => books.get_abbrev(book),
-                BookStyle::Osis => books.get_osis(book),
-            }?;
+            let name = format.book.book(books, book)?;
             // Typing the whole name already offers its chapters
             if name.eq_ignore_ascii_case(typed) {
                 return None;
