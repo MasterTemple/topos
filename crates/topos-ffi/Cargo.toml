@@ -10,7 +10,7 @@ description = "Bindings for TypeScript/WASM, Python, Swift, and Kotlin (via Bolt
 [lib]
 # Matches the published package name (topos-bible), which BoltFFI uses for artifacts
 name = "topos_bible"
-crate-type = ["staticlib", "cdylib"]
+crate-type = ["lib", "staticlib", "cdylib"]
 
 [dependencies]
 boltffi = "0.31.0"

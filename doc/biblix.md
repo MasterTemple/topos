@@ -72,6 +72,17 @@ Steps 2 and 3:
   so it can read Bible text from packages without topos depending on biblix. topos keeps the
   library, markup, formats, index, CLI, and topos-ffi.
 
+Step 5, started:
+- **biblix-ffi** (`crates/biblix-ffi`, npm and PyPI `biblix`) re-exports topos-ffi, so one package
+  has both APIs: BoltFFI exports a local dependency's items with the crate's own.
+- **The host does the I/O**: `Biblix.openPackage` takes the package's files as bytes, and
+  `cacheWrites()` hands back the cache files to save. `Biblix.parseProject` reads a vault's
+  `biblix.toml` and `biblix.lock` and says where each package's files are.
+- **Real packages in WebAssembly** (Node, release build): the BSB opens in 150 ms, and the KJV
+  (USFM, every book parsed to count verses) in 0.8 s, or 0.09 s from the cache (Python).
+- **Still to do**: the archive fetcher over the host's HTTP (installing in WebAssembly), then the
+  plugin's move, its library location setting, and its Bibles section.
+
 ## Layers
 
 ```

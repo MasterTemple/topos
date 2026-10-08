@@ -69,6 +69,20 @@ pub struct ToposTranslations {
     pub(crate) translations: Translations,
 }
 
+/// For Rust crates that build on this one, like biblix's, which adds its packages' verse counts
+impl From<Translations> for ToposTranslations {
+    fn from(translations: Translations) -> Self {
+        Self { translations }
+    }
+}
+
+impl ToposTranslations {
+    /// The translations themselves, for Rust crates that build on this one
+    pub fn core(&self) -> &Translations {
+        &self.translations
+    }
+}
+
 #[export]
 impl ToposTranslations {
     /// No translations

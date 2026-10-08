@@ -58,6 +58,16 @@ pub struct ToposBook {
 }
 
 impl ToposBook {
+    /// A book parsed elsewhere, like biblix's packages and cache (for Rust crates that build on
+    /// this one; other languages use `parse`)
+    pub fn from_tree(nodes: Vec<Node>, spans: Vec<VerseSpan>, book_id: Option<u8>) -> Self {
+        Self {
+            nodes,
+            spans,
+            book_id,
+        }
+    }
+
     /// The book's tree for each part of a passage in this book
     fn parts(&self, passage: &Passage) -> Vec<Vec<Node>> {
         if self.book_id != Some(passage.book_id) {
