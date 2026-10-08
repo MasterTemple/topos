@@ -22,6 +22,7 @@ Obsidian.
   is a manifest without `[package]`. "Index" means only a registry.
 - **No default registry for now**: dependencies name a `git =` URL or a `path =`. The format leaves
   room for registries later (anyone could host one), but nobody has to mirror upstream texts.
+  Catalogs (metadata and URLs, no texts) are searched instead; see Status.
 - **A package can hold several formats** (USX and SWORD of the same text), each behind a feature
   the package's owner names.
 - **Summaries with every verse's hash are published for every package**, not only Bibles.
@@ -92,10 +93,25 @@ Step 5, started:
 - **The Obsidian plugin is on biblix's package** (one WebAssembly module for the plugin and its
   worker) and reads the vault's `biblix.toml` and `biblix.lock`: packages add translations with
   their verse counts and give passage text.
-- **Open: where the plugin's library goes.** The reader, hover previews, and embeds work on vault
-  files, and files in `.obsidian/` aren't vault files. A visible folder (`Bibles/`) works with them
-  now; `.obsidian/biblix` (read for now) needs file-plus-plus to show documents that aren't vault
-  files. The settings (library location, installed Bibles, *Add a Bible*) wait on this.
+- **The plugin's library is a vault folder, `Biblix/` by default** (a setting; decided
+  2026-10-08), with the vault's `biblix.toml` and `biblix.lock` in it unless they're at the
+  vault's root. Its books are vault files, so the reader, hover previews, and embeds open them
+  (files in `.obsidian/` aren't vault files). USFM books open too, read as USX.
+- **The plugin's settings list the vault's packages** (each with a remove button) and add more:
+  *Search* looks through the catalogs and installs or imports the one chosen, *Git URL* adds a
+  package's newest release.
+
+Catalogs and imports (from step 7):
+- **Catalogs** (`catalog.rs`): lists of packages to search by name, abbreviation, or language: a
+  `catalog.toml` of git packages (metadata and URLs only, so anyone can host one in a git
+  repository; `bx catalog entry <url>` writes an entry), or eBible.org's `translations.csv`
+  (1,500 translations; the downloadable, redistributable ones are listed). A vault names its
+  catalogs in `[settings] catalogs`; **without any, eBible.org's own list is searched** (it's
+  eBible.org's listing of its downloads, not a mirror; owner to confirm this default).
+- **Importing from eBible.org** (`import.rs`): its `<id>_usfm.zip` becomes a package
+  (`biblix.toml`, `usfm/`, `copr.htm` as the license file, versioned by eBible.org's update date,
+  `2026.10.8`), used as a path package in `imports/<id>/`. The ASV imports in 0.3 s (`bx`) or 2 s
+  (Obsidian), and reads all 31,102 verses.
 
 ## Layers
 
@@ -388,11 +404,11 @@ biblix-ffi (BoltFFI, like topos-ffi) has biblix's and topos's API in one package
    - With no Bible settings, it uses the workspace's `biblix.toml`, else the library's own.
    - `bible`/`bibles` folders can be packages (USX or USFM) or plain USX folders.
    - The Neovim plugin runs it and builds it from a biblix checkout.
-5. **biblix-ffi with topos's API**: the plugin moves to it, and it gets the library location
-   setting (inside `.obsidian/` to sync) and the Bibles section.
+5. **biblix-ffi with topos's API** (done): the plugin moves to it, and it gets the library location
+   setting (a vault folder, `Biblix/` by default) and the Bibles section.
 6. **Versioning tools**: `bx diff` (from summaries) and `ver=` in links.
-7. **Importers**: eBible.org and fetch.bible (USX/USFM), Door43 (git), CCEL (ThML), SWORD through
-   sword-modules with `Storage`.
+7. **Importers**: eBible.org (done, with its catalog), fetch.bible (USX/USFM), Door43 (git), CCEL
+   (ThML), SWORD through sword-modules with `Storage`.
 8. **Media**: `[media]` in `biblix.toml`, the transcript read as a text source, a timings format
    (not chosen yet), files fetched when first played, checked against their hashes, and kept by
    hash; `bx release` judges media packages by their transcript and timings.
