@@ -1,6 +1,6 @@
 // Run with `npm install && npm start` after `boltffi pack wasm` (see ../../README.md)
 // In Node and Bun the WebAssembly module is ready on import (browsers: `await initialized` first)
-import { Topos, ToposQuery, ToposOptions, ToposErrorException, OffsetUnit, BookStyle, CompletionKind } from "topos-bible";
+import { Topos, ToposQuery, ToposOptions, ToposTranslations, ToposFormat, ToposErrorException, OffsetUnit, BookStyle, CompletionKind } from "topos-bible";
 
 const topos = Topos.new();
 
@@ -24,6 +24,18 @@ const verses = "John 3, John 3:14-18, John 2; 3:16, Rom 8:28";
 const nt = ToposQuery.create().newTestament();
 console.log(topos.searchWith(verses, OffsetUnit.Utf16, nt.explicitOverlap("John 3:16")).map((m) => m.passage.reference));
 console.log(topos.contradiction(ToposQuery.create().oldTestament().genre("Pauline Epistles")));
+
+// Translations are only read by the methods that take them, and only the names listed
+const translations = ToposTranslations.create().add("BSB", []).add("KJV", ["AV"]).add("LXX", [])
+  .chapterVerses("BSB", 64, [15]); // 3 John's verse counts in the BSB (from ToposBook.chapterVerses())
+const named = topos.parseWithTranslation("3 John 15 (bsb)", OffsetUnit.Utf16, translations, BookStyle.Name);
+console.log(named?.passage.reference, named?.translation);
+console.log(topos.parseWithTranslation("3 John 15 (av)", OffsetUnit.Utf16, translations, BookStyle.Name)); // the KJV ends at 14
+const found = topos.searchWithTranslations("Ps 22, LXX; John 3:16", OffsetUnit.Utf16, ToposQuery.create(), translations);
+console.log(found.map((m) => `${m.reference.passage.reference} [${m.translation?.name ?? ""}]`));
+const typed = "John 3:16 K";
+console.log(topos.completeWithTranslations(typed, typed.length, OffsetUnit.Utf16, ToposFormat.create(), 1, translations)[0]?.label);
+translations.dispose();
 
 // Options set up an instance: merge or remove data, or give bare references a book
 const custom = ToposOptions.create()

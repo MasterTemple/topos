@@ -121,7 +121,7 @@ Chain the methods:
 const translations = ToposTranslations.create().add("BSB", []).add("KJV", ["AV"])
   .chapterVerses("BSB", 64, threeJohn.chapterVerses()); // a ToposBook's own verse counts
 topos.parseWithTranslation("3 John 15 (av)", OffsetUnit.Utf16, translations, BookStyle.Name);
-// undefined: the KJV (the default counts) ends 3 John at verse 14
+// null: the KJV (the default counts) ends 3 John at verse 14
 topos.parseWithTranslation("3 John 15 (bsb)", OffsetUnit.Utf16, translations, BookStyle.Name);
 // { passage: 3 John 1:15, translation: { name: "BSB", start: 11, end: 14 } }
 ```
