@@ -324,8 +324,8 @@ biblix-ffi (BoltFFI, like topos-ffi) has biblix's and topos's API in one package
     disk.
   - **Fetching without git**: a release is downloaded as an archive (GitHub, GitLab, and Gitea
     serve one per tag) through the host's HTTP (`requestUrl` in Obsidian, which works on mobile).
-    Native `bx` clones with gitoxide. Either way the result is the same files, checked against
-    the registry's checksum.
+    Native `bx` runs the `git` command (gitoxide could replace it). Either way the result is the
+    same files, checked against the registry's checksum.
 
 ## Managing
 
@@ -354,7 +354,8 @@ biblix-ffi (BoltFFI, like topos-ffi) has biblix's and topos's API in one package
 1. **Create biblix** (done) with `biblix.toml`, the USX source (moved from the LSP and the plugin),
    `Storage`, and the cache. Make packages of the BSB and a KJV by hand.
 2. **`bx` with git and path dependencies** (done): `add`, `install`, the lock file, side-by-side
-   versions, archive downloads, and features that choose formats.
+   versions, and features that choose formats. Fetching runs the `git` command behind `Fetcher`;
+   archive downloads come with biblix-ffi (step 5).
 3. **Summaries** (done): `bx release` writes them, `bx verify` checks them, `bx show` reads them from a
    tag alone.
 4. **The LSP uses the library** (done, as `biblix-lsp` in the biblix repository):
@@ -367,9 +368,12 @@ biblix-ffi (BoltFFI, like topos-ffi) has biblix's and topos's API in one package
 6. **Versioning tools**: `bx diff` (from summaries) and `ver=` in links.
 7. **Importers**: eBible.org and fetch.bible (USX/USFM), Door43 (git), CCEL (ThML), SWORD through
    sword-modules with `Storage`.
-8. **Links that follow changes** (text fragments re-resolved across versions).
-9. **Versification mapping** packages (`kind = "versification-map"`).
-10. **Registries**, if someone wants to host one.
+8. **Media**: `[media]` in `biblix.toml`, the transcript read as a text source, a timings format
+   (not chosen yet), files fetched when first played, checked against their hashes, and kept by
+   hash; `bx release` judges media packages by their transcript and timings.
+9. **Links that follow changes** (text fragments re-resolved across versions).
+10. **Versification mapping** packages (`kind = "versification-map"`).
+11. **Registries**, if someone wants to host one.
 
 ## Open questions
 
