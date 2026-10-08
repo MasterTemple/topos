@@ -1,6 +1,7 @@
 use std::ops::Range;
 
 use crate::{
+    data::translations::Translations,
     matcher::{BibleMatcher, text::SearchText},
     segments::{
         grammar::SegmentList,
@@ -26,6 +27,23 @@ impl BibleMatcher {
       `Mar 25, 2025` is left alone
     */
     pub fn problems(&self, text: &str) -> Vec<Problem> {
+        self.problems_translated(text, None)
+    }
+
+    /**
+    [`BibleMatcher::problems`], where a reference naming one of `translations` right after it
+    (`3 John 1:15 ESV`) is checked against that translation's chapter and verse counts, when it
+    has them, and the message names it (`3 John 1:16 does not exist in the ESV`)
+    */
+    pub fn problems_with_translations(
+        &self,
+        text: &str,
+        translations: &Translations,
+    ) -> Vec<Problem> {
+        self.problems_translated(text, Some(translations))
+    }
+
+    fn problems_translated(&self, text: &str, translations: Option<&Translations>) -> Vec<Problem> {
         let data = self.data();
         let text = SearchText::new(text);
         let starts: Vec<_> = data.books().candidates(text.as_str()).collect();
@@ -37,8 +55,17 @@ impl BibleMatcher {
             let end = starts
                 .get(idx + 1)
                 .map_or(text.as_str().len(), |n| n.start());
-            let list = SegmentList::parse(&text.as_str()[cur.end()..end]);
-            let versification = data.chapter_verses().get_chapter_verses(&book);
+            let window = &text.as_str()[cur.end()..end];
+            let (list, translation) = match translations {
+                Some(translations) => {
+                    translations.read_segments(&text.as_str()[cur.end()..], window.len())
+                }
+                None => (SegmentList::parse(window), None),
+            };
+            let translation = translation.map(|(name, _)| name);
+            let versification = (translation.zip(translations))
+                .and_then(|(name, translations)| translations.chapter_verses(name, book))
+                .or_else(|| data.chapter_verses().get_chapter_verses(&book));
             let valid = Resolver::for_book(versification).resolve(&list.nodes);
             let parsed = Resolver::default().resolve(&list.nodes);
             if parsed.used <= valid.used {
@@ -88,9 +115,10 @@ impl BibleMatcher {
             } else {
                 segment.to_string()
             };
+            let translation = translation.map_or(String::new(), |t| format!(" in the {t}"));
             problems.push(Problem {
                 bytes: text.original_range(bytes),
-                message: format!("{name} {written} does not exist"),
+                message: format!("{name} {written} does not exist{translation}"),
                 detail,
             });
         }

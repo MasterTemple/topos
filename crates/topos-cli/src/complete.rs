@@ -179,6 +179,7 @@ pub fn suggestions(matcher: &BibleMatcher, text: &str, format: &FormatOptions) -
                 CompletionKind::Book => "book",
                 CompletionKind::Chapter => "chapter",
                 CompletionKind::Verse => "verse",
+                CompletionKind::Translation => "translation",
             };
             // OSIS is a reference format of its own (`John.3.16`), not a way to type one
             let osis = (format.book == BookStyle::Osis)

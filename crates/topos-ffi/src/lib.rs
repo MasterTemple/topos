@@ -8,11 +8,13 @@
 mod book;
 mod files;
 mod index;
+mod translations;
 
 #[cfg(feature = "markup")]
 pub use book::*;
 pub use files::*;
 pub use index::*;
+pub use translations::*;
 
 use boltffi::*;
 use topos_lib::{
@@ -21,12 +23,13 @@ use topos_lib::{
         books::BookId,
         chapter_verses::ChapterVerses,
         patch::DataPatch,
+        translations::Translations,
     },
     filter::{
         bible_filter::BibleFilter,
         filters::{book::BookFilter, genre::GenreFilter, testament::TestamentFilter},
     },
-    matcher::{BibleMatcher, context::BookContext},
+    matcher::{BibleMatch, BibleMatcher, context::BookContext},
     segments::{
         Passage as CorePassage, Segment, Segments,
         autocomplete::{CompleteOptions, CompletionKind as CoreKind},
@@ -148,6 +151,8 @@ pub enum CompletionKind {
     Book,
     Chapter,
     Verse,
+    /// A translation after a reference (`complete_with_translations`)
+    Translation,
 }
 
 #[data]
@@ -579,6 +584,99 @@ impl Topos {
         self.passage(&passage, &self.format_with(style))
     }
 
+    /**
+    Like `parse`, and the translation named right after the reference (`John 3:16 KJV`,
+    `John 3:16, KJV`, `John 3:16 (KJV)`) if it is one of `translations`, with its offsets in
+    `unit`
+    - A reference naming a translation with verse counts is checked against them
+    - Without a translation, it's the same passage as `parse` gives
+    */
+    pub fn parse_with_translation(
+        &self,
+        reference: String,
+        unit: OffsetUnit,
+        translations: &ToposTranslations,
+        style: BookStyle,
+    ) -> Option<TranslatedPassage> {
+        let data = self.matcher.data();
+        let books = data.books();
+        let format = self.format_with(style);
+        // OSIS and USFM name no translation
+        if let Some(passage) =
+            (books.parse_osis(&reference).ok()).or_else(|| books.parse_usfm(&reference).ok())
+        {
+            return Some(TranslatedPassage {
+                passage: self.passage(&passage, &format)?,
+                translation: None,
+            });
+        }
+        let found = data.parse_with_translation(&reference, &translations.translations)?;
+        let offsets = Offsets::new(&reference, unit);
+        Some(TranslatedPassage {
+            passage: self.passage(&found.passage, &format)?,
+            translation: found.translation.map(|t| Translation::new(t, &offsets)),
+        })
+    }
+
+    /**
+    The references in `text` that the query keeps (`ToposQuery.create()` keeps all), each with the
+    translation named right after it, if it is one of `translations`
+    - A reference naming a translation with verse counts is checked against them
+    - A name ends a reference: `Ps 22, LXX` is Psalm 22 (not Psalms 22 and 70)
+    */
+    pub fn search_with_translations(
+        &self,
+        text: String,
+        unit: OffsetUnit,
+        query: &ToposQuery,
+        translations: &ToposTranslations,
+    ) -> Result<Vec<TranslatedMatch>, ToposError> {
+        let filtered;
+        let matcher = if query.is_empty() {
+            &self.matcher
+        } else {
+            let matcher = self.filter(query)?.create_matcher();
+            filtered = match self.matcher.context() {
+                Some(context) => matcher.with_context(context.clone()),
+                None => matcher,
+            };
+            &filtered
+        };
+        let offsets = Offsets::new(&text, unit);
+        Ok(matcher
+            .search_with_translations(&text, &translations.translations)
+            .into_iter()
+            .filter_map(|m| {
+                Some(TranslatedMatch {
+                    reference: self.match_of(&m.reference, &text, &offsets)?,
+                    translation: m.translation.map(|t| Translation::new(t, &offsets)),
+                })
+            })
+            .collect())
+    }
+
+    /// Like `complete_with`, and before those, the translations a word after a reference starts
+    /// (`John 3:16 K` offers `KJV`, as `CompletionKind.Translation`)
+    pub fn complete_with_translations(
+        &self,
+        text: String,
+        cursor: u32,
+        unit: OffsetUnit,
+        format: &ToposFormat,
+        limit: u32,
+        translations: &ToposTranslations,
+    ) -> Vec<Completion> {
+        let format = format.options.clone();
+        self.completions_in(
+            text,
+            cursor,
+            unit,
+            format,
+            limit,
+            Some(&translations.translations),
+        )
+    }
+
     /// Every book, in order
     pub fn books(&self) -> Vec<BookInfo> {
         let data = self.matcher.data();
@@ -703,6 +801,18 @@ impl Topos {
         format: FormatOptions,
         limit: u32,
     ) -> Vec<Completion> {
+        self.completions_in(text, cursor, unit, format, limit, None)
+    }
+
+    fn completions_in(
+        &self,
+        text: String,
+        cursor: u32,
+        unit: OffsetUnit,
+        format: FormatOptions,
+        limit: u32,
+        translations: Option<&Translations>,
+    ) -> Vec<Completion> {
         let offsets = Offsets::new(&text, unit);
         let Some(cursor) = offsets.byte_of(cursor) else {
             return vec![];
@@ -711,8 +821,13 @@ impl Topos {
             format,
             limit: (limit > 0).then_some(limit as usize),
         };
-        self.matcher
-            .complete(&text, cursor, &options)
+        let completions = match translations {
+            Some(translations) => {
+                (self.matcher).complete_with_translations(&text, cursor, &options, translations)
+            }
+            None => self.matcher.complete(&text, cursor, &options),
+        };
+        completions
             .into_iter()
             .map(|c| Completion {
                 label: c.label,
@@ -720,6 +835,7 @@ impl Topos {
                     CoreKind::Book => CompletionKind::Book,
                     CoreKind::Chapter => CompletionKind::Chapter,
                     CoreKind::Verse => CompletionKind::Verse,
+                    CoreKind::Translation => CompletionKind::Translation,
                 },
                 start: offsets.of_byte(c.edit.range.start),
                 end: offsets.of_byte(c.edit.range.end),
@@ -796,19 +912,21 @@ impl Topos {
         let offsets = Offsets::new(text, unit);
         matcher
             .search(text)
-            .into_iter()
-            .filter_map(|m| {
-                let bytes = m.location.bytes;
-                let line_start = text[..bytes.start].rfind('\n').map_or(0, |i| i + 1);
-                Some(Match {
-                    passage: self.passage(&m.psg, &self.format)?,
-                    start: offsets.of_byte(bytes.start),
-                    end: offsets.of_byte(bytes.end),
-                    line: m.location.start.line as u32,
-                    column: offsets.of_byte(bytes.start) - offsets.of_byte(line_start) + 1,
-                })
-            })
+            .iter()
+            .filter_map(|m| self.match_of(m, text, &offsets))
             .collect()
+    }
+
+    fn match_of(&self, m: &BibleMatch, text: &str, offsets: &Offsets<'_>) -> Option<Match> {
+        let bytes = m.location.bytes;
+        let line_start = text[..bytes.start].rfind('\n').map_or(0, |i| i + 1);
+        Some(Match {
+            passage: self.passage(&m.psg, &self.format)?,
+            start: offsets.of_byte(bytes.start),
+            end: offsets.of_byte(bytes.end),
+            line: m.location.start.line as u32,
+            column: offsets.of_byte(bytes.start) - offsets.of_byte(line_start) + 1,
+        })
     }
 
     /// The query as a filter over this instance's data
@@ -1052,6 +1170,108 @@ mod tests {
             topos.format_passage(jude, &chapter).as_deref(),
             Some("Jude 5")
         );
+    }
+
+    /// The shared translation cases (topos-lib's tests/cases/translations.txt), through the
+    /// bindings with UTF-16 offsets; problems aren't in the bindings, so those are skipped
+    #[test]
+    fn translation_cases() {
+        let topos = Topos::new();
+        let mut translations = ToposTranslations::create();
+        let mut failures = vec![];
+        let written = |passage: &Passage, translation: &Option<Translation>| match translation {
+            Some(t) => format!("{} [{}]", passage.reference, t.name),
+            None => passage.reference.clone(),
+        };
+        let cases = include_str!("../../topos-lib/tests/cases/translations.txt");
+        for line in cases
+            .lines()
+            .filter(|l| !l.trim().is_empty() && !l.starts_with('#'))
+        {
+            let (kind, rest) = line.split_once(": ").unwrap();
+            if kind == "translations" {
+                translations = ToposTranslations::create();
+                for names in rest.split(", ") {
+                    let mut names = names.split('=');
+                    let name = names.next().unwrap().to_string();
+                    translations = translations.add(name, names.map(String::from).collect());
+                }
+                continue;
+            }
+            if kind == "counts" {
+                let parts: Vec<&str> = rest.split(" | ").collect();
+                let book = topos.find_book(parts[1].into()).unwrap();
+                let counts = parts[2].split(' ').map(|n| n.parse().unwrap()).collect();
+                translations = translations.chapter_verses(parts[0].into(), book, counts);
+                continue;
+            }
+            let (input, expected) = rest.split_once(" =>").unwrap();
+            let input = input.replace("\\n", "\n");
+            let expected: Vec<&str> = expected
+                .split(" | ")
+                .map(str::trim)
+                .filter(|e| !e.is_empty())
+                .collect();
+            let utf16 = |start: u32, end: u32| -> String {
+                let units: Vec<u16> = input.encode_utf16().collect();
+                String::from_utf16(&units[start as usize..end as usize]).unwrap()
+            };
+            let actual: Vec<String> = match kind {
+                "parse" => topos
+                    .parse_with_translation(
+                        input.clone(),
+                        OffsetUnit::Utf16,
+                        &translations,
+                        BookStyle::Name,
+                    )
+                    .map(|found| written(&found.passage, &found.translation))
+                    .into_iter()
+                    .collect(),
+                "search" => topos
+                    .search_with_translations(
+                        input.clone(),
+                        OffsetUnit::Utf16,
+                        &ToposQuery::create(),
+                        &translations,
+                    )
+                    .unwrap()
+                    .into_iter()
+                    .map(|found| {
+                        if let Some(t) = &found.translation {
+                            let named = utf16(t.start, t.end);
+                            assert_eq!(translations.get(named), Some(t.name.clone()), "{input:?}");
+                        }
+                        written(&found.reference.passage, &found.translation)
+                    })
+                    .collect(),
+                "complete" => {
+                    let cursor = input.encode_utf16().count() as u32;
+                    let format = ToposFormat::create();
+                    let found = topos.complete_with_translations(
+                        input.clone(),
+                        cursor,
+                        OffsetUnit::Utf16,
+                        &format,
+                        0,
+                        &translations,
+                    );
+                    found.into_iter().map(|c| c.label).collect()
+                }
+                _ => continue,
+            };
+            let ok = match kind {
+                "complete" if !expected.is_empty() => {
+                    actual.starts_with(&expected.iter().map(|e| e.to_string()).collect::<Vec<_>>())
+                }
+                _ => actual == expected,
+            };
+            if !ok {
+                failures.push(format!(
+                    "{kind}: {input:?}: expected {expected:?}, got {actual:?}"
+                ));
+            }
+        }
+        assert!(failures.is_empty(), "{}", failures.join("\n"));
     }
 
     /// The shared completion cases (topos-lib's tests/cases/complete.txt), through the bindings

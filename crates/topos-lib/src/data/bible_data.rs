@@ -93,23 +93,13 @@ impl BibleData {
         translations: &Translations,
     ) -> Option<TranslatedPassage> {
         let (book, offset, segments) = self.books.split_reference(input)?;
-        // The reference ends where the first translation starts, if only separators come between
-        let named = translations.find(segments).and_then(|(name, range)| {
-            let list = SegmentList::parse(&segments[..range.start]);
-            let (_, following) = translations.following(&segments[list.end()..])?;
-            (list.end() + following.start == range.start).then(|| {
-                let translation = Translation {
-                    name: name.to_string(),
-                    span: offset + range.start..offset + range.end,
-                };
-                (list, translation)
-            })
-        });
-        let (list, translation) = match named {
-            Some((list, translation)) => (list, Some(translation)),
-            None => (SegmentList::parse(segments), None),
-        };
-        let passage = self.resolve(book, &list)?;
+        let (list, named) = translations.read_segments(segments, segments.len());
+        let translation = named.map(|(name, range)| Translation::at(name, range, offset));
+        let versification = (translation.as_ref())
+            .and_then(|t| translations.chapter_verses(&t.name, book))
+            .or_else(|| self.chapter_verses.get_chapter_verses(&book));
+        let resolved = Resolver::for_book(versification).resolve(&list.nodes);
+        let passage = (!resolved.segments.is_empty()).then(|| resolved.segments.with_book(book))?;
         Some(TranslatedPassage {
             passage,
             translation,
@@ -172,6 +162,7 @@ mod tests {
 
     #[test]
     fn parses_a_translation_after_a_reference() {
+        use crate::data::chapter_verses::ChapterVerses;
         let data = BibleData::default();
         let translations =
             Translations::new(["ESV", "KJV", "LXX", "New King James Version"]).alias("AV", "KJV");
@@ -213,6 +204,19 @@ mod tests {
             .parse_with_translation("Read Jn 3:16 (kjv)", &translations)
             .unwrap();
         assert_eq!(found.translation.unwrap().span, 14..17);
+        // A translation's own chapter and verse counts
+        let third_john = data.books().search("3 John").unwrap();
+        let translations =
+            translations.with_chapter_verses("ESV", third_john, ChapterVerses::new(vec![15]));
+        let parse = |input: &str| {
+            let found = data.parse_with_translation(input, &translations)?;
+            Some(found.passage.segments.to_string())
+        };
+        // The default counts (the KJV's) end 3 John at verse 14, the ESV's at 15
+        assert_eq!(parse("3 John 1:15"), None);
+        assert_eq!(parse("3 John 1:15 KJV"), None);
+        assert_eq!(parse("3 John 1:15 esv"), Some("1:15".into()));
+        assert_eq!(parse("3 John 1:16 ESV"), None);
         // Without translations, it parses like `parse`
         let found = data
             .parse_with_translation("Ps 22, LXX", &Translations::default())

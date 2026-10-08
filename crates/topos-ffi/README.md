@@ -30,6 +30,9 @@ Every language gets the same object and types:
 | `contradiction(query) -> String?` | Why nothing can match, if the query's filters contradict each other |
 | `complete_with(text, cursor, unit, format, limit)` | Like `complete`, written with a `ToposFormat` |
 | `format_passage(passage, format) -> String?` | A passage written with a `ToposFormat` |
+| `parse_with_translation(reference, unit, translations, style) -> TranslatedPassage?` | Like `parse`, and the translation named after the reference (`John 3:16 (KJV)`) |
+| `search_with_translations(text, unit, query, translations) -> [TranslatedMatch]` | Like `search_with`, each reference with the translation named after it |
+| `complete_with_translations(text, cursor, unit, format, limit, translations)` | Like `complete_with`, offering translations first after a reference (`John 3:16 K` → `KJV`) |
 
 **Queries** (`ToposQuery`) choose which references to keep, like the CLI's filter options.
 Chain the methods; each returns a new query, so one can be reused and extended:
@@ -110,6 +113,27 @@ format, limit)` and `formatPassage(passage, format)` take a format directly.
 - `Match { passage, start, end, line, column }`
 - `Completion { label, kind, start, end, text }`: accept it by replacing `start..end` with `text`
 
+**Translations** (`ToposTranslations`) are the names a reference can be followed by, like the
+Bibles a plugin has. Only the methods that take them read translations; the others never do.
+Chain the methods:
+
+```ts
+const translations = ToposTranslations.create().add("BSB", []).add("KJV", ["AV"])
+  .chapterVerses("BSB", 64, threeJohn.chapterVerses()); // a ToposBook's own verse counts
+topos.parseWithTranslation("3 John 15 (av)", OffsetUnit.Utf16, translations, BookStyle.Name);
+// undefined: the KJV (the default counts) ends 3 John at verse 14
+topos.parseWithTranslation("3 John 15 (bsb)", OffsetUnit.Utf16, translations, BookStyle.Name);
+// { passage: 3 John 1:15, translation: { name: "BSB", start: 11, end: 14 } }
+```
+
+Names and aliases match ignoring case, the longest first, as whole words after the reference
+(`John 3:16 KJV`, `, KJV`, ` — KJV`, `(KJV)`, `[KJV]`, on the same line). A name ends the reference,
+so `Ps 22, LXX` is Psalm 22 in the LXX (not Psalms 22 and 70). A reference naming a translation
+with verse counts (`chapterVerses(name, bookId, counts)`) is checked against them for that book.
+`TranslatedPassage { passage, translation? }` and `TranslatedMatch { reference, translation? }`
+carry a `Translation { name, start, end }` (offsets in your unit); completions of translations are
+`CompletionKind.Translation`.
+
 **Offsets.** Languages index strings differently, so every offset (and column) is in the
 `OffsetUnit` you pass, and `cursor` is read in that unit too:
 
@@ -144,7 +168,8 @@ uses the CLI's). Each file comes back with its `FileMatch`es (`passage`, offsets
 a book you bring, through [`topos-bible-markup`](../topos-markup): `ToposBook.parse(topos, "usx",
 text)` parses a whole book (USX, or OSIS with verse milestones; `null` in JavaScript for an unknown
 markup), `bookId()` says which (from USX's `<book code>` or OSIS's book `div`), and `verses()` and
-`chapters()` list what it has. `html(passage, options)` and `text(passage, options)` give each part
+`chapters()` list what it has, and `chapterVerses()` its verse counts per chapter (for
+`ToposTranslations.chapterVerses`). `html(passage, options)` and `text(passage, options)` give each part
 of a passage (`John 3:16; 4` has two), and `chapterHtml(chapter, options)` a whole chapter;
 `BookTextOptions { notes, headings, classPrefix }` keeps or drops footnotes and headings. A verse
 runs from the end of the one before it, so a heading goes with the verse after it, and paragraphs

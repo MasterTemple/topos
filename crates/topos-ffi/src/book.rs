@@ -6,7 +6,7 @@ use boltffi::*;
 use topos_bible_markup::{
     Filter, HtmlOptions, HtmlRenderer, Kind, Markup, Node, TextOptions, find_all, parse,
     plain_text,
-    verses::{VerseSpan, passage_ranges, slice, verses},
+    verses::{VerseSpan, chapter_verses, passage_ranges, slice, verses},
 };
 use topos_lib::segments::Passage as CorePassage;
 
@@ -133,6 +133,12 @@ impl ToposBook {
             .collect()
     }
 
+    /// The number of verses in each chapter, from chapter 1, as the book numbers them: its
+    /// versification, for `ToposTranslations.chapterVerses`
+    pub fn chapter_verses(&self) -> Vec<u8> {
+        chapter_verses(&self.spans)
+    }
+
     /// The chapters with verses, in order
     pub fn chapters(&self) -> Vec<u8> {
         let mut chapters: Vec<u8> = self.spans.iter().map(|s| s.chapter).collect();
@@ -217,6 +223,7 @@ mod tests {
         let book = ToposBook::parse(&topos, "usx".into(), USX.into()).unwrap();
         assert_eq!(book.book_id(), Some(43));
         assert_eq!(book.chapters(), [3, 4]);
+        assert_eq!(book.chapter_verses(), [0, 0, 17, 1]);
         assert_eq!(book.verses().len(), 3);
         let parse = |r: &str| topos.parse(r.into(), BookStyle::Name).unwrap();
 

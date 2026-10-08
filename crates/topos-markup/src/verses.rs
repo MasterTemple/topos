@@ -274,3 +274,21 @@ pub fn passage_ranges(spans: &[VerseSpan], passage: &Passage) -> Vec<Range<usize
         })
         .collect()
 }
+
+/**
+The number of verses in each chapter, from chapter 1 to the last chapter with verses, as the
+book's own markers number them (a bridge like `4-5` counts to 5; a chapter without verses is 0)
+- This is the book's versification, for checking references against this translation, like
+  `Translations::set_chapter_verses` in topos-bible
+*/
+pub fn chapter_verses(spans: &[VerseSpan]) -> Vec<u8> {
+    let mut counts: Vec<u8> = vec![];
+    for span in spans.iter().filter(|s| s.chapter > 0) {
+        let idx = span.chapter as usize - 1;
+        if counts.len() <= idx {
+            counts.resize(idx + 1, 0);
+        }
+        counts[idx] = counts[idx].max(span.last.max(span.verse));
+    }
+    counts
+}

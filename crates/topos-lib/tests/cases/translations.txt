@@ -1,0 +1,67 @@
+# Translation cases: what parse, search, problems, and completion read with these translations.
+# - `translations: ESV, KJV=AV` lists the translations (aliases after `=`, separated by `=`)
+# - `counts: ESV | 3 John | 15` gives a book's verse counts in a translation, one per chapter
+# - `parse: input => Book segments [Translation]`; nothing after `=>` means no reference
+# - `search: input => Book segments [Translation] | ...`, like search.txt
+# - `problem: input => message | ...`; nothing after `=>` means no problems
+# - `complete: input => label | ...`: the first completions, with the cursor at the end
+# - `\n` in an input stands for a line break
+# Every front end that reads translations runs these: the library (tests/translations.rs) and the
+# bindings (topos-ffi)
+
+translations: ESV, KJV=AV, LXX, NASB, NASB95, New King James Version=NKJV
+counts: ESV | 3 John | 15
+
+# Forms
+parse: John 3:16 ESV => John 3:16 [ESV]
+parse: John 3:16, ESV => John 3:16 [ESV]
+parse: John 3:16 (ESV) => John 3:16 [ESV]
+parse: John 3:16 [ESV] says => John 3:16 [ESV]
+parse: John 3:16 — ESV => John 3:16 [ESV]
+parse: jn 3:16-18 esv => John 3:16-18 [ESV]
+parse: John 3:16 (AV) => John 3:16 [KJV]
+parse: John 3:16 nkjv => John 3:16 [New King James Version]
+parse: John 3:16 New King James Version => John 3:16 [New King James Version]
+parse: Jude 5 KJV => Jude 1:5 [KJV]
+# The longest name wins, and names are whole words
+parse: John 3:16 NASB95 => John 3:16 [NASB95]
+parse: John 3:16 NASB2020 => John 3:16
+# A name ends the reference (`LXX` would be the Roman numeral 70)
+parse: Ps 22, LXX => Psalm 22 [LXX]
+# Not right after the reference, unclosed, or not listed
+parse: John 3:16 is in the ESV => John 3:16
+parse: John 3:16 (ESV => John 3:16
+parse: John 3:16 NIV => John 3:16
+parse: John ESV =>
+
+# A translation's own counts: the default (the KJV's) end 3 John at verse 14, the ESV's at 15
+parse: 3 John 1:15 =>
+parse: 3 John 1:15 KJV =>
+parse: 3 John 1:15 ESV => 3 John 1:15 [ESV]
+parse: 3 John 15 ESV => 3 John 1:15 [ESV]
+
+# Search
+search: John 3:16 ESV and Romans 8:28 (KJV) => John 3:16 [ESV] | Romans 8:28 [KJV]
+search: John 3:16 ESV, Romans 8:28 => John 3:16 [ESV] | Romans 8:28
+search: Read John 3:16.\nESV notes => John 3:16
+search: John 3:16\nESV => John 3:16
+search: Ps 22, LXX; Ps 23 => Psalm 22 [LXX] | Psalm 23
+search: 3 John 15 ESV and 3 John 15 => 3 John 1:15 [ESV]
+search: 3 John 1:14-15 ESV => 3 John 1:14-15 [ESV]
+# Without the ESV's counts, a range past the end isn't a reference
+search: 3 John 1:14-15 =>
+
+# Problems name the translation
+problem: 3 John 1:16 ESV => 3 John 1:16 does not exist in the ESV
+problem: 3 John 1:15 ESV =>
+problem: 3 John 1:15 => 3 John 1:15 does not exist
+problem: John 3:99 KJV => John 3:99 does not exist in the KJV
+
+# Completion: translations first, from a word after a reference
+complete: John 3:16 K => KJV
+complete: John 3:16 (e => ESV
+complete: John 3:16 a => KJV
+complete: John 3:16 N => NASB | NASB95 | New King James Version
+complete: John 3:16 ESV =>
+complete: John 3:16 =>
+complete: K =>

@@ -83,6 +83,8 @@ The phases are in order, and each one leaves the repo working.
 
 Plan: [doc/translations.md](./doc/translations.md)
 - [x] `BibleData::parse_with_translation` and `Translations`: a reference and the translation named after it (`John 3:16 (KJV)`), as a new `TranslatedPassage`
-- [ ] The FFI's `parseWithTranslation`, then search and completion with translations
-- [ ] A versification per translation
+- [x] Search, problems, and completion with translations (`tests/cases/translations.txt`), without slowing plain search
+- [x] A translation's own chapter and verse counts (`Translations::set_chapter_verses`, from a book's USX with `verses::chapter_verses`)
+- [x] The FFI: `ToposTranslations`, `parseWithTranslation`, `searchWithTranslations`, `completeWithTranslations`, `ToposBook.chapterVerses`
+- [ ] Mapping verses between versifications (Malachi 4:1 KJV = 3:19 MT)
 - [ ] Several Bibles in the LSP (`bibles`), the Neovim plugin, and the Obsidian plugin

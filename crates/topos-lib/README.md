@@ -127,6 +127,37 @@ assert_eq!(problems.len(), 1);
 assert_eq!(problems[0].bytes, 11..15);
 ```
 
+## Translations
+
+Only methods that take `Translations` read a translation after a reference, and only the names
+listed (with aliases, ignoring case). A translation can have its own chapter and verse counts:
+
+```rust
+use topos_bible::{
+    data::{BibleData, chapter_verses::ChapterVerses, translations::Translations},
+    matcher::BibleMatcher,
+};
+
+let matcher = BibleMatcher::default();
+let data = matcher.data();
+let three_john = data.books().search("3 John").unwrap();
+let translations = Translations::new(["BSB", "KJV", "LXX"])
+    .alias("AV", "KJV")
+    .with_chapter_verses("BSB", three_john, ChapterVerses::new(vec![15]));
+
+let found = data.parse_with_translation("3 John 15 (bsb)", &translations).unwrap();
+assert_eq!(found.translation.unwrap().name, "BSB");
+// The default counts (the KJV's) end 3 John at verse 14
+assert_eq!(data.parse_with_translation("3 John 15 AV", &translations), None);
+
+let found = matcher.search_with_translations("Ps 22, LXX; John 3:16", &translations);
+assert_eq!(found[0].translation.as_ref().unwrap().name, "LXX");
+assert_eq!(found[1].translation, None);
+```
+
+`BibleMatcher::problems_with_translations` names the translation (`3 John 1:16 does not exist in
+the BSB`), and `complete_with_translations` offers them after a reference (`John 3:16 K` → `KJV`).
+
 ## Book context
 
 In notes about one book, bare references like `3:16` can count too:

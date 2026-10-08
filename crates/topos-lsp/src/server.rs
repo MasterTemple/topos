@@ -275,6 +275,7 @@ impl Server {
                         CompletionKind::Book => CompletionItemKind::FOLDER,
                         CompletionKind::Chapter => CompletionItemKind::MODULE,
                         CompletionKind::Verse => CompletionItemKind::REFERENCE,
+                        CompletionKind::Translation => CompletionItemKind::ENUM_MEMBER,
                     }),
                     /*
                     What was typed, then the label (`jn 3:1 John 3:16`):

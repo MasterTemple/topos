@@ -1,7 +1,11 @@
 use std::collections::BTreeSet;
 
 use crate::{
-    data::{bible_data::BibleData, books::BookId},
+    data::{
+        bible_data::BibleData,
+        books::BookId,
+        translations::{Translation, Translations},
+    },
     filter::bible_filter::BibleFilter,
     matcher::{
         context::BookContext,
@@ -84,44 +88,96 @@ impl BibleMatcher {
     - Matches are then filtered by book and passage
     */
     pub fn search(&self, text: &str) -> Vec<BibleMatch> {
-        let mut filtered = self.filter();
+        self.search_translated(text, None, |reference, _| reference)
+    }
+
+    /**
+    [`BibleMatcher::search`], with the translation each reference names right after it
+    (`John 3:16 ESV`, `John 3:16 (ESV)`), if it is one of `translations`
+    - A reference naming a translation is checked against that translation's chapter and verse
+      counts, when it has them (see [`Translations::set_chapter_verses`])
+    - A name ends the reference, so `Ps 22, LXX` is Psalm 22 (not Psalms 22 and 70)
+    - References without a book name (with a [`BookContext`]) get the translation after them, but
+      are checked against the data's counts
+    */
+    pub fn search_with_translations(
+        &self,
+        text: &str,
+        translations: &Translations,
+    ) -> Vec<TranslatedMatch> {
+        self.search_translated(text, Some(translations), |reference, translation| {
+            TranslatedMatch {
+                reference,
+                translation,
+            }
+        })
+    }
+
+    fn search_translated<T>(
+        &self,
+        text: &str,
+        translations: Option<&Translations>,
+        to_match: impl Fn(BibleMatch, Option<Translation>) -> T,
+    ) -> Vec<T> {
         let original = text;
         let text = SearchText::new(original);
         let index = LineIndex::new(original);
         let data = self.data();
 
         let starts: Vec<_> = data.books().candidates(text.as_str()).collect();
-        let mut found: Vec<FoundPassage> = starts
+        let mut found: Vec<(FoundPassage, Option<Translation>)> = starts
             .iter()
             .enumerate()
             .filter_map(|(idx, cur)| {
                 let next_start = starts.get(idx + 1).map(|next| next.start());
-                FoundPassage::find(data, text.as_str(), *cur, next_start)
+                FoundPassage::find_translated(data, text.as_str(), *cur, next_start, translations)
             })
             .collect();
 
         if let Some(context) = self.context() {
-            let taken: Vec<_> = found.iter().map(|f| f.bytes.clone()).collect();
+            let taken: Vec<_> = found.iter().map(|(f, _)| f.bytes.clone()).collect();
             let book_starts: Vec<_> = starts.iter().map(|s| s.start()).collect();
-            found.extend(context.find_bare(data, text.as_str(), &taken, &book_starts));
-            found.sort_by_key(|f| f.bytes.start);
+            let bare = context.find_bare(data, text.as_str(), &taken, &book_starts);
+            found.extend(bare.into_iter().map(|f| {
+                let after = &text.as_str()[f.bytes.end..];
+                let translation = translations
+                    .and_then(|t| t.following(after))
+                    .map(|(name, range)| Translation::at(name, range, f.bytes.end));
+                (f, translation)
+            }));
+            found.sort_by_key(|(f, _)| f.bytes.start);
         }
 
-        for found in found {
-            let bytes = text.original_range(found.bytes);
-            let location = LineColLocation::new(&index, bytes.start, bytes.end);
-            filtered.try_add(BibleMatch {
-                location,
-                psg: found.psg,
-            });
-        }
-        filtered.matches()
+        found
+            .into_iter()
+            .filter(|(found, _)| self.keeps(&found.psg))
+            .map(|(found, translation)| {
+                let bytes = text.original_range(found.bytes);
+                let location = LineColLocation::new(&index, bytes.start, bytes.end);
+                let translation = translation.map(|t| Translation {
+                    span: text.original_range(t.span),
+                    ..t
+                });
+                let reference = BibleMatch {
+                    location,
+                    psg: found.psg,
+                };
+                to_match(reference, translation)
+            })
+            .collect()
     }
 
     /// The first reference in `text`
     pub fn find(&self, text: &str) -> Option<BibleMatch> {
         self.search(text).into_iter().next()
     }
+}
+
+/// A reference found by [`BibleMatcher::search_with_translations`], and the translation it names
+#[derive(Clone, Debug)]
+pub struct TranslatedMatch {
+    pub reference: BibleMatch,
+    pub translation: Option<Translation>,
 }
 
 impl Default for BibleMatcher {

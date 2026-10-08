@@ -11,6 +11,7 @@ use crate::{
     data::{
         bible_data::BibleData,
         books::{BookId, Books},
+        translations::Translations,
     },
     matcher::BibleMatcher,
     segments::{formatter::FormatOptions, passage::Passage, segment::Segment},
@@ -31,6 +32,8 @@ pub enum CompletionKind {
     Book,
     Chapter,
     Verse,
+    /// A translation after a reference (from [`BibleMatcher::complete_with_translations`])
+    Translation,
 }
 
 /// Replace the text at `range` (byte offsets into the input) with `text`
@@ -96,6 +99,76 @@ impl BibleMatcher {
             completions.truncate(limit);
         }
         completions
+    }
+}
+
+impl BibleMatcher {
+    /**
+    [`BibleMatcher::complete`], and before its completions, the translations a word after a
+    reference starts (`John 3:16 K` → `KJV`, `John 3:16 (e` → `ESV`), with the reference's passage
+    - The word needs a letter, so `John 3:16 ` alone offers no translations
+    - A translation is offered if `typed` starts its name or one of its aliases, ignoring case
+    - The reference must be on the cursor's line, and kept by this matcher's filters
+    */
+    pub fn complete_with_translations(
+        &self,
+        text: &str,
+        cursor: usize,
+        options: &CompleteOptions,
+        translations: &Translations,
+    ) -> Vec<Completion> {
+        if !text.is_char_boundary(cursor) {
+            return vec![];
+        }
+        let mut completions = self.translation_completions(&text[..cursor], translations);
+        let unlimited = CompleteOptions {
+            limit: None,
+            ..options.clone()
+        };
+        completions.extend(self.complete(text, cursor, &unlimited));
+        if let Some(limit) = options.limit {
+            completions.truncate(limit);
+        }
+        completions
+    }
+
+    fn translation_completions(
+        &self,
+        before: &str,
+        translations: &Translations,
+    ) -> Vec<Completion> {
+        let typed_len: usize = (before.chars().rev())
+            .take_while(|c| c.is_alphanumeric())
+            .map(char::len_utf8)
+            .sum();
+        let start = before.len() - typed_len;
+        let typed = &before[start..];
+        if !typed.chars().any(char::is_alphabetic) {
+            return vec![];
+        }
+        let line_start = before[..start].rfind('\n').map_or(0, |i| i + 1);
+        let line = &before[line_start..start];
+        let Some(found) = self.search(line).pop() else {
+            return vec![];
+        };
+        let gap = &line[found.location.bytes.end..];
+        if gap.is_empty() || !gap.chars().all(Translations::is_gap) {
+            return vec![];
+        }
+        translations
+            .starting_with(typed)
+            .into_iter()
+            .filter(|name| *name != typed)
+            .map(|name| Completion {
+                label: name.to_string(),
+                kind: CompletionKind::Translation,
+                edit: TextEdit {
+                    range: start..before.len(),
+                    text: name.to_string(),
+                },
+                passage: Some(found.psg.clone()),
+            })
+            .collect()
     }
 }
 
