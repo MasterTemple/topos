@@ -72,7 +72,7 @@ The phases are in order, and each one leaves the repo working.
 - [x] A `topos-ffi` façade (BoltFFI 0.31) with owned data types and offsets in the caller's unit
 - [x] Remove the old `topos-py`, `topos-ts`, and `topos-ts-boltffi` test crates
 - [x] Python through BoltFFI (`boltffi pack python` builds a working wheel)
-- [x] An LSP server (`topos-lsp`): completion, hover with the normalized reference, and document symbols
+- [x] An LSP server (`topos-lsp`): completion, hover with the normalized reference, and document symbols (moved to biblix as `biblix-lsp`, October 2026)
 - [x] LSP diagnostics for references that do not exist (`BibleMatcher::problems`)
 - [x] LSP Bible text from a folder of USX files (`bible`, `markup`): passage text in hover, go to definition into a whole book (`topos-bible://BSB/JHN`, colored with semantic tokens), and references from a verse
 - [x] The Neovim plugin moved to its own repository, `topos-bible.nvim`

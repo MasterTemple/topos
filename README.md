@@ -48,8 +48,10 @@ you choose. With [lazy.nvim](https://lazy.folke.io):
 | [`topos-bible`](./crates/topos-lib/README.md) (`topos-lib`) | The core: book data, the segment grammar, resolving, searching, formatting, OSIS, and autocomplete |
 | [`topos-bible-formats`](./crates/topos-formats/README.md) (`topos-formats`) | Locations in HTML, SRT/WebVTT/SBV, EPUB, JSON, XML, and PDF (`pdf` feature) |
 | [`topos-bible-cli`](./crates/topos-cli/README.md) (`topos-cli`) | `topos`, a ripgrep-style search tool |
-| [`topos-lsp`](./crates/topos-lsp/README.md) | A language server: completion, hover (with the passage's text), go to definition and references, symbols, and diagnostics |
 | [`topos-ffi`](./crates/topos-ffi) | Bindings for TypeScript/WASM, Python, Swift, and Kotlin via [BoltFFI](https://boltffi.dev) |
+
+The language server moved to [biblix](https://github.com/MasterTemple/biblix) as `biblix-lsp`
+(October 2026), with Bible text from biblix packages; topos stays references only.
 
 The Obsidian plugin (verse search with filters, autocomplete, and links to Bible sites) is in its own
 repository, `obsidian-topos-bible`, and uses the WebAssembly package from `topos-ffi`.

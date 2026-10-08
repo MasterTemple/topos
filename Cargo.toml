@@ -6,7 +6,6 @@ members = [
     "crates/topos-formats",
     "crates/topos-lib",
     "crates/topos-markup",
-    "crates/topos-lsp",
 ]
 resolver = "3"
 

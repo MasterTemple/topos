@@ -16,7 +16,6 @@ crates/
                    LSP, and FFI
   topos-cli/       ripgrep-style binary (depends on topos-lib + topos-formats + topos-index)
   topos-ffi/       one BoltFFI façade over topos-lib and topos-index (TypeScript/WASM, Python, Swift, Kotlin)
-  topos-lsp/       a language server: completion, hover, document symbols
 ```
 
 `topos-parser`, `topos-pdf`, and the old PyO3, wasm-bindgen, and BoltFFI test crates are gone; `topos-ffi` replaces the bindings.

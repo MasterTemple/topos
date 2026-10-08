@@ -65,6 +65,10 @@ Steps 2 and 3:
 - **Versions keep links working**: a link resolves against the version it was made with, and the
   version number says when a change can break links.
 
+- **The language server moved into biblix** as `biblix-lsp` (`crates/biblix-lsp`, history kept),
+  so it can read Bible text from packages without topos depending on biblix. topos keeps the
+  library, markup, formats, index, CLI, and topos-ffi.
+
 ## Layers
 
 ```
