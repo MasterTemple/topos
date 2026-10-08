@@ -177,6 +177,7 @@ fn respond(server: &Server, request: Request) -> Response {
         }
         server::BOOK_REQUEST => params(request).and_then(|p| server.book(p).map(json)),
         server::BIBLES_REQUEST => Ok(json(server.bibles())),
+        server::SAME_VERSE_REQUEST => params(request).and_then(|p| server.same_verse(p).map(json)),
         ExecuteCommand::METHOD => params(request).and_then(|p| server.execute_command(p).map(json)),
         DocumentDiagnosticRequest::METHOD => {
             params(request).map(|p| json(server.pull_diagnostics(p)))

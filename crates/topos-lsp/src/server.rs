@@ -71,6 +71,21 @@ pub struct BibleInfo {
     pub books: Vec<String>,
 }
 
+/**
+The request for the same verse in another Bible: `{ "uri": "topos-bible://BSB/JHN", "position":
+{ "line": 3, "character": 0 }, "bible": "KJV" }` gives the [`Location`] of the verse at that
+position (or the chapter, for a chapter's label) in the KJV's John, or `null` if it lacks the book
+*/
+pub const SAME_VERSE_REQUEST: &str = "topos/sameVerse";
+
+#[derive(Debug, Deserialize)]
+pub struct SameVerseParams {
+    pub uri: String,
+    pub position: Position,
+    /// The other Bible's name or alias
+    pub bible: String,
+}
+
 /// A whole book, for the editor to show as a read-only document
 #[derive(Debug, Serialize)]
 pub struct BookText {
@@ -1077,6 +1092,51 @@ impl Server {
             title: bible.book_name(book).unwrap_or_default().to_string(),
             text: rendered.text.clone(),
         })
+    }
+
+    /// [`SAME_VERSE_REQUEST`]: where the verse at a position in a whole book is in another
+    /// Bible's book (its verse with that number, else its chapter, else the next chapter it has,
+    /// else the book's start)
+    pub fn same_verse(&self, params: SameVerseParams) -> Result<Option<Location>, String> {
+        let (from, book) = self
+            .bibles
+            .book_of(&params.uri)
+            .ok_or_else(|| format!("{} is not a whole book", params.uri))?;
+        let target = self
+            .bibles
+            .get(&params.bible)
+            .ok_or_else(|| format!("no Bible is named `{}`", params.bible))?;
+        let (Some(rendered), Some(other)) = (from.render(book), target.render(book)) else {
+            return Ok(None);
+        };
+        let index = LineIndex::new(&rendered.text);
+        let position = params.position;
+        let cursor = index
+            .offset_of_utf16(position.line as usize, position.character as usize)
+            .unwrap_or(rendered.text.len());
+        let (chapter, verse) = match rendered.part_at(cursor) {
+            Some(Part::Verse { chapter, verse, .. }) => (chapter, Some(verse)),
+            Some(Part::Chapter(chapter)) => (chapter, None),
+            None => (0, None),
+        };
+        let chapter_of = |part: &Part| match *part {
+            Part::Verse { chapter, .. } | Part::Chapter(chapter) => chapter,
+        };
+        let parts = &other.parts;
+        let found = verse
+            .and_then(|verse| {
+                parts.iter().find(|(_, part)| {
+                    matches!(*part, Part::Verse { chapter: c, verse: v, last }
+                        if c == chapter && v <= verse && verse <= last)
+                })
+            })
+            .or_else(|| (parts.iter()).find(|(_, part)| *part == Part::Chapter(chapter)))
+            .or_else(|| (parts.iter()).find(|(_, part)| chapter_of(part) >= chapter))
+            .map_or(0, |(range, _)| range.start);
+        let uri = Uri::from_str(&target.uri(book).ok_or("the book has no USFM code")?)
+            .map_err(|e| e.to_string())?;
+        let index = LineIndex::new(&other.text);
+        Ok(Some(Location::new(uri, lsp_range(&index, found, found))))
     }
 
     /// [`BIBLES_REQUEST`]: the Bibles, the default first
@@ -2321,6 +2381,49 @@ to condemn.</char> <verse eid="JHN 3:17"/></para>
             .collect();
         assert_eq!(names, [("BSB", &[][..]), ("KJV", &["AV".to_string()][..])]);
         assert_eq!(bibles[1].books, ["JHN"]);
+
+        // The same verse in the other Bible's book
+        let same = |line, bible: &str| {
+            server
+                .same_verse(SameVerseParams {
+                    uri: "topos-bible://BSB/JHN".into(),
+                    position: Position::new(line, 1),
+                    bible: bible.into(),
+                })
+                .unwrap()
+                .map(|l| (l.uri.to_string(), l.range.start))
+        };
+        let bsb = server
+            .book(BookParams {
+                uri: "topos-bible://BSB/JHN".into(),
+            })
+            .unwrap();
+        let line_of =
+            |text: &str, find: &str| text.lines().position(|l| l.contains(find)).unwrap() as u32;
+        let kjv_book = server
+            .book(BookParams {
+                uri: "topos-bible://KJV/JHN".into(),
+            })
+            .unwrap();
+        let kjv_316 = line_of(&kjv_book.text, "[16]");
+        assert_eq!(
+            same(line_of(&bsb.text, "[16]"), "av"),
+            Some(("topos-bible://KJV/JHN".into(), Position::new(kjv_316, 0)))
+        );
+        // A chapter it lacks (and nothing after it) goes to the book's start
+        assert_eq!(
+            same(line_of(&bsb.text, "John 4"), "KJV").map(|(_, p)| p),
+            Some(Position::new(0, 0))
+        );
+        assert!(
+            server
+                .same_verse(SameVerseParams {
+                    uri: "topos-bible://BSB/JHN".into(),
+                    position: Position::new(0, 0),
+                    bible: "NIV".into(),
+                })
+                .is_err()
+        );
 
         // Insertions: from the named Bible, else one per Bible
         let inserts = |server: &Server, character| -> Vec<String> {
