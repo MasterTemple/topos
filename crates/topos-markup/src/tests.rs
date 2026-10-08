@@ -419,3 +419,67 @@ mod verses {
         assert_eq!(text(&slice(&milestones, &spans[1].start, None)), "sent");
     }
 }
+
+/// Verse and chapter labels are written into the text, and their spans cover them
+#[test]
+fn verse_and_chapter_labels() {
+    let usx = r#"<usx><book code="JHN" style="id">x</book><chapter number="3" style="c" sid="JHN 3"/>
+<para style="p"><verse number="16" style="v" sid="JHN 3:16"/>For God so <char style="wj">loved</char> the world.<verse eid="JHN 3:16"/><verse number="17-18" style="v" sid="JHN 3:17-18"/>For God<verse eid="JHN 3:17-18"/></para><chapter eid="JHN 3"/></usx>"#;
+    let nodes = parse(Markup::Usx, usx);
+    let opts = TextOptions {
+        verse_label: Some(String::from("[{verse}]")),
+        chapter_label: Some(String::from("{book} {chapter}")),
+        ..TextOptions::default()
+    };
+    let flat = flatten::flatten(&nodes, &opts);
+    assert_eq!(
+        flat.text,
+        "JHN 3\n[16] For God so loved the world. [17-18] For God"
+    );
+    let labels: Vec<(Kind, &str)> = flat
+        .spans
+        .iter()
+        .filter(|s| matches!(s.kind, Kind::Verse | Kind::Chapter) && !s.range.is_empty())
+        .map(|s| (s.kind, &flat.text[s.range.clone()]))
+        .collect();
+    assert_eq!(
+        labels,
+        [
+            (Kind::Chapter, "JHN 3"),
+            (Kind::Verse, "[16]"),
+            (Kind::Verse, "[17-18]")
+        ]
+    );
+    // Labels aren't from the tree
+    let at = flat.text.find("[16]").unwrap();
+    assert_eq!(flat.source(at), None);
+    assert!(flat.source(at + 5).is_some());
+
+    // A passage cut from the middle of a chapter still knows its chapter (from the verse's id)
+    let osis = parse(
+        Markup::Osis,
+        r#"<verse osisID="John.3.16">For God</verse> <verse osisID="John.3.17">sent</verse>"#,
+    );
+    let opts = TextOptions {
+        verse_label: Some(String::from("{book} {chapter}:{verse}")),
+        ..TextOptions::default()
+    };
+    assert_eq!(plain_text(&osis, &opts), "John 3:16 For God John 3:17 sent");
+    // Without labels, verse markers stay empty
+    let flat = flatten::flatten(&nodes, &TextOptions::default());
+    assert!(flat.text.starts_with("For God"));
+}
+
+/// Each pushed entry's range in the text
+#[test]
+fn entry_ranges() {
+    let mut flat = Flattener::new(TextOptions::default());
+    flat.push(&parse(Markup::Osis, "In the beginning "))
+        .push(&parse(Markup::Osis, "<note>dropped</note>"))
+        .push(&parse(Markup::Osis, " was <q who=\"Jesus\">the Word"))
+        .push(&parse(Markup::Osis, "</q>"));
+    let flat = flat.finish();
+    let entries: Vec<&str> = flat.entries.iter().map(|r| &flat.text[r.clone()]).collect();
+    assert_eq!(entries, ["In the beginning", "", "was the Word", ""]);
+    assert_eq!(flat.entries[1], 17..17);
+}

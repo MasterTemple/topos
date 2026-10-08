@@ -74,5 +74,7 @@ The phases are in order, and each one leaves the repo working.
 - [x] Python through BoltFFI (`boltffi pack python` builds a working wheel)
 - [x] An LSP server (`topos-lsp`): completion, hover with the normalized reference, and document symbols
 - [x] LSP diagnostics for references that do not exist (`BibleMatcher::problems`)
+- [x] LSP Bible text from a folder of USX files (`bible`, `markup`): passage text in hover, go to definition into a whole book (`topos-bible://BSB/JHN`, colored with semantic tokens), and references from a verse
+- [x] The Neovim plugin moved to its own repository, `topos-bible.nvim`
 - [ ] Incremental parsing (re-scan only the edited lines). Deferred: search runs at about 30 MiB/s, so re-searching a document on each LSP request is fast enough for now
 - [x] Criterion benchmarks (`cargo bench -p topos-lib`)

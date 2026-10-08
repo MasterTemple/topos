@@ -5,14 +5,18 @@
 - **Completion**: book names (`1 Co` → `1 Corinthians`), then chapters and verses from the
   book's versification; each completion rewrites the whole reference (`jn 3:1` → `John 3:16`)
 - **Hover**: the reference under the cursor, normalized, with what the `hover` setting lists:
-  its full name and abbreviation, OSIS id, book (and its number and chapters), testament,
-  genres, verses, and where it is. On a reference that doesn't exist, what does (`John 3 has
-  36 verses`, `John has 21 chapters`)
+  the passage's text (with a `bible`), its full name and abbreviation, OSIS id, book (and its
+  number and chapters), testament, genres, verses, and where it is. On a reference that doesn't
+  exist, what does (`John 3 has 36 verses`, `John has 21 chapters`)
+- **Go to definition** (with a `bible`): the passage in its whole book, a read-only document
+  like `topos-bible://BSB/JHN` (see [Whole books](#whole-books))
 - **Inlay hints**: after each reference, how it's written in your format (where that differs,
   like `jn 3:16` → `John 3:16`), or its OSIS id
 - **Document symbols**: every reference in the file, for outlines and pickers
 - **Go to references**: every reference in the workspace that is exactly the one under the
-  cursor (`--exact-overlap`), however it's written
+  cursor (`--exact-overlap`), however it's written. In a whole book, every reference that names
+  the verse under the cursor (`--explicit-overlap`), or on a chapter's label, every reference
+  that shares a verse with the chapter
 - **Code actions**: on a reference, reformat it the way completion writes it (`Reformat as
   "John 3:16"`, and `Reformat all N references in this file` when several differ), or search the
   workspace for it: `Search "John 3:16" for explicit overlap`, `... for any overlap`,
@@ -45,10 +49,27 @@ so one file configures both. It uses these keys and ignores the others:
 | `ext` | Extensions searched in the workspace, like `"md,txt"` (all text files by default) |
 | `inlay-hints` | `"changed"` (default), `"always"`, `"osis"`, or `"never"` |
 | `reference-diagnostics` | The diagnostic on each reference: `"info"` (default), `"hint"`, or `"never"` |
-| `hover` | The lines below the reference in a hover, in order (a list or `"osis,book"`; `[]` for none): `written`, `name`, `abbreviation`, `osis`, `book`, `testament`, `genres`, `verses`, `bcv`, `location`. The default is every one but `written` and `bcv`. `name` and `abbreviation` are left out when the reference is already written that way |
+| `hover` | What a hover shows below the reference, in order (a list or `"osis,book"`; `[]` for none): `text` (the passage, from `bible`), `written`, `name`, `abbreviation`, `osis`, `book`, `testament`, `genres`, `verses`, `bcv`, `location`. The default is every one but `written` and `bcv`. `name` and `abbreviation` are left out when the reference is already written that way |
+| `bible` | A folder of USX files, one book each (`JHN.usx`, `44JHNBSB.usx`, or any name with a `<book code>` inside), as Paratext, the Digital Bible Library, and eBible.org publish them. Its USX files are left out of workspace searches |
+| `markup` | How Bible text is written (see below) |
 
-The CLI skips `inlay-hints`, `reference-diagnostics`, and `hover`, so they can go in the shared
-`config.toml`.
+The CLI skips `inlay-hints`, `reference-diagnostics`, `hover`, `bible`, and `markup`, so they can
+go in the shared `config.toml`.
+
+`markup` has a table for each kind of element, with `show` and, for labels, `display` (the
+defaults are shown; other keys, like an editor's `color`, are ignored):
+
+```toml
+[markup]
+verse_numbers = { show = true, display = "[{verse}]" }
+chapter_numbers = { show = true, display = "{name} {chapter}" } # in whole books, on their own line
+words_of_jesus = { show = true } # false leaves them uncolored
+headings = { show = true }
+notes = { show = false } # footnotes, in brackets
+```
+
+Labels can use `{verse}` (`16`, or `4-5` for a bridge), `{chapter}`, `{name}` (`John`), and
+`{book}` (the USX code, `JHN`).
 
 The editor's settings override the file: as initialization options, or as `settings` (changed
 while the server runs, without a restart). They take the same keys, at the top level or under
@@ -56,11 +77,25 @@ while the server runs, without a restart). They take the same keys, at the top l
 can also be a whole object, like `psg-fmt`. Settings that can't be used are reported as a
 warning, and the previous ones stay.
 
+## Whole books
+
+With a `bible`, go to definition returns a document named like `topos-bible://BSB/JHN` (the
+folder's name, then the book's USX code), which no file backs. The editor asks for its text with
+the `topos/book` request (`{ "uri": "topos-bible://BSB/JHN" }` gives `{ "title": "John", "text":
+"..." }`), shows it read-only, and opens it with the server like any document. The server then
+provides:
+
+- **Semantic tokens**: `verseNumber`, `chapterNumber`, `wordsOfJesus`, `heading`, and `note`
+  (other documents have none), for the editor to color
+- **Go to references** from a verse, as above
+- Hover and go to definition on the references in its headings; no diagnostics, inlay hints, or
+  reformat actions
+
 ## Neovim
 
-The [topos-bible.nvim](../../README.md#neovim) plugin sets up the server, builds it, opens the
-code actions' results in Telescope (or the quickfix list), and adds search commands and pickers.
-See `:help topos-bible`.
+The [topos-bible.nvim](https://github.com/MasterTemple/topos-bible.nvim) plugin sets up the
+server, builds it, opens whole books as read-only buffers colored by `markup`, opens the code
+actions' results in Telescope (or the quickfix list), and adds search commands and pickers.
 
 Without the plugin (Neovim 0.11+):
 
@@ -75,7 +110,9 @@ vim.lsp.enable('topos')
 ```
 
 Go to references and completion then work. The code actions need a `vim.lsp.commands['topos.search']`
-handler to show their results (see below; the plugin's is in `lua/topos/init.lua`).
+handler to show their results (see below; the plugin's is in its `lua/topos/init.lua`), and
+go to definition needs the editor to open `topos-bible://` documents (the plugin's
+`lua/topos/book.lua`).
 
 ## Code actions in other editors
 

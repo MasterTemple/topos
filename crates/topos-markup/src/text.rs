@@ -16,6 +16,17 @@ pub struct TextOptions {
     pub strongs: bool,
     /// Keep line and paragraph breaks as `\n`; otherwise they become spaces; default: true
     pub line_breaks: bool,
+    /**
+    Text written where each verse starts, like `[{verse}]`; default: none (verse markers are
+    empty spans)
+    - `{verse}` is the verse's number as written (`16`, or `4-5` for a bridge), `{chapter}` its
+      chapter, and `{book}` the book in its id (`JHN` from `JHN 3:16`, `John` from `John.3.16`)
+    - The verse's [`Span`](crate::Span) covers the label, which has no source in the tree
+    */
+    pub verse_label: Option<String>,
+    /// Text written on its own line where each chapter starts, like `Chapter {chapter}` (with
+    /// `{chapter}` and `{book}`); default: none
+    pub chapter_label: Option<String>,
 }
 
 impl Default for TextOptions {
@@ -24,6 +35,8 @@ impl Default for TextOptions {
             filter: Filter::text(),
             strongs: false,
             line_breaks: true,
+            verse_label: None,
+            chapter_label: None,
         }
     }
 }

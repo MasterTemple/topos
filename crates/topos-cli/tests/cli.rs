@@ -56,7 +56,7 @@ fn stdout(output: &Output) -> String {
 
 #[test]
 fn quickfix_from_stdin() {
-    // The format the Neovim integration in the README parses
+    // The format topos-bible.nvim parses (`topos -m json`)
     let output = topos(
         &["-m", "quickfix"],
         Some("intro\nsee Rom 8:28 and Jude 5\n"),

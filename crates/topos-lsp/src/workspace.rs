@@ -154,10 +154,23 @@ pub fn find(matcher: &BibleMatcher, text: &str) -> Vec<Found> {
         .collect()
 }
 
+/// Whether a file is one of the Bible's books (by its canonical folder, since either path may go
+/// through a symlink)
+fn in_bible(path: &Path, folder: &Path) -> bool {
+    let usx = path
+        .extension()
+        .is_some_and(|e| e.eq_ignore_ascii_case("usx"));
+    usx && path
+        .parent()
+        .and_then(|parent| parent.canonicalize().ok())
+        .is_some_and(|parent| parent == folder)
+}
+
 /**
 Every reference in the workspace, by file: open documents as they are in the editor (unsaved
 text included), then the files under `roots` with one of `extensions` (any if empty), from the
 cache when unchanged. Files are walked in parallel
+- The USX files in `bible` (the Bible's canonical folder) are left out
 */
 // `Uri` caches its parsed parts, which clippy counts as a mutable key; its text never changes
 #[allow(clippy::mutable_key_type)]
@@ -167,6 +180,7 @@ pub fn references(
     extensions: &[String],
     matcher: &BibleMatcher,
     cache: &Cache,
+    bible: Option<&Path>,
 ) -> Vec<(Uri, Arc<Vec<Found>>)> {
     // Open documents by path: editors may percent-encode their URIs differently
     let open: HashSet<PathBuf> = documents.keys().filter_map(uri_to_path).collect();
@@ -195,6 +209,7 @@ pub fn references(
             let path = entry.path();
             let wanted = entry.file_type().is_some_and(|t| t.is_file())
                 && !open.contains(path)
+                && bible.is_none_or(|folder| !in_bible(path, folder))
                 && (extensions.is_empty()
                     || path
                         .extension()

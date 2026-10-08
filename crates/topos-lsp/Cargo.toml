@@ -19,4 +19,5 @@ serde = { workspace = true }
 serde_json = { workspace = true }
 toml = "1.1"
 topos-bible = { path = "../topos-lib" }
+topos-bible-markup = { path = "../topos-markup" }
 topos-bible-index = { path = "../topos-index", default-features = false, features = ["files"] }

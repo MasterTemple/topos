@@ -203,7 +203,9 @@ pub(crate) fn usx(e: &mut Element) {
             }
             "q" | "qr" | "qc" | "qm" | "qa" | "qd" => Kind::Line,
             "b" => Kind::LineBreak,
-            "rem" | "h" | "toc" | "toca" | "ide" | "sts" | "restore" | "cat" => Kind::Metadata,
+            "rem" | "h" | "toc" | "toca" | "ide" | "sts" | "restore" | "cat" | "usfm" => {
+                Kind::Metadata
+            }
             _ => Kind::Paragraph,
         },
         "char" => match marker {

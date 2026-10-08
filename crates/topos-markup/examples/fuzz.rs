@@ -76,6 +76,8 @@ fn main() {
         filter: Filter::all(),
         strongs: true,
         line_breaks: true,
+        verse_label: Some(String::from("[{book} {chapter}:{verse}]")),
+        chapter_label: Some(String::from("{book} {chapter}")),
     };
     let mut seed: u64 = 0x9E37_79B9_7F4A_7C15;
     let mut rnd = || {

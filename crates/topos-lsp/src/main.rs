@@ -12,14 +12,15 @@ use lsp_types::{
     },
     request::{
         CodeActionRequest, Completion, DocumentDiagnosticRequest, DocumentSymbolRequest,
-        ExecuteCommand, HoverRequest, InlayHintRequest, References, Request as LspRequest,
-        WorkspaceDiagnosticRefresh,
+        ExecuteCommand, GotoDefinition, HoverRequest, InlayHintRequest, References,
+        Request as LspRequest, SemanticTokensFullRequest, WorkspaceDiagnosticRefresh,
     },
 };
 use topos_bible::matcher::BibleMatcher;
 
 use crate::server::Server;
 
+mod bible;
 mod server;
 mod settings;
 mod workspace;
@@ -164,6 +165,11 @@ fn respond(server: &Server, request: Request) -> Response {
         InlayHintRequest::METHOD => params(request).map(|p| json(server.inlay_hints(p))),
         CodeActionRequest::METHOD => params(request).map(|p| json(server.code_actions(p))),
         References::METHOD => params(request).map(|p| json(server.references(p))),
+        GotoDefinition::METHOD => params(request).map(|p| json(server.definition(p))),
+        SemanticTokensFullRequest::METHOD => {
+            params(request).map(|p| json(server.semantic_tokens(p)))
+        }
+        server::BOOK_REQUEST => params(request).and_then(|p| server.book(p).map(json)),
         ExecuteCommand::METHOD => params(request).and_then(|p| server.execute_command(p).map(json)),
         DocumentDiagnosticRequest::METHOD => {
             params(request).map(|p| json(server.pull_diagnostics(p)))

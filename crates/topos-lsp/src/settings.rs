@@ -18,6 +18,8 @@ use topos_bible::{
     segments::formatter::{BookStyle, FormatOptions},
 };
 
+use crate::bible::Bible;
+
 /// What inlay hints show after each reference
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Deserialize)]
 #[serde(rename_all = "lowercase")]
@@ -71,6 +73,8 @@ pub enum HoverField {
     Genres,
     /// How many verses the reference covers, and which: `36 (3:1-36)`
     Verses,
+    /// The passage's text, from the `bible` setting
+    Text,
     /// Integer keys (`book * 1_000_000 + chapter * 1_000 + verse`): `43003016`
     Bcv,
     /// Where the reference is in the document: line and columns
@@ -79,7 +83,8 @@ pub enum HoverField {
 
 impl HoverField {
     /// What the hover shows by default
-    pub const DEFAULT: [HoverField; 8] = [
+    pub const DEFAULT: [HoverField; 9] = [
+        HoverField::Text,
         HoverField::Name,
         HoverField::Abbreviation,
         HoverField::Osis,
@@ -89,6 +94,45 @@ impl HoverField {
         HoverField::Verses,
         HoverField::Location,
     ];
+}
+
+/**
+How Bible text is written (hover, and whole books): `markup = { verse_numbers = { show = true,
+display = "[{verse}]" }, ... }`
+- `display` is a label's template: `{verse}`, `{chapter}`, `{book}` (the USX code, `JHN`), and
+  `{name}` (`John`)
+- Other keys, like the editor's `color`, are for the editor
+*/
+#[derive(Clone, Debug, Default, Deserialize)]
+#[serde(default)]
+pub struct MarkupSettings {
+    /// Shown by default, as `[{verse}]`
+    #[serde(alias = "verse-numbers")]
+    pub verse_numbers: MarkupElement,
+    /// Shown by default, as `{name} {chapter}` on its own line (in whole books)
+    #[serde(alias = "chapter-numbers")]
+    pub chapter_numbers: MarkupElement,
+    /// Colored by default (`show = false` doesn't color them)
+    #[serde(alias = "words-of-jesus")]
+    pub words_of_jesus: MarkupElement,
+    /// Section headings, shown by default
+    pub headings: MarkupElement,
+    /// Footnotes, in brackets; hidden by default
+    pub notes: MarkupElement,
+}
+
+/// One kind of element in [`MarkupSettings`]
+#[derive(Clone, Debug, Default, Deserialize)]
+#[serde(default)]
+pub struct MarkupElement {
+    pub show: Option<bool>,
+    pub display: Option<String>,
+}
+
+impl MarkupElement {
+    pub fn shown(&self, default: bool) -> bool {
+        self.show.unwrap_or(default)
+    }
 }
 
 /// One value or a list (`merge-data = "a.json"` or `["a.json", "b.json"]`)
@@ -144,6 +188,9 @@ pub struct Settings {
     pub reference_diagnostics: ReferenceDiagnostics,
     /// What the hover shows below the reference (`"osis,book"` or a list; `[]` for none)
     pub hover: Option<OneOrMany>,
+    /// A folder of USX files (one book each), for passage text in hover and go-to-definition
+    pub bible: Option<String>,
+    pub markup: MarkupSettings,
     /// Read this config file instead of `~/.config/topos/config.toml`
     pub config: Option<String>,
     /// Don't read a config file
@@ -158,6 +205,7 @@ pub struct Configured {
     pub reference_diagnostics: ReferenceDiagnostics,
     pub hover: Vec<HoverField>,
     pub extensions: Vec<String>,
+    pub bible: Option<Bible>,
 }
 
 /// `psg_fmt` and `psg-fmt` are the same key (only at the top level: the format's own fields are
@@ -297,6 +345,14 @@ impl Settings {
             ),
             (None, None) => None,
         };
+        let bible = match &self.bible {
+            Some(folder) => Some(Bible::load(
+                &expand_home(folder),
+                data.clone(),
+                self.markup.clone(),
+            )?),
+            None => None,
+        };
         let matcher = BibleFilter::new(data).create_matcher();
         let extensions = self
             .ext
@@ -330,6 +386,7 @@ impl Settings {
             reference_diagnostics: self.reference_diagnostics,
             hover,
             extensions,
+            bible,
         })
     }
 }

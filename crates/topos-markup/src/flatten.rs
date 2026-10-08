@@ -49,6 +49,9 @@ pub struct Flat {
     pub text: String,
     /// Every kept element and milestone, in document order
     pub spans: Vec<Span>,
+    /// Where each pushed entry's text is, without the whitespace around it (an empty range where
+    /// it would be, for an entry with no text)
+    pub entries: Vec<Range<usize>>,
     pieces: Vec<Piece>,
 }
 
@@ -140,6 +143,9 @@ pub struct Flattener {
     entries: usize,
     /// Words of Jesus that are still open
     woj: Option<OpenWoj>,
+    /// The book and chapter of the last chapter marker, for labels
+    book: Option<String>,
+    chapter: Option<String>,
 }
 
 /// Words of Jesus that started and haven't ended
@@ -174,6 +180,8 @@ impl Flattener {
             pending: Pending::None,
             entries: 0,
             woj: None,
+            book: None,
+            chapter: None,
         }
     }
 
@@ -203,6 +211,7 @@ impl Flattener {
         if let Some(open) = self.woj.take() {
             self.close_woj(open);
         }
+        self.entries_up_to(self.flat.text.len());
         let text = &self.flat.text;
         for span in &mut self.flat.spans {
             let slice = &text[span.range.clone()];
@@ -249,7 +258,11 @@ impl Flattener {
         }
         self.pending = Pending::None;
         let start = self.flat.text.len();
+        self.entries_up_to(start);
         self.flat.text.push_str(s);
+        if let Some(entry) = self.flat.entries.last_mut() {
+            entry.end = self.flat.text.len();
+        }
         if let Some((entry, path, node_start)) = source {
             self.flat.pieces.push(Piece {
                 range: start..self.flat.text.len(),
@@ -257,6 +270,50 @@ impl Flattener {
                 path: path.clone(),
                 node_start,
             });
+        }
+    }
+
+    /// Starts the ranges of the entries pushed since the last text, at `at`
+    fn entries_up_to(&mut self, at: usize) {
+        while self.flat.entries.len() < self.entries {
+            self.flat.entries.push(at..at);
+        }
+    }
+
+    /// A verse's or chapter's label from its template, or [`None`] without one
+    fn label(&self, e: &Element) -> Option<String> {
+        let template = match e.kind {
+            Kind::Verse => self.opts.verse_label.as_deref()?,
+            Kind::Chapter => self.opts.chapter_label.as_deref()?,
+            _ => return None,
+        };
+        if e.milestone == Some(Milestone::End) {
+            return None;
+        }
+        let (book, chapter, verse) = id_parts(e);
+        let number = e.attr("number").or_else(|| e.attr("n"));
+        let (chapter, verse) = match e.kind {
+            Kind::Chapter => (number.or(chapter), None),
+            _ => (chapter.or(self.chapter.as_deref()), number.or(verse)),
+        };
+        let label = template
+            .replace("{book}", book.or(self.book.as_deref()).unwrap_or_default())
+            .replace("{chapter}", chapter.unwrap_or_default())
+            .replace("{verse}", verse.unwrap_or_default());
+        (!label.trim().is_empty()).then_some(label)
+    }
+
+    /// Writes a verse's label (as its own word) or a chapter's (on its own line)
+    fn write_label(&mut self, e: &Element) {
+        let Some(label) = self.label(e) else { return };
+        if e.kind == Kind::Chapter {
+            self.brk();
+            self.visible(&label, None);
+            self.brk();
+        } else {
+            self.space();
+            self.visible(&label, None);
+            self.space();
         }
     }
 
@@ -293,6 +350,14 @@ impl Flattener {
     }
 
     fn element(&mut self, e: &Element, entry: usize, path: &NodePath) {
+        if e.kind == Kind::Chapter && e.milestone != Some(Milestone::End) {
+            let (book, chapter, _) = id_parts(e);
+            if let Some(book) = book {
+                self.book = Some(book.to_string());
+            }
+            let number = e.attr("number").or_else(|| e.attr("n")).or(chapter);
+            self.chapter = number.map(str::to_string);
+        }
         match self.opts.filter.action(e) {
             Action::Drop => return,
             Action::Unwrap => return self.nodes(&e.children, entry, path),
@@ -319,8 +384,9 @@ impl Flattener {
                 return;
             }
             Kind::Verse | Kind::Chapter | Kind::Milestone if e.children.is_empty() => {
+                self.write_label(e);
                 self.flat.spans.push(Span {
-                    range: start..start,
+                    range: start..self.flat.text.len(),
                     kind: e.kind,
                     entry,
                     path: path.clone(),
@@ -342,6 +408,11 @@ impl Flattener {
                 self.brk();
             }
             Kind::LineBreak => self.brk(),
+            // Verses and chapters with their text inside
+            Kind::Verse | Kind::Chapter => {
+                self.write_label(e);
+                self.nodes(&e.children, entry, path);
+            }
             Kind::Paragraph | Kind::LineGroup | Kind::Entry => {
                 if e.milestone == Some(Milestone::Start) || !e.children.is_empty() {
                     self.brk();
@@ -387,6 +458,25 @@ impl Flattener {
             });
         }
     }
+}
+
+/// The book, chapter, and verse in a marker's id: `JHN 3:16` (USX), `John.3.16` (OSIS), `JHN 3`
+fn id_parts(e: &Element) -> (Option<&str>, Option<&str>, Option<&str>) {
+    let Some(id) = ["sID", "osisID"].into_iter().find_map(|name| e.attr(name)) else {
+        return (None, None, None);
+    };
+    let (book, rest) = match id.split_once(' ') {
+        // USX: `JHN 3:16`
+        Some((book, rest)) if !rest.contains('.') => (book, rest.split(':').collect::<Vec<_>>()),
+        // OSIS: `John.3.16` (the first, if several)
+        _ => {
+            let first = id.split_whitespace().next().unwrap_or_default();
+            let mut parts = first.split('.');
+            (parts.next().unwrap_or_default(), parts.collect())
+        }
+    };
+    let part = |i: usize| rest.get(i).copied().filter(|p| !p.is_empty());
+    (Some(book).filter(|b| !b.is_empty()), part(0), part(1))
 }
 
 /// Flattens one entry (see [`Flattener`])

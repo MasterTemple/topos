@@ -1,19 +1,22 @@
-use std::{collections::HashMap, path::PathBuf};
+use std::{collections::HashMap, path::PathBuf, str::FromStr};
 
 use lsp_types::{
     CodeAction, CodeActionOrCommand, CodeActionParams, CodeActionProviderCapability, Command,
     CompletionItem, CompletionItemKind, CompletionOptions, CompletionParams, CompletionResponse,
     Diagnostic, DiagnosticSeverity, DidChangeTextDocumentParams, DidCloseTextDocumentParams,
     DidOpenTextDocumentParams, DocumentSymbol, DocumentSymbolParams, DocumentSymbolResponse,
-    ExecuteCommandOptions, ExecuteCommandParams, Hover, HoverContents, HoverParams,
-    HoverProviderCapability, InlayHint, InlayHintLabel, InlayHintParams, Location, MarkupContent,
-    MarkupKind, OneOf, Position, PublishDiagnosticsParams, Range, ReferenceParams,
-    ServerCapabilities, SymbolKind, TextDocumentSyncCapability, TextDocumentSyncKind, TextEdit,
-    Uri,
+    ExecuteCommandOptions, ExecuteCommandParams, GotoDefinitionParams, GotoDefinitionResponse,
+    Hover, HoverContents, HoverParams, HoverProviderCapability, InlayHint, InlayHintLabel,
+    InlayHintParams, Location, MarkupContent, MarkupKind, OneOf, Position,
+    PublishDiagnosticsParams, Range, ReferenceParams, SemanticToken, SemanticTokenType,
+    SemanticTokens, SemanticTokensFullOptions, SemanticTokensLegend, SemanticTokensOptions,
+    SemanticTokensParams, SemanticTokensServerCapabilities, ServerCapabilities, SymbolKind,
+    TextDocumentSyncCapability, TextDocumentSyncKind, TextEdit, Uri,
 };
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
 use topos_bible::{
+    data::books::BookId,
     filter::{bible_filter::BibleFilter, filters::testament::TestamentFilter},
     matcher::{BibleMatch, BibleMatcher, LineIndex},
     segments::{
@@ -25,9 +28,27 @@ use topos_bible::{
 };
 
 use crate::{
+    bible::{self, Bible, Part, Token},
     settings::{self, Configured, HoverField, InlayHints, ReferenceDiagnostics},
     workspace,
 };
+
+/// The request for a whole book's text: `{ "uri": "topos-bible://BSB/JHN" }` gives
+/// [`BookText`]
+pub const BOOK_REQUEST: &str = "topos/book";
+
+#[derive(Debug, Deserialize)]
+pub struct BookParams {
+    pub uri: String,
+}
+
+/// A whole book, for the editor to show as a read-only document
+#[derive(Debug, Serialize)]
+pub struct BookText {
+    /// The book's name: `John`
+    pub title: String,
+    pub text: String,
+}
 
 /// The command code actions run; its result is the matching locations
 pub const SEARCH_COMMAND: &str = "topos.search";
@@ -103,6 +124,8 @@ pub struct Server {
     editor: Map<String, Value>,
     /// Each workspace file's references, reused while it is unchanged
     cache: workspace::Cache,
+    /// The `bible` setting's text
+    bible: Option<Bible>,
 }
 
 impl Server {
@@ -118,6 +141,7 @@ impl Server {
             roots: vec![],
             editor: Map::new(),
             cache: workspace::Cache::default(),
+            bible: None,
         }
     }
 
@@ -140,7 +164,9 @@ impl Server {
             reference_diagnostics,
             hover,
             extensions,
+            bible,
         } = settings::settings(config, &editor)?.configure()?;
+        self.bible = bible;
         self.matcher = matcher;
         self.format = format;
         self.inlay_hints = inlay_hints;
@@ -169,6 +195,18 @@ impl Server {
             document_symbol_provider: Some(OneOf::Left(true)),
             inlay_hint_provider: Some(OneOf::Left(true)),
             references_provider: Some(OneOf::Left(true)),
+            definition_provider: Some(OneOf::Left(true)),
+            // Only whole books have tokens: their verse numbers, words of Jesus, ...
+            semantic_tokens_provider: Some(
+                SemanticTokensServerCapabilities::SemanticTokensOptions(SemanticTokensOptions {
+                    legend: SemanticTokensLegend {
+                        token_types: Token::LEGEND.map(SemanticTokenType::new).to_vec(),
+                        token_modifiers: vec![],
+                    },
+                    full: Some(SemanticTokensFullOptions::Bool(true)),
+                    ..SemanticTokensOptions::default()
+                }),
+            ),
             code_action_provider: Some(CodeActionProviderCapability::Simple(true)),
             execute_command_provider: Some(ExecuteCommandOptions {
                 commands: vec![SEARCH_COMMAND.into()],
@@ -254,7 +292,11 @@ impl Server {
       like `John 3:16` (code `reference`; a hint, or none, with `reference-diagnostics`)
     */
     pub fn diagnostics(&self, uri: &Uri) -> PublishDiagnosticsParams {
-        let diagnostics = self.documents.get(uri).map_or_else(Vec::new, |text| {
+        // Whole books are Bible text, not notes
+        let text = (!bible::is_book_uri(uri.as_str()))
+            .then(|| self.documents.get(uri))
+            .flatten();
+        let diagnostics = text.map_or_else(Vec::new, |text| {
             let index = LineIndex::new(text);
             let diagnostic = |range, severity, code: &str, message| Diagnostic {
                 range,
@@ -346,20 +388,38 @@ impl Server {
             .unwrap_or_default();
         let title = self.reference(&found);
         let mut value = format!("**{title}**");
-        let lines: Vec<String> = self
-            .hover
-            .iter()
-            .filter_map(|&field| {
-                let (label, detail) = self.hover_line(field, &found, written)?;
-                // The full name or abbreviation is left out when it is the title already
-                let repeats =
-                    matches!(field, HoverField::Name | HoverField::Abbreviation) && detail == title;
-                (!repeats).then(|| format!("- **{label}**: {detail}"))
-            })
-            .collect();
+        // Lists of lines, and the passage's text between them
+        let mut sections: Vec<String> = vec![];
+        let mut lines: Vec<String> = vec![];
+        for &field in &self.hover {
+            if field == HoverField::Text {
+                let Some(text) = self.bible.as_ref().and_then(|b| b.passage_text(&found.psg))
+                else {
+                    continue;
+                };
+                if !lines.is_empty() {
+                    sections.push(lines.join("\n"));
+                    lines.clear();
+                }
+                sections.push(quote(&text));
+                continue;
+            }
+            let Some((label, detail)) = self.hover_line(field, &found, written) else {
+                continue;
+            };
+            // The full name or abbreviation is left out when it is the title already
+            let repeats =
+                matches!(field, HoverField::Name | HoverField::Abbreviation) && detail == title;
+            if !repeats {
+                lines.push(format!("- **{label}**: {detail}"));
+            }
+        }
         if !lines.is_empty() {
+            sections.push(lines.join("\n"));
+        }
+        for section in sections {
             value.push_str("\n\n");
-            value.push_str(&lines.join("\n"));
+            value.push_str(&section);
         }
         Some(Hover {
             contents: HoverContents::Markup(MarkupContent {
@@ -388,6 +448,7 @@ impl Server {
         };
         let versification = data.chapter_verses().get_chapter_verses(&psg.book);
         Some(match field {
+            HoverField::Text => return None,
             HoverField::Written => ("Written", format!("`{written}`")),
             HoverField::Name => ("Name", styled(BookStyle::Name)?),
             HoverField::Abbreviation => ("Abbreviation", styled(BookStyle::Abbreviation)?),
@@ -538,7 +599,9 @@ impl Server {
     /// A hint after each reference in the range: how it is written in the configured format
     /// (where that differs, by default), or its OSIS id
     pub fn inlay_hints(&self, params: InlayHintParams) -> Option<Vec<InlayHint>> {
-        if self.inlay_hints == InlayHints::Never {
+        if self.inlay_hints == InlayHints::Never
+            || bible::is_book_uri(params.text_document.uri.as_str())
+        {
             return Some(vec![]);
         }
         let text = self.documents.get(&params.text_document.uri)?;
@@ -626,6 +689,10 @@ impl Server {
         let Some(text) = self.documents.get(uri) else {
             return vec![];
         };
+        // Whole books are read-only
+        if bible::is_book_uri(uri.as_str()) {
+            return vec![];
+        }
         // Each reference written differently from the configured format, with its rewrite
         let rewrite = |m: &BibleMatch| {
             let bytes = m.location.bytes;
@@ -681,9 +748,130 @@ impl Server {
     /// cursor (`--exact-overlap`), however it is written
     pub fn references(&self, params: ReferenceParams) -> Option<Vec<Location>> {
         let position = params.text_document_position;
-        let (found, _) = self.reference_at(&position.text_document.uri, position.position)?;
+        let uri = &position.text_document.uri;
+        let Some((found, _)) = self.reference_at(uri, position.position) else {
+            // In a whole book, the verse under the cursor
+            let (mode, passage) = self.verse_at(uri, position.position)?;
+            return self.search(mode, &passage).ok();
+        };
         self.search(SearchMode::ExactOverlap, &self.parseable(&found.psg))
             .ok()
+    }
+
+    /// The Bible and book of a whole-book document
+    fn book_document(&self, uri: &Uri) -> Option<(&Bible, BookId)> {
+        let bible = self.bible.as_ref()?;
+        Some((bible, bible.book_of(uri.as_str())?))
+    }
+
+    /**
+    In a whole book, how to search for what is at a position:
+    - In a verse, references that name it (explicit overlap: `John 3` doesn't count)
+    - On a chapter's label, references that share any verse with the chapter
+    */
+    fn verse_at(&self, uri: &Uri, position: Position) -> Option<(SearchMode, String)> {
+        let (bible, book) = self.book_document(uri)?;
+        let rendered = bible.render(book)?;
+        let index = LineIndex::new(&rendered.text);
+        let cursor = index
+            .offset_of_utf16(position.line as usize, position.character as usize)
+            .unwrap_or(rendered.text.len());
+        let name = bible.book_name(book)?;
+        match rendered.part_at(cursor)? {
+            Part::Verse {
+                chapter,
+                verse,
+                last,
+            } => {
+                let passage = match last > verse {
+                    true => format!("{name} {chapter}:{verse}-{last}"),
+                    false => format!("{name} {chapter}:{verse}"),
+                };
+                Some((SearchMode::ExplicitOverlap, passage))
+            }
+            Part::Chapter(chapter) => Some((SearchMode::AnyOverlap, format!("{name} {chapter}"))),
+        }
+    }
+
+    /// Go to definition: the reference's text in the `bible` setting's whole book (one location
+    /// per part of the reference)
+    pub fn definition(&self, params: GotoDefinitionParams) -> Option<GotoDefinitionResponse> {
+        let position = params.text_document_position_params;
+        let (found, _) = self.reference_at(&position.text_document.uri, position.position)?;
+        let bible = self.bible.as_ref()?;
+        let rendered = bible.render(found.psg.book)?;
+        let uri = Uri::from_str(&bible.uri(found.psg.book)?).ok()?;
+        let index = LineIndex::new(&rendered.text);
+        let mut locations: Vec<Location> = rendered
+            .passage_ranges(&found.psg)
+            .into_iter()
+            .map(|r| Location::new(uri.clone(), lsp_range(&index, r.start, r.end)))
+            .collect();
+        match locations.len() {
+            0 => None,
+            1 => locations.pop().map(GotoDefinitionResponse::Scalar),
+            _ => Some(GotoDefinitionResponse::Array(locations)),
+        }
+    }
+
+    /// [`BOOK_REQUEST`]: a whole book's text
+    pub fn book(&self, params: BookParams) -> Result<BookText, String> {
+        let bible = self
+            .bible
+            .as_ref()
+            .ok_or("no Bible is set (the `bible` setting)")?;
+        let book = bible
+            .book_of(&params.uri)
+            .ok_or_else(|| format!("{} is not a book of {}", params.uri, bible.name))?;
+        let rendered = bible
+            .render(book)
+            .ok_or_else(|| format!("{} can't be read", params.uri))?;
+        Ok(BookText {
+            title: bible.book_name(book).unwrap_or_default().to_string(),
+            text: rendered.text.clone(),
+        })
+    }
+
+    /// Whole books' verse numbers, chapter labels, words of Jesus, headings, and notes (split at
+    /// line breaks); other documents have none
+    pub fn semantic_tokens(&self, params: SemanticTokensParams) -> SemanticTokens {
+        let Some(rendered) = self
+            .book_document(&params.text_document.uri)
+            .and_then(|(bible, book)| bible.render(book))
+        else {
+            return SemanticTokens::default();
+        };
+        let text = &rendered.text;
+        let index = LineIndex::new(text);
+        let mut data = vec![];
+        let (mut line, mut character) = (0, 0);
+        for (range, token) in &rendered.tokens {
+            let mut start = range.start;
+            for piece in text[range.clone()].split('\n') {
+                let end = start + piece.len();
+                if !piece.trim().is_empty() {
+                    let position = lsp_position(&index, start);
+                    let delta_line = position.line - line;
+                    let delta_start = match delta_line {
+                        0 => position.character - character,
+                        _ => position.character,
+                    };
+                    data.push(SemanticToken {
+                        delta_line,
+                        delta_start,
+                        length: piece.encode_utf16().count() as u32,
+                        token_type: *token as u32,
+                        token_modifiers_bitset: 0,
+                    });
+                    (line, character) = (position.line, position.character);
+                }
+                start = end + 1;
+            }
+        }
+        SemanticTokens {
+            result_id: None,
+            data,
+        }
     }
 
     /// Runs [`SEARCH_COMMAND`], returning the locations it finds
@@ -718,6 +906,7 @@ impl Server {
             &self.extensions,
             &self.matcher,
             &self.cache,
+            self.bible.as_ref().map(|b| b.folder.as_path()),
         );
         files.sort_by(|a, b| a.0.as_str().cmp(b.0.as_str()));
         let locations = files
@@ -749,6 +938,17 @@ impl Server {
             .passage(passage, self.matcher.data())
             .unwrap_or_else(|| passage.segments.to_string())
     }
+}
+
+/// Text as a Markdown block quote
+fn quote(text: &str) -> String {
+    text.lines()
+        .map(|line| match line.is_empty() {
+            true => String::from(">"),
+            false => format!("> {line}"),
+        })
+        .collect::<Vec<_>>()
+        .join("\n")
 }
 
 fn lsp_position(index: &LineIndex, offset: usize) -> Position {
@@ -965,9 +1165,10 @@ mod tests {
         assert_eq!(summary(&server).len(), 1);
     }
 
-    /// A workspace folder with notes on disk, plus one open document
-    fn workspace(open: &str) -> (Server, Uri, PathBuf) {
-        let dir = std::env::temp_dir().join(format!("topos-lsp-{}", std::process::id()));
+    /// A workspace folder with notes on disk, plus one open document (`name` keeps tests that
+    /// run at once apart)
+    fn workspace(open: &str, name: &str) -> (Server, Uri, PathBuf) {
+        let dir = std::env::temp_dir().join(format!("topos-lsp-{}-{name}", std::process::id()));
         let _ = std::fs::remove_dir_all(&dir);
         std::fs::create_dir_all(dir.join("My Notes")).unwrap();
         std::fs::write(
@@ -1010,7 +1211,7 @@ mod tests {
 
     #[test]
     fn searches_the_workspace() {
-        let (server, uri, dir) = workspace("See John 3:16 here");
+        let (server, uri, dir) = workspace("See John 3:16 here", "search");
         // Go to references: exactly John 3:16, however it is written
         let references = server
             .references(ReferenceParams {
@@ -1300,5 +1501,204 @@ mod tests {
         );
         let settings = json!({ "no-config": true, "hover": [] });
         assert_eq!(hover("Gen 1:1", settings), "**Genesis 1:1**");
+    }
+
+    const JHN: &str = r#"<?xml version="1.0" encoding="utf-8"?>
+<usx version="3.0"><book code="JHN" style="id">x</book><para style="usfm">3.1</para>
+<para style="mt1">John</para>
+<chapter number="3" style="c" sid="JHN 3"/>
+<para style="s1">Jesus and Nicodemus</para>
+<para style="p"><verse number="16" style="v" sid="JHN 3:16"/>For God so loved the world. <verse eid="JHN 3:16"/><verse number="17" style="v" sid="JHN 3:17"/>Jesus said, <char style="wj">I did not come
+to condemn.</char> <verse eid="JHN 3:17"/></para>
+<chapter eid="JHN 3"/>
+<chapter number="4" style="c" sid="JHN 4"/>
+<para style="p"><verse number="1" style="v" sid="JHN 4:1"/>Now Jesus learned<verse eid="JHN 4:1"/></para>
+<chapter eid="JHN 4"/></usx>"#;
+
+    /// A workspace with notes and a Bible (a folder of USX files) set
+    fn with_bible(open: &str, markup: Value, name: &str) -> (Server, Uri, PathBuf) {
+        let (mut server, uri, dir) = workspace(open, name);
+        let bible = dir.join("Bibles/BSB");
+        std::fs::create_dir_all(&bible).unwrap();
+        std::fs::write(bible.join("JHN.usx"), JHN).unwrap();
+        let settings = json!({
+            "no-config": true,
+            "bible": bible.to_str().unwrap(),
+            "markup": markup,
+        });
+        server.configure(settings).unwrap();
+        (server, uri, dir)
+    }
+
+    fn book_uri() -> Uri {
+        Uri::from_str("topos-bible://BSB/JHN").unwrap()
+    }
+
+    #[test]
+    fn bible_text_in_hover_and_whole_books() {
+        let (server, uri, dir) = with_bible("See John 3:16-17 and John 4", json!({}), "bible");
+        let hover = server
+            .hover(HoverParams {
+                text_document_position_params: at(&uri, 0, 6),
+                work_done_progress_params: WorkDoneProgressParams::default(),
+            })
+            .unwrap();
+        let HoverContents::Markup(markup) = hover.contents else {
+            panic!("no markup");
+        };
+        // The heading before 3:16 belongs to it
+        assert!(
+            markup.value.starts_with(
+                "**John 3:16-17**\n\n> Jesus and Nicodemus\n> [16] For God so loved the world. [17] Jesus said, I did not come to condemn.\n\n- **Abbreviation**"
+            ),
+            "{}",
+            markup.value
+        );
+
+        // The whole book, with chapter labels; its title is a heading
+        let book = server
+            .book(BookParams {
+                uri: book_uri().to_string(),
+            })
+            .unwrap();
+        assert_eq!(book.title, "John");
+        assert_eq!(
+            book.text,
+            "John\nJohn 3\nJesus and Nicodemus\n[16] For God so loved the world. [17] Jesus said, I did not come to condemn.\nJohn 4\n[1] Now Jesus learned"
+        );
+        assert!(
+            server
+                .book(BookParams {
+                    uri: "topos-bible://KJV/JHN".into()
+                })
+                .is_err()
+        );
+
+        // Go to definition: from the first verse's number to the last one's end
+        let definition = |character| {
+            server.definition(GotoDefinitionParams {
+                text_document_position_params: at(&uri, 0, character),
+                work_done_progress_params: WorkDoneProgressParams::default(),
+                partial_result_params: PartialResultParams::default(),
+            })
+        };
+        let Some(GotoDefinitionResponse::Scalar(location)) = definition(6) else {
+            panic!("no definition");
+        };
+        assert_eq!(location.uri, book_uri());
+        assert_eq!(
+            location.range,
+            Range::new(Position::new(3, 0), Position::new(3, 76))
+        );
+        let Some(GotoDefinitionResponse::Scalar(chapter)) = definition(23) else {
+            panic!("no definition");
+        };
+        assert_eq!(chapter.range.start, Position::new(5, 0));
+
+        // Tokens: chapter labels, headings, verse numbers, and words of Jesus (each on its line)
+        let tokens = server
+            .semantic_tokens(SemanticTokensParams {
+                work_done_progress_params: WorkDoneProgressParams::default(),
+                partial_result_params: PartialResultParams::default(),
+                text_document: TextDocumentIdentifier::new(book_uri()),
+            })
+            .data;
+        let mut absolute = vec![];
+        let (mut line, mut character) = (0, 0);
+        for t in &tokens {
+            line += t.delta_line;
+            character = if t.delta_line == 0 {
+                character + t.delta_start
+            } else {
+                t.delta_start
+            };
+            absolute.push((
+                line,
+                character,
+                t.length,
+                Token::LEGEND[t.token_type as usize],
+            ));
+        }
+        assert_eq!(
+            absolute,
+            [
+                (0, 0, 4, "heading"),
+                (1, 0, 6, "chapterNumber"),
+                (2, 0, 19, "heading"),
+                (3, 0, 4, "verseNumber"),
+                (3, 33, 4, "verseNumber"),
+                (3, 50, 26, "wordsOfJesus"),
+                (4, 0, 6, "chapterNumber"),
+                (5, 0, 3, "verseNumber"),
+            ]
+        );
+        // Notes have none
+        let notes = server.semantic_tokens(SemanticTokensParams {
+            work_done_progress_params: WorkDoneProgressParams::default(),
+            partial_result_params: PartialResultParams::default(),
+            text_document: TextDocumentIdentifier::new(uri.clone()),
+        });
+        assert!(notes.data.is_empty());
+
+        // References from a verse in the book: every reference that names it
+        let references = |line, character| {
+            server.references(ReferenceParams {
+                text_document_position: at(&book_uri(), line, character),
+                work_done_progress_params: WorkDoneProgressParams::default(),
+                partial_result_params: PartialResultParams::default(),
+                context: lsp_types::ReferenceContext {
+                    include_declaration: true,
+                },
+            })
+        };
+        let verse = references(3, 10).unwrap();
+        assert_eq!(
+            found(&dir, &verse[..3]),
+            [
+                "My Notes/a.md: Jn 3:16",
+                "My Notes/a.md: John 3:14-18",
+                "b.txt: John 2; 3:16",
+            ]
+        );
+        // The open note's `John 3:16-17` (the book itself isn't searched)
+        assert_eq!((verse.len(), verse[3].uri.clone()), (4, uri.clone()));
+        assert_eq!(verse[3].range.end, Position::new(0, 16));
+        // On the chapter's label, anything in the chapter
+        assert_eq!(references(1, 2).unwrap().len(), 5);
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    /// The markup settings: labels, what is shown, and words of Jesus left uncolored
+    #[test]
+    fn markup_settings() {
+        let markup = json!({
+            "verse_numbers": { "display": "{chapter}:{verse}", "color": "blue" },
+            "chapter-numbers": { "show": false },
+            "words_of_jesus": { "show": false },
+            "headings": { "show": false },
+        });
+        let (server, _, dir) = with_bible("John 3:16", markup, "markup");
+        let book = server
+            .book(BookParams {
+                uri: book_uri().to_string(),
+            })
+            .unwrap();
+        assert_eq!(
+            book.text,
+            "3:16 For God so loved the world. 3:17 Jesus said, I did not come to condemn.\n4:1 Now Jesus learned"
+        );
+        let tokens = server.semantic_tokens(SemanticTokensParams {
+            work_done_progress_params: WorkDoneProgressParams::default(),
+            partial_result_params: PartialResultParams::default(),
+            text_document: TextDocumentIdentifier::new(book_uri()),
+        });
+        assert!(
+            tokens
+                .data
+                .iter()
+                .all(|t| t.token_type == Token::VerseNumber as u32)
+        );
+        assert_eq!(tokens.data.len(), 3);
+        let _ = std::fs::remove_dir_all(&dir);
     }
 }
