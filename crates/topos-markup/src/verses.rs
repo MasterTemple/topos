@@ -33,6 +33,7 @@ use crate::{Element, Kind, Milestone, Node, NodePath};
 
 /// Where one verse is in a book's tree
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct VerseSpan {
     pub chapter: u8,
     pub verse: u8,

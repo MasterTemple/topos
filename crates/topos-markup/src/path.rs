@@ -10,6 +10,7 @@ A node's position in a tree: the index of each node on the way down from the top
 - Displayed as `/2/0`
 */
 #[derive(Debug, Clone, Default, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct NodePath(pub Vec<usize>);
 
 impl NodePath {

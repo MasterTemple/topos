@@ -52,6 +52,7 @@ impl Markup {
 
 /// A node in parsed markup
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Node {
     Text(String),
     Element(Element),
@@ -74,6 +75,7 @@ impl Node {
 
 /// What an element means, the same across markup formats
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Kind {
     /// A word, usually annotated with Strong's numbers (`lemma`, USX `strong`) and morphology
     /// (`morph`)
@@ -152,6 +154,7 @@ impl Kind {
 
 /// Which half of a split element this is
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Milestone {
     /// `sID` milestone: the element starts here and continues past this point
     Start,
@@ -161,6 +164,7 @@ pub enum Milestone {
 
 /// An element of parsed markup
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Element {
     pub kind: Kind,
     /// Original tag name (GBF: the token code such as `FR`, `RF`, `CM`; ThML/GBF Strong's-tagged

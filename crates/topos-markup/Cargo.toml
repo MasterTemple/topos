@@ -12,3 +12,9 @@ categories = ["parser-implementations", "text-processing"]
 [dependencies]
 topos-bible = { path = "../topos-lib", version = "0.5.0" }
 quick-xml = "0.42"
+serde = { version = "1", features = ["derive"], optional = true }
+
+[features]
+## Serialize and Deserialize for the tree (Node, Element, Kind, Milestone, NodePath, VerseSpan),
+## for caching parsed books
+serde = ["dep:serde"]
