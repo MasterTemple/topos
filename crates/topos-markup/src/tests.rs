@@ -483,3 +483,49 @@ fn entry_ranges() {
     assert_eq!(entries, ["In the beginning", "", "was the Word", ""]);
     assert_eq!(flat.entries[1], 17..17);
 }
+
+/// Templates around elements: notes, headings, and words of Jesus (also across entries)
+#[test]
+fn element_templates() {
+    let usx = r#"<usx><para style="s1">The Word</para><para style="p">Jesus said, <char style="wj"> I am the light</char>, and<note style="f"><char style="ft">Or bread</char></note> went.</para></usx>"#;
+    let nodes = parse(Markup::Usx, usx);
+    let opts = TextOptions {
+        filter: Filter::all().drop(Kind::Metadata),
+        templates: [
+            (Kind::Title, "## {text}"),
+            (Kind::WordsOfJesus, "“{text}”"),
+            (Kind::Note, "^({text})"),
+        ]
+        .into_iter()
+        .map(|(kind, template)| (kind, template.to_string()))
+        .collect(),
+        ..TextOptions::default()
+    };
+    let flat = flatten::flatten(&nodes, &opts);
+    assert_eq!(
+        flat.text,
+        "## The Word\nJesus said, “I am the light”, and ^(Or bread) went."
+    );
+    // Spans cover their template's text
+    let red = flat
+        .spans
+        .iter()
+        .find(|s| s.kind == Kind::WordsOfJesus)
+        .unwrap();
+    assert_eq!(&flat.text[red.range.clone()], "“I am the light”");
+    // Notes keep their brackets without a template
+    let plain = TextOptions {
+        filter: Filter::all().drop(Kind::Metadata),
+        ..TextOptions::default()
+    };
+    assert!(plain_text(&nodes, &plain).contains("and [Or bread] went"));
+
+    // Words of Jesus between milestones, across entries: one opening and one closing quote
+    let mut flat = Flattener::new(opts.clone());
+    flat.push(&parse(
+        Markup::Osis,
+        r#"He said, <q who="Jesus" sID="q1"/>Follow"#,
+    ))
+    .push(&parse(Markup::Osis, r#"me.<q eID="q1"/> And they did."#));
+    assert_eq!(flat.finish().text, "He said, “Follow me.” And they did.");
+}

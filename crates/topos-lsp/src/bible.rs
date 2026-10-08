@@ -4,12 +4,13 @@ plugin reads. Passages render as plain text for hover, and whole books as read-o
 (`topos-bible://BSB/JHN`) that go-to-definition opens.
 
 A rendered book knows which verse each part of its text is, so references from it can find
-every reference to that verse, and where its verse numbers, chapter labels, and words of Jesus
-are, so the editor can color them (semantic tokens).
+every reference to that verse, and where its verse numbers, chapter labels, words of Jesus, and
+so on are, so the editor can color them (semantic tokens, and in hover the code block's info
+string, see [`Text::fence`]).
 */
 
 use std::{
-    collections::HashMap,
+    collections::{BTreeMap, HashMap},
     ops::Range,
     path::{Path, PathBuf},
     sync::{Arc, Mutex},
@@ -20,19 +21,19 @@ use topos_bible::{
     segments::Passage,
 };
 use topos_bible_markup::{
-    Filter, Flattener, Kind, Markup, Node, NodePath, TextOptions,
+    Filter, Flat, Flattener, Kind, Markup, Node, NodePath, TextOptions,
     flatten::flatten,
     parse,
     verses::{VerseSpan, passage_ranges, slice, verses},
 };
 
-use crate::settings::MarkupSettings;
+use crate::settings::{MarkupElement, MarkupSettings};
 
 /// The scheme of whole-book documents: `topos-bible://BSB/JHN`
 pub const SCHEME: &str = "topos-bible";
 
 /// Hover text is cut after this many bytes (a whole psalm is plenty)
-const MAX_HOVER_TEXT: usize = 2000;
+pub const MAX_HOVER_TEXT: usize = 2000;
 
 /// What colors a part of a rendered book (the semantic token types, in the legend's order)
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -42,17 +43,93 @@ pub enum Token {
     WordsOfJesus,
     Heading,
     Note,
+    /// Translators' additions (KJV italics)
+    Added,
+    /// LORD in small capitals
+    DivineName,
+    /// Quotations other than words of Jesus
+    Quote,
 }
 
 impl Token {
     /// The semantic token types, indexed by `Token as u32`
-    pub const LEGEND: [&str; 5] = [
+    pub const LEGEND: [&str; 8] = [
         "verseNumber",
         "chapterNumber",
         "wordsOfJesus",
         "heading",
         "note",
+        "added",
+        "divineName",
+        "quote",
     ];
+
+    fn of(kind: Kind) -> Option<Token> {
+        Some(match kind {
+            Kind::Verse => Token::VerseNumber,
+            Kind::Chapter => Token::ChapterNumber,
+            Kind::WordsOfJesus => Token::WordsOfJesus,
+            Kind::Title => Token::Heading,
+            Kind::Note => Token::Note,
+            Kind::Added => Token::Added,
+            Kind::DivineName => Token::DivineName,
+            Kind::Quote => Token::Quote,
+            _ => return None,
+        })
+    }
+}
+
+/// What to color in a text: each kept element's span that has a token, in order
+fn tokens(flat: &Flat) -> Vec<(Range<usize>, Token)> {
+    let mut tokens: Vec<(Range<usize>, Token)> = flat
+        .spans
+        .iter()
+        .filter(|s| !s.range.is_empty())
+        .filter_map(|s| Some((s.range.clone(), Token::of(s.kind)?)))
+        .collect();
+    tokens.sort_by_key(|(range, _)| (range.start, range.end));
+    tokens
+}
+
+/// A passage's text, and what to color in it
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Text {
+    pub text: String,
+    pub tokens: Vec<(Range<usize>, Token)>,
+}
+
+impl Text {
+    /**
+    A Markdown code block of the text, whose info string after the language says what to color:
+    ` ```topos-bible 0:0:4:0 0:33:4:2` (line, byte column, byte length, and token type, each
+    token within one line)
+    - Editors hide the info string; the Neovim plugin reads it to color the block
+    */
+    pub fn fence(&self) -> String {
+        let mut info = vec![];
+        let starts: Vec<usize> = std::iter::once(0)
+            .chain(self.text.match_indices('\n').map(|(i, _)| i + 1))
+            .collect();
+        for (range, token) in &self.tokens {
+            let mut start = range.start;
+            while start < range.end {
+                let line = starts.partition_point(|&s| s <= start) - 1;
+                let line_end = starts.get(line + 1).map_or(self.text.len(), |&s| s - 1);
+                let end = range.end.min(line_end);
+                if end > start {
+                    let column = start - starts[line];
+                    info.push(format!("{line}:{column}:{}:{}", end - start, *token as u32));
+                }
+                start = end + 1;
+            }
+        }
+        // Backticks in the text would end a shorter fence
+        let mut fence = String::from("```");
+        while self.text.contains(&fence) {
+            fence.push('`');
+        }
+        format!("{fence}{SCHEME} {}\n{}\n{fence}", info.join(" "), self.text)
+    }
 }
 
 /// What a part of a rendered book is
@@ -142,7 +219,7 @@ pub struct Bible {
     /// Each book's file
     files: HashMap<BookId, PathBuf>,
     data: BibleData,
-    markup: MarkupSettings,
+    pub markup: MarkupSettings,
     books: Mutex<HashMap<BookId, Arc<Book>>>,
     rendered: Mutex<HashMap<BookId, Arc<Rendered>>>,
 }
@@ -231,11 +308,14 @@ impl Bible {
         Some(book)
     }
 
-    /// How text is written: the markup settings, with `{name}` as the book's name
-    fn text_options(&self, book: BookId) -> TextOptions {
-        let markup = &self.markup;
+    /**
+    How text is written: the markup settings, with `{name}` as the book's name
+    - Headings and notes that aren't shown are left out; other elements that aren't shown are
+      plain text (no template or color)
+    */
+    fn text_options(&self, book: BookId, markup: &MarkupSettings) -> TextOptions {
         let name = self.data.books().get_name(book).map_or("", String::as_str);
-        let label = |element: &crate::settings::MarkupElement, default: &str| {
+        let label = |element: &MarkupElement, default: &str| {
             element.shown(true).then(|| {
                 element
                     .display
@@ -245,48 +325,82 @@ impl Bible {
             })
         };
         let mut filter = Filter::all().drop(Kind::Metadata);
-        if !markup.headings.shown(true) {
-            filter = filter.drop(Kind::Title);
-        }
-        if !markup.notes.shown(false) {
-            filter = filter.drop(Kind::Note);
+        let mut templates = BTreeMap::new();
+        for (kind, element, default) in markup.elements() {
+            if !element.shown(default) {
+                filter = match kind {
+                    Kind::Title | Kind::Note => filter.drop(kind),
+                    _ => filter.unwrap(kind),
+                };
+            } else if let Some(display) = &element.display {
+                templates.insert(kind, display.replace("{name}", name));
+            }
         }
         TextOptions {
             filter,
             verse_label: label(&markup.verse_numbers, "[{verse}]"),
             chapter_label: label(&markup.chapter_numbers, "{name} {chapter}"),
+            templates,
             ..TextOptions::default()
         }
     }
 
-    /// A passage as text, its parts separated by blank lines, or [`None`] if the Bible doesn't
-    /// have it
-    pub fn passage_text(&self, passage: &Passage) -> Option<String> {
+    /**
+    A passage as text with `markup` (the settings' by default), its parts separated by blank
+    lines, or [`None`] if the Bible doesn't have it
+    - With a `limit`, text after that many bytes is cut, ending with ` …`
+    */
+    pub fn passage(
+        &self,
+        passage: &Passage,
+        markup: Option<&MarkupSettings>,
+        limit: Option<usize>,
+    ) -> Option<Text> {
         let book = self.book(passage.book)?;
-        let mut flat = Flattener::new(self.text_options(passage.book));
-        let parts = passage_ranges(&book.spans, passage);
-        for r in &parts {
+        let mut flat =
+            Flattener::new(self.text_options(passage.book, markup.unwrap_or(&self.markup)));
+        for r in passage_ranges(&book.spans, passage) {
             let (first, last) = (&book.spans[r.start], &book.spans[r.end - 1]);
             flat.push(&slice(&book.nodes, &first.start, Some(&last.end)));
         }
         let flat = flat.finish();
-        let text: Vec<&str> = flat
-            .entries
-            .iter()
-            .map(|r| &flat.text[r.clone()])
-            .filter(|t| !t.is_empty())
-            .collect();
-        let mut text = text.join("\n\n");
-        if text.is_empty() {
+        let all = tokens(&flat);
+        // The parts joined, moving each token with its part
+        let mut text = Text {
+            text: String::new(),
+            tokens: vec![],
+        };
+        for entry in flat.entries.iter().filter(|r| !r.is_empty()) {
+            if !text.text.is_empty() {
+                text.text.push_str("\n\n");
+            }
+            let offset = text.text.len();
+            text.text.push_str(&flat.text[entry.clone()]);
+            text.tokens.extend(
+                all.iter()
+                    .filter(|(r, _)| entry.start <= r.start && r.end <= entry.end)
+                    .map(|(r, token)| {
+                        (
+                            r.start - entry.start + offset..r.end - entry.start + offset,
+                            *token,
+                        )
+                    }),
+            );
+        }
+        if text.text.is_empty() {
             return None;
         }
-        if text.len() > MAX_HOVER_TEXT {
-            let mut cut = MAX_HOVER_TEXT;
-            while !text.is_char_boundary(cut) {
+        if let Some(limit) = limit.filter(|&limit| text.text.len() > limit) {
+            let mut cut = limit;
+            while !text.text.is_char_boundary(cut) {
                 cut -= 1;
             }
-            text.truncate(cut);
-            text.push_str(" …");
+            text.text.truncate(cut);
+            text.tokens.retain(|(r, _)| r.start < cut);
+            for (r, _) in &mut text.tokens {
+                r.end = r.end.min(cut);
+            }
+            text.text.push_str(" …");
         }
         Some(text)
     }
@@ -305,7 +419,7 @@ impl Bible {
     /// The whole tree at once (a verse can start in one paragraph and end in the next), with
     /// each verse found by its marker
     fn render_book(&self, id: BookId, book: &Book) -> Rendered {
-        let flat = flatten(&book.nodes, &self.text_options(id));
+        let flat = flatten(&book.nodes, &self.text_options(id, &self.markup));
         let verses: HashMap<&NodePath, &VerseSpan> =
             book.spans.iter().map(|s| (&s.marker, s)).collect();
         // Each verse's and chapter's start, and where headings start (which end the part before)
@@ -346,28 +460,10 @@ impl Bible {
                 Part::Chapter(c) => *c = chapter.unwrap_or_default(),
             }
         }
-        let woj = self.markup.words_of_jesus.shown(true);
-        let mut tokens: Vec<(Range<usize>, Token)> = flat
-            .spans
-            .iter()
-            .filter(|s| !s.range.is_empty())
-            .filter_map(|s| {
-                let token = match s.kind {
-                    Kind::Verse => Token::VerseNumber,
-                    Kind::Chapter => Token::ChapterNumber,
-                    Kind::WordsOfJesus if woj => Token::WordsOfJesus,
-                    Kind::Title => Token::Heading,
-                    Kind::Note => Token::Note,
-                    _ => return None,
-                };
-                Some((s.range.clone(), token))
-            })
-            .collect();
-        tokens.sort_by_key(|(range, _)| (range.start, range.end));
         Rendered {
+            tokens: tokens(&flat),
             text: flat.text,
             parts,
-            tokens,
         }
     }
 

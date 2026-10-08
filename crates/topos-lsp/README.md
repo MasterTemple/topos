@@ -3,12 +3,13 @@
 `topos-lsp` speaks the Language Server Protocol over stdin and stdout:
 
 - **Completion**: book names (`1 Co` → `1 Corinthians`), then chapters and verses from the
-  book's versification; each completion rewrites the whole reference (`jn 3:1` → `John 3:16`)
+  book's versification; each completion rewrites the whole reference (`jn 3:1` → `John 3:16`).
+  With a `bible`, chapters and verses resolve (`completionItem/resolve`) to their text
 - **Hover**: the reference under the cursor, normalized, with what the `hover` setting lists:
   the passage's text (with a `bible`), its full name and abbreviation, OSIS id, book (and its
   number and chapters), testament, genres, verses, and where it is. On a reference that doesn't
   exist, what does (`John 3 has 36 verses`, `John has 21 chapters`)
-- **Go to definition** (with a `bible`): the passage in its whole book, a read-only document
+- **Go to definition** and **declaration** (with a `bible`): the passage in its whole book, a read-only document
   like `topos-bible://BSB/JHN` (see [Whole books](#whole-books))
 - **Inlay hints**: after each reference, how it's written in your format (where that differs,
   like `jn 3:16` → `John 3:16`), or its OSIS id
@@ -20,7 +21,8 @@
 - **Code actions**: on a reference, reformat it the way completion writes it (`Reformat as
   "John 3:16"`, and `Reformat all N references in this file` when several differ), or search the
   workspace for it: `Search "John 3:16" for explicit overlap`, `... for any overlap`,
-  `... for exact overlap`, and `Search inside "John 3"`
+  `... for exact overlap`, and `Search inside "John 3"`. With a `bible`, one action per
+  `insertions` entry (`Insert Callout`) writes the passage's text below the reference
 - **Diagnostics**, pushed, or pulled when the editor asks for them (`textDocument/diagnostic`, for
   editors that support it): an information diagnostic on each reference with how it's written in your
   format (`John 3:16`, code `reference`), and warnings for references that do not exist, like
@@ -52,24 +54,43 @@ so one file configures both. It uses these keys and ignores the others:
 | `hover` | What a hover shows below the reference, in order (a list or `"osis,book"`; `[]` for none): `text` (the passage, from `bible`), `written`, `name`, `abbreviation`, `osis`, `book`, `testament`, `genres`, `verses`, `bcv`, `location`. The default is every one but `written` and `bcv`. `name` and `abbreviation` are left out when the reference is already written that way |
 | `bible` | A folder of USX files, one book each (`JHN.usx`, `44JHNBSB.usx`, or any name with a `<book code>` inside), as Paratext, the Digital Bible Library, and eBible.org publish them. Its USX files are left out of workspace searches |
 | `markup` | How Bible text is written (see below) |
+| `insertions` | Code actions that insert a passage's text (see below) |
 
-The CLI skips `inlay-hints`, `reference-diagnostics`, `hover`, `bible`, and `markup`, so they can
-go in the shared `config.toml`.
+The CLI skips `inlay-hints`, `reference-diagnostics`, `hover`, `bible`, `markup`, and
+`insertions`, so they can go in the shared `config.toml`.
 
-`markup` has a table for each kind of element, with `show` and, for labels, `display` (the
-defaults are shown; other keys, like an editor's `color`, are ignored):
+`markup` has a table for each kind of element, with `show` and `display` (the defaults are
+shown; other keys, like an editor's `color`, are ignored):
 
 ```toml
 [markup]
 verse_numbers = { show = true, display = "[{verse}]" }
 chapter_numbers = { show = true, display = "{name} {chapter}" } # in whole books, on their own line
-words_of_jesus = { show = true } # false leaves them uncolored
-headings = { show = true }
-notes = { show = false } # footnotes, in brackets
+headings = { show = true, display = "{text}" }
+notes = { show = false, display = "[{text}]" } # footnotes
+words_of_jesus = { show = true, display = "{text}" }
+added = { show = true, display = "{text}" }        # translators' additions (KJV italics)
+divine_name = { show = true, display = "{text}" }  # LORD in small capitals
+quotes = { show = true, display = "{text}" }       # quotations other than words of Jesus
 ```
 
-Labels can use `{verse}` (`16`, or `4-5` for a bridge), `{chapter}`, `{name}` (`John`), and
-`{book}` (the USX code, `JHN`).
+Labels (verse and chapter numbers) can use `{verse}` (`16`, or `4-5` for a bridge),
+`{chapter}`, `{name}` (`John`), and `{book}` (the USX code, `JHN`). The other elements' `display`
+is a template with `{text}` (and `{name}`), like `## {text}` or `“{text}”`, glued to the element's
+words. Headings and notes that aren't shown are left out; other elements that aren't shown are
+plain text, without their template or color.
+
+Each insertion has a `name` (the action is `Insert {name}`), a `display` (default `{text}`; also
+`{reference}` as formatted and `{osis}`), a `line_prefix` written before each line of `{text}`,
+and its own `markup` over the one above:
+
+```toml
+[[insertions]]
+name = "Callout"
+display = "> [!bible] {reference}\n{text}"
+line_prefix = "> "
+markup = { headings = { show = false } }
+```
 
 The editor's settings override the file: as initialization options, or as `settings` (changed
 while the server runs, without a restart). They take the same keys, at the top level or under
@@ -85,11 +106,28 @@ the `topos/book` request (`{ "uri": "topos-bible://BSB/JHN" }` gives `{ "title":
 "..." }`), shows it read-only, and opens it with the server like any document. The server then
 provides:
 
-- **Semantic tokens**: `verseNumber`, `chapterNumber`, `wordsOfJesus`, `heading`, and `note`
-  (other documents have none), for the editor to color
-- **Go to references** from a verse, as above
+- **Semantic tokens**: `verseNumber`, `chapterNumber`, `wordsOfJesus`, `heading`, `note`,
+  `added`, `divineName`, and `quote` (other documents have none), for the editor to color
+- **Go to references** from a verse, as above; **hover** on a verse says how many references
+  name it and in how many files (`???` if searching takes more than half a second; files read
+  until then are cached)
 - Hover and go to definition on the references in its headings; no diagnostics, inlay hints, or
   reformat actions
+
+## Passage text in hover
+
+A passage's text in hover and completion documentation is a Markdown code block whose info
+string, after the language, says what to color: `line:column:length:type` for each token, with
+byte columns in the block's text and the types numbered as in the semantic tokens legend:
+
+````markdown
+```topos-bible 0:0:19:3 1:0:4:0 1:33:4:0
+Jesus and Nicodemus
+[16] For God so loved the world. [17] ...
+```
+````
+
+Editors show only the language; the Neovim plugin colors the block from it.
 
 ## Neovim
 

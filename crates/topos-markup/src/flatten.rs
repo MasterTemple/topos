@@ -146,6 +146,8 @@ pub struct Flattener {
     /// The book and chapter of the last chapter marker, for labels
     book: Option<String>,
     chapter: Option<String>,
+    /// Right after a template's text before an element: whitespace that follows is left out
+    glued: bool,
 }
 
 /// Words of Jesus that started and haven't ended
@@ -182,6 +184,7 @@ impl Flattener {
             woj: None,
             book: None,
             chapter: None,
+            glued: false,
         }
     }
 
@@ -194,7 +197,7 @@ impl Flattener {
             if let Some(open) = self.woj.take() {
                 // Words of Jesus continue from the previous entry: close that part there
                 let id = open.id.clone();
-                self.close_woj(open);
+                self.close_woj(open, false);
                 self.woj = Some(OpenWoj {
                     start: self.flat.text.len(),
                     entry,
@@ -209,7 +212,7 @@ impl Flattener {
 
     pub fn finish(mut self) -> Flat {
         if let Some(open) = self.woj.take() {
-            self.close_woj(open);
+            self.close_woj(open, true);
         }
         self.entries_up_to(self.flat.text.len());
         let text = &self.flat.text;
@@ -222,7 +225,12 @@ impl Flattener {
         self.flat
     }
 
-    fn close_woj(&mut self, open: OpenWoj) {
+    /// Ends a span of words of Jesus; `ending` when they end (not at an entry's end, where they
+    /// continue into the next), which writes their template's end
+    fn close_woj(&mut self, open: OpenWoj, ending: bool) {
+        if ending && let Some((_, after)) = self.around(Kind::WordsOfJesus) {
+            self.after(&after);
+        }
         self.flat.spans.push(Span {
             range: open.start..self.flat.text.len(),
             kind: Kind::WordsOfJesus,
@@ -232,7 +240,7 @@ impl Flattener {
     }
 
     fn space(&mut self) {
-        if self.pending == Pending::None {
+        if self.pending == Pending::None && !self.glued {
             self.pending = Pending::Space;
         }
     }
@@ -263,6 +271,7 @@ impl Flattener {
         if let Some(entry) = self.flat.entries.last_mut() {
             entry.end = self.flat.text.len();
         }
+        self.glued = false;
         if let Some((entry, path, node_start)) = source {
             self.flat.pieces.push(Piece {
                 range: start..self.flat.text.len(),
@@ -278,6 +287,40 @@ impl Flattener {
         while self.flat.entries.len() < self.entries {
             self.flat.entries.push(at..at);
         }
+    }
+
+    /// The text before and after an element of a kind, from its template (notes are in brackets
+    /// without one)
+    fn around(&self, kind: Kind) -> Option<(String, String)> {
+        let template = match self.opts.templates.get(&kind) {
+            Some(template) => template.as_str(),
+            None if kind == Kind::Note => "[{text}]",
+            None => return None,
+        };
+        Some(match template.split_once("{text}") {
+            Some((before, after)) => (before.to_string(), after.to_string()),
+            None => (template.to_string(), String::new()),
+        })
+    }
+
+    /// Writes a template's text before an element, glued to the element's first word
+    fn before(&mut self, before: &str) {
+        if !before.is_empty() {
+            self.visible(before, None);
+            self.glued = true;
+        }
+    }
+
+    /// Writes a template's text after an element, glued to its last word (the whitespace after
+    /// the element goes after this)
+    fn after(&mut self, after: &str) {
+        if after.is_empty() {
+            return;
+        }
+        let pending = std::mem::replace(&mut self.pending, Pending::None);
+        self.glued = false;
+        self.visible(after, None);
+        self.pending = pending;
     }
 
     /// A verse's or chapter's label from its template, or [`None`] without one
@@ -349,6 +392,19 @@ impl Flattener {
         }
     }
 
+    /// An element's children, with its kind's template around them (words of Jesus that continue
+    /// into the next entry end there)
+    fn templated(&mut self, e: &Element, entry: usize, path: &NodePath) {
+        let Some((before, after)) = self.around(e.kind) else {
+            return self.nodes(&e.children, entry, path);
+        };
+        self.before(&before);
+        self.nodes(&e.children, entry, path);
+        if !(e.kind == Kind::WordsOfJesus && e.unclosed) {
+            self.after(&after);
+        }
+    }
+
     fn element(&mut self, e: &Element, entry: usize, path: &NodePath) {
         if e.kind == Kind::Chapter && e.milestone != Some(Milestone::End) {
             let (book, chapter, _) = id_parts(e);
@@ -367,16 +423,21 @@ impl Flattener {
         match e.kind {
             Kind::WordsOfJesus | Kind::Quote if e.milestone.is_some() => {
                 match e.milestone {
-                    Some(Milestone::Start) if e.kind == Kind::WordsOfJesus => {
-                        self.woj.get_or_insert(OpenWoj {
+                    Some(Milestone::Start)
+                        if e.kind == Kind::WordsOfJesus && self.woj.is_none() =>
+                    {
+                        self.woj = Some(OpenWoj {
                             start,
                             entry,
                             path: path.clone(),
                             id: e.attr("sID").map(str::to_string),
                         });
+                        if let Some((before, _)) = self.around(Kind::WordsOfJesus) {
+                            self.before(&before);
+                        }
                     }
                     Some(Milestone::End) => match self.woj.take() {
-                        Some(open) if ends_woj(open.id.as_deref(), e) => self.close_woj(open),
+                        Some(open) if ends_woj(open.id.as_deref(), e) => self.close_woj(open, true),
                         open => self.woj = open,
                     },
                     _ => {}
@@ -398,13 +459,11 @@ impl Flattener {
                     return;
                 }
                 self.space();
-                self.visible("[", None);
-                self.nodes(&e.children, entry, path);
-                self.visible("]", None);
+                self.templated(e, entry, path);
             }
             Kind::Title => {
                 self.brk();
-                self.nodes(&e.children, entry, path);
+                self.templated(e, entry, path);
                 self.brk();
             }
             Kind::LineBreak => self.brk(),
@@ -437,7 +496,7 @@ impl Flattener {
                     self.visible(&format!("[{}]", list.join(" ")), None);
                 }
             }
-            _ => self.nodes(&e.children, entry, path),
+            _ => self.templated(e, entry, path),
         }
         if e.kind == Kind::WordsOfJesus && e.unclosed {
             // Continues into the next entry

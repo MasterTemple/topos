@@ -18,6 +18,8 @@ use topos_bible::{
     segments::formatter::{BookStyle, FormatOptions},
 };
 
+use topos_bible_markup::Kind;
+
 use crate::bible::Bible;
 
 /// What inlay hints show after each reference
@@ -97,10 +99,13 @@ impl HoverField {
 }
 
 /**
-How Bible text is written (hover, and whole books): `markup = { verse_numbers = { show = true,
-display = "[{verse}]" }, ... }`
-- `display` is a label's template: `{verse}`, `{chapter}`, `{book}` (the USX code, `JHN`), and
-  `{name}` (`John`)
+How Bible text is written (hover, whole books, and insertions): `markup = { verse_numbers = {
+show = true, display = "[{verse}]" }, ... }`
+- Labels' `display` (verse and chapter numbers) can use `{verse}`, `{chapter}`, `{book}` (the
+  USX code, `JHN`), and `{name}` (`John`)
+- Other elements' `display` is a template with `{text}` for their text (and `{name}`), like
+  `## {text}` for headings or `“{text}”` for words of Jesus
+- Headings and notes that aren't shown are left out; the others are plain text
 - Other keys, like the editor's `color`, are for the editor
 */
 #[derive(Clone, Debug, Default, Deserialize)]
@@ -112,13 +117,53 @@ pub struct MarkupSettings {
     /// Shown by default, as `{name} {chapter}` on its own line (in whole books)
     #[serde(alias = "chapter-numbers")]
     pub chapter_numbers: MarkupElement,
-    /// Colored by default (`show = false` doesn't color them)
-    #[serde(alias = "words-of-jesus")]
-    pub words_of_jesus: MarkupElement,
     /// Section headings, shown by default
     pub headings: MarkupElement,
-    /// Footnotes, in brackets; hidden by default
+    /// Footnotes; hidden by default, and `[{text}]` when shown
     pub notes: MarkupElement,
+    /// Words of Christ (red letters)
+    #[serde(alias = "words-of-jesus")]
+    pub words_of_jesus: MarkupElement,
+    /// Translators' additions (KJV italics)
+    pub added: MarkupElement,
+    /// LORD in small capitals
+    #[serde(alias = "divine-name")]
+    pub divine_name: MarkupElement,
+    /// Quotations other than words of Jesus
+    pub quotes: MarkupElement,
+}
+
+impl MarkupSettings {
+    /// The elements with a `{text}` template: their kind, settings, and whether they're shown by
+    /// default
+    pub fn elements(&self) -> [(Kind, &MarkupElement, bool); 6] {
+        [
+            (Kind::Title, &self.headings, true),
+            (Kind::Note, &self.notes, false),
+            (Kind::WordsOfJesus, &self.words_of_jesus, true),
+            (Kind::Added, &self.added, true),
+            (Kind::DivineName, &self.divine_name, true),
+            (Kind::Quote, &self.quotes, true),
+        ]
+    }
+
+    /// These settings with `over`'s on top (each `show` and `display` it sets)
+    pub fn merged(&self, over: &MarkupSettings) -> MarkupSettings {
+        let merge = |base: &MarkupElement, over: &MarkupElement| MarkupElement {
+            show: over.show.or(base.show),
+            display: over.display.clone().or_else(|| base.display.clone()),
+        };
+        MarkupSettings {
+            verse_numbers: merge(&self.verse_numbers, &over.verse_numbers),
+            chapter_numbers: merge(&self.chapter_numbers, &over.chapter_numbers),
+            headings: merge(&self.headings, &over.headings),
+            notes: merge(&self.notes, &over.notes),
+            words_of_jesus: merge(&self.words_of_jesus, &over.words_of_jesus),
+            added: merge(&self.added, &over.added),
+            divine_name: merge(&self.divine_name, &over.divine_name),
+            quotes: merge(&self.quotes, &over.quotes),
+        }
+    }
 }
 
 /// One kind of element in [`MarkupSettings`]
@@ -132,6 +177,36 @@ pub struct MarkupElement {
 impl MarkupElement {
     pub fn shown(&self, default: bool) -> bool {
         self.show.unwrap_or(default)
+    }
+}
+
+/**
+A way to insert a passage's text, offered as a code action on references (`Insert Callout`):
+`{ name = "Callout", display = "> [!bible] {reference}\n{text}", line_prefix = "> " }`
+*/
+#[derive(Clone, Debug, Deserialize)]
+#[serde(default)]
+pub struct Insertion {
+    /// The action's name: `Insert {name}`
+    pub name: String,
+    /// What is inserted on the lines after the reference: `{text}` (the passage), `{reference}`
+    /// (as formatted, like `John 3:16`), and `{osis}` (`John.3.16`); default `{text}`
+    pub display: String,
+    /// Written before each line of `{text}`, like `> ` for a quote
+    #[serde(alias = "line-prefix")]
+    pub line_prefix: String,
+    /// The `markup` settings for this insertion, over the others
+    pub markup: MarkupSettings,
+}
+
+impl Default for Insertion {
+    fn default() -> Self {
+        Insertion {
+            name: String::from("Passage"),
+            display: String::from("{text}"),
+            line_prefix: String::new(),
+            markup: MarkupSettings::default(),
+        }
     }
 }
 
@@ -191,6 +266,8 @@ pub struct Settings {
     /// A folder of USX files (one book each), for passage text in hover and go-to-definition
     pub bible: Option<String>,
     pub markup: MarkupSettings,
+    /// Ways to insert a passage's text, offered as code actions (with a `bible`)
+    pub insertions: Vec<Insertion>,
     /// Read this config file instead of `~/.config/topos/config.toml`
     pub config: Option<String>,
     /// Don't read a config file
@@ -206,6 +283,7 @@ pub struct Configured {
     pub hover: Vec<HoverField>,
     pub extensions: Vec<String>,
     pub bible: Option<Bible>,
+    pub insertions: Vec<Insertion>,
 }
 
 /// `psg_fmt` and `psg-fmt` are the same key (only at the top level: the format's own fields are
@@ -387,6 +465,7 @@ impl Settings {
             hover,
             extensions,
             bible,
+            insertions: self.insertions.clone(),
         })
     }
 }

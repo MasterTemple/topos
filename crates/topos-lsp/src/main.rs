@@ -12,8 +12,9 @@ use lsp_types::{
     },
     request::{
         CodeActionRequest, Completion, DocumentDiagnosticRequest, DocumentSymbolRequest,
-        ExecuteCommand, GotoDefinition, HoverRequest, InlayHintRequest, References,
-        Request as LspRequest, SemanticTokensFullRequest, WorkspaceDiagnosticRefresh,
+        ExecuteCommand, GotoDeclaration, GotoDefinition, HoverRequest, InlayHintRequest,
+        References, Request as LspRequest, ResolveCompletionItem, SemanticTokensFullRequest,
+        WorkspaceDiagnosticRefresh,
     },
 };
 use topos_bible::matcher::BibleMatcher;
@@ -165,7 +166,12 @@ fn respond(server: &Server, request: Request) -> Response {
         InlayHintRequest::METHOD => params(request).map(|p| json(server.inlay_hints(p))),
         CodeActionRequest::METHOD => params(request).map(|p| json(server.code_actions(p))),
         References::METHOD => params(request).map(|p| json(server.references(p))),
-        GotoDefinition::METHOD => params(request).map(|p| json(server.definition(p))),
+        GotoDefinition::METHOD | GotoDeclaration::METHOD => {
+            params(request).map(|p| json(server.definition(p)))
+        }
+        ResolveCompletionItem::METHOD => {
+            params(request).map(|p| json(server.resolve_completion(p)))
+        }
         SemanticTokensFullRequest::METHOD => {
             params(request).map(|p| json(server.semantic_tokens(p)))
         }

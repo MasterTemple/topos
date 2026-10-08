@@ -1,4 +1,9 @@
-use std::{collections::HashMap, path::PathBuf, str::FromStr};
+use std::{
+    collections::{HashMap, HashSet},
+    path::PathBuf,
+    str::FromStr,
+    time::{Duration, Instant},
+};
 
 use lsp_types::{
     CodeAction, CodeActionOrCommand, CodeActionParams, CodeActionProviderCapability, Command,
@@ -28,10 +33,13 @@ use topos_bible::{
 };
 
 use crate::{
-    bible::{self, Bible, Part, Token},
-    settings::{self, Configured, HoverField, InlayHints, ReferenceDiagnostics},
+    bible::{self, Bible, MAX_HOVER_TEXT, Part, Token},
+    settings::{self, Configured, HoverField, InlayHints, Insertion, ReferenceDiagnostics},
     workspace,
 };
+
+/// How long hovering a verse in a whole book searches for its references before giving up
+const HOVER_SEARCH_TIME: Duration = Duration::from_millis(500);
 
 /// The request for a whole book's text: `{ "uri": "topos-bible://BSB/JHN" }` gives
 /// [`BookText`]
@@ -126,6 +134,8 @@ pub struct Server {
     cache: workspace::Cache,
     /// The `bible` setting's text
     bible: Option<Bible>,
+    /// Ways to insert a passage's text (code actions)
+    insertions: Vec<Insertion>,
 }
 
 impl Server {
@@ -142,6 +152,7 @@ impl Server {
             editor: Map::new(),
             cache: workspace::Cache::default(),
             bible: None,
+            insertions: vec![],
         }
     }
 
@@ -165,8 +176,10 @@ impl Server {
             hover,
             extensions,
             bible,
+            insertions,
         } = settings::settings(config, &editor)?.configure()?;
         self.bible = bible;
+        self.insertions = insertions;
         self.matcher = matcher;
         self.format = format;
         self.inlay_hints = inlay_hints;
@@ -189,6 +202,8 @@ impl Server {
             text_document_sync: Some(TextDocumentSyncCapability::Kind(TextDocumentSyncKind::FULL)),
             completion_provider: Some(CompletionOptions {
                 trigger_characters: Some([" ", ":", "-", ",", ";", "."].map(String::from).to_vec()),
+                // The passage's text, for chapters and verses
+                resolve_provider: Some(true),
                 ..CompletionOptions::default()
             }),
             hover_provider: Some(HoverProviderCapability::Simple(true)),
@@ -196,6 +211,7 @@ impl Server {
             inlay_hint_provider: Some(OneOf::Left(true)),
             references_provider: Some(OneOf::Left(true)),
             definition_provider: Some(OneOf::Left(true)),
+            declaration_provider: Some(lsp_types::DeclarationCapability::Simple(true)),
             // Only whole books have tokens: their verse numbers, words of Jesus, ...
             semantic_tokens_provider: Some(
                 SemanticTokensServerCapabilities::SemanticTokensOptions(SemanticTokensOptions {
@@ -269,6 +285,12 @@ impl Server {
                     filter_text: Some(format!("{} {}", &text[range.clone()], completion.label)),
                     // Keep the order: chapters and verses are in reading order
                     sort_text: Some(format!("{idx:05}")),
+                    // For `completionItem/resolve` to add the passage's text
+                    data: completion
+                        .passage
+                        .as_ref()
+                        .filter(|_| self.bible.is_some())
+                        .map(|p| serde_json::json!({ "passage": self.parseable(p) })),
                     text_edit: Some(lsp_types::CompletionTextEdit::Edit(TextEdit {
                         range: lsp_range(&index, range.start, range.end),
                         new_text: completion.edit.text,
@@ -283,6 +305,26 @@ impl Server {
             is_incomplete: true,
             items,
         }))
+    }
+
+    /// A completion with its passage's text as documentation (with a `bible`)
+    pub fn resolve_completion(&self, mut item: CompletionItem) -> CompletionItem {
+        let text = item
+            .data
+            .as_ref()
+            .and_then(|data| data.get("passage")?.as_str())
+            .and_then(|passage| self.matcher.data().parse(passage))
+            .and_then(|passage| {
+                let bible = self.bible.as_ref()?;
+                bible.passage(&passage, None, Some(MAX_HOVER_TEXT))
+            });
+        if let Some(text) = text {
+            item.documentation = Some(lsp_types::Documentation::MarkupContent(MarkupContent {
+                kind: MarkupKind::Markdown,
+                value: text.fence(),
+            }));
+        }
+        item
     }
 
     /**
@@ -379,7 +421,9 @@ impl Server {
         if let Some(hover) = self.problem_hover(uri, position.position) {
             return Some(hover);
         }
-        let (found, index) = self.reference_at(uri, position.position)?;
+        let Some((found, index)) = self.reference_at(uri, position.position) else {
+            return self.verse_hover(uri, position.position);
+        };
         let bytes = found.location.bytes;
         let written = self
             .documents
@@ -393,7 +437,10 @@ impl Server {
         let mut lines: Vec<String> = vec![];
         for &field in &self.hover {
             if field == HoverField::Text {
-                let Some(text) = self.bible.as_ref().and_then(|b| b.passage_text(&found.psg))
+                let Some(text) = self
+                    .bible
+                    .as_ref()
+                    .and_then(|b| b.passage(&found.psg, None, Some(MAX_HOVER_TEXT)))
                 else {
                     continue;
                 };
@@ -401,7 +448,7 @@ impl Server {
                     sections.push(lines.join("\n"));
                     lines.clear();
                 }
-                sections.push(quote(&text));
+                sections.push(text.fence());
                 continue;
             }
             let Some((label, detail)) = self.hover_line(field, &found, written) else {
@@ -652,6 +699,7 @@ impl Server {
         let reference = self.reference(&found);
         let passage = self.parseable(&found.psg);
         let mut actions = self.reformat_actions(uri, &found, &index);
+        actions.extend(self.insert_actions(uri, &found, &index));
         let searches = SearchMode::ALL
             .into_iter()
             .map(|mode| {
@@ -702,27 +750,13 @@ impl Server {
                 new_text: formatted,
             })
         };
-        let unnamed = is_unnamed(uri);
         let action = |title: String, edits: Vec<TextEdit>| {
-            let (edit, command) = if unnamed {
-                let arguments = serde_json::json!({ "edits": edits });
-                let command = Command::new(
-                    title.clone(),
-                    APPLY_EDITS_COMMAND.into(),
-                    Some(vec![arguments]),
-                );
-                (None, Some(command))
-            } else {
-                let changes = HashMap::from([(uri.clone(), edits)]);
-                (Some(lsp_types::WorkspaceEdit::new(changes)), None)
-            };
-            CodeActionOrCommand::CodeAction(CodeAction {
+            edit_action(
+                uri,
                 title,
-                kind: Some(lsp_types::CodeActionKind::REFACTOR_REWRITE),
-                edit,
-                command,
-                ..CodeAction::default()
-            })
+                edits,
+                lsp_types::CodeActionKind::REFACTOR_REWRITE,
+            )
         };
         let mut actions = vec![];
         if let Some(edit) = rewrite(found) {
@@ -742,6 +776,69 @@ impl Server {
             actions.push(action(title, all));
         }
         actions
+    }
+
+    /// `Insert Callout` for each insertion: the passage's text on the lines after the reference
+    fn insert_actions(
+        &self,
+        uri: &Uri,
+        found: &BibleMatch,
+        index: &LineIndex,
+    ) -> Vec<CodeActionOrCommand> {
+        let (Some(bible), Some(text)) = (self.bible.as_ref(), self.documents.get(uri)) else {
+            return vec![];
+        };
+        if bible::is_book_uri(uri.as_str()) {
+            return vec![];
+        }
+        // At the end of the reference's line
+        let end = found.location.bytes.end;
+        let line_end = text[end..].find('\n').map_or(text.len(), |i| end + i);
+        let at = lsp_range(index, line_end, line_end);
+        self.insertions
+            .iter()
+            .filter_map(|insertion| {
+                let new_text = format!("\n{}", self.insertion_text(bible, insertion, found)?);
+                let title = format!("Insert {}", insertion.name);
+                let edits = vec![TextEdit::new(at, new_text)];
+                Some(edit_action(
+                    uri,
+                    title,
+                    edits,
+                    lsp_types::CodeActionKind::REFACTOR,
+                ))
+            })
+            .collect()
+    }
+
+    /// What an insertion writes for a reference, or [`None`] if the Bible doesn't have it
+    fn insertion_text(
+        &self,
+        bible: &Bible,
+        insertion: &Insertion,
+        found: &BibleMatch,
+    ) -> Option<String> {
+        let markup = bible.markup.merged(&insertion.markup);
+        let text = bible.passage(&found.psg, Some(&markup), None)?.text;
+        let text: Vec<String> = text
+            .lines()
+            .map(|line| {
+                format!("{}{line}", insertion.line_prefix)
+                    .trim_end()
+                    .to_string()
+            })
+            .collect();
+        let osis = found
+            .psg
+            .to_osis(self.matcher.data().books())
+            .unwrap_or_default();
+        Some(
+            insertion
+                .display
+                .replace("{reference}", &self.reference(found))
+                .replace("{osis}", &osis)
+                .replace("{text}", &text.join("\n")),
+        )
     }
 
     /// Go to references: every reference in the workspace that is exactly the one under the
@@ -793,7 +890,38 @@ impl Server {
         }
     }
 
-    /// Go to definition: the reference's text in the `bible` setting's whole book (one location
+    /**
+    Hovering a verse in a whole book (not on a reference): how many references name it, and in
+    how many files, or `???` if searching takes longer than [`HOVER_SEARCH_TIME`] (files read
+    until then are cached, so the next hover gets further)
+    */
+    fn verse_hover(&self, uri: &Uri, position: Position) -> Option<Hover> {
+        let (mode, passage) = self.verse_at(uri, position)?;
+        let deadline = Instant::now() + HOVER_SEARCH_TIME;
+        let count = match self.search_until(mode, &passage, Some(deadline)) {
+            Ok((locations, true)) => {
+                let files: HashSet<&str> = locations.iter().map(|l| l.uri.as_str()).collect();
+                let plural = |n: usize| if n == 1 { "" } else { "s" };
+                format!(
+                    "{} reference{} in {} file{}",
+                    locations.len(),
+                    plural(locations.len()),
+                    files.len(),
+                    plural(files.len())
+                )
+            }
+            _ => String::from("??? references (searching took too long)"),
+        };
+        Some(Hover {
+            contents: HoverContents::Markup(MarkupContent {
+                kind: MarkupKind::Markdown,
+                value: format!("**{passage}**\n\n{count}"),
+            }),
+            range: None,
+        })
+    }
+
+    /// Go to definition (and declaration): the reference's text in the `bible` setting's whole book (one location
     /// per part of the reference)
     pub fn definition(&self, params: GotoDefinitionParams) -> Option<GotoDefinitionResponse> {
         let position = params.text_document_position_params;
@@ -891,6 +1019,17 @@ impl Server {
 
     /// The references in the workspace that a search keeps, in file order
     pub fn search(&self, mode: SearchMode, passage: &str) -> Result<Vec<Location>, String> {
+        self.search_until(mode, passage, None)
+            .map(|(locations, _)| locations)
+    }
+
+    /// [`Server::search`], stopping at a deadline; also whether it searched every file
+    fn search_until(
+        &self,
+        mode: SearchMode,
+        passage: &str,
+        deadline: Option<Instant>,
+    ) -> Result<(Vec<Location>, bool), String> {
         let mut filter = BibleFilter::new(self.matcher.data().clone());
         match mode {
             SearchMode::ExplicitOverlap => filter.filter_explicit_overlap(passage),
@@ -900,13 +1039,14 @@ impl Server {
         }
         .map_err(|e| e.to_string())?;
         let query = filter.create_matcher();
-        let mut files = workspace::references(
+        let (mut files, complete) = workspace::references(
             &self.roots,
             &self.documents,
             &self.extensions,
             &self.matcher,
             &self.cache,
             self.bible.as_ref().map(|b| b.folder.as_path()),
+            deadline,
         );
         files.sort_by(|a, b| a.0.as_str().cmp(b.0.as_str()));
         let locations = files
@@ -918,7 +1058,7 @@ impl Server {
                     .map(|f| Location::new(uri.clone(), f.range))
             })
             .collect();
-        Ok(locations)
+        Ok((locations, complete))
     }
 
     /// The reference in the configured format (OSIS references are written as OSIS ids)
@@ -940,15 +1080,38 @@ impl Server {
     }
 }
 
-/// Text as a Markdown block quote
-fn quote(text: &str) -> String {
-    text.lines()
-        .map(|line| match line.is_empty() {
-            true => String::from(">"),
-            false => format!("> {line}"),
-        })
-        .collect::<Vec<_>>()
-        .join("\n")
+/**
+A code action that makes edits in a document
+- In unnamed documents, as the [`APPLY_EDITS_COMMAND`]: a workspace edit's URI (`file://`) would
+  name no buffer
+*/
+// `WorkspaceEdit::changes` is keyed by `Uri`, which clippy counts as a mutable key
+#[allow(clippy::mutable_key_type)]
+fn edit_action(
+    uri: &Uri,
+    title: String,
+    edits: Vec<TextEdit>,
+    kind: lsp_types::CodeActionKind,
+) -> CodeActionOrCommand {
+    let (edit, command) = if is_unnamed(uri) {
+        let arguments = serde_json::json!({ "edits": edits });
+        let command = Command::new(
+            title.clone(),
+            APPLY_EDITS_COMMAND.into(),
+            Some(vec![arguments]),
+        );
+        (None, Some(command))
+    } else {
+        let changes = HashMap::from([(uri.clone(), edits)]);
+        (Some(lsp_types::WorkspaceEdit::new(changes)), None)
+    };
+    CodeActionOrCommand::CodeAction(CodeAction {
+        title,
+        kind: Some(kind),
+        edit,
+        command,
+        ..CodeAction::default()
+    })
 }
 
 fn lsp_position(index: &LineIndex, offset: usize) -> Position {
@@ -1546,10 +1709,11 @@ to condemn.</char> <verse eid="JHN 3:17"/></para>
         let HoverContents::Markup(markup) = hover.contents else {
             panic!("no markup");
         };
-        // The heading before 3:16 belongs to it
+        // The heading before 3:16 belongs to it; the info string says what to color: the heading,
+        // verse numbers, and words of Jesus
         assert!(
             markup.value.starts_with(
-                "**John 3:16-17**\n\n> Jesus and Nicodemus\n> [16] For God so loved the world. [17] Jesus said, I did not come to condemn.\n\n- **Abbreviation**"
+                "**John 3:16-17**\n\n```topos-bible 0:0:19:3 1:0:4:0 1:33:4:0 1:50:26:2\nJesus and Nicodemus\n[16] For God so loved the world. [17] Jesus said, I did not come to condemn.\n```\n\n- **Abbreviation**"
             ),
             "{}",
             markup.value
@@ -1699,6 +1863,169 @@ to condemn.</char> <verse eid="JHN 3:17"/></para>
                 .all(|t| t.token_type == Token::VerseNumber as u32)
         );
         assert_eq!(tokens.data.len(), 3);
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    /// Templates for headings and words of Jesus, and elements that aren't shown
+    #[test]
+    fn markup_templates() {
+        let markup = json!({
+            "headings": { "display": "## {text}" },
+            "words_of_jesus": { "display": "“{text}”" },
+            "verse_numbers": { "show": false },
+            "chapter_numbers": { "display": "Chapter {chapter}" },
+        });
+        let (server, _, dir) = with_bible("John 3:16", markup, "templates");
+        let book = server
+            .book(BookParams {
+                uri: book_uri().to_string(),
+            })
+            .unwrap();
+        assert_eq!(
+            book.text,
+            "## John\nChapter 3\n## Jesus and Nicodemus\nFor God so loved the world. Jesus said, “I did not come to condemn.”\nChapter 4\nNow Jesus learned"
+        );
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    /// Hovering a verse in a whole book counts its references; go to declaration opens the book
+    /// like definition; completions resolve to the passage's text
+    #[test]
+    fn verse_hover_declaration_and_completion_text() {
+        let (server, uri, dir) = with_bible("See John 3:16", json!({}), "verse-hover");
+        let hover = |uri: &Uri, line, character| {
+            let hover = server.hover(HoverParams {
+                text_document_position_params: at(uri, line, character),
+                work_done_progress_params: WorkDoneProgressParams::default(),
+            })?;
+            match hover.contents {
+                HoverContents::Markup(markup) => Some(markup.value),
+                _ => None,
+            }
+        };
+        assert_eq!(
+            hover(&book_uri(), 3, 10).unwrap(),
+            "**John 3:16**\n\n4 references in 3 files"
+        );
+        assert_eq!(
+            hover(&book_uri(), 1, 1).unwrap(),
+            "**John 3**\n\n5 references in 3 files"
+        );
+        // Out of time: the hover says `???`
+        let (_, complete) = server
+            .search_until(
+                SearchMode::ExplicitOverlap,
+                "John 3:16",
+                Some(Instant::now()),
+            )
+            .unwrap();
+        assert!(!complete);
+
+        let declaration = server.definition(GotoDefinitionParams {
+            text_document_position_params: at(&uri, 0, 6),
+            work_done_progress_params: WorkDoneProgressParams::default(),
+            partial_result_params: PartialResultParams::default(),
+        });
+        assert!(
+            matches!(declaration, Some(GotoDefinitionResponse::Scalar(l)) if l.uri == book_uri())
+        );
+
+        let (mut server, uri) = server_with("John 3:1", &server);
+        server.did_open(DidOpenTextDocumentParams {
+            text_document: TextDocumentItem::new(
+                uri.clone(),
+                "markdown".into(),
+                1,
+                "John 3:1".into(),
+            ),
+        });
+        let Some(CompletionResponse::List(list)) = server.completion(CompletionParams {
+            text_document_position: at(&uri, 0, 8),
+            work_done_progress_params: WorkDoneProgressParams::default(),
+            partial_result_params: PartialResultParams::default(),
+            context: None,
+        }) else {
+            panic!("no completions");
+        };
+        let item = list
+            .items
+            .into_iter()
+            .find(|i| i.label == "John 3:16")
+            .unwrap();
+        let resolved = server.resolve_completion(item);
+        let Some(lsp_types::Documentation::MarkupContent(doc)) = resolved.documentation else {
+            panic!("no documentation");
+        };
+        assert!(
+            doc.value
+                .ends_with("\nJesus and Nicodemus\n[16] For God so loved the world.\n```"),
+            "{}",
+            doc.value
+        );
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    /// The same settings, for another document
+    fn server_with(_text: &str, other: &Server) -> (Server, Uri) {
+        let mut server = Server::new(BibleMatcher::default());
+        server
+            .configure(Value::Object(other.editor.clone()))
+            .unwrap();
+        (server, Uri::from_str("file:///typing.md").unwrap())
+    }
+
+    /// Insertions: a code action per insertion, with its own markup over the others
+    #[test]
+    fn insertions() {
+        let (mut server, uri, dir) =
+            with_bible("Read John 3:16-17 today\nnext", json!({}), "insert");
+        let mut settings = server.editor.clone();
+        settings.insert(
+            "insertions".into(),
+            json!([
+                {
+                    "name": "Callout",
+                    "display": "> [!bible] {reference}\n{text}",
+                    "line_prefix": "> ",
+                    "markup": { "headings": { "show": false }, "verse_numbers": { "display": "{verse}" } }
+                },
+                { "name": "Plain", "markup": { "verse_numbers": { "show": false }, "headings": { "show": false } } }
+            ]),
+        );
+        server.configure(Value::Object(settings)).unwrap();
+        let actions = server
+            .code_actions(CodeActionParams {
+                text_document: TextDocumentIdentifier::new(uri.clone()),
+                range: Range::new(Position::new(0, 6), Position::new(0, 6)),
+                context: lsp_types::CodeActionContext::default(),
+                work_done_progress_params: WorkDoneProgressParams::default(),
+                partial_result_params: PartialResultParams::default(),
+            })
+            .unwrap();
+        let inserts: Vec<(String, TextEdit)> = actions
+            .into_iter()
+            .filter_map(|a| match a {
+                CodeActionOrCommand::CodeAction(a) if a.title.starts_with("Insert") => {
+                    let edit = a.edit?.changes?.into_values().next()?.pop()?;
+                    Some((a.title, edit))
+                }
+                _ => None,
+            })
+            .collect();
+        let at = Range::new(Position::new(0, 23), Position::new(0, 23));
+        assert_eq!(
+            inserts,
+            [
+                (
+                    String::from("Insert Callout"),
+                    TextEdit::new(at, "\n> [!bible] John 3:16-17\n> 16 For God so loved the world. 17 Jesus said, I did not come to condemn.".into())
+                ),
+                (
+                    String::from("Insert Plain"),
+                    TextEdit::new(at, "\nFor God so loved the world. Jesus said, I did not come to condemn.".into())
+                ),
+            ]
+        );
         let _ = std::fs::remove_dir_all(&dir);
     }
 }

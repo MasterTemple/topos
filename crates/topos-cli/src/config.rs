@@ -110,12 +110,13 @@ pub fn with_defaults(args: Vec<OsString>) -> Result<Vec<OsString>, String> {
 }
 
 /// Settings only the language server uses (it reads this file too), which the CLI skips
-const LSP_KEYS: [&str; 5] = [
+const LSP_KEYS: [&str; 6] = [
     "inlay-hints",
     "reference-diagnostics",
     "hover",
     "bible",
     "markup",
+    "insertions",
 ];
 
 /// Turns the TOML table into command line arguments
@@ -224,7 +225,7 @@ mod tests {
 
     #[test]
     fn skips_language_server_settings() {
-        let text = "hover = [\"osis\"]\ninlay_hints = \"never\"\nreference-diagnostics = \"hint\"\nmode = \"json\"\nbible = \"~/Bibles/BSB\"\n[markup]\nverse_numbers = { display = \"{verse}\" }";
+        let text = "hover = [\"osis\"]\ninlay_hints = \"never\"\nreference-diagnostics = \"hint\"\nmode = \"json\"\nbible = \"~/Bibles/BSB\"\n[markup]\nverse_numbers = { display = \"{verse}\" }\n[[insertions]]\nname = \"Callout\"";
         assert_eq!(parse(text).unwrap(), ["--mode", "json"]);
     }
 }

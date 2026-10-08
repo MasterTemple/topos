@@ -1,6 +1,8 @@
 //! Plain text, for terminals and editors.
 
-use crate::{Node, filter::Filter, flatten::flatten};
+use std::collections::BTreeMap;
+
+use crate::{Kind, Node, filter::Filter, flatten::flatten};
 
 /// Options for [`plain_text`] and [`Flattener`](crate::Flattener)
 #[derive(Debug, Clone)]
@@ -27,6 +29,15 @@ pub struct TextOptions {
     /// Text written on its own line where each chapter starts, like `Chapter {chapter}` (with
     /// `{chapter}` and `{book}`); default: none
     pub chapter_label: Option<String>,
+    /**
+    How kept elements of a kind are written: a template with `{text}` for the element's text,
+    like `“{text}”` for [`Kind::WordsOfJesus`] or `## {text}` for [`Kind::Title`]
+    - Notes are `[{text}]` without one
+    - The template's text is glued to the element's: `“ I am ”` is written `“I am”`
+    - Without `{text}`, the template goes before the text
+    - Not for verse and chapter markers (see the labels), paragraphs, lines, or line breaks
+    */
+    pub templates: BTreeMap<Kind, String>,
 }
 
 impl Default for TextOptions {
@@ -37,6 +48,7 @@ impl Default for TextOptions {
             line_breaks: true,
             verse_label: None,
             chapter_label: None,
+            templates: BTreeMap::new(),
         }
     }
 }

@@ -7,8 +7,11 @@ use std::{
     collections::{HashMap, HashSet},
     path::{Path, PathBuf},
     str::FromStr,
-    sync::{Arc, Mutex},
-    time::SystemTime,
+    sync::{
+        Arc, Mutex,
+        atomic::{AtomicBool, Ordering},
+    },
+    time::{Instant, SystemTime},
 };
 
 use ignore::WalkState;
@@ -138,6 +141,9 @@ impl Cache {
     }
 }
 
+/// A file and its references
+pub type FileReferences = (Uri, Arc<Vec<Found>>);
+
 /// The references in a text, with LSP ranges
 pub fn find(matcher: &BibleMatcher, text: &str) -> Vec<Found> {
     let index = LineIndex::new(text);
@@ -171,6 +177,7 @@ Every reference in the workspace, by file: open documents as they are in the edi
 text included), then the files under `roots` with one of `extensions` (any if empty), from the
 cache when unchanged. Files are walked in parallel
 - The USX files in `bible` (the Bible's canonical folder) are left out
+- At the `deadline`, it stops walking; the `bool` is whether it searched every file
 */
 // `Uri` caches its parsed parts, which clippy counts as a mutable key; its text never changes
 #[allow(clippy::mutable_key_type)]
@@ -181,7 +188,8 @@ pub fn references(
     matcher: &BibleMatcher,
     cache: &Cache,
     bible: Option<&Path>,
-) -> Vec<(Uri, Arc<Vec<Found>>)> {
+    deadline: Option<Instant>,
+) -> (Vec<FileReferences>, bool) {
     // Open documents by path: editors may percent-encode their URIs differently
     let open: HashSet<PathBuf> = documents.keys().filter_map(uri_to_path).collect();
     // Unnamed documents (`file://`) are left out: there is no file to go to
@@ -199,10 +207,15 @@ pub fn references(
         ..WalkOptions::default()
     };
     let Ok(builder) = walk.builder(roots) else {
-        return results.into_inner().unwrap_or_default();
+        return (results.into_inner().unwrap_or_default(), true);
     };
+    let stopped = AtomicBool::new(false);
     builder.build_parallel().run(|| {
         Box::new(|entry| {
+            if deadline.is_some_and(|deadline| Instant::now() >= deadline) {
+                stopped.store(true, Ordering::Relaxed);
+                return WalkState::Quit;
+            }
             let Ok(entry) = entry else {
                 return WalkState::Continue;
             };
@@ -249,8 +262,12 @@ pub fn references(
             WalkState::Continue
         })
     });
-    cache.retain(&seen.into_inner().unwrap_or_default());
-    results.into_inner().unwrap_or_default()
+    let complete = !stopped.into_inner();
+    // Files not reached yet may still be there
+    if complete {
+        cache.retain(&seen.into_inner().unwrap_or_default());
+    }
+    (results.into_inner().unwrap_or_default(), complete)
 }
 
 #[cfg(test)]
