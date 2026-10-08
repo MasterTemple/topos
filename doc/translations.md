@@ -9,7 +9,24 @@ folders read by `topos-bible-markup`, `ToposBook` in the FFI, the LSP's `bible.r
 through sword-modules). The library's part is the **name** a reference gives and the
 **versification** a translation uses.
 
-## Where things stand
+## Status (2026-10-08)
+
+Steps 1 to 6 are done, with these differences from the plan below:
+
+- Step 4: a translation's verse counts live in `Translations` (`set_chapter_verses`), and come from
+  the translation's own USX (`verses::usx_chapter_verses` reads only the markers: the whole BSB in
+  15 ms, the same counts as a full parse). topos has no named versification systems or
+  `TranslationInfo`; those, and mapping between versifications, moved to
+  [bible-library.md](./bible-library.md)
+- Step 5: Neovim chooses Bibles with `vim.ui.select` (Telescope backs it with telescope-ui-select).
+  `:ToposParallel` keeps the two books on the same verse through a new request,
+  `topos/sameVerse`
+- Step 6: compare is in embeds (`compareBibles`), not hover, since Obsidian's page preview shows
+  one file. The parallel tabs keep the verse at the top of either at the top of the other
+- Step 7 (and caching, sharing, and managing translations) is
+  [bible-library.md](./bible-library.md)
+
+## Where things stood
 
 - Obsidian: every folder of USX files is a Bible named after the folder
   (`src/core/bibles.ts`). `settings.bible` picks one for links, hover, and embeds. The others can
@@ -39,7 +56,7 @@ through sword-modules). The library's part is the **name** a reference gives and
 - `TranslatedPassage { passage, translation: Option<Translation { name, span }> }` is new, so
   `Passage` is unchanged. `BibleData::parse` and search don't look for translations.
 
-## Step 2: bindings
+## Step 2: bindings (done)
 
 - FFI: `ToposTranslations` (names and aliases) and `Topos.parseWithTranslation(reference,
   translations, style) -> Option<TranslatedPassage>` with the translation's span in the caller's
@@ -47,7 +64,7 @@ through sword-modules). The library's part is the **name** a reference gives and
   could take a translation too: OSIS has one (`KJV:John.3.16`, a work prefix).
 - The CLI doesn't need this until search does (step 3).
 
-## Step 3: translations in search
+## Step 3: translations in search (done)
 
 - `BibleMatcher::search_with_translations(text, &Translations) -> Vec<TranslatedMatch>`: a new
   result with the `MatchResult` and an optional `Translation`. It runs search, then looks right
@@ -64,7 +81,7 @@ through sword-modules). The library's part is the **name** a reference gives and
 - Problems: a reference whose named translation lacks the verse (`3 John 1:15 KJV`, where the KJV
   ends at 14) is a problem only once step 4 gives each translation its own versification.
 
-## Step 4: versification per translation
+## Step 4: versification per translation (counts done; mapping in bible-library.md)
 
 Translations number verses differently: Malachi 4 vs. 3:19–24, 3 John 1:14–15, psalm titles as
 verse 1, Romans 16:25–27, and the deuterocanon.
@@ -84,7 +101,7 @@ verse 1, Romans 16:25–27, and the deuterocanon.
   reference opens at the same numbers in another translation, which is right for almost every
   verse.
 
-## Step 5: the LSP and the Neovim plugin
+## Step 5: the LSP and the Neovim plugin (done)
 
 - Settings: `bibles = { BSB = "~/Bibles/BSB", KJV = "~/Bibles/KJV" }` and `default_bible = "BSB"`.
   The old `bible = "path"` still works as one Bible named after its folder. Each Bible loads
@@ -103,7 +120,7 @@ verse 1, Romans 16:25–27, and the deuterocanon.
   another Bible in a split, scroll-bound by verse, and a Telescope picker lists the Bibles.
   `:checkhealth` checks each folder.
 
-## Step 6: the Obsidian plugin
+## Step 6: the Obsidian plugin (done)
 
 - The translation names are the Bible folders' names plus aliases from settings, and each
   reference resolves through `parseWithTranslation` in the WASM package.
@@ -116,7 +133,7 @@ verse 1, Romans 16:25–27, and the deuterocanon.
 - The index doesn't store translations. If the sidebar groups or filters by translation later,
   keep them in a side table keyed by entry and span, not in `FileEntry`'s codec.
 
-## Step 7: SWORD modules (later)
+## Step 7: SWORD modules (see bible-library.md)
 
 sword-modules reads SWORD Bibles with their own versification. When the plugins or the LSP read
 SWORD modules (native only; WASM would need the files in the vault), a module's name is its

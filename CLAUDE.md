@@ -1,6 +1,6 @@
 # topos
 
-Finds and parses Bible references in text and documents, reporting where each one is in the source's own terms. See `ROADMAP.md` (what's done and planned) and `doc/architecture.md` (design). `doc/review.md` is a historical snapshot; most of it is fixed.
+Finds and parses Bible references in text and documents, reporting where each one is in the source's own terms. See `ROADMAP.md` (what's done and planned), `doc/architecture.md` (design), `doc/translations.md` (several translations), and `doc/bible-library.md` (the planned library above topos that caches, shares, and installs translations; topos itself stays references only). `doc/review.md` is a historical snapshot; most of it is fixed.
 
 ## Crates
 
