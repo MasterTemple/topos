@@ -86,7 +86,7 @@ Plan: [doc/translations.md](./doc/translations.md)
 - [x] Search, problems, and completion with translations (`tests/cases/translations.txt`), without slowing plain search
 - [x] A translation's own chapter and verse counts (`Translations::set_chapter_verses`, from a book's USX with `verses::chapter_verses`)
 - [x] The FFI: `ToposTranslations`, `parseWithTranslation`, `searchWithTranslations`, `completeWithTranslations`, `ToposBook.chapterVerses`
-- [ ] Mapping verses between versifications (Malachi 4:1 KJV = 3:19 MT), in the Bible library
+- [ ] Mapping verses between versifications (Malachi 4:1 KJV = 3:19 MT), in biblix
 - [x] Several Bibles in the LSP (`bibles`, `default-bible`, `hover-bibles`, `topos/bibles`)
 - [x] Several Bibles in the Neovim plugin (`bibles`, `:ToposBible`, `:ToposParallel`) and the Obsidian plugin (named references, verse counts, compare in embeds, parallel tabs)
-- [ ] A Bible library above topos (caching, sharing, installing translations from USX, SWORD, and more): [doc/bible-library.md](./doc/bible-library.md)
+- [ ] biblix, a library and CLI (`bx`) above topos: translations as versioned git packages, cached, shared, and installed from USX, SWORD, and more: [doc/biblix.md](./doc/biblix.md)
