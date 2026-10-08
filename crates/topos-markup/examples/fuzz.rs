@@ -97,7 +97,15 @@ fn main() {
                     assert!(point.path.resolve(&nodes).is_some());
                 }
             }
-            let _ = HtmlRenderer::new().render(&nodes);
+            let mut html = HtmlRenderer::new();
+            let len = flat.text.len();
+            for (a, b) in [(0, len), (len / 3, len / 2), (len / 2, len)] {
+                if let Some((start, end)) = flat.source_range(a..b) {
+                    html.mark(start, end);
+                }
+            }
+            let _ = html.render(&nodes);
+            let _ = html.render(&nodes);
             let _ = tagged_references(&nodes, &data);
         }
     }

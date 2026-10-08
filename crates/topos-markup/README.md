@@ -10,7 +10,8 @@ From the tree:
 - **Plain text** for terminals and editors ([`plain_text`]), and a [`Flat`] text with a map
   back to the tree and the span of every element, for highlighting
 - **HTML** with prefixed classes (`topos-woj`, `topos-note topos-crossref`) and data attributes
-  (`data-strong`, `data-osis-ref`), never inline styles ([`HtmlRenderer`])
+  (`data-strong`, `data-osis-ref`), never inline styles ([`HtmlRenderer`]), and `<mark>`s for
+  search matches ([`HtmlRenderer::mark`])
 - **Filters** that keep, unwrap, or drop elements by kind, note type, or a custom rule
   ([`Filter`])
 - **References**: the ones the markup tags, as topos passages ([`refs::tagged_references`]), and,

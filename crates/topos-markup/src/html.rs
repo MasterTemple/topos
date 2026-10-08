@@ -1,11 +1,11 @@
 //! HTML with classes for applications to style.
 
-use std::borrow::Cow;
+use std::{borrow::Cow, cmp::Ordering};
 
 use crate::{
     Element, Kind, Milestone, Node,
     filter::{Action, Filter},
-    flatten::ends_woj,
+    flatten::{Point, ends_woj},
 };
 
 /// Options for [`HtmlRenderer`]
@@ -48,6 +48,7 @@ Classes (with the prefix, `topos-` by default):
 | paragraph, line group, line | `p`, `div`, `span` | `p`, `lg`, `l` | |
 | verse, chapter (milestones) | `span` | `verse`, `chapter` | `data-osis-id`, `data-n` |
 | dictionary entry | `div` | `entry` | |
+| mark ([`HtmlRenderer::mark`]) | `mark` | `mark` | `data-mark` (`0` for the first mark) |
 
 Keep one renderer for a passage, so words of Jesus that continue from one verse into the next
 (`sID`/`eID` milestones or an unclosed `<q>`) stay marked. [`HtmlRenderer::wrap`] puts a
@@ -70,6 +71,12 @@ pub struct HtmlRenderer {
     pub opts: HtmlOptions,
     /// Words of Jesus still open from a milestone or an unclosed `<q>`, with the start's `sID`
     woj: Option<Option<String>>,
+    /// Ranges to mark, in the order they were added
+    marks: Vec<(Point, Point)>,
+    /// The entry being rendered (how many [`HtmlRenderer::render`] calls came before)
+    entry: usize,
+    /// The node being rendered
+    path: Vec<usize>,
 }
 
 impl HtmlRenderer {
@@ -78,14 +85,106 @@ impl HtmlRenderer {
     }
 
     pub fn with_options(opts: HtmlOptions) -> Self {
-        Self { opts, woj: None }
+        Self {
+            opts,
+            ..Self::default()
+        }
     }
 
-    /// One entry's nodes
+    /// One entry's nodes; each call is the next entry, as in [`Flattener::push`](crate::Flattener::push)
     pub fn render(&mut self, nodes: &[Node]) -> String {
         let mut out = String::new();
+        self.path.clear();
         self.nodes(nodes, &mut out, false);
+        self.entry += 1;
         out
+    }
+
+    /**
+    Marks the text from `start` to `end` (exclusive) with `<mark class="topos-mark"
+    data-mark="n">`, where `n` counts marks in the order they were added
+    - The points are where a search match starts and ends, as `topos-bible-formats`'
+      `MarkupLocation` gives them for a [`Flat`](crate::Flat) of the same entries (in the same
+      order, with any filter): highlight search results without searching the HTML again
+    - A mark across elements is one `<mark>` per text node, all with the same `data-mark`
+    - Add marks before rendering the entries they are in
+
+    ```
+    use topos_bible_markup::{HtmlRenderer, Markup, TextOptions, flatten::flatten, parse};
+
+    let nodes = parse(Markup::Osis, "See <hi type=\"italic\">John</hi> 3:16 today.");
+    let flat = flatten(&nodes, &TextOptions::default());
+    // A search match for `John 3:16` (`MarkupLocation` gives these points)
+    let (start, end) = flat.source_range(4..13).unwrap();
+    let mut html = HtmlRenderer::new();
+    html.mark(start, end);
+    assert_eq!(
+        html.render(&nodes),
+        r#"See <i class="topos-hi topos-italic"><mark class="topos-mark" data-mark="0">John</mark></i><mark class="topos-mark" data-mark="0"> 3:16</mark> today."#
+    );
+    ```
+    */
+    pub fn mark(&mut self, start: Point, end: Point) -> usize {
+        self.marks.push((start, end));
+        self.marks.len() - 1
+    }
+
+    /// Removes every mark
+    pub fn clear_marks(&mut self) {
+        self.marks.clear();
+    }
+
+    /// The marked byte ranges of the current text node, merged and in order, with their marks
+    fn marked(&self, text: &str) -> Vec<(usize, usize, usize)> {
+        let here = (self.entry, self.path.as_slice());
+        let mut ranges: Vec<(usize, usize, usize)> = self
+            .marks
+            .iter()
+            .enumerate()
+            .filter_map(|(i, (start, end))| {
+                let starts = (start.entry, start.path.0.as_slice()).cmp(&here);
+                let ends = (end.entry, end.path.0.as_slice()).cmp(&here);
+                if starts == Ordering::Greater || ends == Ordering::Less {
+                    return None;
+                }
+                let from = if starts == Ordering::Equal {
+                    start.offset
+                } else {
+                    0
+                };
+                let to = if ends == Ordering::Equal {
+                    end.offset
+                } else {
+                    text.len()
+                };
+                let to = to.min(text.len());
+                (from < to && text.is_char_boundary(from) && text.is_char_boundary(to))
+                    .then_some((from, to, i))
+            })
+            .collect();
+        ranges.sort();
+        let mut merged: Vec<(usize, usize, usize)> = Vec::new();
+        for (from, to, i) in ranges {
+            match merged.last_mut() {
+                Some(last) if from <= last.1 => last.1 = last.1.max(to),
+                _ => merged.push((from, to, i)),
+            }
+        }
+        merged
+    }
+
+    /// A text node, with its marks
+    fn text(&self, text: &str, out: &mut String) {
+        let mut at = 0;
+        for (from, to, i) in self.marked(text) {
+            escape(&text[at..from], out);
+            let class = self.class(&["mark"]);
+            open(out, "mark", &class, &[("data-mark", Some(&i.to_string()))]);
+            escape(&text[from..to], out);
+            out.push_str("</mark>");
+            at = to;
+        }
+        escape(&text[at..], out);
     }
 
     /// Wraps rendered HTML in a `div` whose class is the prefix without its trailing `-` or `_`
@@ -116,20 +215,22 @@ impl HtmlRenderer {
     }
 
     fn nodes(&mut self, nodes: &[Node], out: &mut String, in_woj: bool) {
-        for n in nodes {
+        for (i, n) in nodes.iter().enumerate() {
+            self.path.push(i);
             match n {
                 Node::Text(t) => {
                     if self.woj.is_some() && !in_woj && !t.trim().is_empty() {
                         let class = self.class(&[Kind::WordsOfJesus.class_name()]);
                         open(out, "span", &class, &[]);
-                        escape(t, out);
+                        self.text(t, out);
                         out.push_str("</span>");
                     } else {
-                        escape(t, out);
+                        self.text(t, out);
                     }
                 }
                 Node::Element(e) => self.element(e, out, in_woj),
             }
+            self.path.pop();
         }
     }
 

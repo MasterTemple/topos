@@ -285,3 +285,25 @@ fn plaintext_lines() {
         "one\ntwo words\n\nthree"
     );
 }
+
+#[test]
+fn marks_across_entries_and_elements() {
+    let a = parse(Markup::Osis, r#"Read <w lemma="strong:G1">John</w>"#);
+    let b = parse(Markup::Osis, r#"3:16 and Rom 8:28 &amp; Rom 8:28."#);
+    let mut flat = Flattener::new(TextOptions::default());
+    flat.push(&a).push(&b);
+    let flat = flat.finish();
+    assert_eq!(flat.text, "Read John 3:16 and Rom 8:28 & Rom 8:28.");
+    let mut html = HtmlRenderer::new();
+    // `John 3:16` runs from the first entry into the second; the second `Rom 8:28` overlaps a
+    // wider mark, and overlapping marks are merged
+    for range in [5..14, 19..27, 30..38, 28..38] {
+        let (start, end) = flat.source_range(range).unwrap();
+        html.mark(start, end);
+    }
+    let out = format!("{}|{}", html.render(&a), html.render(&b));
+    assert_eq!(
+        out,
+        r#"Read <span class="topos-w" data-strong="G1" data-lemma="strong:G1"><mark class="topos-mark" data-mark="0">John</mark></span>|<mark class="topos-mark" data-mark="0">3:16</mark> and <mark class="topos-mark" data-mark="1">Rom 8:28</mark> <mark class="topos-mark" data-mark="3">&amp; Rom 8:28</mark>."#
+    );
+}

@@ -13,6 +13,8 @@ Where a match is in parsed markup
   or not, titles or not); see [`Flattener`](topos_bible_markup::Flattener)
 - A match can start and end in different elements (`See <hi>John</hi> 3:16`)
 - Matches made only of added text (note brackets, Strong's numbers) are left out
+- To highlight matches in rendered HTML, pass `start` and `end` to
+  [`HtmlRenderer::mark`](topos_bible_markup::HtmlRenderer::mark)
 
 ```
 use topos_bible::matcher::BibleMatcher;
