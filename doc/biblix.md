@@ -24,6 +24,30 @@ Obsidian.
   room for registries later (anyone could host one), but nobody has to mirror upstream texts.
 - **A package can hold several formats** (USX and SWORD of the same text), each behind a feature
   the package's owner names.
+- **Summaries with every verse's hash are published for every package**, not only Bibles.
+- **biblix is its own repository**: `~/Development/rust/biblix`, next to sword-modules.
+- **USFM is read with usfm3.** On the whole KJV, both usfm3 and
+  [usfm-onion](https://github.com/WycliffeAssociates/usfm-onion) gave its 31,102 verses, and
+  usfm-onion was faster (0.58 s against 0.86 s). But usfm-onion's USX drops the space between
+  adjacent `\w` words (`For</char><char …>God`), so it reads "ForGodsoloved". usfm3 keeps the
+  spaces, and it's on crates.io.
+
+## Status
+
+Step 1 is done in the biblix repository:
+- `biblix.toml`, `Storage`, the USX and USFM sources, packages, the cache, and `bx show`/`bx check`
+- Hand-made packages in `~/Development/biblix-packages/`, as git repositories tagged `v1.0.0`:
+  `bsb` (USX, from a DBL bundle) and `kjv` (USFM, from fetch.bible)
+
+Reading every book of each:
+
+| | From source | Building the cache | From the cache |
+|---|---|---|---|
+| BSB (USX, 31,086 verse spans) | 166 ms | 227 ms | 120 ms |
+| KJV (USFM, 31,102 verses) | 1 s | 2 s | 323 ms |
+
+The cache helps most with USFM. A warm open also hashes the whole package (about 30 ms); a git
+package could be keyed by its commit instead.
 - **Versions keep links working**: a link resolves against the version it was made with, and the
   version number says when a change can break links.
 
@@ -120,7 +144,7 @@ strongs = 0
 ```
 
 Plus, beside it, `biblix.verses.bin`: a short hash of each verse's text (about 250 KB for a
-Bible).
+Bible), published for every package of any kind (commentaries are keyed by verse too).
 
 What this gives without installing:
 - **Browsing**: which books (the deuterocanon or not), which features and elements, and how big
@@ -244,9 +268,8 @@ What exists, from a survey on 2026-10-08:
 
 Formats to read:
 - **USX** (done)
-- **USFM**: an existing crate, whichever is better: [`usfm3`](https://docs.rs/crate/usfm3/0.2.0)
-  (error-tolerant, USFM 3 to USX/USJ), usfm-onion, or [`usfm`](https://docs.rs/crate/usfm/0.1.1)
-  (pest). Compare them on eBible.org's USFM for speed and on how they handle malformed files
+- **USFM** (done): [`usfm3`](https://docs.rs/crate/usfm3/0.2.0) converts it to USX (see
+  Decisions for the comparison with usfm-onion)
 - **USJ** (USX as JSON)
 - **OSIS** and **ThML** (done in topos-bible-markup)
 - **SWORD** (sword-modules)
@@ -291,7 +314,7 @@ biblix-ffi (BoltFFI, like topos-ffi) has biblix's and topos's API in one package
 
 ## Steps
 
-1. **Create biblix** with `biblix.toml`, the USX source (moved from the LSP and the plugin),
+1. **Create biblix** (done) with `biblix.toml`, the USX source (moved from the LSP and the plugin),
    `Storage`, and the cache. Make packages of the BSB and a KJV by hand.
 2. **`bx` with git and path dependencies**: `add`, `install`, the lock file, side-by-side
    versions, archive downloads, and features that choose formats.
@@ -309,6 +332,4 @@ biblix-ffi (BoltFFI, like topos-ffi) has biblix's and topos's API in one package
 
 ## Open questions
 
-- **Which USFM crate**: usfm3, usfm-onion, or usfm, after comparing them on real files.
-- **What a summary counts**: the list of elements in `[contents]`, and whether verse hashes are
-  always published or only for Bibles.
+- **What a summary counts**: the list of elements in `[contents]`.

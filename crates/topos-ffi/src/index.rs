@@ -5,8 +5,8 @@ use std::{collections::HashSet, sync::Mutex};
 
 use boltffi::*;
 use topos_bible_index::{
-    Detail, EntryMessage, EpubEntryBuilder, EpubRef, FileEntry, Hit, Index, Order, Pack, Results,
-    Scope, Stamp, Status, Unit, detail_name, text_entry,
+    Detail, EntryMessage, EpubEntryBuilder, EpubRef, FileEntry, Hit, Index, Order, Pack,
+    PathFilter, Results, Scope, Stamp, Status, Unit, detail_name, text_entry,
 };
 use topos_lib::segments::Passage as CorePassage;
 
@@ -54,6 +54,134 @@ pub struct ExtensionCount {
     pub extension: String,
     pub references: u32,
     pub files: u32,
+}
+
+/**
+Which files an index query looks at, by path ([`ToposIndex::query_paths`]). Build one by chaining,
+like [`ToposQuery`]; patterns are checked when it's used (or with [`ToposPaths::problems`])
+
+```ts
+const paths = ToposPaths.create().path("Sermons").path("Notes/John.md").glob("!drafts").extension("md");
+index.queryPaths(topos, ToposQuery.create(), paths, IndexOrder.File);
+```
+
+A file is kept when it's one of the files or in one of the folders (if any are given), matches an
+included glob or regular expression (if any are), matches no excluded one (`!` before a pattern
+excludes; `\!` is a literal `!`), and has one of the extensions (if any are)
+*/
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct ToposPaths {
+    /// Files and folders (relative paths with `/`)
+    pub paths: Vec<String>,
+    /// Globs like ripgrep's `--glob`: `*.md` matches at any depth, and a glob matching a folder
+    /// matches everything in it
+    pub globs: Vec<String>,
+    /// Globs ignoring case, like `--iglob`
+    pub iglobs: Vec<String>,
+    /// Regular expressions matched anywhere in the path (`(?i)` ignores case)
+    pub regexes: Vec<String>,
+    /// Extensions without the dot, any case
+    pub extensions: Vec<String>,
+}
+
+impl ToposPaths {
+    fn filter(&self) -> Result<PathFilter, ToposError> {
+        let invalid = |e: topos_bible_index::PathError| ToposError::InvalidQuery {
+            message: e.to_string(),
+        };
+        let mut filter = PathFilter::new();
+        for path in &self.paths {
+            filter = filter.path(path);
+        }
+        for glob in &self.globs {
+            filter = filter.glob(glob, false).map_err(invalid)?;
+        }
+        for glob in &self.iglobs {
+            filter = filter.glob(glob, true).map_err(invalid)?;
+        }
+        for regex in &self.regexes {
+            filter = filter.regex(regex).map_err(invalid)?;
+        }
+        for extension in &self.extensions {
+            filter = filter.extension(extension);
+        }
+        Ok(filter)
+    }
+}
+
+fn adding(mut list: Vec<String>, value: String) -> Vec<String> {
+    list.push(value);
+    list
+}
+
+#[export]
+impl ToposPaths {
+    /// Every file
+    pub fn create() -> Self {
+        Self::default()
+    }
+
+    /// A file, or a folder with everything in it
+    pub fn path(&self, path: String) -> Self {
+        Self {
+            paths: adding(self.paths.clone(), path),
+            ..self.clone()
+        }
+    }
+
+    /// A glob (`!` excludes)
+    pub fn glob(&self, glob: String) -> Self {
+        Self {
+            globs: adding(self.globs.clone(), glob),
+            ..self.clone()
+        }
+    }
+
+    /// A glob ignoring case (`!` excludes)
+    pub fn iglob(&self, glob: String) -> Self {
+        Self {
+            iglobs: adding(self.iglobs.clone(), glob),
+            ..self.clone()
+        }
+    }
+
+    /// A regular expression matched anywhere in the path (`!` excludes)
+    pub fn regex(&self, regex: String) -> Self {
+        Self {
+            regexes: adding(self.regexes.clone(), regex),
+            ..self.clone()
+        }
+    }
+
+    /// An extension, without the dot
+    pub fn extension(&self, extension: String) -> Self {
+        Self {
+            extensions: adding(self.extensions.clone(), extension),
+            ..self.clone()
+        }
+    }
+
+    /// Why each pattern that can't be read can't be (empty when they all can)
+    pub fn problems(&self) -> Vec<String> {
+        let globs = self
+            .globs
+            .iter()
+            .map(|g| PathFilter::new().glob(g, false).err());
+        let iglobs = self
+            .iglobs
+            .iter()
+            .map(|g| PathFilter::new().glob(g, true).err());
+        let regexes = self
+            .regexes
+            .iter()
+            .map(|r| PathFilter::new().regex(r).err());
+        globs
+            .chain(iglobs)
+            .chain(regexes)
+            .flatten()
+            .map(|e| e.to_string())
+            .collect()
+    }
 }
 
 /// A file to write: a pack (`<device>-<number>.bin`) or an EPUB's details (`<name>.bin`)
@@ -442,6 +570,33 @@ impl ToposIndex {
         Ok(IndexResults { inner: results })
     }
 
+    /// The references a query keeps in the files `paths` keeps (an error names a pattern that
+    /// can't be read)
+    pub fn query_paths(
+        &self,
+        topos: &Topos,
+        query: &ToposQuery,
+        paths: &ToposPaths,
+        order: IndexOrder,
+    ) -> Result<IndexResults, ToposError> {
+        let filter = paths.filter()?;
+        let order = match order {
+            IndexOrder::File => Order::File,
+            IndexOrder::Bible => Order::Bible,
+        };
+        let results = if query.is_empty() {
+            self.lock()
+                .query_paths(None, None, &Scope::All, &filter, order)
+        } else {
+            let matcher = topos.filter(query)?.create_matcher();
+            let books = matcher.possible_books();
+            let keep = |p: &CorePassage| matcher.keeps(p);
+            self.lock()
+                .query_paths(Some(&keep), books.as_ref(), &Scope::All, &filter, order)
+        };
+        Ok(IndexResults { inner: results })
+    }
+
     /// How many of the results are in files with each extension, by extension
     pub fn extension_counts(&self, results: &IndexResults) -> Vec<ExtensionCount> {
         self.lock()
@@ -567,5 +722,59 @@ impl Topos {
             detail: None,
         }
         .encode()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn queries_by_path() -> Result<(), ToposError> {
+        let topos = Topos::new();
+        let index = ToposIndex::create("laptop".into(), "test".into(), OffsetUnit::Utf16);
+        for (path, text) in [
+            ("Notes/a.md", "John 3:16"),
+            ("Notes/drafts/b.md", "Rom 8:28"),
+            ("Sermons/c.srt", "Ps 23"),
+            ("d.txt", "Gen 1:1"),
+        ] {
+            index.index_text(&topos, path.into(), 1.0, 1.0, text.into(), 1.0);
+        }
+        let found = |paths: ToposPaths| -> Result<Vec<String>, ToposError> {
+            let results =
+                index.query_paths(&topos, &ToposQuery::create(), &paths, IndexOrder::File)?;
+            Ok(index
+                .page(&topos, &results, 0, 10)
+                .into_iter()
+                .map(|h| h.path)
+                .collect())
+        };
+        let notes = ToposPaths::create()
+            .path("Notes".into())
+            .path("d.txt".into());
+        assert_eq!(
+            found(notes.glob("!drafts".into()))?,
+            ["d.txt", "Notes/a.md"]
+        );
+        assert_eq!(
+            found(ToposPaths::create().iglob("SERMONS".into()))?,
+            ["Sermons/c.srt"]
+        );
+        assert_eq!(
+            found(
+                ToposPaths::create()
+                    .regex(r"\.(md|txt)$".into())
+                    .extension("TXT".into())
+            )?,
+            ["d.txt"]
+        );
+        let bad = ToposPaths::create()
+            .glob("a[".into())
+            .regex("(".into())
+            .glob("*.md".into());
+        assert_eq!(bad.problems().len(), 2);
+        assert!(matches!(found(bad), Err(ToposError::InvalidQuery { .. })));
+        Ok(())
     }
 }

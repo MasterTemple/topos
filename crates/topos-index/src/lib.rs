@@ -9,6 +9,8 @@ files again and again (a notes vault, a library of books)
   matched by a hash of its contents instead.
 - Each device writes its own packs (a binary format, [`Pack`]), so syncing never conflicts.
 - [`Index::query`] filters, sorts, and counts in Rust; results are read a page at a time.
+  [`Index::query_paths`] also picks files by path ([`PathFilter`]: files and folders, globs, and
+  regular expressions).
 */
 
 mod codec;
@@ -17,6 +19,7 @@ pub mod entry;
 pub mod files;
 pub mod index;
 pub mod pack;
+pub mod paths;
 
 pub use entry::{
     Detail, EpubEntryBuilder, EpubRef, FileEntry, RefDetail, Reference, Section, Stamp, Unit,
@@ -26,3 +29,4 @@ pub use entry::{
 pub use entry::{epub_entry, epub_file_entry};
 pub use index::{Hit, Index, IndexError, Order, PACK_COUNT, Results, Scope, Status};
 pub use pack::{Confirmation, EntryMessage, FORMAT, FormatError, Pack, pack_number};
+pub use paths::{PathError, PathFilter};

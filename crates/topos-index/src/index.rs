@@ -12,6 +12,7 @@ use topos_bible::{
 };
 
 use crate::{
+    PathFilter,
     entry::{Detail, FileEntry, RefDetail, Reference, Unit},
     pack::{Confirmation, EntryMessage, Pack, pack_number},
 };
@@ -607,11 +608,22 @@ impl Index {
         extensions: &[String],
         order: Order,
     ) -> Results {
-        let extensions: Vec<String> = extensions
+        let paths = extensions
             .iter()
-            .map(|e| lowercase(e.trim_start_matches('.')))
-            .collect();
-        if keep.is_none() && books.is_none() && *scope == Scope::All && extensions.is_empty() {
+            .fold(PathFilter::new(), |paths, e| paths.extension(e));
+        self.query_paths(keep, books, scope, &paths, order)
+    }
+
+    /// Like [`Index::query`], in the files `paths` keeps
+    pub fn query_paths(
+        &self,
+        keep: Option<&dyn Fn(&Passage) -> bool>,
+        books: Option<&BTreeSet<BookId>>,
+        scope: &Scope,
+        paths: &PathFilter,
+        order: Order,
+    ) -> Results {
+        if keep.is_none() && books.is_none() && *scope == Scope::All && paths.is_empty() {
             let all = self.ordered(order);
             return Results {
                 generation: self.generation,
@@ -635,7 +647,7 @@ impl Index {
                                 .is_some_and(|rest| rest.starts_with('/'))
                     }
                 };
-                in_scope && (extensions.is_empty() || extensions.contains(&extension(&slot.path)))
+                in_scope && paths.keeps(&slot.path)
             })
             .collect();
         // References in books the filter can't keep are skipped without testing them
