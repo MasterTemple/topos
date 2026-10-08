@@ -72,6 +72,22 @@ pub struct GenrePatch {
     pub subcategories: Vec<String>,
 }
 
+static DEUTEROCANON_JSON: &str = include_str!("./deuterocanon.json");
+
+impl DataPatch {
+    /**
+    The deuterocanonical and other books that SWORD's versifications use but the default data
+    leaves out (Tobit, Sirach, 1 Maccabees, ...), to [merge](BibleDataInput::merge) into data
+    - Ids 67 to 90, each with its OSIS id, so the testament filters (1 to 39, 40 to 66) leave them out
+    - The `Deuterocanon` genre (also `apocrypha`)
+    - Chapter and verse counts from SWORD's NRSVA versification, else LXX, KJVA, Luther, or Vulgate
+    - Abbreviations that are also words (`bar`, `sir`, `wisdom`) need an explicit verse in search
+    */
+    pub fn deuterocanon() -> Self {
+        serde_json::from_str(DEUTEROCANON_JSON).expect("the deuterocanon data is valid JSON")
+    }
+}
+
 fn key(name: &str) -> String {
     Books::normalize_book_name(name)
 }

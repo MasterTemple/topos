@@ -169,6 +169,24 @@ assert_eq!(matcher.search("Jude 5").len(), 0);
 Every name must mean exactly one book, so merging an abbreviation that another book already uses
 is an error.
 
+## Deuterocanon
+
+The default books are the 66 of the Protestant canon. `BibleData::with_deuterocanon()` adds the 24
+others that SWORD's versifications use (Tobit, Sirach, 1 Maccabees, ...), with OSIS ids, chapter and
+verse counts, and the `Deuterocanon` genre; `DataPatch::deuterocanon()` merges them into your own
+data:
+
+```rust
+use topos_bible::{data::BibleData, matcher::BibleMatcher};
+
+let data = BibleData::with_deuterocanon();
+let passage = data.parse("Sir 24:3").unwrap();
+assert_eq!(passage.to_osis(data.books()).unwrap(), "Sir.24.3");
+
+let matcher = BibleMatcher::new(data, Default::default());
+assert_eq!(matcher.search("Tobit 4:15 and 1 Macc 2:21").len(), 2);
+```
+
 ## Formats
 
 [`topos-bible-formats`](https://crates.io/crates/topos-bible-formats) finds references in HTML

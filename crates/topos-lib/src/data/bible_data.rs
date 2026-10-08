@@ -5,6 +5,7 @@ use crate::{
         books::{Books, BooksInput},
         chapter_verses::{BookChapterVerses, BookChapterVersesInput},
         genres::{Genres, GenresInput},
+        patch::DataPatch,
     },
     error::ToposResult,
     segments::{Passage, grammar::SegmentList, resolve::Resolver},
@@ -68,6 +69,15 @@ impl BibleData {
         (!resolved.segments.is_empty()).then(|| resolved.segments.with_book(book))
     }
 
+    /// The default data with the deuterocanonical books added (see [`DataPatch::deuterocanon`])
+    pub fn with_deuterocanon() -> Self {
+        let mut input = BibleDataInput::defaults();
+        input
+            .merge(DataPatch::deuterocanon())
+            .expect("the deuterocanon data merges into the defaults");
+        Self::new(input).expect("the default data with the deuterocanon is valid")
+    }
+
     pub fn books(&self) -> &Books {
         &self.books
     }
@@ -120,5 +130,47 @@ mod tests {
         assert_eq!(data.books().search("Exodus"), None);
         let versification = data.chapter_verses().get_chapter_verses(&genesis).unwrap();
         assert_eq!(versification.get_chapter_count(), 2);
+    }
+
+    #[test]
+    fn deuterocanon() {
+        let data = BibleData::with_deuterocanon();
+        let books = data.books();
+        let name = |p: &Passage| format!("{} {}", books.get_name(p.book).unwrap(), p.segments);
+        assert_eq!(name(&data.parse("Sir 24:3").unwrap()), "Sirach 24:3");
+        assert_eq!(
+            name(&data.parse("1 Macc 1:1-4").unwrap()),
+            "1 Maccabees 1:1-4"
+        );
+        // A single-chapter book's number is a verse
+        assert_eq!(
+            name(&data.parse("Bel 5").unwrap()),
+            "Bel and the Dragon 1:5"
+        );
+        assert_eq!(data.parse("Tob 1:99"), None);
+        // Every added book has an OSIS id, and every book of SWORD's versifications is known
+        for osis in [
+            "Tob", "Jdt", "EsthGr", "AddEsth", "Wis", "Sir", "Bar", "EpJer", "PrAzar", "Sus",
+            "Bel", "AddDan", "1Macc", "2Macc", "1Esd", "PrMan", "AddPs", "3Macc", "2Esd", "4Macc",
+            "Odes", "PssSol", "1En", "EpLao",
+        ] {
+            let id = books.search_osis(osis).unwrap();
+            assert!(
+                data.chapter_verses().get_chapter_verses(&id).is_some(),
+                "{osis}"
+            );
+        }
+        assert_eq!(data.genres().genre_ids("apocrypha").unwrap().len(), 24);
+        // Words aren't references without a verse
+        let matcher = crate::matcher::BibleMatcher::new(
+            data.clone(),
+            crate::matcher::matches::ComplexFilter::default(),
+        );
+        assert!(matcher.search("a bar 2 drinks, sir 3").is_empty());
+        let found = matcher.search("see Sir 24:3 and Wisdom 7:26");
+        let found: Vec<_> = found.iter().map(|m| name(&m.psg)).collect();
+        assert_eq!(found, ["Sirach 24:3", "Wisdom of Solomon 7:26"]);
+        // The defaults are unchanged
+        assert_eq!(BibleData::default().books().search_osis("Tob"), None);
     }
 }

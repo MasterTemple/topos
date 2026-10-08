@@ -8,6 +8,16 @@ use crate::data::books::{BookId, Books};
 pub struct ChapterVerses(Vec<u8>);
 
 impl ChapterVerses {
+    /// The number of verses in each chapter, starting with chapter 1
+    pub fn new(verses: Vec<u8>) -> Self {
+        Self(verses)
+    }
+
+    /// The number of verses in each chapter, starting with chapter 1
+    pub fn verse_counts(&self) -> &[u8] {
+        &self.0
+    }
+
     pub fn get_last_verse(&self, chapter: u8) -> Option<u8> {
         let idx = chapter.checked_sub(1)? as usize;
         self.0.get(idx).cloned()
@@ -19,6 +29,12 @@ impl ChapterVerses {
 
     pub fn get_chapter_count(&self) -> u8 {
         self.0.len() as u8
+    }
+}
+
+impl From<Vec<u8>> for ChapterVerses {
+    fn from(verses: Vec<u8>) -> Self {
+        Self::new(verses)
     }
 }
 
