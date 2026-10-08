@@ -118,12 +118,12 @@ Bibles a plugin has. Only the methods that take them read translations; the othe
 Chain the methods:
 
 ```ts
-const translations = ToposTranslations.create().add("BSB", []).add("KJV", ["AV"])
-  .chapterVerses("BSB", 64, threeJohn.chapterVerses()); // a ToposBook's own verse counts
+const translations = ToposTranslations.create().add("ESV", []).add("KJV", ["AV"])
+  .chapterVerses("ESV", 64, threeJohn.chapterVerses()); // a ToposBook's own verse counts
 topos.parseWithTranslation("3 John 15 (av)", OffsetUnit.Utf16, translations, BookStyle.Name);
 // null: the KJV (the default counts) ends 3 John at verse 14
-topos.parseWithTranslation("3 John 15 (bsb)", OffsetUnit.Utf16, translations, BookStyle.Name);
-// { passage: 3 John 1:15, translation: { name: "BSB", start: 11, end: 14 } }
+topos.parseWithTranslation("3 John 15 (esv)", OffsetUnit.Utf16, translations, BookStyle.Name);
+// { passage: 3 John 1:15, translation: { name: "ESV", start: 11, end: 14 } }
 ```
 
 Names and aliases match ignoring case, the longest first, as whole words after the reference

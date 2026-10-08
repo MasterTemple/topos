@@ -52,11 +52,11 @@ returns new translations)
 
 ```ts
 const translations = ToposTranslations.create()
-  .add("BSB", [])
+  .add("ESV", [])
   .add("KJV", ["AV"])
-  .chapterVerses("BSB", 64, book.chapterVerses()); // 3 John's verse counts from its USX
-topos.parseWithTranslation("3 John 15 (bsb)", OffsetUnit.Utf16, translations, BookStyle.Name);
-// { passage: 3 John 1:15, translation: { name: "BSB", start: 11, end: 14 } }
+  .chapterVerses("ESV", 64, book.chapterVerses()); // 3 John's verse counts from its USX
+topos.parseWithTranslation("3 John 15 (esv)", OffsetUnit.Utf16, translations, BookStyle.Name);
+// { passage: 3 John 1:15, translation: { name: "ESV", start: 11, end: 14 } }
 ```
 
 - Names and aliases are matched ignoring case; only these are translations, so other words after

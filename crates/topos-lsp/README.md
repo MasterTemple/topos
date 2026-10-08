@@ -117,8 +117,8 @@ other references use `default-bible`. Then:
 - Completion offers the names after a reference (`John 3:16 K` → `KJV`), whose documentation is
   that Bible's text
 - The reference is checked against that Bible's own verse counts, read from its USX markers when
-  it loads (`3 John 1:15 BSB` exists, while the default counts, the KJV's, end at verse 14), and
-  diagnostics name it: `3 John 1:16 does not exist in the BSB`
+  it loads (with an ESV, `3 John 1:15 ESV` exists, though the default counts, the KJV's, end 3 John
+  at verse 14), and diagnostics name it: `3 John 1:16 does not exist in the ESV`
 - Insertions use it; a reference without one offers an insertion per Bible
 
 The `topos/bibles` request (no parameters) lists them, the default first: `{ "bibles": [{ "name":
