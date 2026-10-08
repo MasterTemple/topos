@@ -4,9 +4,13 @@
 //! differently: bytes (Rust, C), Unicode scalars (Python), or UTF-16 code units (JavaScript,
 //! Kotlin, Swift's `utf16` view).
 
+#[cfg(feature = "markup")]
+mod book;
 mod files;
 mod index;
 
+#[cfg(feature = "markup")]
+pub use book::*;
 pub use files::*;
 pub use index::*;
 
@@ -170,6 +174,8 @@ pub enum ToposError {
     /// Files can't be searched: a glob or ignore file is wrong, or there's no file access (in
     /// WebAssembly)
     Files { message: String },
+    /// Markup in a format topos-bible-markup doesn't read (see [`ToposBook::parse`])
+    InvalidMarkup { message: String },
 }
 
 /// A testament, for [`ToposQuery`]

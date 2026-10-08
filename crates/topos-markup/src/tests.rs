@@ -307,3 +307,115 @@ fn marks_across_entries_and_elements() {
         r#"Read <span class="topos-w" data-strong="G1" data-lemma="strong:G1"><mark class="topos-mark" data-mark="0">John</mark></span>|<mark class="topos-mark" data-mark="0">3:16</mark> and <mark class="topos-mark" data-mark="1">Rom 8:28</mark> <mark class="topos-mark" data-mark="3">&amp; Rom 8:28</mark>."#
     );
 }
+
+// Expected passage parts are lists of index ranges, often just one
+#[allow(clippy::single_range_in_vec_init)]
+mod verses {
+    use super::*;
+    use crate::verses::{passage_ranges, slice, verses};
+    use topos_bible::data::BibleData;
+
+    const USX: &str = r#"<usx version="3.0"><book code="PSA" style="id"/>
+<para style="mt1">Psalms</para>
+<chapter number="1" style="c" sid="PSA 1"/>
+<para style="d">A heading</para>
+<para style="q1"><verse number="1" style="v" sid="PSA 1:1"/>Blessed is the man</para>
+<para style="q2">who does not walk<verse eid="PSA 1:1"/></para>
+<para style="s1">The way</para>
+<para style="q1"><verse number="2-3" style="v" sid="PSA 1:2-3"/>But his delight<verse eid="PSA 1:2-3"/><verse number="4" style="v" sid="PSA 1:4"/>Not so<verse eid="PSA 1:4"/></para>
+<chapter eid="PSA 1"/>
+<chapter number="2" style="c" sid="PSA 2"/>
+<para style="q1"><verse number="1" style="v" sid="PSA 2:1"/>Why do the nations rage<verse eid="PSA 2:1"/></para>
+<chapter eid="PSA 2"/></usx>"#;
+
+    fn text(nodes: &[Node]) -> String {
+        plain_text(
+            nodes,
+            &TextOptions {
+                filter: Filter::all(),
+                ..TextOptions::default()
+            },
+        )
+    }
+
+    #[test]
+    fn usx_verses_cross_paragraphs_and_keep_headings() {
+        let nodes = parse(Markup::Usx, USX);
+        let spans = verses(&nodes);
+        let numbers: Vec<_> = spans.iter().map(|s| (s.chapter, s.verse, s.last)).collect();
+        assert_eq!(numbers, [(1, 1, 1), (1, 2, 3), (1, 4, 4), (2, 1, 1)]);
+        let verse = |i: usize| slice(&nodes, &spans[i].start, Some(&spans[i].end));
+        // The heading after the chapter marker goes with verse 1, the verse keeps both lines
+        let first = verse(0);
+        assert_eq!(
+            text(&first),
+            "A heading\nBlessed is the man\nwho does not walk"
+        );
+        assert_eq!(find_all(&first, Kind::Line).len(), 2);
+        // A heading between verses belongs to the verse after it; the book title to none
+        assert_eq!(text(&verse(1)), "The way\nBut his delight");
+        assert_eq!(text(&verse(2)), "Not so");
+        assert_eq!(text(&verse(3)), "Why do the nations rage");
+        assert!(!(0..4).any(|i| text(&verse(i)).contains("Psalms")));
+    }
+
+    #[test]
+    fn passages_pick_verses() {
+        let nodes = parse(Markup::Usx, USX);
+        let spans = verses(&nodes);
+        let data = BibleData::default();
+        let ranges = |r: &str| passage_ranges(&spans, &data.parse(r).unwrap());
+        // A bridged verse is in the passage when any of its verses is
+        assert_eq!(ranges("Psalm 1:3"), [1..2]);
+        assert_eq!(ranges("Psalm 1:1-3"), [0..2]);
+        assert_eq!(ranges("Psalm 1"), [0..3]);
+        assert_eq!(ranges("Psalm 1:4; 2"), [2..3, 3..4]);
+        assert!(ranges("Psalm 3").is_empty());
+        // A whole chapter slices to all its verses, with the cut paragraph left whole
+        let r = &ranges("Psalm 1")[0];
+        let chapter = slice(&nodes, &spans[r.start].start, Some(&spans[r.end - 1].end));
+        assert_eq!(
+            text(&chapter),
+            "A heading\nBlessed is the man\nwho does not walk\nThe way\nBut his delightNot so"
+        );
+    }
+
+    #[test]
+    fn osis_verse_elements_and_milestones() {
+        let elements = parse(
+            Markup::Osis,
+            r#"<div type="book" osisID="John"><chapter osisID="John.3"><verse osisID="John.3.16">For God</verse> <verse osisID="John.3.17">For God sent</verse></chapter></div>"#,
+        );
+        let spans = verses(&elements);
+        assert_eq!(
+            spans
+                .iter()
+                .map(|s| (s.chapter, s.verse))
+                .collect::<Vec<_>>(),
+            [(3, 16), (3, 17)]
+        );
+        assert_eq!(
+            text(&slice(&elements, &spans[1].start, Some(&spans[1].end))),
+            "For God sent"
+        );
+
+        let milestones = parse(
+            Markup::Osis,
+            r#"<chapter sID="John.3" osisID="John.3"/><verse sID="John.3.16" osisID="John.3.16"/>For God<verse eID="John.3.16"/><verse sID="John.3.17" osisID="John.3.17"/>sent<verse eID="John.3.17"/><chapter eID="John.3"/>"#,
+        );
+        let spans = verses(&milestones);
+        assert_eq!(
+            spans
+                .iter()
+                .map(|s| (s.chapter, s.verse))
+                .collect::<Vec<_>>(),
+            [(3, 16), (3, 17)]
+        );
+        assert_eq!(
+            text(&slice(&milestones, &spans[0].start, Some(&spans[0].end))),
+            "For God"
+        );
+        // No end: to the end of the tree
+        assert_eq!(text(&slice(&milestones, &spans[1].start, None)), "sent");
+    }
+}

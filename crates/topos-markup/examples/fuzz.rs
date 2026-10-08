@@ -3,7 +3,9 @@
 //!     cargo run --release -p topos-bible-markup --example fuzz
 use topos_bible::data::BibleData;
 use topos_bible_markup::{
-    Filter, Flattener, HtmlRenderer, Markup, TextOptions, parse, refs::tagged_references,
+    Filter, Flattener, HtmlRenderer, Markup, TextOptions, parse,
+    refs::tagged_references,
+    verses::{slice, verses},
 };
 
 fn main() {
@@ -48,6 +50,11 @@ fn main() {
         "<div eID=\"x\"/>",
         "<verse sid=\"JHN 1:1\"/>",
         "<verse eid=\"JHN 1:1\"/>",
+        "<verse number=\"2-3\" sid=\"JHN 1:2\"/>",
+        "<verse osisID=\"John.1.4\">",
+        "</verse>",
+        "<chapter number=\"2\" sid=\"JHN 2\"/>",
+        "<chapter eID=\"John.2\"/>",
         "<char style=\"wj\">",
         "</char>",
         "<para style=\"q1\">",
@@ -107,6 +114,10 @@ fn main() {
             let _ = html.render(&nodes);
             let _ = html.render(&nodes);
             let _ = tagged_references(&nodes, &data);
+            for verse in verses(&nodes) {
+                assert!(verse.start <= verse.end, "{verse:?} in {s:?}");
+                let _ = html.render(&slice(&nodes, &verse.start, Some(&verse.end)));
+            }
         }
     }
     println!("ok: {} parses without panic", rounds * markups.len());

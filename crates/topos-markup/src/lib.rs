@@ -10,6 +10,7 @@ pub mod path;
 pub mod refs;
 pub mod text;
 mod tree;
+pub mod verses;
 mod xml;
 
 pub use entities::decode_entities;

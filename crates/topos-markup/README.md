@@ -14,6 +14,8 @@ From the tree:
   search matches ([`HtmlRenderer::mark`])
 - **Filters** that keep, unwrap, or drop elements by kind, note type, or a custom rule
   ([`Filter`])
+- **Verses in a whole book** (USX, or OSIS with milestones), and the tree between two places, so
+  a passage keeps its paragraphs and headings ([`verses`])
 - **References**: the ones the markup tags, as topos passages ([`refs::tagged_references`]), and,
   with `topos-bible-formats`' `markup` feature, the ones written in the text, with their place
   in the tree

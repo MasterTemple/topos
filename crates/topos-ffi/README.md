@@ -140,9 +140,20 @@ uses the CLI's). Each file comes back with its `FileMatch`es (`passage`, offsets
 `line`, `column`, a `label` like a time or page, and `epub` with the CFI and chapter) or an
 `error`. `listFiles(paths, files)` lists what would be searched.
 
+**A book's text** (feature `markup`, on by default). topos holds no Bible text, but it can read
+a book you bring, through [`topos-bible-markup`](../topos-markup): `ToposBook.parse(topos, "usx",
+text)` parses a whole book (USX, or OSIS with verse milestones; `null` in JavaScript for an unknown
+markup), `bookId()` says which (from USX's `<book code>` or OSIS's book `div`), and `verses()` and
+`chapters()` list what it has. `html(passage, options)` and `text(passage, options)` give each part
+of a passage (`John 3:16; 4` has two), and `chapterHtml(chapter, options)` a whole chapter;
+`BookTextOptions { notes, headings, classPrefix }` keeps or drops footnotes and headings. A verse
+runs from the end of the one before it, so a heading goes with the verse after it, and paragraphs
+cut by a passage stay paragraphs. The HTML uses topos-bible-markup's classes (verse markers are
+empty `<span class="topos-verse" data-n="16">`s for a stylesheet to number).
+
 **Errors.** `ToposError` is `InvalidConfig { message }`, `InvalidQuery { message }`,
-`InvalidIndex { message }` (an index file that's damaged or from another version), or
-`Files { message }` (a bad glob or ignore file, or no file access). Python
+`InvalidIndex { message }` (an index file that's damaged or from another version), 
+`Files { message }` (a bad glob or ignore file, or no file access), or `InvalidMarkup { message }`. Python
 raises `ToposErrorException`; JavaScript throws `ToposErrorException`, with the error in its
 `value` (`e.value.message`). `Topos.with_config` is older: in JavaScript it returns `null` on bad
 input instead, so prefer `ToposOptions.create().data(json).build()`, which throws everywhere.
