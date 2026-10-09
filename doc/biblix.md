@@ -30,6 +30,21 @@ Obsidian.
   and SHA-256, with its transcript and timings (see Media). Git keeps only small, diffable files,
   and the media stays wherever its owner serves it.
 - **biblix is its own repository**: `~/Development/rust/biblix`, next to sword-modules.
+- **Imports are named by their catalog's kind** (`ebible:<id>`, `fetch:<id>`): each kind declares
+  its prefix, and `bx import` looks the name up in the project's catalogs, the same ones
+  `bx search` reads (decided October 2026).
+- **Short names for git hosts** (decided October 2026): `github:owner/repo` (also `gitlab:`,
+  `codeberg:`; the path is the host's own, so GitLab's nested groups work) wherever a URL is
+  taken. They're shorthand for typing: manifests and lock files keep the full URL.
+- **Forks side by side** (decided October 2026): a dependency can name another package
+  (`kjv-bob = { package = "kjv", … }`, like Cargo) and give its own `abbreviation` and `aliases`,
+  so references name each fork apart. Library folders are `<version>+g<commit>`, so forks at one
+  version never share a folder, and lock files name packages the same way.
+- **Each work is its own package; libraries are packages of packages** (decided October 2026):
+  a collection holds no text, only optional dependencies a feature turns on each
+  (`gill = ["dep:gill"]`), so readers take only the works they want, and each work is versioned
+  on its own. Rejected: parts of one package chosen by features, which would need partial
+  checksums and summaries per part.
 - **USFM is read with usfm3.** On the whole KJV, both usfm3 and
   [usfm-onion](https://github.com/WycliffeAssociates/usfm-onion) gave its 31,102 verses, and
   usfm-onion was faster (0.58 s against 0.86 s). But usfm-onion's USX drops the space between
@@ -356,7 +371,9 @@ Formats to read:
 - **USFM** (done): [`usfm3`](https://docs.rs/crate/usfm3/0.2.0) converts it to USX (see
   Decisions for the comparison with usfm-onion)
 - **USJ** (USX as JSON)
-- **OSIS** and **ThML** (done in topos-bible-markup)
+- **OSIS** and **ThML** (done: Bibles, a book a file or the whole Bible in one; on the KJV from
+  open-bibles' OSIS and CCEL's ThML, 31,102 verses in the 66 books, the same per chapter as USFM.
+  ThML's empty `<scripture parsed=…/>` elements are its verse markers)
 - **SWORD** (sword-modules)
 - Later: Zefania XML, then the SQLite app formats
 
@@ -432,8 +449,10 @@ biblix-ffi (BoltFFI, like topos-ffi) has biblix's and topos's API in one package
    without timings); apps get them from `BiblixPackage.timings(file)`. A timing change is a
    patch. Still to do: a player in the plugin (play from a verse, follow along).
 9. **Links that follow changes** (text fragments re-resolved across versions).
-10. **Versification mapping** packages (`kind = "versification-map"`).
-11. **Registries**, if someone wants to host one.
+10. **Collections**: `kind = "collection"`, a package with no `[formats]`, only dependencies; a
+   project's Bibles include what its collections bring in.
+11. **Versification mapping** packages (`kind = "versification-map"`).
+12. **Registries**, if someone wants to host one.
 
 ## Open questions
 
