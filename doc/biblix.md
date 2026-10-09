@@ -127,6 +127,11 @@ Catalogs and imports (from step 7):
   clash), `default-catalogs = false` turns the defaults off. `bx catalog list|add|remove` and
   the plugin's *Catalogs* settings edit them; adding reads the catalog first to check it. A
   hosted `catalog.toml` is how anyone runs a registry of their own for now.
+  **Registries** are named catalogs (`[settings.registries]`, `bx catalog add <location> --name
+  dorean-local`): a folder of package repositories (each git repository with a `biblix.toml`,
+  at any depth) or a catalog. `dorean-local:dorean-collection` names a package by its id,
+  `dorean-local:books/romans` by its path in the folder (the owner asked for both, October
+  2026); manifests keep the full URL.
   fetch.bible's `manifest.json` lists 1,400 translations as USX, with SPDX-like licenses.
 - **Importing from fetch.bible**: each book's USX (66 downloads; 12 s one at a time in `bx`,
   1 s eight at a time in Obsidian) into `usx/`, with its attribution in `COPYRIGHT.txt`. Its BSB
