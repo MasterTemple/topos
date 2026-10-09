@@ -413,9 +413,13 @@ biblix-ffi (BoltFFI, like topos-ffi) has biblix's and topos's API in one package
 6. **Versioning tools**: `bx diff` (from summaries) and `ver=` in links.
 7. **Importers**: eBible.org and fetch.bible (done, with their catalogs), Door43 (git), CCEL
    (ThML), SWORD through sword-modules with `Storage`.
-8. **Media**: `[media]` in `biblix.toml`, the transcript read as a text source, a timings format
-   (not chosen yet), files fetched when first played, checked against their hashes, and kept by
-   hash; `bx release` judges media packages by their transcript and timings.
+8. **Media**: `[media]` in `biblix.toml` (done: each file's path, URL, size, SHA-256, and book;
+   `bx media add` and `bx media check`; hosts check downloads with `verify` and keep them by hash),
+   the transcript read as a text source (it's the package's `[formats]`, so done), and a timings
+   format (not chosen yet). **Proposal for the owner:** WebVTT, one file per media file
+   (`timings/JHN.vtt`), each cue's identifier a USFM reference (`JHN 3:16`) and its time range
+   the verse's: a standard format that topos-bible-formats already reads (srt and WebVTT), that
+   Transcript++ shows, and whose cue text can be the transcript. A timing change is a patch.
 9. **Links that follow changes** (text fragments re-resolved across versions).
 10. **Versification mapping** packages (`kind = "versification-map"`).
 11. **Registries**, if someone wants to host one.
