@@ -105,9 +105,13 @@ Catalogs and imports (from step 7):
 - **Catalogs** (`catalog.rs`): lists of packages to search by name, abbreviation, or language: a
   `catalog.toml` of git packages (metadata and URLs only, so anyone can host one in a git
   repository; `bx catalog entry <url>` writes an entry), or eBible.org's `translations.csv`
-  (1,500 translations; the downloadable, redistributable ones are listed). A vault names its
-  catalogs in `[settings] catalogs`; **without any, eBible.org's and fetch.bible's own lists are
-  searched** (their listings of their downloads, not mirrors; owner to confirm this default).
+  (1,500 translations; the downloadable, redistributable ones are listed). **eBible.org's and
+  fetch.bible's own lists are searched by default** (their listings of their downloads, not
+  mirrors; the owner confirmed this, October 2026), **and users add their own catalogs**:
+  `[settings] catalogs` in a vault's `biblix.toml` are searched first (their entries win when ids
+  clash), `default-catalogs = false` turns the defaults off. `bx catalog list|add|remove` and
+  the plugin's *Catalogs* settings edit them; adding reads the catalog first to check it. A
+  hosted `catalog.toml` is how anyone runs a registry of their own for now.
   fetch.bible's `manifest.json` lists 1,400 translations as USX, with SPDX-like licenses.
 - **Importing from fetch.bible**: each book's USX (66 downloads; 12 s one at a time in `bx`,
   1 s eight at a time in Obsidian) into `usx/`, with its attribution in `COPYRIGHT.txt`. Its BSB
@@ -190,8 +194,7 @@ tsk = { git = "https://github.com/someone/tsk-cross-references", tag = "v1.0.0" 
 
   ```toml
   [media]
-  timings = "timings/"           # each verse's start and end, per file
-  transcript = "transcript/"     # USX or USFM, read like any other text
+  timings = "timings/"           # each verse's start and end, per file: timings/JHN.vtt
 
   [[media.files]]
   path = "JHN.mp3"               # what timings name it by
@@ -419,11 +422,15 @@ biblix-ffi (BoltFFI, like topos-ffi) has biblix's and topos's API in one package
    (ThML), SWORD through sword-modules with `Storage`.
 8. **Media**: `[media]` in `biblix.toml` (done: each file's path, URL, size, SHA-256, and book;
    `bx media add` and `bx media check`; hosts check downloads with `verify` and keep them by hash),
-   the transcript read as a text source (it's the package's `[formats]`, so done), and a timings
-   format (not chosen yet). **Proposal for the owner:** WebVTT, one file per media file
-   (`timings/JHN.vtt`), each cue's identifier a USFM reference (`JHN 3:16`) and its time range
-   the verse's: a standard format that topos-bible-formats already reads (srt and WebVTT), that
-   Transcript++ shows, and whose cue text can be the transcript. A timing change is a patch.
+   the transcript read as a text source (it's the package's `[formats]`, so done), and timings
+   (done; **the owner chose WebVTT**, October 2026, for audio Bibles): one file per media file
+   (`timings/JHN.vtt`), each cue named by the verse it reads (a USFM reference, `JHN 3:16`, or
+   `JHN 3:17-18` for a bridge), its time range the verse's, its text the verse's or empty; cues
+   not named by a verse (introductions, music) are skipped. Any subtitle player shows them, and
+   Transcript++ can. `bx check`, `bx media check --offline`, and `bx release` check them against
+   the text (verses it lacks, another book than the file's, out of order, overlapping, a file
+   without timings); apps get them from `BiblixPackage.timings(file)`. A timing change is a
+   patch. Still to do: a player in the plugin (play from a verse, follow along).
 9. **Links that follow changes** (text fragments re-resolved across versions).
 10. **Versification mapping** packages (`kind = "versification-map"`).
 11. **Registries**, if someone wants to host one.
