@@ -449,8 +449,20 @@ biblix-ffi (BoltFFI, like topos-ffi) has biblix's and topos's API in one package
    without timings); apps get them from `BiblixPackage.timings(file)`. A timing change is a
    patch. Still to do: a player in the plugin (play from a verse, follow along).
 9. **Links that follow changes** (text fragments re-resolved across versions).
-10. **Collections**: `kind = "collection"`, a package with no `[formats]`, only dependencies; a
-   project's Bibles include what its collections bring in.
+10. **Collections** (done): `kind = "collection"`, a package with no `[formats]`, only
+   dependencies (optional ones a feature turns on); a project's Bibles include what its
+   collections bring in. Books (`kind = "book"`, an `epub` format) are packages too, kept as
+   files: `bx new --from book.epub` fills in `[package]` from the EPUB (title, subtitle, every
+   author: `authors` is a list), and a release compares their files (any change is minor). A
+   book's release publishes the passages topos finds it citing, with counts
+   (`biblix.references.bin`, a few KB), so what it cites is known without downloading it;
+   where each reference is comes from the book itself (a tenth of a second).
+   **A package is what its manifest declares** (decided October 2026): its formats' files by
+   extension, the license file, summary, timings, and `include` globs. Files a reader adds
+   beside them (File++'s annotations) don't change its checksum, `bx clean` never removes them,
+   and `bx install --repair` puts back edited files and keeps them. The
+   bindings make packages (`newPackage`, `newCollection`, `fileMetadata`) and find references
+   (`BiblixPackage.references()`) in WebAssembly too.
 11. **Versification mapping** packages (`kind = "versification-map"`).
 12. **Registries**, if someone wants to host one.
 
