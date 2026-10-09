@@ -34,7 +34,7 @@ Chapter 0..9 entry=0 path=/0 "JudeMercy"
 #### html-bare ####
 <div class="title">Heading</div>JudeMercy
 #### verses ####
-1:1-1 marker=/0/1 start=/1 end=/0/2 ""
+1:1-1 marker=/0/1 start=/0/0 end=/0/2 "Heading\nJude"
 1:2-2 marker=/0/2 start=/0/2 end=/0/3 "Mercy"
 chapter_verses: [2]
 

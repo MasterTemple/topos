@@ -57,7 +57,9 @@ verse starts (none at first), and the verse that is open (none at first).
 - **Chapter marker that is an `End` milestone**: ignored.
 - **Any other chapter marker**: the open verse, if any, ends at this marker's path and is added.
   The chapter becomes the marker's first number, or the previous chapter plus one (saturating at
-  255) if it has none. The next verse starts after this marker.
+  255) if it has none. The next verse starts after this marker. When the marker is an element
+  with children (an OSIS `<chapter osisID>` holding its verses), it becomes the **holding
+  chapter**; any other chapter marker leaves no holding chapter.
 - **Verse marker that is an `End` milestone**: if a verse is open, it ends at this marker's path,
   is added, and the next verse starts after this marker. If none is open, nothing happens.
 - **Any other verse marker** (a start milestone, or an element):
@@ -67,7 +69,11 @@ verse starts (none at first), and the verse that is open (none at first).
      verse).
   3. Otherwise a verse is made: chapter = the current chapter; verse and last from the number;
      marker = its path; start = the remembered start, which is then forgotten, or the marker's own
-     path when there is none; end = one past the last top-level node (`[nodes.len()]`).
+     path when there is none; end = one past the last top-level node (`[nodes.len()]`). But when
+     there is a holding chapter and this marker is inside it (the chapter's path is a proper
+     prefix of the marker's), start is the chapter's first child (the chapter's path plus `0`),
+     so the verse holds what comes before it in the chapter, as it would after a chapter
+     milestone. Either way the holding chapter and the remembered start are forgotten.
   4. If the marker is an element with its text inside (its counted milestone is `None`), the
      verse ends after the marker, is added at once, and the next verse starts after it.
      Otherwise the verse is open.
@@ -80,7 +86,9 @@ Consequences:
 
 - With end markers, a verse starts right after the previous verse's end marker, so a heading
   between two verses belongs to the second. After a chapter marker, the first verse starts right
-  after the chapter marker, so the chapter's opening heading belongs to verse 1. Text before the
+  after the chapter marker, so the chapter's opening heading belongs to verse 1. In a chapter
+  element holding its verses, the first verse starts at the chapter's first child, so the same
+  holds. Text before the
   first chapter marker (a book title) belongs to no verse.
 - Without end markers (USX 2, OSIS milestones without `eID`), each verse starts at its own marker
   and ends at the next verse's or chapter's marker, except that the first verse after a chapter
@@ -112,9 +120,11 @@ rage`; none contains `Psalms`. `chapter_verses` is `[4, 1]`.
 
 ### Example (OSIS elements)
 
-`<div type="book" osisID="John"><chapter osisID="John.3"><verse osisID="John.3.16">For God</verse>
-<verse osisID="John.3.17">For God sent</verse></chapter></div>` gives (3, 16) and (3, 17); the
-second sliced is `For God sent`. With milestones (`<chapter sID="John.3" osisID="John.3"/><verse
+`<div type="book" osisID="John"><chapter osisID="John.3"><title>Born again</title><verse
+osisID="John.3.16">For God</verse><verse osisID="John.3.17">For God sent</verse></chapter></div>`
+gives (3, 16) and (3, 17); sliced and written with `Filter::all()` they are `Born again
+For God`
+(the chapter's heading goes with its first verse) and `For God sent`. With milestones (`<chapter sID="John.3" osisID="John.3"/><verse
 sID="John.3.16" osisID="John.3.16"/>For God<verse eID="John.3.16"/>…`) the same verses, and the
 first sliced is `For God`.
 

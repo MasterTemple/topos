@@ -5,6 +5,13 @@
 compares. The expected outputs were produced by running the original crate as a black box; they
 are the reference wherever the prose specification is silent or unclear.
 
+Changed on purpose since then (the prose was changed first):
+
+- October 2026, verses.md: the first verse inside an OSIS chapter element holding its verses
+  starts at the chapter's first child. 0.5.0 started it after the whole chapter, so its text was
+  empty. The `verses` sections of `osis/chapter-element-with-verses`,
+  `osis/fixture-osis-document-genesis-1`, and `osis/test-verse-elements` changed.
+
 ## File format
 
 A golden file is a sequence of sections. Each section starts with a header line

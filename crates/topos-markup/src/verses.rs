@@ -137,6 +137,9 @@ pub fn verses(nodes: &[Node]) -> Vec<VerseSpan> {
     let mut out = Vec::new();
     let mut chapter: u8 = 0;
     let mut next_start: Option<NodePath> = None;
+    // The chapter marker before, when it's an element holding its verses (OSIS
+    // `<chapter osisID>…</chapter>`), whose first verse starts inside it
+    let mut holding: Option<Vec<usize>> = None;
     let mut open: Option<VerseSpan> = None;
     for marker in found {
         let e = marker.element;
@@ -159,6 +162,7 @@ pub fn verses(nodes: &[Node]) -> Vec<VerseSpan> {
                 None => chapter.saturating_add(1),
             };
             next_start = Some(after(&marker.path));
+            holding = (!e.children.is_empty()).then(|| marker.path.clone());
             continue;
         }
         if milestone == Some(Milestone::End) {
@@ -176,12 +180,19 @@ pub fn verses(nodes: &[Node]) -> Vec<VerseSpan> {
         let Some((first, last)) = number(e) else {
             continue;
         };
+        let start = match (holding.take(), next_start.take()) {
+            // The chapter's first verse inside it starts at the chapter's start
+            (Some(chapter), _) if marker.path.starts_with(&chapter) => {
+                NodePath([chapter.as_slice(), &[0]].concat())
+            }
+            (_, start) => start.unwrap_or_else(|| here.clone()),
+        };
         let verse = VerseSpan {
             chapter,
             verse: first,
             last,
             marker: here.clone(),
-            start: next_start.take().unwrap_or(here),
+            start,
             end: tree_end.clone(),
         };
         if milestone.is_none() {

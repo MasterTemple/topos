@@ -229,3 +229,16 @@ fn counts() {
     assert!(usx_chapter_verses("").is_empty());
     assert!(usx_chapter_verses("<chapter number=1><verse number=2>").is_empty());
 }
+
+#[test]
+fn osis_chapters_holding_their_verses() {
+    let osis = r#"<div type="book" osisID="Exod"><chapter osisID="Exod.1"><title>The names</title><verse osisID="Exod.1.1">Now these are the names.</verse><verse osisID="Exod.1.2">Reuben.</verse></chapter><chapter osisID="Exod.2"><verse osisID="Exod.2.1">And there went.</verse></chapter></div>"#;
+    let nodes = parse(Markup::Osis, osis);
+    let spans = verses(&nodes);
+    assert_eq!(numbers(&spans), [(1, 1, 1), (1, 2, 2), (2, 1, 1)]);
+    let verse = |i: usize| all_text(&slice(&nodes, &spans[i].start, Some(&spans[i].end)));
+    // The chapter's heading goes with its first verse, as it does after a chapter milestone
+    assert_eq!(verse(0), "The names\nNow these are the names.");
+    assert_eq!(verse(1), "Reuben.");
+    assert_eq!(verse(2), "And there went.");
+}
