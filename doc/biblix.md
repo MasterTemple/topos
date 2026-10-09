@@ -469,7 +469,15 @@ biblix-ffi (BoltFFI, like topos-ffi) has biblix's and topos's API in one package
    bindings make packages (`newPackage`, `newCollection`, `fileMetadata`) and find references
    (`BiblixPackage.references()`) in WebAssembly too.
 11. **Versification mapping** packages (`kind = "versification-map"`).
-12. **Registries**, if someone wants to host one.
+12. **Registries** (done, October 2026): a registry publishes each release as an archive (its
+   declared files, packed the same way every time) listed with its SHA-256 in its
+   `catalog.toml`, so thousands of books need no repository each (the owner's concern) and any
+   static host serves one. `bx registry init` sets one up in a folder or in a GitHub
+   repository's releases (`gh`; the catalog is release `index`'s file), and `bx publish` adds a
+   release (its files at its tag). A dependency `{ registry = "<catalog URL>", version = "1" }`
+   downloads only that archive; the lock pins its URL and hash. Authoring stays in git: one
+   repository can hold many packages, each in a folder with its own tags
+   (`the-dorean-principle/v1.0.2`). The plugin installs from registries and searches them.
 
 ## Open questions
 
