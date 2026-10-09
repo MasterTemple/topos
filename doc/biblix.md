@@ -439,7 +439,13 @@ biblix-ffi (BoltFFI, like topos-ffi) has biblix's and topos's API in one package
    - The Neovim plugin runs it and builds it from a biblix checkout.
 5. **biblix-ffi with topos's API** (done): the plugin moves to it, and it gets the library location
    setting (a vault folder, `Biblix/` by default) and the Bibles section.
-6. **Versioning tools**: `bx diff` (from summaries) and `ver=` in links.
+6. **Versioning tools** (done): `bx diff` (from summaries), and links that record their edition:
+   the Obsidian plugin's links into a package's Bible end with `&ver=1.0.2&vh=9f86d081` (the
+   version, and 8 hex digits of the hash of the first verse's words, as `biblix.verses.bin`
+   hashes them). Opened in another version, a link whose words aren't at its number any more
+   looks for them by that hash: renumbered, it goes where they are and says so; reworded, it
+   says the words changed. No older version is downloaded: the installed one's hashes are
+   enough (`BiblixPackage.verseHashes`).
 7. **Importers**: eBible.org and fetch.bible (done, with their catalogs), Door43 (git), CCEL
    (ThML), SWORD through sword-modules with `Storage`.
 8. **Media**: `[media]` in `biblix.toml` (done: each file's path, URL, size, SHA-256, and book;
@@ -453,7 +459,8 @@ biblix-ffi (BoltFFI, like topos-ffi) has biblix's and topos's API in one package
    the text (verses it lacks, another book than the file's, out of order, overlapping, a file
    without timings); apps get them from `BiblixPackage.timings(file)`. A timing change is a
    patch. Still to do: a player in the plugin (play from a verse, follow along).
-9. **Links that follow changes** (text fragments re-resolved across versions).
+9. **Links that follow changes**: renumbered verses are followed (step 6). Still to do: finding a
+   reworded verse's exact words (a link's text fragment) when they changed a little.
 10. **Collections** (done): `kind = "collection"`, a package with no `[formats]`, only
    dependencies (optional ones a feature turns on); a project's Bibles include what its
    collections bring in. Books (`kind = "book"`, an `epub` format) are packages too, kept as
@@ -468,7 +475,17 @@ biblix-ffi (BoltFFI, like topos-ffi) has biblix's and topos's API in one package
    and `bx install --repair` puts back edited files and keeps them. The
    bindings make packages (`newPackage`, `newCollection`, `fileMetadata`) and find references
    (`BiblixPackage.references()`) in WebAssembly too.
-11. **Versification mapping** packages (`kind = "versification-map"`).
+11. **Versification mapping** packages (done, October 2026): `kind = "versification-map"`, a
+   `vrs` format of Paratext `.vrs` mapping lines (`PSA 51:0 = PSA 51:1`, so Paratext's own
+   `eng.vrs` reads), between `[package] versification` and `maps-to`. `bx map "Psalm 51:1"
+   --from English --to Original` maps a reference through the project's maps (several in a row
+   if needed), naming what has no counterpart; `Project::map_reference` and the bindings'
+   `BiblixVersifications` do the same. Bibles still need to name their versification (the KJV
+   and BSB packages say `own`), and the language server and plugin don't map yet.
+- **Titles** (decided October 2026): each file has a title apart from its file name, read from
+  the file (`\toc2`/`\h`, an EPUB's title) or given in `[titles]`; summaries list them, a
+  changed title is a major change, and the plugin names stubs and copies by it
+  (`Biblix/bsb/John.bible`), renaming older ones so links follow.
 12. **Registries** (done, October 2026): a registry publishes each release as an archive (its
    declared files, packed the same way every time) listed with its SHA-256 in its
    `catalog.toml`, so thousands of books need no repository each (the owner's concern) and any
@@ -478,6 +495,8 @@ biblix-ffi (BoltFFI, like topos-ffi) has biblix's and topos's API in one package
    downloads only that archive; the lock pins its URL and hash. Authoring stays in git: one
    repository can hold many packages, each in a folder with its own tags
    (`the-dorean-principle/v1.0.2`). The plugin installs from registries and searches them.
+   `bx publish --all` publishes every released package of a repository, and `bx yank`
+   withdraws a release (locks that have it still install it).
 
 ## Open questions
 
