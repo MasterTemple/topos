@@ -1,0 +1,52 @@
+#### markup ####
+osis
+#### input ####
+<chapter osisID="Gen.1" sID="c"/><verse osisID="Gen.1.1" sID="a"/>a<verse eID="a"/><chapter eID="c"/><chapter n="2"/><verse n="1"/>b<verse sID="Exod.3.4"/>c
+#### tree ####
+Chapter chapter @start osisID="Gen.1" sID="c"
+Verse verse @start osisID="Gen.1.1" sID="a"
+text "a"
+Verse verse @end eID="a"
+Chapter chapter @end eID="c"
+Chapter chapter n="2"
+Verse verse n="1"
+text "b"
+Verse verse @start sID="Exod.3.4"
+text "c"
+
+#### text ####
+abc
+#### text-all ####
+c 
+[a :] a
+c 2
+[c 2:1] b [Exod 3:4] c
+#### text-nobreaks ####
+abc
+#### spans ####
+entries: 0..3
+Chapter 0..0 entry=0 path=/0 ""
+Verse 0..0 entry=0 path=/1 ""
+Verse 1..1 entry=0 path=/3 ""
+Chapter 1..1 entry=0 path=/4 ""
+Chapter 1..1 entry=0 path=/5 ""
+Verse 1..1 entry=0 path=/6 ""
+Verse 2..2 entry=0 path=/8 ""
+
+#### sources ####
+0..1 entry=0 path=/2 offset=0
+1..2 entry=0 path=/7 offset=0
+2..3 entry=0 path=/9 offset=0
+
+#### html ####
+<span class="topos-chapter" data-osis-id="Gen.1"></span><span class="topos-verse" data-osis-id="Gen.1.1"></span>a<span class="topos-chapter" data-n="2"></span><span class="topos-verse" data-n="1"></span>b<span class="topos-verse" data-osis-id="Exod.3.4"></span>c
+#### html-bare ####
+<span class="chapter" data-osis-id="Gen.1"></span><span class="verse" data-osis-id="Gen.1.1"></span>a<span class="chapter" data-n="2"></span><span class="verse" data-n="1"></span>b<span class="verse" data-osis-id="Exod.3.4"></span>c
+#### verses ####
+1:1-1 marker=/1 start=/1 end=/3 "a"
+2:1-1 marker=/6 start=/6 end=/8 "b"
+2:4-4 marker=/8 start=/8 end=/10 "c"
+chapter_verses: [1, 4]
+
+#### refs ####
+

@@ -1,0 +1,41 @@
+#### markup ####
+osis
+#### input ####
+a<q who="Jesus" sID="q1"/>b<q who="Jesus" sID="q2"/>c<q eID="q2"/>d<q eID="q1"/>e
+#### tree ####
+text "a"
+WordsOfJesus q @start who="Jesus" sID="q1"
+text "b"
+WordsOfJesus q @start who="Jesus" sID="q2"
+text "c"
+Quote q @end eID="q2"
+text "d"
+Quote q @end eID="q1"
+text "e"
+
+#### text ####
+abcde
+#### text-all ####
+a“bcd”e
+#### text-nobreaks ####
+abcde
+#### spans ####
+entries: 0..5
+WordsOfJesus 1..4 entry=0 path=/1 "bcd"
+
+#### sources ####
+0..1 entry=0 path=/0 offset=0
+1..2 entry=0 path=/2 offset=0
+2..3 entry=0 path=/4 offset=0
+3..4 entry=0 path=/6 offset=0
+4..5 entry=0 path=/8 offset=0
+
+#### html ####
+a<span class="topos-woj">b</span><span class="topos-woj">c</span>de
+#### html-bare ####
+a<span class="woj">b</span><span class="woj">c</span>de
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+

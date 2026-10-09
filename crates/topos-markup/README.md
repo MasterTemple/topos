@@ -37,8 +37,9 @@ The class names are listed on [`HtmlRenderer`] and are part of the API.
 
 ## Provenance
 
-The parsers and classification came from `sword-modules`, where they were written from the
-markup formats' public documentation, not from libsword (see that crate's `CLEANROOM.md`).
+This is a clean-room implementation: it was written from behavioural specifications
+(`docs/spec/`), the markup formats' public documentation, and black-box test outputs, by an
+implementer who never saw the earlier implementation or libsword (see `CLEANROOM.md`).
 
 ## License
 

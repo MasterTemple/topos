@@ -1,0 +1,32 @@
+#### markup ####
+osis
+#### input ####
+text <!-- never ends <w>x</w>
+#### tree ####
+text "text <!-- never ends <w>x</w>"
+
+#### text ####
+text <!-- never ends <w>x</w>
+#### text-all ####
+text <!-- never ends <w>x</w>
+#### text-nobreaks ####
+text <!-- never ends <w>x</w>
+#### spans ####
+entries: 0..29
+
+#### sources ####
+0..4 entry=0 path=/0 offset=0
+5..9 entry=0 path=/0 offset=5
+10..15 entry=0 path=/0 offset=10
+16..20 entry=0 path=/0 offset=16
+21..29 entry=0 path=/0 offset=21
+
+#### html ####
+text &lt;!-- never ends &lt;w&gt;x&lt;/w&gt;
+#### html-bare ####
+text &lt;!-- never ends &lt;w&gt;x&lt;/w&gt;
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+

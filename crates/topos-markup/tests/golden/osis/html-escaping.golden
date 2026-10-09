@@ -1,0 +1,39 @@
+#### markup ####
+osis
+#### input ####
+<w lemma="a&quot;b&lt;c&gt;" morph="&amp;">x &lt; y &gt; z &amp; &quot;q&quot; 's</w><note type="a&quot;b" n="&lt;">n</note>
+#### tree ####
+Word w lemma="a\"b<c>" morph="&"
+  text "x < y > z & \"q\" 's"
+Note note type="a\"b" n="<"
+  text "n"
+
+#### text ####
+x < y > z & "q" 's
+#### text-all ####
+x < y > z & "q" 's (n)
+#### text-nobreaks ####
+x < y > z & "q" 's
+#### spans ####
+entries: 0..18
+Word 0..18 entry=0 path=/0 "x < y > z & \"q\" 's"
+
+#### sources ####
+0..1 entry=0 path=/0/0 offset=0
+2..3 entry=0 path=/0/0 offset=2
+4..5 entry=0 path=/0/0 offset=4
+6..7 entry=0 path=/0/0 offset=6
+8..9 entry=0 path=/0/0 offset=8
+10..11 entry=0 path=/0/0 offset=10
+12..15 entry=0 path=/0/0 offset=12
+16..18 entry=0 path=/0/0 offset=16
+
+#### html ####
+<span class="topos-w" data-lemma="a&quot;b&lt;c&gt;" data-morph="&amp;">x &lt; y &gt; z &amp; &quot;q&quot; 's</span><span class="topos-note topos-a-b" data-note-type="a&quot;b" data-n="&lt;">n</span>
+#### html-bare ####
+<span class="w" data-lemma="a&quot;b&lt;c&gt;" data-morph="&amp;">x &lt; y &gt; z &amp; &quot;q&quot; 's</span><span class="note a-b" data-note-type="a&quot;b" data-n="&lt;">n</span>
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+

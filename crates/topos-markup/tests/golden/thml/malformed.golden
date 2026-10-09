@@ -1,0 +1,53 @@
+#### markup ####
+thml
+#### input ####
+<p>unclosed <b>bold <i>both</p> after</b> <<x>> & raw &amp; stray </i>
+#### tree ####
+Paragraph p
+  text "unclosed "
+  Highlight b @unclosed type="bold"
+    text "bold "
+    Highlight i @unclosed type="italic"
+      text "both"
+text " after"
+Highlight b @end type="bold"
+text " "
+Other <x @unclosed
+  text "> & raw & stray </i>"
+
+#### text ####
+unclosed bold both
+after > & raw & stray </i>
+#### text-all ####
+unclosed bold both
+after > & raw & stray </i>
+#### text-nobreaks ####
+unclosed bold both after > & raw & stray </i>
+#### spans ####
+entries: 0..45
+Highlight 14..18 entry=0 path=/0/1/1 "both"
+Highlight 9..18 entry=0 path=/0/1 "bold both"
+Paragraph 0..18 entry=0 path=/0 "unclosed bold both"
+Other 25..45 entry=0 path=/4 "> & raw & stray </i>"
+
+#### sources ####
+0..8 entry=0 path=/0/0 offset=0
+9..13 entry=0 path=/0/1/0 offset=0
+14..18 entry=0 path=/0/1/1/0 offset=0
+19..24 entry=0 path=/1 offset=1
+25..26 entry=0 path=/4/0 offset=0
+27..28 entry=0 path=/4/0 offset=2
+29..32 entry=0 path=/4/0 offset=4
+33..34 entry=0 path=/4/0 offset=8
+35..40 entry=0 path=/4/0 offset=10
+41..45 entry=0 path=/4/0 offset=16
+
+#### html ####
+<p class="topos-p">unclosed <b class="topos-hi topos-bold">bold <i class="topos-hi topos-italic">both</i></b></p> after<b class="topos-hi topos-bold"></b> &gt; &amp; raw &amp; stray &lt;/i&gt;
+#### html-bare ####
+<p class="p">unclosed <b class="hi bold">bold <i class="hi italic">both</i></b></p> after<b class="hi bold"></b> &gt; &amp; raw &amp; stray &lt;/i&gt;
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+

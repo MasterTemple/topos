@@ -1,0 +1,31 @@
+#### markup ####
+osis
+#### input ####
+text then <w lemma="strong:G1
+#### tree ####
+text "text then <w lemma=\"strong:G1"
+
+#### text ####
+text then <w lemma="strong:G1
+#### text-all ####
+text then <w lemma="strong:G1
+#### text-nobreaks ####
+text then <w lemma="strong:G1
+#### spans ####
+entries: 0..29
+
+#### sources ####
+0..4 entry=0 path=/0 offset=0
+5..9 entry=0 path=/0 offset=5
+10..12 entry=0 path=/0 offset=10
+13..29 entry=0 path=/0 offset=13
+
+#### html ####
+text then &lt;w lemma=&quot;strong:G1
+#### html-bare ####
+text then &lt;w lemma=&quot;strong:G1
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+

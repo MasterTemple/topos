@@ -1,119 +1,216 @@
-//! Builds a [`Node`] tree from a stream of tag/text events, tolerating the
-//! unbalanced fragments SWORD entries contain.
+//! Building the tree from a stream of text, start, empty, and end events, shared by every markup
+//! but plain text (which is also here, being only lines).
 
-use super::{Element, Kind, Milestone, Node};
+use crate::{Element, Kind, Markup, Milestone, Node, classify};
 
-pub(crate) struct TreeBuilder {
-    root: Vec<Node>,
-    stack: Vec<Element>,
-    classify: fn(&mut Element),
+/// Appends the text of every text node below `nodes`, in document order
+pub(crate) fn collect_text(nodes: &[Node], out: &mut String) {
+    for node in nodes {
+        match node {
+            Node::Text(t) => out.push_str(t),
+            Node::Element(e) => collect_text(&e.children, out),
+        }
+    }
 }
 
-impl TreeBuilder {
-    pub(crate) fn new(classify: fn(&mut Element)) -> Self {
-        TreeBuilder {
-            root: Vec::new(),
-            stack: Vec::new(),
-            classify,
+/// Plain text: lines, with a line break element between each two
+pub(crate) fn plain(text: &str) -> Vec<Node> {
+    let mut nodes = Vec::new();
+    if text.is_empty() {
+        return nodes;
+    }
+    for (i, line) in text.split('\n').enumerate() {
+        if i > 0 {
+            nodes.push(Node::Element(Element {
+                kind: Kind::LineBreak,
+                name: String::from("br"),
+                attrs: Vec::new(),
+                children: Vec::new(),
+                milestone: None,
+                unclosed: false,
+            }));
+        }
+        let line = line.strip_suffix('\r').unwrap_or(line);
+        if !line.is_empty() {
+            nodes.push(Node::Text(line.to_string()));
+        }
+    }
+    nodes
+}
+
+/// The most elements open at once while parsing, so crafted input can't nest deep enough to
+/// overflow the stack (parsing.md, "Depth limit")
+const MAX_OPEN: usize = 1_000;
+
+/// Builds a tree from events
+pub(crate) struct Builder {
+    markup: Markup,
+    top: Vec<Node>,
+    /// Elements opened and not yet closed, outermost first
+    open: Vec<Element>,
+}
+
+impl Builder {
+    pub(crate) fn new(markup: Markup) -> Self {
+        Builder {
+            markup,
+            top: Vec::new(),
+            open: Vec::new(),
         }
     }
 
-    fn children(&mut self) -> &mut Vec<Node> {
-        match self.stack.last_mut() {
+    /// The node list new nodes go into
+    fn container(&mut self) -> &mut Vec<Node> {
+        match self.open.last_mut() {
             Some(e) => &mut e.children,
-            None => &mut self.root,
+            None => &mut self.top,
         }
     }
 
-    pub(crate) fn text(&mut self, s: &str) {
-        if s.is_empty() {
+    /// Adds text, joining it to a text node right before it
+    pub(crate) fn text(&mut self, text: &str) {
+        if text.is_empty() {
             return;
         }
-        let kids = self.children();
-        if let Some(Node::Text(t)) = kids.last_mut() {
-            t.push_str(s);
+        let container = self.container();
+        if let Some(Node::Text(last)) = container.last_mut() {
+            last.push_str(text);
         } else {
-            kids.push(Node::Text(s.to_string()));
+            container.push(Node::Text(text.to_string()));
         }
     }
 
-    pub(crate) fn start(&mut self, e: Element) {
-        self.stack.push(e);
+    /// Opens an element; at the depth limit it is added without children instead, marked
+    /// unclosed, and what follows goes beside it
+    pub(crate) fn start(&mut self, name: String, attrs: Vec<(String, String)>) {
+        if self.open.len() >= MAX_OPEN {
+            let mut e = Element {
+                kind: Kind::Other,
+                name,
+                attrs,
+                children: Vec::new(),
+                milestone: None,
+                unclosed: true,
+            };
+            classify::classify(self.markup, &mut e);
+            self.container().push(Node::Element(e));
+            return;
+        }
+        self.open.push(Element {
+            kind: Kind::Other,
+            name,
+            attrs,
+            children: Vec::new(),
+            milestone: None,
+            unclosed: false,
+        });
     }
 
-    pub(crate) fn empty(&mut self, mut e: Element) {
-        (self.classify)(&mut e);
-        self.children().push(Node::Element(e));
+    /// Adds an element without children
+    pub(crate) fn empty(&mut self, name: String, attrs: Vec<(String, String)>) {
+        let mut e = Element {
+            kind: Kind::Other,
+            name,
+            attrs,
+            children: Vec::new(),
+            milestone: None,
+            unclosed: false,
+        };
+        classify::classify(self.markup, &mut e);
+        self.container().push(Node::Element(e));
     }
 
+    /// Closes the innermost open element with this name (ignoring ASCII case), or adds an orphan
+    /// end
     pub(crate) fn end(&mut self, name: &str) {
         match self
-            .stack
+            .open
             .iter()
             .rposition(|e| e.name.eq_ignore_ascii_case(name))
         {
-            Some(i) => {
-                while self.stack.len() > i + 1 {
-                    self.close_top(true);
+            Some(index) => {
+                while self.open.len() > index + 1 {
+                    self.close_last(true);
                 }
-                self.close_top(false);
+                self.close_last(false);
             }
             None => {
-                let mut e = Element::new(name, Vec::new());
-                e.milestone = Some(Milestone::End);
-                (self.classify)(&mut e);
-                self.children().push(Node::Element(e));
+                let mut e = Element {
+                    kind: Kind::Other,
+                    name: name.to_string(),
+                    attrs: Vec::new(),
+                    children: Vec::new(),
+                    milestone: Some(Milestone::End),
+                    unclosed: false,
+                };
+                classify::classify(self.markup, &mut e);
+                self.container().push(Node::Element(e));
             }
         }
     }
 
-    fn close_top(&mut self, unclosed: bool) {
-        if let Some(mut e) = self.stack.pop() {
+    /// Closes the innermost open element and adds it to its container
+    fn close_last(&mut self, unclosed: bool) {
+        if let Some(mut e) = self.open.pop() {
             e.unclosed = unclosed;
-            (self.classify)(&mut e);
-            self.children().push(Node::Element(e));
+            classify::classify(self.markup, &mut e);
+            self.container().push(Node::Element(e));
         }
     }
 
-    pub(crate) fn finish(mut self) -> Vec<Node> {
-        while !self.stack.is_empty() {
-            self.close_top(true);
-        }
-        self.root
-    }
-
-    /// For ThML `<sync type="Strongs">` / GBF `<WG25>`, which *follow* the word they
-    /// tag: wrap the preceding word in a synthetic `w` element (or extend the `w`
-    /// created by a previous tag) and add the value to its `attr`.
-    pub(crate) fn tag_previous_word(&mut self, attr: &str, value: String) {
-        let kids = self.children();
-        let need_new = !matches!(kids.last(), Some(Node::Element(e)) if e.kind == Kind::Word);
-        if need_new {
-            let mut w = Element::new("w", Vec::new());
-            w.kind = Kind::Word;
-            if let Some(Node::Text(t)) = kids.last_mut() {
-                let trimmed = t.trim_end();
-                if trimmed.len() == t.len() {
-                    // text ends in a word: split it off
-                    let start = t
-                        .rfind(char::is_whitespace)
-                        .map_or(0, |i| i + t[i..].chars().next().unwrap().len_utf8());
-                    let word = t[start..].to_string();
-                    t.truncate(start);
-                    if t.is_empty() {
-                        kids.pop();
-                    }
-                    w.children.push(Node::Text(word));
+    /// Sets an attribute on the word before the current position, making the word if there is
+    /// none (from the last word of the text before, or empty)
+    pub(crate) fn tag_previous_word(&mut self, key: &str, value: &str) {
+        let container = self.container();
+        let is_word = matches!(container.last(), Some(Node::Element(e)) if e.kind == Kind::Word);
+        if !is_word {
+            let mut word = Element {
+                kind: Kind::Word,
+                name: String::from("w"),
+                attrs: Vec::new(),
+                children: Vec::new(),
+                milestone: None,
+                unclosed: false,
+            };
+            if let Some(Node::Text(text)) = container.last_mut()
+                && !text.ends_with(char::is_whitespace)
+            {
+                let start = text
+                    .char_indices()
+                    .rev()
+                    .find(|(_, c)| c.is_whitespace())
+                    .map_or(0, |(i, c)| i + c.len_utf8());
+                let last = text.split_off(start);
+                if text.is_empty() {
+                    container.pop();
+                }
+                if !last.is_empty() {
+                    word.children.push(Node::Text(last));
                 }
             }
-            kids.push(Node::Element(w));
+            container.push(Node::Element(word));
         }
-        if let Some(Node::Element(w)) = kids.last_mut() {
-            let v = match w.attr(attr) {
-                Some(old) => format!("{old} {value}"),
-                None => value,
-            };
-            w.set_attr(attr, v);
+        if let Some(Node::Element(word)) = container.last_mut() {
+            let existing = word.attrs.iter().position(|(k, _)| k == key).or_else(|| {
+                word.attrs
+                    .iter()
+                    .position(|(k, _)| k.eq_ignore_ascii_case(key))
+            });
+            match existing.and_then(|i| word.attrs.get_mut(i)) {
+                Some((_, v)) => {
+                    v.push(' ');
+                    v.push_str(value);
+                }
+                None => word.attrs.push((key.to_string(), value.to_string())),
+            }
         }
+    }
+
+    /// Closes everything still open and gives the tree
+    pub(crate) fn finish(mut self) -> Vec<Node> {
+        while !self.open.is_empty() {
+            self.close_last(true);
+        }
+        self.top
     }
 }

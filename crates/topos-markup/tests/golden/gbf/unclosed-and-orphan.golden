@@ -1,0 +1,54 @@
+#### markup ####
+gbf
+#### input ####
+<FR>never closed
+#### input ####
+still red<Fr> after <Fi>orphan
+#### tree ####
+WordsOfJesus FR @unclosed
+  text "never closed"
+
+#### tree ####
+text "still red"
+WordsOfJesus FR @end
+text " after "
+Highlight FI @end type="italic"
+text "orphan"
+
+#### text ####
+never closed still red after orphan
+#### text-all ####
+“never closed still red” after orphan
+#### text-nobreaks ####
+never closed still red after orphan
+#### spans ####
+entries: 0..12 13..35
+WordsOfJesus 0..12 entry=0 path=/0 "never closed"
+WordsOfJesus 13..22 entry=1 path= "still red"
+
+#### sources ####
+0..5 entry=0 path=/0/0 offset=0
+6..12 entry=0 path=/0/0 offset=6
+13..18 entry=1 path=/0 offset=0
+19..22 entry=1 path=/0 offset=6
+23..28 entry=1 path=/2 offset=1
+29..35 entry=1 path=/4 offset=0
+
+#### html ####
+<span class="topos-woj">never closed</span>
+#### html ####
+<span class="topos-woj">still red</span> after <i class="topos-hi topos-italic"></i>orphan
+#### html-bare ####
+<span class="woj">never closed</span>
+#### html-bare ####
+<span class="woj">still red</span> after <i class="hi italic"></i>orphan
+#### verses ####
+chapter_verses: []
+
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+
+#### refs ####
+

@@ -1,0 +1,50 @@
+#### markup ####
+tei
+#### input ####
+<ref target="Gen.1.1">g</ref> <ref target="Bible:John.3.16">j</ref> <ref target="StrongsHebrew:00430">h</ref> <ref>Rom 8:28</ref>
+#### tree ####
+Reference ref target="Gen.1.1"
+  text "g"
+text " "
+Reference ref target="Bible:John.3.16"
+  text "j"
+text " "
+Reference ref target="StrongsHebrew:00430"
+  text "h"
+text " "
+Reference ref
+  text "Rom 8:28"
+
+#### text ####
+g j h Rom 8:28
+#### text-all ####
+g j h Rom 8:28
+#### text-nobreaks ####
+g j h Rom 8:28
+#### spans ####
+entries: 0..14
+Reference 0..1 entry=0 path=/0 "g"
+Reference 2..3 entry=0 path=/2 "j"
+Reference 4..5 entry=0 path=/4 "h"
+Reference 6..14 entry=0 path=/6 "Rom 8:28"
+
+#### sources ####
+0..1 entry=0 path=/0/0 offset=0
+2..3 entry=0 path=/2/0 offset=0
+4..5 entry=0 path=/4/0 offset=0
+6..9 entry=0 path=/6/0 offset=0
+10..14 entry=0 path=/6/0 offset=4
+
+#### html ####
+<a class="topos-ref" data-osis-ref="Gen.1.1">g</a> <a class="topos-ref" data-osis-ref="Bible:John.3.16">j</a> <a class="topos-ref" data-osis-ref="StrongsHebrew:00430">h</a> <a class="topos-ref">Rom 8:28</a>
+#### html-bare ####
+<a class="ref" data-osis-ref="Gen.1.1">g</a> <a class="ref" data-osis-ref="Bible:John.3.16">j</a> <a class="ref" data-osis-ref="StrongsHebrew:00430">h</a> <a class="ref">Rom 8:28</a>
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+/0 target="Gen.1.1" passages=[Gen.1.1]
+/2 target="Bible:John.3.16" passages=[John.3.16]
+/4 target="StrongsHebrew:00430" passages=[]
+/6 target=- passages=[Rom.8.28]
+

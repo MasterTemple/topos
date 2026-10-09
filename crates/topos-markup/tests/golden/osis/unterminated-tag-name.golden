@@ -1,0 +1,29 @@
+#### markup ####
+osis
+#### input ####
+text <hi
+#### tree ####
+text "text <hi"
+
+#### text ####
+text <hi
+#### text-all ####
+text <hi
+#### text-nobreaks ####
+text <hi
+#### spans ####
+entries: 0..8
+
+#### sources ####
+0..4 entry=0 path=/0 offset=0
+5..8 entry=0 path=/0 offset=5
+
+#### html ####
+text &lt;hi
+#### html-bare ####
+text &lt;hi
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+

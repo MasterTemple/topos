@@ -1,0 +1,163 @@
+#### markup ####
+usx
+#### input ####
+<usx><para style="p"><char style="wj">wj</char> <char style="add">add</char> <char style="nd">nd</char> <char style="w">w</char> <char style="xt">xt</char> <char style="qt">qt</char> <char style="tl">tl</char> <char style="it">it</char> <char style="em">em</char> <char style="bk">bk</char> <char style="bd">bd</char> <char style="bdit">bdit</char> <char style="sc">sc</char> <char style="sup">sup</char> <char style="no">no</char> <char style="pn">pn</char> <char style="k">k</char> <char style="fr">fr</char> <char style="ft">ft</char> <char style="fq">fq</char> <char style="fqa">fqa</char> <char style="xo">xo</char> <char style="jmp">jmp</char> <char style="wj1">wj1</char> <char style="add2">add2</char> <char style="x-custom">x-custom</char></para></usx>
+#### tree ####
+Other usx
+  Paragraph para style="p"
+    WordsOfJesus char style="wj"
+      text "wj"
+    text " "
+    Added char style="add"
+      text "add"
+    text " "
+    DivineName char style="nd"
+      text "nd"
+    text " "
+    Word char style="w"
+      text "w"
+    text " "
+    Reference char style="xt"
+      text "xt"
+    text " "
+    Quote char style="qt"
+      text "qt"
+    text " "
+    Foreign char style="tl"
+      text "tl"
+    text " "
+    Highlight char style="it" type="italic"
+      text "it"
+    text " "
+    Highlight char style="em" type="italic"
+      text "em"
+    text " "
+    Highlight char style="bk" type="italic"
+      text "bk"
+    text " "
+    Highlight char style="bd" type="bold"
+      text "bd"
+    text " "
+    Highlight char style="bdit" type="bold-italic"
+      text "bdit"
+    text " "
+    Highlight char style="sc" type="small-caps"
+      text "sc"
+    text " "
+    Highlight char style="sup" type="super"
+      text "sup"
+    text " "
+    Highlight char style="no" type="normal"
+      text "no"
+    text " "
+    Other char style="pn"
+      text "pn"
+    text " "
+    Other char style="k"
+      text "k"
+    text " "
+    Other char style="fr"
+      text "fr"
+    text " "
+    Other char style="ft"
+      text "ft"
+    text " "
+    Other char style="fq"
+      text "fq"
+    text " "
+    Other char style="fqa"
+      text "fqa"
+    text " "
+    Other char style="xo"
+      text "xo"
+    text " "
+    Other char style="jmp"
+      text "jmp"
+    text " "
+    WordsOfJesus char style="wj1"
+      text "wj1"
+    text " "
+    Added char style="add2"
+      text "add2"
+    text " "
+    Other char style="x-custom"
+      text "x-custom"
+
+#### text ####
+wj add nd w xt qt tl it em bk bd bdit sc sup no pn k fr ft fq fqa xo jmp wj1 add2 x-custom
+#### text-all ####
+“wj” add* ^nd w xt qt tl it em bk bd bdit sc sup no pn k fr ft fq fqa xo jmp “wj1” add2* x-custom
+#### text-nobreaks ####
+wj add nd w xt qt tl it em bk bd bdit sc sup no pn k fr ft fq fqa xo jmp wj1 add2 x-custom
+#### spans ####
+entries: 0..90
+WordsOfJesus 0..2 entry=0 path=/0/0/0 "wj"
+Added 3..6 entry=0 path=/0/0/2 "add"
+DivineName 7..9 entry=0 path=/0/0/4 "nd"
+Word 10..11 entry=0 path=/0/0/6 "w"
+Reference 12..14 entry=0 path=/0/0/8 "xt"
+Quote 15..17 entry=0 path=/0/0/10 "qt"
+Foreign 18..20 entry=0 path=/0/0/12 "tl"
+Highlight 21..23 entry=0 path=/0/0/14 "it"
+Highlight 24..26 entry=0 path=/0/0/16 "em"
+Highlight 27..29 entry=0 path=/0/0/18 "bk"
+Highlight 30..32 entry=0 path=/0/0/20 "bd"
+Highlight 33..37 entry=0 path=/0/0/22 "bdit"
+Highlight 38..40 entry=0 path=/0/0/24 "sc"
+Highlight 41..44 entry=0 path=/0/0/26 "sup"
+Highlight 45..47 entry=0 path=/0/0/28 "no"
+Other 48..50 entry=0 path=/0/0/30 "pn"
+Other 51..52 entry=0 path=/0/0/32 "k"
+Other 53..55 entry=0 path=/0/0/34 "fr"
+Other 56..58 entry=0 path=/0/0/36 "ft"
+Other 59..61 entry=0 path=/0/0/38 "fq"
+Other 62..65 entry=0 path=/0/0/40 "fqa"
+Other 66..68 entry=0 path=/0/0/42 "xo"
+Other 69..72 entry=0 path=/0/0/44 "jmp"
+WordsOfJesus 73..76 entry=0 path=/0/0/46 "wj1"
+Added 77..81 entry=0 path=/0/0/48 "add2"
+Other 82..90 entry=0 path=/0/0/50 "x-custom"
+Paragraph 0..90 entry=0 path=/0/0 "wj add nd w xt qt tl it em bk bd bdit sc sup no pn k fr ft fq fqa xo jmp wj1 add2 x-custom"
+Other 0..90 entry=0 path=/0 "wj add nd w xt qt tl it em bk bd bdit sc sup no pn k fr ft fq fqa xo jmp wj1 add2 x-custom"
+
+#### sources ####
+0..2 entry=0 path=/0/0/0/0 offset=0
+3..6 entry=0 path=/0/0/2/0 offset=0
+7..9 entry=0 path=/0/0/4/0 offset=0
+10..11 entry=0 path=/0/0/6/0 offset=0
+12..14 entry=0 path=/0/0/8/0 offset=0
+15..17 entry=0 path=/0/0/10/0 offset=0
+18..20 entry=0 path=/0/0/12/0 offset=0
+21..23 entry=0 path=/0/0/14/0 offset=0
+24..26 entry=0 path=/0/0/16/0 offset=0
+27..29 entry=0 path=/0/0/18/0 offset=0
+30..32 entry=0 path=/0/0/20/0 offset=0
+33..37 entry=0 path=/0/0/22/0 offset=0
+38..40 entry=0 path=/0/0/24/0 offset=0
+41..44 entry=0 path=/0/0/26/0 offset=0
+45..47 entry=0 path=/0/0/28/0 offset=0
+48..50 entry=0 path=/0/0/30/0 offset=0
+51..52 entry=0 path=/0/0/32/0 offset=0
+53..55 entry=0 path=/0/0/34/0 offset=0
+56..58 entry=0 path=/0/0/36/0 offset=0
+59..61 entry=0 path=/0/0/38/0 offset=0
+62..65 entry=0 path=/0/0/40/0 offset=0
+66..68 entry=0 path=/0/0/42/0 offset=0
+69..72 entry=0 path=/0/0/44/0 offset=0
+73..76 entry=0 path=/0/0/46/0 offset=0
+77..81 entry=0 path=/0/0/48/0 offset=0
+82..90 entry=0 path=/0/0/50/0 offset=0
+
+#### html ####
+<p class="topos-p"><span class="topos-woj">wj</span> <span class="topos-added">add</span> <span class="topos-divine-name">nd</span> <span class="topos-w">w</span> <a class="topos-ref">xt</a> <span class="topos-quote">qt</span> <span class="topos-foreign">tl</span> <i class="topos-hi topos-italic">it</i> <i class="topos-hi topos-italic">em</i> <i class="topos-hi topos-italic">bk</i> <b class="topos-hi topos-bold">bd</b> <span class="topos-hi topos-bold-italic">bdit</span> <span class="topos-hi topos-small-caps">sc</span> <sup class="topos-hi topos-super">sup</sup> <span class="topos-hi topos-normal">no</span> pn k fr ft fq fqa xo jmp <span class="topos-woj">wj1</span> <span class="topos-added">add2</span> x-custom</p>
+#### html-bare ####
+<p class="p"><span class="woj">wj</span> <span class="added">add</span> <span class="divine-name">nd</span> <span class="w">w</span> <a class="ref">xt</a> <span class="quote">qt</span> <span class="foreign">tl</span> <i class="hi italic">it</i> <i class="hi italic">em</i> <i class="hi italic">bk</i> <b class="hi bold">bd</b> <span class="hi bold-italic">bdit</span> <span class="hi small-caps">sc</span> <sup class="hi super">sup</sup> <span class="hi normal">no</span> pn k fr ft fq fqa xo jmp <span class="woj">wj1</span> <span class="added">add2</span> x-custom</p>
+#### verses ####
+chapter_verses: []
+
+#### usx-chapter-verses ####
+[]
+
+#### refs ####
+/0/0/8 target=- passages=[]
+

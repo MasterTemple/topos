@@ -1,0 +1,49 @@
+#### markup ####
+osis
+#### input ####
+one<div type="paragraph" sID="p1"/>two<div type="paragraph" eID="p1"/>three<div type="x-p" sID="p2"/>four<p sID="p3"/>five<p eID="p3"/>six
+#### tree ####
+text "one"
+Paragraph div @start type="paragraph" sID="p1"
+text "two"
+Paragraph div @end type="paragraph" eID="p1"
+text "three"
+Paragraph div @start type="x-p" sID="p2"
+text "four"
+Paragraph p @start sID="p3"
+text "five"
+Paragraph p @end eID="p3"
+text "six"
+
+#### text ####
+one
+twothree
+four
+fivesix
+#### text-all ####
+one
+twothree
+four
+fivesix
+#### text-nobreaks ####
+one twothree four fivesix
+#### spans ####
+entries: 0..25
+
+#### sources ####
+0..3 entry=0 path=/0 offset=0
+4..7 entry=0 path=/2 offset=0
+7..12 entry=0 path=/4 offset=0
+13..17 entry=0 path=/6 offset=0
+18..22 entry=0 path=/8 offset=0
+22..25 entry=0 path=/10 offset=0
+
+#### html ####
+one<br class="topos-p">twothree<br class="topos-p">four<br class="topos-p">fivesix
+#### html-bare ####
+one<br class="p">twothree<br class="p">four<br class="p">fivesix
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+

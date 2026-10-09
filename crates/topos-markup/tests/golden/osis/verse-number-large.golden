@@ -1,0 +1,45 @@
+#### markup ####
+osis
+#### input ####
+<verse osisID="Ps.119.176"/>last<verse osisID="Ps.119.300"/>too big<verse n="255"/>edge<verse n="256"/>over
+#### tree ####
+Verse verse osisID="Ps.119.176"
+text "last"
+Verse verse osisID="Ps.119.300"
+text "too big"
+Verse verse n="255"
+text "edge"
+Verse verse n="256"
+text "over"
+
+#### text ####
+lasttoo bigedgeover
+#### text-all ####
+[Ps 119:176] last [Ps 119:300] too big [ :255] edge [ :256] over
+#### text-nobreaks ####
+lasttoo bigedgeover
+#### spans ####
+entries: 0..19
+Verse 0..0 entry=0 path=/0 ""
+Verse 4..4 entry=0 path=/2 ""
+Verse 11..11 entry=0 path=/4 ""
+Verse 15..15 entry=0 path=/6 ""
+
+#### sources ####
+0..4 entry=0 path=/1 offset=0
+4..7 entry=0 path=/3 offset=0
+8..11 entry=0 path=/3 offset=4
+11..15 entry=0 path=/5 offset=0
+15..19 entry=0 path=/7 offset=0
+
+#### html ####
+<span class="topos-verse" data-osis-id="Ps.119.176"></span>last<span class="topos-verse" data-osis-id="Ps.119.300"></span>too big<span class="topos-verse" data-n="255"></span>edge<span class="topos-verse" data-n="256"></span>over
+#### html-bare ####
+<span class="verse" data-osis-id="Ps.119.176"></span>last<span class="verse" data-osis-id="Ps.119.300"></span>too big<span class="verse" data-n="255"></span>edge<span class="verse" data-n="256"></span>over
+#### verses ####
+0:176-176 marker=/0 start=/0 end=/2 "last"
+0:255-255 marker=/4 start=/4 end=/6 "edge"
+chapter_verses: []
+
+#### refs ####
+

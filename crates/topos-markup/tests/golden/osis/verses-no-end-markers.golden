@@ -1,0 +1,51 @@
+#### markup ####
+osis
+#### input ####
+<chapter osisID="John.1"/><title>t</title><verse osisID="John.1.1"/>one <verse osisID="John.1.2"/>two<chapter osisID="John.2"/><verse osisID="John.2.1"/>three
+#### tree ####
+Chapter chapter osisID="John.1"
+Title title
+  text "t"
+Verse verse osisID="John.1.1"
+text "one "
+Verse verse osisID="John.1.2"
+text "two"
+Chapter chapter osisID="John.2"
+Verse verse osisID="John.2.1"
+text "three"
+
+#### text ####
+one twothree
+#### text-all ####
+John 1
+## t
+[John 1:1] one [John 1:2] two
+John 2
+[John 2:1] three
+#### text-nobreaks ####
+one twothree
+#### spans ####
+entries: 0..12
+Chapter 0..0 entry=0 path=/0 ""
+Verse 0..0 entry=0 path=/2 ""
+Verse 3..3 entry=0 path=/4 ""
+Chapter 7..7 entry=0 path=/6 ""
+Verse 7..7 entry=0 path=/7 ""
+
+#### sources ####
+0..3 entry=0 path=/3 offset=0
+4..7 entry=0 path=/5 offset=0
+7..12 entry=0 path=/8 offset=0
+
+#### html ####
+<span class="topos-chapter" data-osis-id="John.1"></span><div class="topos-title">t</div><span class="topos-verse" data-osis-id="John.1.1"></span>one <span class="topos-verse" data-osis-id="John.1.2"></span>two<span class="topos-chapter" data-osis-id="John.2"></span><span class="topos-verse" data-osis-id="John.2.1"></span>three
+#### html-bare ####
+<span class="chapter" data-osis-id="John.1"></span><div class="title">t</div><span class="verse" data-osis-id="John.1.1"></span>one <span class="verse" data-osis-id="John.1.2"></span>two<span class="chapter" data-osis-id="John.2"></span><span class="verse" data-osis-id="John.2.1"></span>three
+#### verses ####
+1:1-1 marker=/2 start=/1 end=/4 "t\none"
+1:2-2 marker=/4 start=/4 end=/6 "two"
+2:1-1 marker=/7 start=/7 end=/9 "three"
+chapter_verses: [2, 1]
+
+#### refs ####
+

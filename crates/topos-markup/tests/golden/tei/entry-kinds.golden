@@ -1,0 +1,42 @@
+#### markup ####
+tei
+#### input ####
+<superentry><entry n="a"><orth>a</orth></entry><entryFree n="b"><orth>b</orth></entryFree></superentry>
+#### tree ####
+Entry superentry
+  Entry entry n="a"
+    Other orth
+      text "a"
+  Entry entryFree n="b"
+    Other orth
+      text "b"
+
+#### text ####
+a
+b
+#### text-all ####
+a
+b
+#### text-nobreaks ####
+a b
+#### spans ####
+entries: 0..3
+Other 0..1 entry=0 path=/0/0/0 "a"
+Entry 0..1 entry=0 path=/0/0 "a"
+Other 2..3 entry=0 path=/0/1/0 "b"
+Entry 2..3 entry=0 path=/0/1 "b"
+Entry 0..3 entry=0 path=/0 "a\nb"
+
+#### sources ####
+0..1 entry=0 path=/0/0/0/0 offset=0
+2..3 entry=0 path=/0/1/0/0 offset=0
+
+#### html ####
+<div class="topos-entry"><div class="topos-entry">a</div><div class="topos-entry">b</div></div>
+#### html-bare ####
+<div class="entry"><div class="entry">a</div><div class="entry">b</div></div>
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+

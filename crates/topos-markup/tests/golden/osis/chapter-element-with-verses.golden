@@ -1,0 +1,42 @@
+#### markup ####
+osis
+#### input ####
+<chapter osisID="Jude.1"><title>Heading</title><verse osisID="Jude.1.1">Jude</verse><verse osisID="Jude.1.2">Mercy</verse></chapter>
+#### tree ####
+Chapter chapter osisID="Jude.1"
+  Title title
+    text "Heading"
+  Verse verse osisID="Jude.1.1"
+    text "Jude"
+  Verse verse osisID="Jude.1.2"
+    text "Mercy"
+
+#### text ####
+JudeMercy
+#### text-all ####
+Jude 1
+## Heading
+[Jude 1:1] Jude [Jude 1:2] Mercy
+#### text-nobreaks ####
+JudeMercy
+#### spans ####
+entries: 0..9
+Verse 0..4 entry=0 path=/0/1 "Jude"
+Verse 4..9 entry=0 path=/0/2 "Mercy"
+Chapter 0..9 entry=0 path=/0 "JudeMercy"
+
+#### sources ####
+0..4 entry=0 path=/0/1/0 offset=0
+4..9 entry=0 path=/0/2/0 offset=0
+
+#### html ####
+<div class="topos-title">Heading</div>JudeMercy
+#### html-bare ####
+<div class="title">Heading</div>JudeMercy
+#### verses ####
+1:1-1 marker=/0/1 start=/1 end=/0/2 ""
+1:2-2 marker=/0/2 start=/0/2 end=/0/3 "Mercy"
+chapter_verses: [2]
+
+#### refs ####
+

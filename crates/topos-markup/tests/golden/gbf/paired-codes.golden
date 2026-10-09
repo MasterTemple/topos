@@ -1,0 +1,105 @@
+#### markup ####
+gbf
+#### input ####
+<FI>i<Fi> <FB>b<Fb> <FU>u<Fu> <FS>s<Fs> <FV>v<Fv> <FC>c<Fc> <FN>n<Fn> <FR>r<Fr> <FO>o<Fo> <RF>f<Rf> <RX>x<Rx> <TS>ts<Ts> <TT>tt<Tt> <TH>th<Th> <PP>pp<Pp> <RB>rb<Rb>
+#### tree ####
+Highlight FI type="italic"
+  text "i"
+text " "
+Highlight FB type="bold"
+  text "b"
+text " "
+Highlight FU type="underline"
+  text "u"
+text " "
+Highlight FS type="super"
+  text "s"
+text " "
+Highlight FV type="sub"
+  text "v"
+text " "
+Highlight FC type="small-caps"
+  text "c"
+text " "
+Highlight FN
+  text "n"
+text " "
+WordsOfJesus FR
+  text "r"
+text " "
+Quote FO
+  text "o"
+text " "
+Note RF
+  text "f"
+text " "
+Reference RX
+  text "x"
+text " "
+Title TS
+  text "ts"
+text " "
+Title TT
+  text "tt"
+text " "
+Title TH
+  text "th"
+text " "
+LineGroup PP
+  text "pp"
+text " "
+Other RB
+  text "rb"
+
+#### text ####
+i b u s v c n r o x
+pp
+rb
+#### text-all ####
+i b u s v c n “r” o (f) x
+## ts
+## tt
+## th
+pp
+rb
+#### text-nobreaks ####
+i b u s v c n r o x pp rb
+#### spans ####
+entries: 0..25
+Highlight 0..1 entry=0 path=/0 "i"
+Highlight 2..3 entry=0 path=/2 "b"
+Highlight 4..5 entry=0 path=/4 "u"
+Highlight 6..7 entry=0 path=/6 "s"
+Highlight 8..9 entry=0 path=/8 "v"
+Highlight 10..11 entry=0 path=/10 "c"
+Highlight 12..13 entry=0 path=/12 "n"
+WordsOfJesus 14..15 entry=0 path=/14 "r"
+Quote 16..17 entry=0 path=/16 "o"
+Reference 18..19 entry=0 path=/20 "x"
+LineGroup 20..22 entry=0 path=/28 "pp"
+Other 23..25 entry=0 path=/30 "rb"
+
+#### sources ####
+0..1 entry=0 path=/0/0 offset=0
+2..3 entry=0 path=/2/0 offset=0
+4..5 entry=0 path=/4/0 offset=0
+6..7 entry=0 path=/6/0 offset=0
+8..9 entry=0 path=/8/0 offset=0
+10..11 entry=0 path=/10/0 offset=0
+12..13 entry=0 path=/12/0 offset=0
+14..15 entry=0 path=/14/0 offset=0
+16..17 entry=0 path=/16/0 offset=0
+18..19 entry=0 path=/20/0 offset=0
+20..22 entry=0 path=/28/0 offset=0
+23..25 entry=0 path=/30/0 offset=0
+
+#### html ####
+<i class="topos-hi topos-italic">i</i> <b class="topos-hi topos-bold">b</b> <span class="topos-hi topos-underline">u</span> <sup class="topos-hi topos-super">s</sup> <sub class="topos-hi topos-sub">v</sub> <span class="topos-hi topos-small-caps">c</span> <span class="topos-hi">n</span> <span class="topos-woj">r</span> <span class="topos-quote">o</span> <span class="topos-note">f</span> <a class="topos-ref">x</a> <div class="topos-title">ts</div> <div class="topos-title">tt</div> <div class="topos-title">th</div> <div class="topos-lg">pp</div> rb
+#### html-bare ####
+<i class="hi italic">i</i> <b class="hi bold">b</b> <span class="hi underline">u</span> <sup class="hi super">s</sup> <sub class="hi sub">v</sub> <span class="hi small-caps">c</span> <span class="hi">n</span> <span class="woj">r</span> <span class="quote">o</span> <span class="note">f</span> <a class="ref">x</a> <div class="title">ts</div> <div class="title">tt</div> <div class="title">th</div> <div class="lg">pp</div> rb
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+/20 target=- passages=[]
+

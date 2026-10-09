@@ -1,0 +1,54 @@
+#### markup ####
+usx
+#### input ####
+<usx><para style="s1">The Word</para><para style="p">Jesus said, <char style="wj"> I am the light</char>, and<note style="f"><char style="ft">Or bread</char></note> went.</para></usx>
+#### tree ####
+Other usx
+  Title para style="s1" type="s1"
+    text "The Word"
+  Paragraph para style="p"
+    text "Jesus said, "
+    WordsOfJesus char style="wj"
+      text " I am the light"
+    text ", and"
+    Note note style="f" type="footnote"
+      Other char style="ft"
+        text "Or bread"
+    text " went."
+
+#### text ####
+Jesus said, I am the light, and went.
+#### text-all ####
+## The Word
+Jesus said, “I am the light”, and (Or bread) went.
+#### text-nobreaks ####
+Jesus said, I am the light, and went.
+#### spans ####
+entries: 0..37
+WordsOfJesus 12..26 entry=0 path=/0/1/1 "I am the light"
+Paragraph 0..37 entry=0 path=/0/1 "Jesus said, I am the light, and went."
+Other 0..37 entry=0 path=/0 "Jesus said, I am the light, and went."
+
+#### sources ####
+0..5 entry=0 path=/0/1/0 offset=0
+6..11 entry=0 path=/0/1/0 offset=6
+12..13 entry=0 path=/0/1/1/0 offset=1
+14..16 entry=0 path=/0/1/1/0 offset=3
+17..20 entry=0 path=/0/1/1/0 offset=6
+21..26 entry=0 path=/0/1/1/0 offset=10
+26..27 entry=0 path=/0/1/2 offset=0
+28..31 entry=0 path=/0/1/2 offset=2
+32..37 entry=0 path=/0/1/4 offset=1
+
+#### html ####
+<div class="topos-title topos-s1" data-title-type="s1">The Word</div><p class="topos-p">Jesus said, <span class="topos-woj"> I am the light</span>, and<span class="topos-note topos-footnote" data-note-type="footnote">Or bread</span> went.</p>
+#### html-bare ####
+<div class="title s1" data-title-type="s1">The Word</div><p class="p">Jesus said, <span class="woj"> I am the light</span>, and<span class="note footnote" data-note-type="footnote">Or bread</span> went.</p>
+#### verses ####
+chapter_verses: []
+
+#### usx-chapter-verses ####
+[]
+
+#### refs ####
+

@@ -1,0 +1,32 @@
+#### markup ####
+osis
+#### input ####
+a<![CDATA[ <b>raw &amp; </b> ]]>c
+#### tree ####
+text "a <b>raw &amp; </b> c"
+
+#### text ####
+a <b>raw &amp; </b> c
+#### text-all ####
+a <b>raw &amp; </b> c
+#### text-nobreaks ####
+a <b>raw &amp; </b> c
+#### spans ####
+entries: 0..21
+
+#### sources ####
+0..1 entry=0 path=/0 offset=0
+2..8 entry=0 path=/0 offset=2
+9..14 entry=0 path=/0 offset=9
+15..19 entry=0 path=/0 offset=15
+20..21 entry=0 path=/0 offset=20
+
+#### html ####
+a &lt;b&gt;raw &amp;amp; &lt;/b&gt; c
+#### html-bare ####
+a &lt;b&gt;raw &amp;amp; &lt;/b&gt; c
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+

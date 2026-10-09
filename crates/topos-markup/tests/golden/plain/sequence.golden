@@ -1,0 +1,67 @@
+#### markup ####
+plain
+#### input ####
+first entry
+
+#### input ####
+second
+#### input ####
+
+third
+#### tree ####
+text "first entry"
+LineBreak br
+
+#### tree ####
+text "second"
+
+#### tree ####
+LineBreak br
+text "third"
+
+#### text ####
+first entry
+second
+third
+#### text-all ####
+first entry
+second
+third
+#### text-nobreaks ####
+first entry second third
+#### spans ####
+entries: 0..11 12..18 19..24
+
+#### sources ####
+0..5 entry=0 path=/0 offset=0
+6..11 entry=0 path=/0 offset=6
+12..18 entry=1 path=/0 offset=0
+19..24 entry=2 path=/1 offset=0
+
+#### html ####
+first entry<br class="topos-lb">
+#### html ####
+second
+#### html ####
+<br class="topos-lb">third
+#### html-bare ####
+first entry<br class="lb">
+#### html-bare ####
+second
+#### html-bare ####
+<br class="lb">third
+#### verses ####
+chapter_verses: []
+
+#### verses ####
+chapter_verses: []
+
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+
+#### refs ####
+
+#### refs ####
+

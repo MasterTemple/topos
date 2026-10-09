@@ -1,0 +1,71 @@
+#### markup ####
+usx
+#### input ####
+<usx><para style="p">a<note caller="+" style="f"><char style="ft">f</char></note> b<note caller="-" style="fe">fe</note> c<note caller="+" style="x"><char style="xt">Gen 1:1</char></note> d<note caller="a" style="ex">ex</note> e<note caller="+" style="ef">ef</note> f<note style="zz">zz</note> g<note>none</note> h<note style="x" type="mine">typed</note> i<note style="f"/></para></usx>
+#### tree ####
+Other usx
+  Paragraph para style="p"
+    text "a"
+    Note note caller="+" style="f" type="footnote"
+      Other char style="ft"
+        text "f"
+    text " b"
+    Note note caller="-" style="fe" type="footnote"
+      text "fe"
+    text " c"
+    Note note caller="+" style="x" type="crossReference"
+      Reference char style="xt"
+        text "Gen 1:1"
+    text " d"
+    Note note caller="a" style="ex" type="crossReference"
+      text "ex"
+    text " e"
+    Note note caller="+" style="ef" type="study"
+      text "ef"
+    text " f"
+    Note note style="zz" type="footnote"
+      text "zz"
+    text " g"
+    Note note type="footnote"
+      text "none"
+    text " h"
+    Note note style="x" type="mine"
+      text "typed"
+    text " i"
+    Note note style="f" type="footnote"
+
+#### text ####
+a b c d e f g h i
+#### text-all ####
+a (f) b (fe) c (Gen 1:1) d (ex) e (ef) f (zz) g (none) h (typed) i
+#### text-nobreaks ####
+a b c d e f g h i
+#### spans ####
+entries: 0..17
+Paragraph 0..17 entry=0 path=/0/0 "a b c d e f g h i"
+Other 0..17 entry=0 path=/0 "a b c d e f g h i"
+
+#### sources ####
+0..1 entry=0 path=/0/0/0 offset=0
+2..3 entry=0 path=/0/0/2 offset=1
+4..5 entry=0 path=/0/0/4 offset=1
+6..7 entry=0 path=/0/0/6 offset=1
+8..9 entry=0 path=/0/0/8 offset=1
+10..11 entry=0 path=/0/0/10 offset=1
+12..13 entry=0 path=/0/0/12 offset=1
+14..15 entry=0 path=/0/0/14 offset=1
+16..17 entry=0 path=/0/0/16 offset=1
+
+#### html ####
+<p class="topos-p">a<span class="topos-note topos-footnote" data-note-type="footnote" data-n="+">f</span> b<span class="topos-note topos-footnote" data-note-type="footnote" data-n="-">fe</span> c<span class="topos-note topos-crossref" data-note-type="crossReference" data-n="+"><a class="topos-ref">Gen 1:1</a></span> d<span class="topos-note topos-crossref" data-note-type="crossReference" data-n="a">ex</span> e<span class="topos-note topos-study" data-note-type="study" data-n="+">ef</span> f<span class="topos-note topos-footnote" data-note-type="footnote">zz</span> g<span class="topos-note topos-footnote" data-note-type="footnote">none</span> h<span class="topos-note topos-mine" data-note-type="mine">typed</span> i</p>
+#### html-bare ####
+<p class="p">a<span class="note footnote" data-note-type="footnote" data-n="+">f</span> b<span class="note footnote" data-note-type="footnote" data-n="-">fe</span> c<span class="note crossref" data-note-type="crossReference" data-n="+"><a class="ref">Gen 1:1</a></span> d<span class="note crossref" data-note-type="crossReference" data-n="a">ex</span> e<span class="note study" data-note-type="study" data-n="+">ef</span> f<span class="note footnote" data-note-type="footnote">zz</span> g<span class="note footnote" data-note-type="footnote">none</span> h<span class="note mine" data-note-type="mine">typed</span> i</p>
+#### verses ####
+chapter_verses: []
+
+#### usx-chapter-verses ####
+[]
+
+#### refs ####
+/0/0/5/0 target=- passages=[Gen.1.1]
+

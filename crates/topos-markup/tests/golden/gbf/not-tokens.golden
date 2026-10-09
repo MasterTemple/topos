@@ -1,0 +1,41 @@
+#### markup ####
+gbf
+#### input ####
+<ab> <A1> <A> <a> <AB c> x <> y < z <<Geschrieben von Rom.>
+#### tree ####
+text "<ab> <A1> <A> <a> <AB c> x <> y < z <<Geschrieben von Rom.>"
+
+#### text ####
+<ab> <A1> <A> <a> <AB c> x <> y < z <<Geschrieben von Rom.>
+#### text-all ####
+<ab> <A1> <A> <a> <AB c> x <> y < z <<Geschrieben von Rom.>
+#### text-nobreaks ####
+<ab> <A1> <A> <a> <AB c> x <> y < z <<Geschrieben von Rom.>
+#### spans ####
+entries: 0..59
+
+#### sources ####
+0..4 entry=0 path=/0 offset=0
+5..9 entry=0 path=/0 offset=5
+10..13 entry=0 path=/0 offset=10
+14..17 entry=0 path=/0 offset=14
+18..21 entry=0 path=/0 offset=18
+22..24 entry=0 path=/0 offset=22
+25..26 entry=0 path=/0 offset=25
+27..29 entry=0 path=/0 offset=27
+30..31 entry=0 path=/0 offset=30
+32..33 entry=0 path=/0 offset=32
+34..35 entry=0 path=/0 offset=34
+36..49 entry=0 path=/0 offset=36
+50..53 entry=0 path=/0 offset=50
+54..59 entry=0 path=/0 offset=54
+
+#### html ####
+&lt;ab&gt; &lt;A1&gt; &lt;A&gt; &lt;a&gt; &lt;AB c&gt; x &lt;&gt; y &lt; z &lt;&lt;Geschrieben von Rom.&gt;
+#### html-bare ####
+&lt;ab&gt; &lt;A1&gt; &lt;A&gt; &lt;a&gt; &lt;AB c&gt; x &lt;&gt; y &lt; z &lt;&lt;Geschrieben von Rom.&gt;
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+

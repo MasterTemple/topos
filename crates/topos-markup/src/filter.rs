@@ -1,6 +1,6 @@
 //! Which elements are rendered, flattened and searched.
 
-use std::{collections::BTreeMap, fmt, sync::Arc};
+use std::sync::Arc;
 
 use crate::{Element, Kind};
 
@@ -40,8 +40,11 @@ assert_eq!(plain_text(&nodes, &opts), "In the beginning [Or, origin]");
 */
 #[derive(Clone, Default)]
 pub struct Filter {
-    kinds: BTreeMap<Kind, Action>,
+    /// The action set for each kind, at most one per kind
+    kinds: Vec<(Kind, Action)>,
+    /// Note types and their actions, in the order they were added
     note_types: Vec<(String, Action)>,
+    /// Custom rules, in the order they were added
     rules: Vec<Rule>,
 }
 
@@ -61,7 +64,10 @@ impl Filter {
 
     /// Sets what happens to a kind of element
     pub fn kind(mut self, kind: Kind, action: Action) -> Self {
-        self.kinds.insert(kind, action);
+        match self.kinds.iter_mut().find(|(k, _)| *k == kind) {
+            Some(entry) => entry.1 = action,
+            None => self.kinds.push((kind, action)),
+        }
         self
     }
 
@@ -109,14 +115,14 @@ impl Filter {
             return *action;
         }
         self.kinds
-            .get(&element.kind)
-            .copied()
-            .unwrap_or(Action::Keep)
+            .iter()
+            .find(|(k, _)| *k == element.kind)
+            .map_or(Action::Keep, |(_, a)| *a)
     }
 }
 
-impl fmt::Debug for Filter {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+impl std::fmt::Debug for Filter {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Filter")
             .field("kinds", &self.kinds)
             .field("note_types", &self.note_types)

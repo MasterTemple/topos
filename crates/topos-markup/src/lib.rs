@@ -8,6 +8,7 @@ mod gbf;
 pub mod html;
 pub mod path;
 pub mod refs;
+mod strongs;
 pub mod text;
 mod tree;
 pub mod verses;
@@ -18,9 +19,8 @@ pub use filter::{Action, Filter};
 pub use flatten::{Flat, Flattener, Point, Span};
 pub use html::{HtmlOptions, HtmlRenderer};
 pub use path::NodePath;
+pub use strongs::{Strongs, StrongsLang};
 pub use text::{TextOptions, plain_text};
-
-use std::fmt;
 
 /// The markup a text is written in
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -38,15 +38,19 @@ impl Markup {
     /// A markup by name, ignoring case: `osis`, `thml`, `gbf`, `tei`, `usx`, `plaintext` or
     /// `plain`
     pub fn from_name(name: &str) -> Option<Markup> {
-        Some(match name.to_ascii_lowercase().as_str() {
-            "osis" => Markup::Osis,
-            "thml" => Markup::Thml,
-            "gbf" => Markup::Gbf,
-            "tei" => Markup::Tei,
-            "usx" => Markup::Usx,
-            "plaintext" | "plain" => Markup::Plaintext,
-            _ => return None,
-        })
+        let names = [
+            ("osis", Markup::Osis),
+            ("thml", Markup::Thml),
+            ("gbf", Markup::Gbf),
+            ("tei", Markup::Tei),
+            ("usx", Markup::Usx),
+            ("plaintext", Markup::Plaintext),
+            ("plain", Markup::Plaintext),
+        ];
+        names
+            .iter()
+            .find(|(n, _)| n.eq_ignore_ascii_case(name))
+            .map(|(_, m)| *m)
     }
 }
 
@@ -65,6 +69,7 @@ impl Node {
             Node::Text(_) => None,
         }
     }
+
     pub fn as_text(&self) -> Option<&str> {
         match self {
             Node::Text(t) => Some(t),
@@ -179,17 +184,6 @@ pub struct Element {
 }
 
 impl Element {
-    pub(crate) fn new(name: impl Into<String>, attrs: Vec<(String, String)>) -> Element {
-        Element {
-            kind: Kind::Other,
-            name: name.into(),
-            attrs,
-            children: Vec::new(),
-            milestone: None,
-            unclosed: false,
-        }
-    }
-
     /// Attribute value by name (exact match first, then ASCII case-insensitive)
     pub fn attr(&self, name: &str) -> Option<&str> {
         self.attrs
@@ -203,25 +197,17 @@ impl Element {
             .map(|(_, v)| v.as_str())
     }
 
-    pub(crate) fn set_attr(&mut self, name: &str, value: String) {
-        if let Some(a) = self.attrs.iter_mut().find(|(k, _)| k == name) {
-            a.1 = value;
-        } else {
-            self.attrs.push((name.to_string(), value));
-        }
-    }
-
     /// Concatenated text of all descendants (notes included)
     pub fn text(&self) -> String {
-        let mut s = String::new();
-        collect_text(&self.children, &mut s);
-        s
+        let mut out = String::new();
+        tree::collect_text(&self.children, &mut out);
+        out
     }
 
     /// Strong's numbers from `lemma` (OSIS `strong:H07225`, synthesised for ThML and GBF) and
     /// USX's `strong`
     pub fn strongs(&self) -> Vec<Strongs> {
-        let mut out: Vec<Strongs> = self
+        let mut out = self
             .attr("lemma")
             .map(Strongs::parse_list)
             .unwrap_or_default();
@@ -259,7 +245,7 @@ impl Element {
     /// Link target: `osisRef`, ThML `passage`, TEI `target`, USX `loc` or `link-href`, or `href`
     pub fn reference_target(&self) -> Option<&str> {
         ["osisRef", "passage", "target", "loc", "link-href", "href"]
-            .into_iter()
+            .iter()
             .find_map(|name| self.attr(name))
     }
 
@@ -276,19 +262,10 @@ impl Element {
     }
 }
 
-fn collect_text(nodes: &[Node], out: &mut String) {
-    for n in nodes {
-        match n {
-            Node::Text(t) => out.push_str(t),
-            Node::Element(e) => collect_text(&e.children, out),
-        }
-    }
-}
-
 /// Visit every element in a node list depth-first (pre-order)
 pub fn walk<'a>(nodes: &'a [Node], f: &mut impl FnMut(&'a Element)) {
-    for n in nodes {
-        if let Node::Element(e) = n {
+    for node in nodes {
+        if let Node::Element(e) = node {
             f(e);
             walk(&e.children, f);
         }
@@ -300,7 +277,7 @@ pub fn find_all(nodes: &[Node], kind: Kind) -> Vec<&Element> {
     let mut out = Vec::new();
     walk(nodes, &mut |e| {
         if e.kind == kind {
-            out.push(e)
+            out.push(e);
         }
     });
     out
@@ -311,7 +288,7 @@ pub fn strongs_numbers(nodes: &[Node]) -> Vec<Strongs> {
     let mut out = Vec::new();
     walk(nodes, &mut |e| {
         if e.kind == Kind::Word {
-            out.extend(e.strongs())
+            out.extend(e.strongs());
         }
     });
     out
@@ -326,112 +303,8 @@ Parses text in the given markup; this never fails
 */
 pub fn parse(markup: Markup, text: &str) -> Vec<Node> {
     match markup {
-        Markup::Plaintext => plaintext(text),
+        Markup::Plaintext => tree::plain(text),
         Markup::Gbf => gbf::parse(text),
         Markup::Osis | Markup::Thml | Markup::Tei | Markup::Usx => xml::parse(markup, text),
     }
 }
-
-fn plaintext(text: &str) -> Vec<Node> {
-    let mut nodes = Vec::new();
-    for (i, line) in text.split('\n').enumerate() {
-        if i > 0 {
-            let mut br = Element::new("br", Vec::new());
-            br.kind = Kind::LineBreak;
-            nodes.push(Node::Element(br));
-        }
-        let line = line.strip_suffix('\r').unwrap_or(line);
-        if !line.is_empty() {
-            nodes.push(Node::Text(line.to_string()));
-        }
-    }
-    nodes
-}
-
-/// Strong's language
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub enum StrongsLang {
-    Hebrew,
-    Greek,
-}
-
-/// A Strong's number such as `H7225` or `G25`, with an optional suffix (`H0430a` → `a`)
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub struct Strongs {
-    pub lang: StrongsLang,
-    pub number: u32,
-    pub suffix: Option<String>,
-}
-
-impl Strongs {
-    /// Parses one token: `strong:H07225`, `x-Strongs:G25`, `G25`, `H0430a`
-    pub fn parse(token: &str) -> Option<Strongs> {
-        let t = token
-            .strip_prefix("strong:")
-            .or_else(|| token.strip_prefix("x-Strongs:"))
-            .or_else(|| token.strip_prefix("Strongs:"))
-            .unwrap_or(token);
-        let mut chars = t.chars();
-        let lang = match chars.next()? {
-            'G' | 'g' => StrongsLang::Greek,
-            'H' | 'h' => StrongsLang::Hebrew,
-            _ => return None,
-        };
-        let rest = chars.as_str();
-        let digits = rest.chars().take_while(char::is_ascii_digit).count();
-        if digits == 0 {
-            return None;
-        }
-        let number = rest[..digits].parse().ok()?;
-        let suffix = &rest[digits..];
-        if !suffix
-            .chars()
-            .all(|c| c.is_ascii_alphanumeric() || c == '!')
-        {
-            return None;
-        }
-        Some(Strongs {
-            lang,
-            number,
-            suffix: (!suffix.is_empty()).then(|| suffix.to_string()),
-        })
-    }
-
-    /// Parses a whitespace-separated `lemma` attribute, keeping only Strong's tokens
-    pub fn parse_list(lemma: &str) -> Vec<Strongs> {
-        lemma
-            .split_whitespace()
-            .filter_map(Strongs::parse)
-            .collect()
-    }
-
-    /// Key for looking the number up in SWORD's StrongsGreek/StrongsHebrew modules
-    pub fn dictionary_key(&self) -> String {
-        format!("{:05}", self.number)
-    }
-
-    /// Conventional dictionary module name: `StrongsGreek` / `StrongsHebrew`
-    pub fn dictionary_module(&self) -> &'static str {
-        match self.lang {
-            StrongsLang::Greek => "StrongsGreek",
-            StrongsLang::Hebrew => "StrongsHebrew",
-        }
-    }
-}
-
-impl fmt::Display for Strongs {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let l = match self.lang {
-            StrongsLang::Greek => 'G',
-            StrongsLang::Hebrew => 'H',
-        };
-        write!(f, "{l}{}", self.number)?;
-        if let Some(s) = &self.suffix {
-            write!(f, "{s}")?;
-        }
-        Ok(())
-    }
-}
-
-#[cfg(test)]
-mod tests;

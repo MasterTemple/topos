@@ -1,0 +1,45 @@
+#### markup ####
+osis
+#### input ####
+<W lemma="strong:G1">x</W> <TransChange>y</TransChange> <Note>z</Note> <DIV type="x-p">d</DIV>
+#### tree ####
+Other W lemma="strong:G1"
+  text "x"
+text " "
+Other TransChange
+  text "y"
+text " "
+Other Note
+  text "z"
+text " "
+Other DIV type="x-p"
+  text "d"
+
+#### text ####
+x y z d
+#### text-all ####
+x y z d
+#### text-nobreaks ####
+x y z d
+#### spans ####
+entries: 0..7
+Other 0..1 entry=0 path=/0 "x"
+Other 2..3 entry=0 path=/2 "y"
+Other 4..5 entry=0 path=/4 "z"
+Other 6..7 entry=0 path=/6 "d"
+
+#### sources ####
+0..1 entry=0 path=/0/0 offset=0
+2..3 entry=0 path=/2/0 offset=0
+4..5 entry=0 path=/4/0 offset=0
+6..7 entry=0 path=/6/0 offset=0
+
+#### html ####
+x y z d
+#### html-bare ####
+x y z d
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+

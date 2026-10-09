@@ -1,0 +1,38 @@
+#### markup ####
+osis
+#### input ####
+<verse n="4-5" sID="x"/>bridge<verse eID="x"/><verse n="6a"/>six
+#### tree ####
+Verse verse @start n="4-5" sID="x"
+text "bridge"
+Verse verse @end eID="x"
+Verse verse n="6a"
+text "six"
+
+#### text ####
+bridgesix
+#### text-all ####
+[x :4-5] bridge [ :6a] six
+#### text-nobreaks ####
+bridgesix
+#### spans ####
+entries: 0..9
+Verse 0..0 entry=0 path=/0 ""
+Verse 6..6 entry=0 path=/2 ""
+Verse 6..6 entry=0 path=/3 ""
+
+#### sources ####
+0..6 entry=0 path=/1 offset=0
+6..9 entry=0 path=/4 offset=0
+
+#### html ####
+<span class="topos-verse" data-osis-id="x" data-n="4-5"></span>bridge<span class="topos-verse" data-n="6a"></span>six
+#### html-bare ####
+<span class="verse" data-osis-id="x" data-n="4-5"></span>bridge<span class="verse" data-n="6a"></span>six
+#### verses ####
+0:4-5 marker=/0 start=/0 end=/2 "bridge"
+0:6-6 marker=/3 start=/3 end=/5 "six"
+chapter_verses: []
+
+#### refs ####
+

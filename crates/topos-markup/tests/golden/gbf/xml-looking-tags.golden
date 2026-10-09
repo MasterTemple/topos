@@ -1,0 +1,31 @@
+#### markup ####
+gbf
+#### input ####
+<i>not xml</i> <w>neither</w> <br/>
+#### tree ####
+text "<i>not xml</i> <w>neither</w> <br/>"
+
+#### text ####
+<i>not xml</i> <w>neither</w> <br/>
+#### text-all ####
+<i>not xml</i> <w>neither</w> <br/>
+#### text-nobreaks ####
+<i>not xml</i> <w>neither</w> <br/>
+#### spans ####
+entries: 0..35
+
+#### sources ####
+0..6 entry=0 path=/0 offset=0
+7..14 entry=0 path=/0 offset=7
+15..29 entry=0 path=/0 offset=15
+30..35 entry=0 path=/0 offset=30
+
+#### html ####
+&lt;i&gt;not xml&lt;/i&gt; &lt;w&gt;neither&lt;/w&gt; &lt;br/&gt;
+#### html-bare ####
+&lt;i&gt;not xml&lt;/i&gt; &lt;w&gt;neither&lt;/w&gt; &lt;br/&gt;
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+

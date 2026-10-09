@@ -1,0 +1,65 @@
+#### markup ####
+usx
+#### input ####
+<usx><chapter number="0" style="c"/><para><verse number="1"/>zero</para><chapter number="300" style="c"/><para><verse number="1"/>big</para><chapter number="x" style="c"/><para><verse number="2"/>x</para></usx>
+#### tree ####
+Other usx
+  Chapter chapter number="0" style="c"
+  Paragraph para
+    Verse verse number="1"
+    text "zero"
+  Chapter chapter number="300" style="c"
+  Paragraph para
+    Verse verse number="1"
+    text "big"
+  Chapter chapter number="x" style="c"
+  Paragraph para
+    Verse verse number="2"
+    text "x"
+
+#### text ####
+zero
+big
+x
+#### text-all ####
+ 0
+[ 0:1] zero
+ 300
+[ 300:1] big
+ x
+[ x:2] x
+#### text-nobreaks ####
+zero big x
+#### spans ####
+entries: 0..10
+Chapter 0..0 entry=0 path=/0/0 ""
+Verse 0..0 entry=0 path=/0/1/0 ""
+Paragraph 0..4 entry=0 path=/0/1 "zero"
+Chapter 4..4 entry=0 path=/0/2 ""
+Verse 4..4 entry=0 path=/0/3/0 ""
+Paragraph 5..8 entry=0 path=/0/3 "big"
+Chapter 8..8 entry=0 path=/0/4 ""
+Verse 8..8 entry=0 path=/0/5/0 ""
+Paragraph 9..10 entry=0 path=/0/5 "x"
+Other 0..10 entry=0 path=/0 "zero\nbig\nx"
+
+#### sources ####
+0..4 entry=0 path=/0/1/1 offset=0
+5..8 entry=0 path=/0/3/1 offset=0
+9..10 entry=0 path=/0/5/1 offset=0
+
+#### html ####
+<span class="topos-chapter" data-n="0"></span><p class="topos-p"><span class="topos-verse" data-n="1"></span>zero</p><span class="topos-chapter" data-n="300"></span><p class="topos-p"><span class="topos-verse" data-n="1"></span>big</p><span class="topos-chapter" data-n="x"></span><p class="topos-p"><span class="topos-verse" data-n="2"></span>x</p>
+#### html-bare ####
+<span class="chapter" data-n="0"></span><p class="p"><span class="verse" data-n="1"></span>zero</p><span class="chapter" data-n="300"></span><p class="p"><span class="verse" data-n="1"></span>big</p><span class="chapter" data-n="x"></span><p class="p"><span class="verse" data-n="2"></span>x</p>
+#### verses ####
+0:1-1 marker=/0/1/0 start=/0/1 end=/0/2 "zero"
+1:1-1 marker=/0/3/0 start=/0/3 end=/0/4 "big"
+2:2-2 marker=/0/5/0 start=/0/5 end=/1 "x"
+chapter_verses: [1, 2]
+
+#### usx-chapter-verses ####
+[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2]
+
+#### refs ####
+

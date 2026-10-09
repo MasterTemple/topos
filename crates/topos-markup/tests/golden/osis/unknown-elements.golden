@@ -1,0 +1,36 @@
+#### markup ####
+osis
+#### input ####
+<foo bar="baz">x<baz/></foo><seg type="x-y">s</seg>
+#### tree ####
+Other foo bar="baz"
+  text "x"
+  Other baz
+Other seg type="x-y"
+  text "s"
+
+#### text ####
+xs
+#### text-all ####
+xs
+#### text-nobreaks ####
+xs
+#### spans ####
+entries: 0..2
+Other 1..1 entry=0 path=/0/1 ""
+Other 0..1 entry=0 path=/0 "x"
+Other 1..2 entry=0 path=/1 "s"
+
+#### sources ####
+0..1 entry=0 path=/0/0 offset=0
+1..2 entry=0 path=/1/0 offset=0
+
+#### html ####
+xs
+#### html-bare ####
+xs
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+

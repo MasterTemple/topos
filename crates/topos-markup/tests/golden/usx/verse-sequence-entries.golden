@@ -1,0 +1,67 @@
+#### markup ####
+usx
+#### input ####
+<para style="p"><verse number="1" style="v" sid="JHN 1:1"/><char style="wj">In the beginning
+#### input ####
+was the Word</char><verse eid="JHN 1:1"/></para>
+#### tree ####
+Paragraph para @unclosed style="p"
+  Verse verse @start number="1" style="v" sid="JHN 1:1"
+  WordsOfJesus char @unclosed style="wj"
+    text "In the beginning"
+
+#### tree ####
+text "was the Word"
+Other char @end
+Verse verse @end eid="JHN 1:1"
+Paragraph para @end
+
+#### text ####
+In the beginning
+was the Word
+#### text-all ####
+[JHN 1:1] “In the beginning
+was the Word”
+#### text-nobreaks ####
+In the beginning was the Word
+#### spans ####
+entries: 0..16 17..29
+Verse 0..0 entry=0 path=/0/0 ""
+Paragraph 0..16 entry=0 path=/0 "In the beginning"
+WordsOfJesus 0..16 entry=0 path=/0/1 "In the beginning"
+Verse 29..29 entry=1 path=/2 ""
+WordsOfJesus 17..29 entry=1 path= "was the Word"
+
+#### sources ####
+0..2 entry=0 path=/0/1/0 offset=0
+3..6 entry=0 path=/0/1/0 offset=3
+7..16 entry=0 path=/0/1/0 offset=7
+17..20 entry=1 path=/0 offset=0
+21..24 entry=1 path=/0 offset=4
+25..29 entry=1 path=/0 offset=8
+
+#### html ####
+<p class="topos-p"><span class="topos-verse" data-osis-id="JHN 1:1" data-n="1"></span><span class="topos-woj">In the beginning</span></p>
+#### html ####
+<span class="topos-woj">was the Word</span>
+#### html-bare ####
+<p class="p"><span class="verse" data-osis-id="JHN 1:1" data-n="1"></span><span class="woj">In the beginning</span></p>
+#### html-bare ####
+<span class="woj">was the Word</span>
+#### verses ####
+0:1-1 marker=/0/0 start=/0/0 end=/1 "In the beginning"
+chapter_verses: []
+
+#### verses ####
+chapter_verses: []
+
+#### usx-chapter-verses ####
+[]
+
+#### usx-chapter-verses ####
+[]
+
+#### refs ####
+
+#### refs ####
+

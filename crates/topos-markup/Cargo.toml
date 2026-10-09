@@ -18,3 +18,7 @@ serde = { version = "1", features = ["derive"], optional = true }
 ## Serialize and Deserialize for the tree (Node, Element, Kind, Milestone, NodePath, VerseSpan),
 ## for caching parsed books
 serde = ["dep:serde"]
+
+[dev-dependencies]
+# For tests/serde.rs only
+serde_json = "1"

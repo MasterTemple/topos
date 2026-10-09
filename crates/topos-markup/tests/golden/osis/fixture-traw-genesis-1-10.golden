@@ -1,0 +1,37 @@
+#### markup ####
+osis
+#### input ####
+God in beginning שָׁלוֹם <note n="a" type="crossReference"><reference osisRef="John.3.16">John 3:16</reference></note> &amp;end.
+#### tree ####
+text "God in beginning שָׁלוֹם "
+Note note n="a" type="crossReference"
+  Reference reference osisRef="John.3.16"
+    text "John 3:16"
+text " &end."
+
+#### text ####
+God in beginning שָׁלוֹם &end.
+#### text-all ####
+God in beginning שָׁלוֹם (John 3:16) &end.
+#### text-nobreaks ####
+God in beginning שָׁלוֹם &end.
+#### spans ####
+entries: 0..37
+
+#### sources ####
+0..3 entry=0 path=/0 offset=0
+4..6 entry=0 path=/0 offset=4
+7..16 entry=0 path=/0 offset=7
+17..31 entry=0 path=/0 offset=17
+32..37 entry=0 path=/2 offset=1
+
+#### html ####
+God in beginning שָׁלוֹם <span class="topos-note topos-crossref" data-note-type="crossReference" data-n="a"><a class="topos-ref" data-osis-ref="John.3.16">John 3:16</a></span> &amp;end.
+#### html-bare ####
+God in beginning שָׁלוֹם <span class="note crossref" data-note-type="crossReference" data-n="a"><a class="ref" data-osis-ref="John.3.16">John 3:16</a></span> &amp;end.
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+/1/0 target="John.3.16" passages=[John.3.16]
+

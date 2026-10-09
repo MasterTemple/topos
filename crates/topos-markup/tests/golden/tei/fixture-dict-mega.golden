@@ -1,0 +1,53 @@
+#### markup ####
+tei
+#### input ####
+<entryFree n="Ωmega"><orth>Ωmega</orth> <def>Definition of Ωmega with <ref target="X:Ωmega">ref</ref> &amp; more
+second line</def></entryFree>
+#### tree ####
+Entry entryFree n="Ωmega"
+  Other orth
+    text "Ωmega"
+  text " "
+  Other def
+    text "Definition of Ωmega with "
+    Reference ref target="X:Ωmega"
+      text "ref"
+    text " & more\nsecond line"
+
+#### text ####
+Ωmega Definition of Ωmega with ref & more second line
+#### text-all ####
+Ωmega Definition of Ωmega with ref & more second line
+#### text-nobreaks ####
+Ωmega Definition of Ωmega with ref & more second line
+#### spans ####
+entries: 0..55
+Other 0..6 entry=0 path=/0/0 "Ωmega"
+Reference 33..36 entry=0 path=/0/2/1 "ref"
+Other 7..55 entry=0 path=/0/2 "Definition of Ωmega with ref & more second line"
+Entry 0..55 entry=0 path=/0 "Ωmega Definition of Ωmega with ref & more second line"
+
+#### sources ####
+0..6 entry=0 path=/0/0/0 offset=0
+7..17 entry=0 path=/0/2/0 offset=0
+18..20 entry=0 path=/0/2/0 offset=11
+21..27 entry=0 path=/0/2/0 offset=14
+28..32 entry=0 path=/0/2/0 offset=21
+33..36 entry=0 path=/0/2/1/0 offset=0
+37..38 entry=0 path=/0/2/2 offset=1
+39..43 entry=0 path=/0/2/2 offset=3
+44..50 entry=0 path=/0/2/2 offset=8
+51..55 entry=0 path=/0/2/2 offset=15
+
+#### html ####
+<div class="topos-entry">Ωmega Definition of Ωmega with <a class="topos-ref" data-osis-ref="X:Ωmega">ref</a> &amp; more
+second line</div>
+#### html-bare ####
+<div class="entry">Ωmega Definition of Ωmega with <a class="ref" data-osis-ref="X:Ωmega">ref</a> &amp; more
+second line</div>
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+/0/2/1 target="X:Ωmega" passages=[]
+

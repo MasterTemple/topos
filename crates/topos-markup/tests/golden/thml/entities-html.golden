@@ -1,0 +1,35 @@
+#### markup ####
+thml
+#### input ####
+&ldquo;Quote&rdquo; &mdash; caf&eacute; &copy; &frac12; &AElig;sir &szlig; &#x3b1;
+#### tree ####
+text "“Quote” — café © ½ Æsir ß α"
+
+#### text ####
+“Quote” — café © ½ Æsir ß α
+#### text-all ####
+“Quote” — café © ½ Æsir ß α
+#### text-nobreaks ####
+“Quote” — café © ½ Æsir ß α
+#### spans ####
+entries: 0..39
+
+#### sources ####
+0..11 entry=0 path=/0 offset=0
+12..15 entry=0 path=/0 offset=12
+16..21 entry=0 path=/0 offset=16
+22..24 entry=0 path=/0 offset=22
+25..27 entry=0 path=/0 offset=25
+28..33 entry=0 path=/0 offset=28
+34..36 entry=0 path=/0 offset=34
+37..39 entry=0 path=/0 offset=37
+
+#### html ####
+“Quote” — café © ½ Æsir ß α
+#### html-bare ####
+“Quote” — café © ½ Æsir ß α
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+

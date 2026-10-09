@@ -1,7 +1,5 @@
 //! Positions in a parsed tree.
 
-use std::fmt;
-
 use crate::Node;
 
 /**
@@ -18,31 +16,23 @@ impl NodePath {
     pub fn resolve<'a>(&self, nodes: &'a [Node]) -> Option<&'a Node> {
         let (first, rest) = self.0.split_first()?;
         let mut node = nodes.get(*first)?;
-        for &i in rest {
-            node = match node {
-                Node::Element(e) => e.children.get(i)?,
-                Node::Text(_) => return None,
-            };
+        for index in rest {
+            node = node.as_element()?.children.get(*index)?;
         }
         Some(node)
     }
 
     /// The paths of the elements containing this node, outermost first
     pub fn ancestors(&self) -> impl Iterator<Item = NodePath> + '_ {
-        (1..self.0.len()).map(|n| NodePath(self.0[..n].to_vec()))
-    }
-
-    pub(crate) fn child(&self, i: usize) -> NodePath {
-        let mut path = self.0.clone();
-        path.push(i);
-        NodePath(path)
+        let len = self.0.len();
+        (1..len).map(move |n| NodePath(self.0.get(..n).unwrap_or_default().to_vec()))
     }
 }
 
-impl fmt::Display for NodePath {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        for i in &self.0 {
-            write!(f, "/{i}")?;
+impl std::fmt::Display for NodePath {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        for index in &self.0 {
+            write!(f, "/{index}")?;
         }
         Ok(())
     }

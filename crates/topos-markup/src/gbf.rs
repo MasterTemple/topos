@@ -1,87 +1,72 @@
-//! GBF (General Bible Format). Not XML: tokens are `<CODE>` where paired codes
-//! open with two capitals (`<FR>`) and close with the second letter lowercased
-//! (`<Fr>`). Strong's (`<WG25>`, `<WH430>`) and morphology (`<WTV-PAI-3S>`)
-//! tokens follow the word they tag.
-//!
-//! Anything in angle brackets that does not look like a GBF token (e.g. the
-//! literal `<<Geschrieben von Rom…>` in GerLut1545) is kept as text.
+//! GBF: text with `<XY…>` tokens.
 
-use super::classify;
-use super::entities::decode_entities;
-use super::tree::TreeBuilder;
-use super::{Element, Node};
+use crate::tree::Builder;
+use crate::{Markup, Node, decode_entities};
 
-/// Codes that come in start/end pairs.
+/// Codes that open with two capitals and close with the second letter in lowercase
 const PAIRED: &[&str] = &[
     "FI", "FB", "FU", "FS", "FV", "FC", "FN", "FR", "FO", "RF", "RX", "TS", "TT", "TH", "PP", "RB",
 ];
 
+pub(crate) fn parse(text: &str) -> Vec<Node> {
+    let mut builder = Builder::new(Markup::Gbf);
+    let mut rest = text;
+    while let Some(lt) = rest.find('<') {
+        let (before, from_lt) = rest.split_at(lt);
+        builder.text(&decode_entities(before));
+        let after = &from_lt[1..];
+        let Some(gt) = after.find('>') else {
+            builder.text(&decode_entities(from_lt));
+            return builder.finish();
+        };
+        let body = &after[..gt];
+        if is_token(body) {
+            token(&mut builder, body);
+            rest = &after[gt + 1..];
+        } else {
+            builder.text("<");
+            rest = after;
+        }
+    }
+    builder.text(&decode_entities(rest));
+    builder.finish()
+}
+
 fn is_token(body: &str) -> bool {
-    let b = body.as_bytes();
-    b.len() >= 2
-        && b[0].is_ascii_uppercase()
-        && b[1].is_ascii_alphabetic()
+    let mut chars = body.chars();
+    let (Some(first), Some(second)) = (chars.next(), chars.next()) else {
+        return false;
+    };
+    first.is_ascii_uppercase()
+        && second.is_ascii_alphabetic()
         && !body.contains(|c: char| c.is_whitespace() || c == '<')
 }
 
-pub(crate) fn parse(text: &str) -> Vec<Node> {
-    let mut b = TreeBuilder::new(classify::gbf);
-    let mut rest = text;
-    while let Some(lt) = rest.find('<') {
-        let (before, after) = rest.split_at(lt);
-        b.text(&decode_entities(before));
-        let Some(gt) = after.find('>') else {
-            b.text(&decode_entities(after));
-            rest = "";
-            break;
-        };
-        let body = &after[1..gt];
-        if is_token(body) {
-            token(&mut b, body);
-            rest = &after[gt + 1..];
-        } else {
-            b.text("<");
-            rest = &after[1..];
-        }
-    }
-    b.text(&decode_entities(rest));
-    b.finish()
-}
-
-fn token(b: &mut TreeBuilder, body: &str) {
-    let bytes = body.as_bytes();
-    // Strong's: WG1234 / WH1234 (optionally with a letter suffix)
-    if bytes[0] == b'W'
-        && (bytes[1] == b'G' || bytes[1] == b'H')
-        && bytes.get(2).is_some_and(u8::is_ascii_digit)
-    {
-        b.tag_previous_word("lemma", format!("strong:{}", &body[1..]));
+fn token(builder: &mut Builder, body: &str) {
+    // A token starts with two ASCII letters, so these splits are on character boundaries
+    let (code, value) = body.split_at(2.min(body.len()));
+    let third_is_digit = value.starts_with(|c: char| c.is_ascii_digit());
+    if (code == "WG" || code == "WH") && third_is_digit {
+        builder.tag_previous_word("lemma", &format!("strong:{}", &body[1..]));
         return;
     }
-    // Morphology: WT<code>
-    if body.starts_with("WT") && body.len() > 2 {
-        b.tag_previous_word("morph", body[2..].to_string());
+    if code == "WT" && !value.is_empty() {
+        builder.tag_previous_word("morph", value);
         return;
     }
-    let code = &body[..2];
     let upper = code.to_ascii_uppercase();
-    if PAIRED.contains(&upper.as_str()) {
-        let attrs = if body.len() > 2 {
-            vec![("value".to_string(), body[2..].to_string())]
-        } else {
-            Vec::new()
-        };
-        if bytes[1].is_ascii_lowercase() {
-            b.end(&upper);
-        } else {
-            b.start(Element::new(upper, attrs));
-        }
-        return;
-    }
-    let attrs = if body.len() > 2 {
-        vec![("value".to_string(), body[2..].to_string())]
-    } else {
+    let attrs = if value.is_empty() {
         Vec::new()
+    } else {
+        vec![(String::from("value"), value.to_string())]
     };
-    b.empty(Element::new(code.to_string(), attrs));
+    if PAIRED.contains(&upper.as_str()) {
+        if code[1..].starts_with(|c: char| c.is_ascii_lowercase()) {
+            builder.end(&upper);
+        } else {
+            builder.start(upper, attrs);
+        }
+    } else {
+        builder.empty(code.to_string(), attrs);
+    }
 }

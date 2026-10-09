@@ -1,0 +1,63 @@
+#### markup ####
+usx
+#### input ####
+<usx version="2.5"><book code="JUD" style="id"/><chapter number="1" style="c"/><para style="s1">Greeting</para><para style="p"><verse number="1" style="v"/>Jude, a servant <verse number="2" style="v"/>Mercy to you</para><para style="p"><verse number="3" style="v"/>Beloved</para></usx>
+#### tree ####
+Other usx version="2.5"
+  Metadata book code="JUD" style="id"
+  Chapter chapter number="1" style="c"
+  Title para style="s1" type="s1"
+    text "Greeting"
+  Paragraph para style="p"
+    Verse verse number="1" style="v"
+    text "Jude, a servant "
+    Verse verse number="2" style="v"
+    text "Mercy to you"
+  Paragraph para style="p"
+    Verse verse number="3" style="v"
+    text "Beloved"
+
+#### text ####
+Jude, a servant Mercy to you
+Beloved
+#### text-all ####
+ 1
+## Greeting
+[ 1:1] Jude, a servant [ 1:2] Mercy to you
+[ 1:3] Beloved
+#### text-nobreaks ####
+Jude, a servant Mercy to you Beloved
+#### spans ####
+entries: 0..36
+Chapter 0..0 entry=0 path=/0/1 ""
+Verse 0..0 entry=0 path=/0/3/0 ""
+Verse 15..15 entry=0 path=/0/3/2 ""
+Paragraph 0..28 entry=0 path=/0/3 "Jude, a servant Mercy to you"
+Verse 28..28 entry=0 path=/0/4/0 ""
+Paragraph 29..36 entry=0 path=/0/4 "Beloved"
+Other 0..36 entry=0 path=/0 "Jude, a servant Mercy to you\nBeloved"
+
+#### sources ####
+0..5 entry=0 path=/0/3/1 offset=0
+6..7 entry=0 path=/0/3/1 offset=6
+8..15 entry=0 path=/0/3/1 offset=8
+16..21 entry=0 path=/0/3/3 offset=0
+22..24 entry=0 path=/0/3/3 offset=6
+25..28 entry=0 path=/0/3/3 offset=9
+29..36 entry=0 path=/0/4/1 offset=0
+
+#### html ####
+<span class="topos-chapter" data-n="1"></span><div class="topos-title topos-s1" data-title-type="s1">Greeting</div><p class="topos-p"><span class="topos-verse" data-n="1"></span>Jude, a servant <span class="topos-verse" data-n="2"></span>Mercy to you</p><p class="topos-p"><span class="topos-verse" data-n="3"></span>Beloved</p>
+#### html-bare ####
+<span class="chapter" data-n="1"></span><div class="title s1" data-title-type="s1">Greeting</div><p class="p"><span class="verse" data-n="1"></span>Jude, a servant <span class="verse" data-n="2"></span>Mercy to you</p><p class="p"><span class="verse" data-n="3"></span>Beloved</p>
+#### verses ####
+1:1-1 marker=/0/3/0 start=/0/2 end=/0/3/2 "Greeting\nJude, a servant"
+1:2-2 marker=/0/3/2 start=/0/3/2 end=/0/4/0 "Mercy to you"
+1:3-3 marker=/0/4/0 start=/0/4/0 end=/1 "Beloved"
+chapter_verses: [3]
+
+#### usx-chapter-verses ####
+[3]
+
+#### refs ####
+

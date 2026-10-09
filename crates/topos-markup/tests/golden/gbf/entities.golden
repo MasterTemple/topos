@@ -1,0 +1,33 @@
+#### markup ####
+gbf
+#### input ####
+&amp;<FI>&lt;</FI>&eacute; &bogus;
+#### tree ####
+text "&"
+Highlight FI @unclosed type="italic"
+  text "<</FI>é &bogus;"
+
+#### text ####
+&<</FI>é &bogus;
+#### text-all ####
+&<</FI>é &bogus;
+#### text-nobreaks ####
+&<</FI>é &bogus;
+#### spans ####
+entries: 0..17
+Highlight 1..17 entry=0 path=/1 "<</FI>é &bogus;"
+
+#### sources ####
+0..1 entry=0 path=/0 offset=0
+1..9 entry=0 path=/1/0 offset=0
+10..17 entry=0 path=/1/0 offset=9
+
+#### html ####
+&amp;<i class="topos-hi topos-italic">&lt;&lt;/FI&gt;é &amp;bogus;</i>
+#### html-bare ####
+&amp;<i class="hi italic">&lt;&lt;/FI&gt;é &amp;bogus;</i>
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+

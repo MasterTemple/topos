@@ -1,0 +1,30 @@
+#### markup ####
+osis
+#### input ####
+<div type="book" osisID="Gen" sID="b"/>text<div type="book" eID="b"/>
+#### tree ####
+Division div @start type="book" osisID="Gen" sID="b"
+text "text"
+Division div @end type="book" eID="b"
+
+#### text ####
+text
+#### text-all ####
+text
+#### text-nobreaks ####
+text
+#### spans ####
+entries: 0..4
+
+#### sources ####
+0..4 entry=0 path=/1 offset=0
+
+#### html ####
+text
+#### html-bare ####
+text
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+

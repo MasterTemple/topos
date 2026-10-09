@@ -1,0 +1,49 @@
+#### markup ####
+tei
+#### input ####
+<entryFree n="1"><orth>1</orth> <def>Definition of 1 with <ref target="X:1">ref</ref> &amp; moresecond line</def></entryFree>
+#### tree ####
+Entry entryFree n="1"
+  Other orth
+    text "1"
+  text " "
+  Other def
+    text "Definition of 1 with "
+    Reference ref target="X:1"
+      text "ref"
+    text " & moresecond line"
+
+#### text ####
+1 Definition of 1 with ref & moresecond line
+#### text-all ####
+1 Definition of 1 with ref & moresecond line
+#### text-nobreaks ####
+1 Definition of 1 with ref & moresecond line
+#### spans ####
+entries: 0..44
+Other 0..1 entry=0 path=/0/0 "1"
+Reference 23..26 entry=0 path=/0/2/1 "ref"
+Other 2..44 entry=0 path=/0/2 "Definition of 1 with ref & moresecond line"
+Entry 0..44 entry=0 path=/0 "1 Definition of 1 with ref & moresecond line"
+
+#### sources ####
+0..1 entry=0 path=/0/0/0 offset=0
+2..12 entry=0 path=/0/2/0 offset=0
+13..15 entry=0 path=/0/2/0 offset=11
+16..17 entry=0 path=/0/2/0 offset=14
+18..22 entry=0 path=/0/2/0 offset=16
+23..26 entry=0 path=/0/2/1/0 offset=0
+27..28 entry=0 path=/0/2/2 offset=1
+29..39 entry=0 path=/0/2/2 offset=3
+40..44 entry=0 path=/0/2/2 offset=14
+
+#### html ####
+<div class="topos-entry">1 Definition of 1 with <a class="topos-ref" data-osis-ref="X:1">ref</a> &amp; moresecond line</div>
+#### html-bare ####
+<div class="entry">1 Definition of 1 with <a class="ref" data-osis-ref="X:1">ref</a> &amp; moresecond line</div>
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+/0/2/1 target="X:1" passages=[]
+

@@ -1,0 +1,45 @@
+#### markup ####
+tei
+#### input ####
+<verse n="1">v</verse> <chapter n="2">c</chapter> <transChange>t</transChange> <divineName>d</divineName>
+#### tree ####
+Other verse n="1"
+  text "v"
+text " "
+Other chapter n="2"
+  text "c"
+text " "
+Other transChange
+  text "t"
+text " "
+Other divineName
+  text "d"
+
+#### text ####
+v c t d
+#### text-all ####
+v c t d
+#### text-nobreaks ####
+v c t d
+#### spans ####
+entries: 0..7
+Other 0..1 entry=0 path=/0 "v"
+Other 2..3 entry=0 path=/2 "c"
+Other 4..5 entry=0 path=/4 "t"
+Other 6..7 entry=0 path=/6 "d"
+
+#### sources ####
+0..1 entry=0 path=/0/0 offset=0
+2..3 entry=0 path=/2/0 offset=0
+4..5 entry=0 path=/4/0 offset=0
+6..7 entry=0 path=/6/0 offset=0
+
+#### html ####
+v c t d
+#### html-bare ####
+v c t d
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+

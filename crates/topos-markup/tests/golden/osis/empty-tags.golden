@@ -1,0 +1,38 @@
+#### markup ####
+osis
+#### input ####
+a<>b</>c< />d
+#### tree ####
+text "a"
+Other 
+  text "b"
+text "c"
+Other 
+text "d"
+
+#### text ####
+abcd
+#### text-all ####
+abcd
+#### text-nobreaks ####
+abcd
+#### spans ####
+entries: 0..4
+Other 1..2 entry=0 path=/1 "b"
+Other 3..3 entry=0 path=/3 ""
+
+#### sources ####
+0..1 entry=0 path=/0 offset=0
+1..2 entry=0 path=/1/0 offset=0
+2..3 entry=0 path=/2 offset=0
+3..4 entry=0 path=/4 offset=0
+
+#### html ####
+abcd
+#### html-bare ####
+abcd
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+

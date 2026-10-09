@@ -1,0 +1,44 @@
+#### markup ####
+osis
+#### input ####
+<chapter/>a<verse osisID="X.Y.1"/>b<chapter/>c<verse osisID="X.Y.2"/>d
+#### tree ####
+Chapter chapter
+text "a"
+Verse verse osisID="X.Y.1"
+text "b"
+Chapter chapter
+text "c"
+Verse verse osisID="X.Y.2"
+text "d"
+
+#### text ####
+abcd
+#### text-all ####
+a [X Y:1] bc [X Y:2] d
+#### text-nobreaks ####
+abcd
+#### spans ####
+entries: 0..4
+Chapter 0..0 entry=0 path=/0 ""
+Verse 1..1 entry=0 path=/2 ""
+Chapter 2..2 entry=0 path=/4 ""
+Verse 3..3 entry=0 path=/6 ""
+
+#### sources ####
+0..1 entry=0 path=/1 offset=0
+1..2 entry=0 path=/3 offset=0
+2..3 entry=0 path=/5 offset=0
+3..4 entry=0 path=/7 offset=0
+
+#### html ####
+<span class="topos-chapter"></span>a<span class="topos-verse" data-osis-id="X.Y.1"></span>b<span class="topos-chapter"></span>c<span class="topos-verse" data-osis-id="X.Y.2"></span>d
+#### html-bare ####
+<span class="chapter"></span>a<span class="verse" data-osis-id="X.Y.1"></span>b<span class="chapter"></span>c<span class="verse" data-osis-id="X.Y.2"></span>d
+#### verses ####
+1:1-1 marker=/2 start=/1 end=/4 "ab"
+2:2-2 marker=/6 start=/5 end=/8 "cd"
+chapter_verses: [1, 2]
+
+#### refs ####
+

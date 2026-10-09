@@ -1,0 +1,36 @@
+#### markup ####
+osis
+#### input ####
+a<w lemma="strong:G1"/>b<w lemma="strong:G2"></w>c
+#### tree ####
+text "a"
+Word w lemma="strong:G1"
+text "b"
+Word w lemma="strong:G2"
+text "c"
+
+#### text ####
+abc
+#### text-all ####
+a [G1]b [G2]c
+#### text-nobreaks ####
+abc
+#### spans ####
+entries: 0..3
+Word 1..1 entry=0 path=/1 ""
+Word 2..2 entry=0 path=/3 ""
+
+#### sources ####
+0..1 entry=0 path=/0 offset=0
+1..2 entry=0 path=/2 offset=0
+2..3 entry=0 path=/4 offset=0
+
+#### html ####
+a<span class="topos-w" data-strong="G1" data-lemma="strong:G1"></span>b<span class="topos-w" data-strong="G2" data-lemma="strong:G2"></span>c
+#### html-bare ####
+a<span class="w" data-strong="G1" data-lemma="strong:G1"></span>b<span class="w" data-strong="G2" data-lemma="strong:G2"></span>c
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+

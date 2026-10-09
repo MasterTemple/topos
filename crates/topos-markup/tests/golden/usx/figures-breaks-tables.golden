@@ -1,0 +1,82 @@
+#### markup ####
+usx
+#### input ####
+<usx><para style="p">a<figure style="fig" file="x.jpg" ref="1:1">caption</figure>b<optbreak/>c</para><table><row style="tr"><cell style="th1" align="start">h</cell><cell style="tc1">c</cell></row></table><sidebar style="esb"><para style="p">side</para></sidebar><periph id="x"><para style="p">periph</para></periph><ms style="qt-s" sid="q1"/>quoted<ms style="qt-e" eid="q1"/></usx>
+#### tree ####
+Other usx
+  Paragraph para style="p"
+    text "a"
+    Image figure style="fig" file="x.jpg" ref="1:1"
+      text "caption"
+    text "b"
+    LineBreak optbreak
+    text "c"
+  Division table
+    Paragraph row style="tr"
+      Other cell style="th1" align="start"
+        text "h"
+      Other cell style="tc1"
+        text "c"
+  Division sidebar style="esb"
+    Paragraph para style="p"
+      text "side"
+  Division periph id="x"
+    Paragraph para style="p"
+      text "periph"
+  Other ms @start style="qt-s" sid="q1"
+  text "quoted"
+  Other ms @end style="qt-e" eid="q1"
+
+#### text ####
+acaptionb
+c
+hc
+side
+periph
+quoted
+#### text-all ####
+acaptionb
+c
+hc
+side
+periph
+quoted
+#### text-nobreaks ####
+acaptionb c hc side periph quoted
+#### spans ####
+entries: 0..33
+Image 1..8 entry=0 path=/0/0/1 "caption"
+Paragraph 0..11 entry=0 path=/0/0 "acaptionb\nc"
+Other 12..13 entry=0 path=/0/1/0/0 "h"
+Other 13..14 entry=0 path=/0/1/0/1 "c"
+Paragraph 12..14 entry=0 path=/0/1/0 "hc"
+Division 12..14 entry=0 path=/0/1 "hc"
+Paragraph 15..19 entry=0 path=/0/2/0 "side"
+Division 15..19 entry=0 path=/0/2 "side"
+Paragraph 20..26 entry=0 path=/0/3/0 "periph"
+Division 20..26 entry=0 path=/0/3 "periph"
+Other 0..33 entry=0 path=/0 "acaptionb\nc\nhc\nside\nperiph\nquoted"
+
+#### sources ####
+0..1 entry=0 path=/0/0/0 offset=0
+1..8 entry=0 path=/0/0/1/0 offset=0
+8..9 entry=0 path=/0/0/2 offset=0
+10..11 entry=0 path=/0/0/4 offset=0
+12..13 entry=0 path=/0/1/0/0/0 offset=0
+13..14 entry=0 path=/0/1/0/1/0 offset=0
+15..19 entry=0 path=/0/2/0/0 offset=0
+20..26 entry=0 path=/0/3/0/0 offset=0
+27..33 entry=0 path=/0/5 offset=0
+
+#### html ####
+<p class="topos-p">acaptionb<br class="topos-lb">c</p><p class="topos-p">hc</p><p class="topos-p">side</p><p class="topos-p">periph</p>quoted
+#### html-bare ####
+<p class="p">acaptionb<br class="lb">c</p><p class="p">hc</p><p class="p">side</p><p class="p">periph</p>quoted
+#### verses ####
+chapter_verses: []
+
+#### usx-chapter-verses ####
+[]
+
+#### refs ####
+

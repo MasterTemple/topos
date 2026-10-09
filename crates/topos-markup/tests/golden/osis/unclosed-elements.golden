@@ -1,0 +1,34 @@
+#### markup ####
+osis
+#### input ####
+<p>a<note>b<hi type="bold">c
+#### tree ####
+Paragraph p @unclosed
+  text "a"
+  Note note @unclosed
+    text "b"
+    Highlight hi @unclosed type="bold"
+      text "c"
+
+#### text ####
+a
+#### text-all ####
+a (bc)
+#### text-nobreaks ####
+a
+#### spans ####
+entries: 0..1
+Paragraph 0..1 entry=0 path=/0 "a"
+
+#### sources ####
+0..1 entry=0 path=/0/0 offset=0
+
+#### html ####
+<p class="topos-p">a<span class="topos-note">b<b class="topos-hi topos-bold">c</b></span></p>
+#### html-bare ####
+<p class="p">a<span class="note">b<b class="hi bold">c</b></span></p>
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+

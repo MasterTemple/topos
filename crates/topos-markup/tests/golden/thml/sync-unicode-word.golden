@@ -1,0 +1,35 @@
+#### markup ####
+thml
+#### input ####
+בָּרָא<sync type="Strongs" value="H1254"/> ἀρχῇ<sync type="Strongs" value="G746"/>
+#### tree ####
+Word w lemma="strong:H1254"
+  text "בָּרָא"
+text " "
+Word w lemma="strong:G746"
+  text "ἀρχῇ"
+
+#### text ####
+בָּרָא ἀρχῇ
+#### text-all ####
+בָּרָא [H1254] ἀρχῇ [G746]
+#### text-nobreaks ####
+בָּרָא ἀρχῇ
+#### spans ####
+entries: 0..23
+Word 0..12 entry=0 path=/0 "בָּרָא"
+Word 13..23 entry=0 path=/2 "ἀρχῇ"
+
+#### sources ####
+0..12 entry=0 path=/0/0 offset=0
+13..23 entry=0 path=/2/0 offset=0
+
+#### html ####
+<span class="topos-w" data-strong="H1254" data-lemma="strong:H1254">בָּרָא</span> <span class="topos-w" data-strong="G746" data-lemma="strong:G746">ἀρχῇ</span>
+#### html-bare ####
+<span class="w" data-strong="H1254" data-lemma="strong:H1254">בָּרָא</span> <span class="w" data-strong="G746" data-lemma="strong:G746">ἀρχῇ</span>
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+

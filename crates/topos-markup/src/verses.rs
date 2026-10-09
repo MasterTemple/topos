@@ -53,20 +53,74 @@ pub struct VerseSpan {
     pub end: NodePath,
 }
 
-impl VerseSpan {
-    /// Whether the verse is in the inclusive range of (chapter, verse) pairs
-    fn within(&self, start: (u8, u8), end: (u8, u8)) -> bool {
-        (self.chapter, self.last) >= start && (self.chapter, self.verse) <= end
+/// A verse or chapter marker found in the tree
+struct Marker<'a> {
+    path: Vec<usize>,
+    element: &'a Element,
+}
+
+fn markers<'a>(nodes: &'a [Node], path: &mut Vec<usize>, out: &mut Vec<Marker<'a>>) {
+    for (i, node) in nodes.iter().enumerate() {
+        let Node::Element(e) = node else { continue };
+        path.push(i);
+        if e.kind == Kind::Verse || e.kind == Kind::Chapter {
+            out.push(Marker {
+                path: path.clone(),
+                element: e,
+            });
+        }
+        if e.kind != Kind::Verse {
+            markers(&e.children, path, out);
+        }
+        path.pop();
     }
 }
 
-/// A marker found while walking the tree
-struct Marker {
-    path: NodePath,
-    kind: Kind,
-    milestone: Option<Milestone>,
-    /// The chapter or verse number (and the last verse of a bridge)
-    number: Option<(u8, u8)>,
+/// The value of a number's leading ASCII digits, after trimming whitespace
+fn leading_number(s: &str) -> Option<u32> {
+    let s = s.trim();
+    let digits = s.find(|c: char| !c.is_ascii_digit()).unwrap_or(s.len());
+    let digits = s.get(..digits)?;
+    if digits.is_empty() {
+        return None;
+    }
+    Some(digits.bytes().fold(0u32, |n, d| {
+        n.saturating_mul(10).saturating_add(u32::from(d - b'0'))
+    }))
+}
+
+/// A marker's number as (first, last)
+fn number(e: &Element) -> Option<(u8, u8)> {
+    let written = match e.attr("number").or_else(|| e.attr("n")) {
+        Some(n) => n,
+        None => {
+            let id = e.attr("osisID").or_else(|| e.attr("sID"))?;
+            let word = id.split_whitespace().last().unwrap_or("");
+            word.rsplit(['.', ':']).next().unwrap_or("")
+        }
+    };
+    let (first, rest) = match written.find(['-', '–', ',']) {
+        Some(i) => {
+            let sep = written.get(i..)?.chars().next()?.len_utf8();
+            (written.get(..i)?, written.get(i + sep..))
+        }
+        None => (written, None),
+    };
+    let first = u8::try_from(leading_number(first)?).ok()?;
+    let last = rest
+        .and_then(leading_number)
+        .and_then(|n| u8::try_from(n).ok())
+        .unwrap_or(first);
+    Some((first, last.max(first)))
+}
+
+/// The place right after a node
+fn after(path: &[usize]) -> NodePath {
+    let mut place = path.to_vec();
+    if let Some(last) = place.last_mut() {
+        *last = last.saturating_add(1);
+    }
+    NodePath(place)
 }
 
 /**
@@ -77,126 +131,118 @@ Every verse in a book's tree, in order
   verse is that element
 */
 pub fn verses(nodes: &[Node]) -> Vec<VerseSpan> {
-    let mut markers = Vec::new();
-    collect(nodes, &mut NodePath::default(), &mut markers);
-    let after_all = NodePath(vec![nodes.len()]);
-
-    let mut out: Vec<VerseSpan> = Vec::new();
-    let mut chapter = 0u8;
-    // Where the next verse starts: after the last end marker or chapter marker
+    let mut found = Vec::new();
+    markers(nodes, &mut Vec::new(), &mut found);
+    let tree_end = NodePath(vec![nodes.len()]);
+    let mut out = Vec::new();
+    let mut chapter: u8 = 0;
     let mut next_start: Option<NodePath> = None;
-    // The verse waiting for its end
     let mut open: Option<VerseSpan> = None;
-    for m in &markers {
-        match (m.kind, m.milestone) {
-            (Kind::Chapter, Some(Milestone::End)) => {}
-            (Kind::Chapter, _) => {
-                if let Some(mut v) = open.take() {
-                    v.end = m.path.clone();
-                    out.push(v);
-                }
-                chapter = m.number.map_or(chapter.saturating_add(1), |(n, _)| n);
-                next_start = Some(after(&m.path));
+    for marker in found {
+        let e = marker.element;
+        let milestone = if e.children.is_empty() {
+            Some(e.milestone.unwrap_or(Milestone::Start))
+        } else {
+            e.milestone
+        };
+        let here = NodePath(marker.path.clone());
+        if e.kind == Kind::Chapter {
+            if milestone == Some(Milestone::End) {
+                continue;
             }
-            (Kind::Verse, Some(Milestone::End)) => {
-                if let Some(mut v) = open.take() {
-                    v.end = m.path.clone();
-                    next_start = Some(after(&m.path));
-                    out.push(v);
-                }
+            if let Some(mut verse) = open.take() {
+                verse.end = here.clone();
+                out.push(verse);
             }
-            (Kind::Verse, _) => {
-                if let Some(mut v) = open.take() {
-                    v.end = m.path.clone();
-                    out.push(v);
-                }
-                let Some((verse, last)) = m.number else {
-                    continue;
-                };
-                let start = next_start.take().unwrap_or_else(|| m.path.clone());
-                let mut span = VerseSpan {
-                    chapter,
-                    verse,
-                    last,
-                    marker: m.path.clone(),
-                    start,
-                    end: after_all.clone(),
-                };
-                if m.milestone.is_none() {
-                    // The verse is the element itself
-                    span.end = after(&m.path);
-                    next_start = Some(span.end.clone());
-                    out.push(span);
-                } else {
-                    open = Some(span);
-                }
+            chapter = match number(e) {
+                Some((n, _)) => n,
+                None => chapter.saturating_add(1),
+            };
+            next_start = Some(after(&marker.path));
+            continue;
+        }
+        if milestone == Some(Milestone::End) {
+            if let Some(mut verse) = open.take() {
+                verse.end = here;
+                out.push(verse);
+                next_start = Some(after(&marker.path));
             }
-            _ => {}
+            continue;
+        }
+        if let Some(mut verse) = open.take() {
+            verse.end = here.clone();
+            out.push(verse);
+        }
+        let Some((first, last)) = number(e) else {
+            continue;
+        };
+        let verse = VerseSpan {
+            chapter,
+            verse: first,
+            last,
+            marker: here.clone(),
+            start: next_start.take().unwrap_or(here),
+            end: tree_end.clone(),
+        };
+        if milestone.is_none() {
+            out.push(VerseSpan {
+                end: after(&marker.path),
+                ..verse
+            });
+            next_start = Some(after(&marker.path));
+        } else {
+            open = Some(verse);
         }
     }
-    if let Some(v) = open {
-        out.push(v);
+    if let Some(verse) = open {
+        out.push(verse);
     }
     out
 }
 
-/// The verse and chapter markers in document order (not looking inside verse elements)
-fn collect(nodes: &[Node], path: &mut NodePath, out: &mut Vec<Marker>) {
+/// Whether `a` is a proper prefix of `b` (an ancestor of the place `b`)
+fn is_ancestor(a: &[usize], b: &[usize]) -> bool {
+    a.len() < b.len() && b.starts_with(a)
+}
+
+fn slice_nodes(
+    nodes: &[Node],
+    path: &mut Vec<usize>,
+    start: &[usize],
+    end: Option<&[usize]>,
+) -> Vec<Node> {
+    let mut out = Vec::new();
     for (i, node) in nodes.iter().enumerate() {
-        let Node::Element(e) = node else { continue };
-        path.0.push(i);
-        if matches!(e.kind, Kind::Verse | Kind::Chapter) {
-            out.push(Marker {
-                path: path.clone(),
-                kind: e.kind,
-                milestone: if e.children.is_empty() {
-                    // `<verse number="1"/>` without sid is a start too
-                    Some(e.milestone.unwrap_or(Milestone::Start))
-                } else {
-                    e.milestone
-                },
-                number: number(e),
-            });
-            if e.children.is_empty() || e.kind == Kind::Verse {
-                path.0.pop();
-                continue;
-            }
+        path.push(i);
+        let p = path.as_slice();
+        if end.is_some_and(|end| p >= end) {
+            path.pop();
+            break;
         }
-        collect(&e.children, path, out);
-        path.0.pop();
+        let holds_start = is_ancestor(p, start);
+        if p < start && !holds_start {
+            path.pop();
+            continue;
+        }
+        match node {
+            Node::Element(e) if holds_start || end.is_some_and(|end| is_ancestor(p, end)) => {
+                let children = slice_nodes(&e.children, path, start, end);
+                if !children.is_empty() {
+                    out.push(Node::Element(Element {
+                        kind: e.kind,
+                        name: e.name.clone(),
+                        attrs: e.attrs.clone(),
+                        children,
+                        milestone: e.milestone,
+                        unclosed: e.unclosed,
+                    }));
+                }
+            }
+            _ => out.push(node.clone()),
+        }
+        path.pop();
     }
-}
-
-/// The place right after a node (its next sibling's place)
-fn after(path: &NodePath) -> NodePath {
-    let mut next = path.clone();
-    if let Some(last) = next.0.last_mut() {
-        *last += 1;
-    }
-    next
-}
-
-/// A chapter or verse number, with the last verse of a bridge (`4-5`)
-fn number(e: &Element) -> Option<(u8, u8)> {
-    let text = e
-        .attr("number")
-        .or_else(|| e.attr("n"))
-        .map(str::to_string)
-        .or_else(|| {
-            // `John.3.16`, `JHN 3:16`, `Gen.1`
-            let id = e.attr("osisID").or_else(|| e.attr("sID"))?;
-            let id = id.split_whitespace().next_back()?;
-            Some(id.rsplit(['.', ':']).next()?.to_string())
-        })?;
-    let mut parts = text.splitn(2, ['-', '–', ',']);
-    let first = leading_number(parts.next()?)?;
-    let last = parts.next().and_then(leading_number).unwrap_or(first);
-    Some((first, last.max(first)))
-}
-
-fn leading_number(s: &str) -> Option<u8> {
-    let digits: String = s.trim().chars().take_while(char::is_ascii_digit).collect();
-    digits.parse().ok()
+    out
 }
 
 /**
@@ -206,53 +252,12 @@ A copy of the tree from `start` up to (not including) `end`; `None` is the end o
 - Places compare in document order, so `start` and `end` can be anywhere (see [`VerseSpan`])
 */
 pub fn slice(nodes: &[Node], start: &NodePath, end: Option<&NodePath>) -> Vec<Node> {
-    slice_in(nodes, &mut NodePath::default(), start, end)
-}
-
-fn slice_in(
-    nodes: &[Node],
-    prefix: &mut NodePath,
-    start: &NodePath,
-    end: Option<&NodePath>,
-) -> Vec<Node> {
-    let mut out = Vec::new();
-    for (i, node) in nodes.iter().enumerate() {
-        prefix.0.push(i);
-        let here = &*prefix;
-        // At or after the end (an ancestor of the end is before it, and is cut instead)
-        if end.is_some_and(|end| here >= end) {
-            prefix.0.pop();
-            break;
-        }
-        let cuts_start = is_strict_prefix(here, start);
-        let cuts_end = end.is_some_and(|end| is_strict_prefix(here, end));
-        if here < start && !cuts_start {
-            prefix.0.pop();
-            continue;
-        }
-        match node {
-            Node::Element(e) if cuts_start || cuts_end => {
-                let children = slice_in(&e.children, prefix, start, end);
-                if !children.is_empty() {
-                    let mut copy = Element {
-                        children,
-                        ..Element::new(e.name.clone(), e.attrs.clone())
-                    };
-                    copy.kind = e.kind;
-                    copy.milestone = e.milestone;
-                    copy.unclosed = e.unclosed;
-                    out.push(Node::Element(copy));
-                }
-            }
-            _ => out.push(node.clone()),
-        }
-        prefix.0.pop();
-    }
-    out
-}
-
-fn is_strict_prefix(a: &NodePath, b: &NodePath) -> bool {
-    a.0.len() < b.0.len() && b.0.starts_with(&a.0)
+    slice_nodes(
+        nodes,
+        &mut Vec::new(),
+        &start.0,
+        end.map(|e| e.0.as_slice()),
+    )
 }
 
 /**
@@ -263,17 +268,31 @@ The places each part of a passage covers, as `start..end` for [`slice`], in the 
 pub fn passage_ranges(spans: &[VerseSpan], passage: &Passage) -> Vec<Range<usize>> {
     passage
         .ranges(None)
-        .into_iter()
-        .filter_map(|r| {
-            let (start, end) = (
-                (r.start.chapter, r.start.verse),
-                (r.end.chapter, r.end.verse),
-            );
-            let first = spans.iter().position(|s| s.within(start, end))?;
-            let last = spans.iter().rposition(|s| s.within(start, end))?;
+        .iter()
+        .filter_map(|range| {
+            let from = (range.start.chapter, range.start.verse);
+            let to = (range.end.chapter, range.end.verse);
+            let mut inside = spans
+                .iter()
+                .enumerate()
+                .filter(|(_, s)| (s.chapter, s.last) >= from && (s.chapter, s.verse) <= to)
+                .map(|(i, _)| i);
+            let first = inside.next()?;
+            let last = inside.next_back().unwrap_or(first);
             Some(first..last + 1)
         })
         .collect()
+}
+
+/// Raises a chapter's count, growing the list as needed
+fn raise(counts: &mut Vec<u8>, chapter: u8, verse: u8) {
+    let index = usize::from(chapter).saturating_sub(1);
+    if counts.len() <= index {
+        counts.resize(index + 1, 0);
+    }
+    if let Some(count) = counts.get_mut(index) {
+        *count = (*count).max(verse);
+    }
 }
 
 /**
@@ -283,15 +302,38 @@ book's own markers number them (a bridge like `4-5` counts to 5; a chapter witho
   `Translations::set_chapter_verses` in topos-bible
 */
 pub fn chapter_verses(spans: &[VerseSpan]) -> Vec<u8> {
-    let mut counts: Vec<u8> = vec![];
-    for span in spans.iter().filter(|s| s.chapter > 0) {
-        let idx = span.chapter as usize - 1;
-        if counts.len() <= idx {
-            counts.resize(idx + 1, 0);
+    let mut counts = Vec::new();
+    for span in spans {
+        if span.chapter >= 1 {
+            raise(&mut counts, span.chapter, span.last.max(span.verse));
         }
-        counts[idx] = counts[idx].max(span.last.max(span.verse));
     }
     counts
+}
+
+/// The `number` attribute in a tag's text, read without parsing the tag
+fn number_attribute(tag: &str) -> Option<&str> {
+    let mut from = 0;
+    while let Some(found) = tag.get(from..)?.find("number") {
+        let at = from + found;
+        from = at + "number".len();
+        let preceded = tag
+            .get(..at)
+            .and_then(|b| b.chars().next_back())
+            .is_some_and(char::is_whitespace);
+        if !preceded {
+            continue;
+        }
+        let rest = tag.get(from..)?.trim_start();
+        let Some(rest) = rest.strip_prefix('=') else {
+            continue;
+        };
+        let rest = rest.trim_start();
+        let quote = rest.chars().next().filter(|c| *c == '"' || *c == '\'')?;
+        let value = rest.get(1..)?;
+        return Some(value.split(quote).next().unwrap_or(value));
+    }
+    None
 }
 
 /**
@@ -299,55 +341,30 @@ A USX book's verse counts, like [`chapter_verses`], from its `<chapter number>` 
 `<verse number>` markers alone, without parsing the rest (fast enough to count a whole Bible)
 */
 pub fn usx_chapter_verses(usx: &str) -> Vec<u8> {
-    let mut counts: Vec<u8> = vec![];
-    let mut chapter = 0;
-    for tag in usx.split('<').skip(1) {
-        let tag = tag.split('>').next().unwrap_or_default();
-        let name_end = tag
-            .find(|c: char| c.is_whitespace() || c == '/')
-            .unwrap_or(tag.len());
-        let name = &tag[..name_end];
+    let mut counts = Vec::new();
+    let mut chapter: u8 = 0;
+    for piece in usx.split('<').skip(1) {
+        let tag = piece.split('>').next().unwrap_or(piece);
+        let name = tag
+            .split(|c: char| c.is_whitespace() || c == '/')
+            .next()
+            .unwrap_or("");
         if name != "chapter" && name != "verse" {
             continue;
         }
-        let Some(number) = attribute(tag, "number") else {
+        let Some(value) = number_attribute(tag) else {
             continue;
         };
-        // `4-5` counts to 5, and `4a` is verse 4
-        let last = number.rsplit(['-', '\u{2013}']).next().unwrap_or_default();
-        let digits = last.trim().split(|c: char| !c.is_ascii_digit()).next();
-        let Some(n) = digits.and_then(|d| d.parse::<u32>().ok()) else {
+        let last = value.rsplit(['-', '–']).next().unwrap_or(value);
+        let Some(n) = leading_number(last) else {
             continue;
         };
-        let n = n.min(u8::MAX as u32) as u8;
+        let n = u8::try_from(n).unwrap_or(u8::MAX);
         if name == "chapter" {
-            chapter = n as usize;
-        } else if chapter > 0 {
-            if counts.len() < chapter {
-                counts.resize(chapter, 0);
-            }
-            counts[chapter - 1] = counts[chapter - 1].max(n);
+            chapter = n;
+        } else if chapter >= 1 {
+            raise(&mut counts, chapter, n);
         }
     }
     counts
-}
-
-/// An attribute's value in a tag's text (`number="16"`)
-fn attribute<'a>(tag: &'a str, name: &str) -> Option<&'a str> {
-    let mut rest = tag;
-    while let Some(at) = rest.find(name) {
-        let before = rest[..at].chars().next_back();
-        let after = rest[at + name.len()..].trim_start();
-        rest = &rest[at + name.len()..];
-        if !before.is_some_and(char::is_whitespace) {
-            continue;
-        }
-        let Some(value) = after.strip_prefix('=') else {
-            continue;
-        };
-        let value = value.trim_start();
-        let quote = value.chars().next().filter(|c| *c == '"' || *c == '\'')?;
-        return value[1..].split(quote).next();
-    }
-    None
 }

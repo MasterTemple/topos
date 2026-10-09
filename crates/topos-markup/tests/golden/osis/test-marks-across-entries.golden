@@ -1,0 +1,53 @@
+#### markup ####
+osis
+#### input ####
+Read <w lemma="strong:G1">John</w>
+#### input ####
+3:16 and Rom 8:28 &amp; Rom 8:28.
+#### tree ####
+text "Read "
+Word w lemma="strong:G1"
+  text "John"
+
+#### tree ####
+text "3:16 and Rom 8:28 & Rom 8:28."
+
+#### text ####
+Read John 3:16 and Rom 8:28 & Rom 8:28.
+#### text-all ####
+Read John [G1] 3:16 and Rom 8:28 & Rom 8:28.
+#### text-nobreaks ####
+Read John 3:16 and Rom 8:28 & Rom 8:28.
+#### spans ####
+entries: 0..9 10..39
+Word 5..9 entry=0 path=/1 "John"
+
+#### sources ####
+0..4 entry=0 path=/0 offset=0
+5..9 entry=0 path=/1/0 offset=0
+10..14 entry=1 path=/0 offset=0
+15..18 entry=1 path=/0 offset=5
+19..22 entry=1 path=/0 offset=9
+23..27 entry=1 path=/0 offset=13
+28..29 entry=1 path=/0 offset=18
+30..33 entry=1 path=/0 offset=20
+34..39 entry=1 path=/0 offset=24
+
+#### html ####
+Read <span class="topos-w" data-strong="G1" data-lemma="strong:G1">John</span>
+#### html ####
+3:16 and Rom 8:28 &amp; Rom 8:28.
+#### html-bare ####
+Read <span class="w" data-strong="G1" data-lemma="strong:G1">John</span>
+#### html-bare ####
+3:16 and Rom 8:28 &amp; Rom 8:28.
+#### verses ####
+chapter_verses: []
+
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+
+#### refs ####
+

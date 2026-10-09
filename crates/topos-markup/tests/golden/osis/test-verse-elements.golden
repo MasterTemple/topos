@@ -1,0 +1,45 @@
+#### markup ####
+osis
+#### input ####
+<div type="book" osisID="John"><chapter osisID="John.3"><verse osisID="John.3.16">For God</verse> <verse osisID="John.3.17">For God sent</verse></chapter></div>
+#### tree ####
+Division div type="book" osisID="John"
+  Chapter chapter osisID="John.3"
+    Verse verse osisID="John.3.16"
+      text "For God"
+    text " "
+    Verse verse osisID="John.3.17"
+      text "For God sent"
+
+#### text ####
+For God For God sent
+#### text-all ####
+John 3
+[John 3:16] For God [John 3:17] For God sent
+#### text-nobreaks ####
+For God For God sent
+#### spans ####
+entries: 0..20
+Verse 0..7 entry=0 path=/0/0/0 "For God"
+Verse 8..20 entry=0 path=/0/0/2 "For God sent"
+Chapter 0..20 entry=0 path=/0/0 "For God For God sent"
+Division 0..20 entry=0 path=/0 "For God For God sent"
+
+#### sources ####
+0..3 entry=0 path=/0/0/0/0 offset=0
+4..7 entry=0 path=/0/0/0/0 offset=4
+8..11 entry=0 path=/0/0/2/0 offset=0
+12..15 entry=0 path=/0/0/2/0 offset=4
+16..20 entry=0 path=/0/0/2/0 offset=8
+
+#### html ####
+For God For God sent
+#### html-bare ####
+For God For God sent
+#### verses ####
+3:16-16 marker=/0/0/0 start=/0/1 end=/0/0/1 ""
+3:17-17 marker=/0/0/2 start=/0/0/1 end=/0/0/3 "For God sent"
+chapter_verses: [0, 0, 17]
+
+#### refs ####
+

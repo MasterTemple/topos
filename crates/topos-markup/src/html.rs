@@ -1,12 +1,10 @@
 //! HTML with classes for applications to style.
 
-use std::{borrow::Cow, cmp::Ordering};
+use std::borrow::Cow;
+use std::fmt::Write as _;
 
-use crate::{
-    Element, Kind, Milestone, Node,
-    filter::{Action, Filter},
-    flatten::{Point, ends_woj},
-};
+use crate::flatten::words_match;
+use crate::{Element, Filter, Kind, Milestone, Node, Point, filter::Action};
 
 /// Options for [`HtmlRenderer`]
 #[derive(Debug, Clone)]
@@ -24,7 +22,7 @@ pub struct HtmlOptions {
 
 impl Default for HtmlOptions {
     fn default() -> Self {
-        Self {
+        HtmlOptions {
             class_prefix: Cow::Borrowed("topos-"),
             filter: Filter::all().drop(Kind::Metadata),
         }
@@ -69,14 +67,73 @@ assert_eq!(html.wrap(&verse), format!(r#"<div class="topos">{verse}</div>"#));
 #[derive(Debug, Default, Clone)]
 pub struct HtmlRenderer {
     pub opts: HtmlOptions,
-    /// Words of Jesus still open from a milestone or an unclosed `<q>`, with the start's `sID`
-    woj: Option<Option<String>>,
-    /// Ranges to mark, in the order they were added
+    /// Words of Jesus open across milestones or entries, with the start's id
+    words: Option<Option<String>>,
+    /// Marks, numbered by their index
     marks: Vec<(Point, Point)>,
-    /// The entry being rendered (how many [`HtmlRenderer::render`] calls came before)
+    /// How many entries have been rendered
+    rendered: usize,
+}
+
+/// Escapes text and attribute values
+fn escape(s: &str, out: &mut String) {
+    for c in s.chars() {
+        match c {
+            '&' => out.push_str("&amp;"),
+            '<' => out.push_str("&lt;"),
+            '>' => out.push_str("&gt;"),
+            '"' => out.push_str("&quot;"),
+            c => out.push(c),
+        }
+    }
+}
+
+/// A value made safe for a class name: ASCII letters (lowercased), digits, and `-`; anything
+/// else is `-`
+fn class_safe(s: &str) -> String {
+    s.chars()
+        .map(|c| {
+            if c.is_ascii_alphanumeric() || c == '-' {
+                c.to_ascii_lowercase()
+            } else {
+                '-'
+            }
+        })
+        .collect()
+}
+
+/// What follows an element's opening tag
+#[derive(Default)]
+struct Plan {
+    /// Its children are rendered
+    children: bool,
+    /// Its children are inside words of Jesus
+    words: bool,
+    /// The end tag
+    close: Option<&'static str>,
+    /// A line's `<br>` after its end tag
+    line_break: bool,
+    /// Words of Jesus stay open after it (an unclosed words-of-Jesus element)
+    open_words: bool,
+}
+
+impl Plan {
+    /// Only the children, with no tag of its own
+    fn children() -> Self {
+        Plan {
+            children: true,
+            ..Plan::default()
+        }
+    }
+}
+
+/// One entry being rendered
+struct Render<'r> {
+    renderer: &'r mut HtmlRenderer,
+    out: String,
     entry: usize,
-    /// The node being rendered
-    path: Vec<usize>,
+    /// How many words-of-Jesus elements the current node is in (kept or unwrapped)
+    in_words: usize,
 }
 
 impl HtmlRenderer {
@@ -85,7 +142,7 @@ impl HtmlRenderer {
     }
 
     pub fn with_options(opts: HtmlOptions) -> Self {
-        Self {
+        HtmlRenderer {
             opts,
             ..Self::default()
         }
@@ -93,11 +150,17 @@ impl HtmlRenderer {
 
     /// One entry's nodes; each call is the next entry, as in [`Flattener::push`](crate::Flattener::push)
     pub fn render(&mut self, nodes: &[Node]) -> String {
-        let mut out = String::new();
-        self.path.clear();
-        self.nodes(nodes, &mut out, false);
-        self.entry += 1;
-        out
+        let entry = self.rendered;
+        self.rendered = self.rendered.saturating_add(1);
+        let mut render = Render {
+            renderer: self,
+            out: String::new(),
+            entry,
+            in_words: 0,
+        };
+        let mut path = Vec::new();
+        render.nodes(nodes, &mut path);
+        render.out
     }
 
     /**
@@ -134,291 +197,296 @@ impl HtmlRenderer {
         self.marks.clear();
     }
 
-    /// The marked byte ranges of the current text node, merged and in order, with their marks
-    fn marked(&self, text: &str) -> Vec<(usize, usize, usize)> {
-        let here = (self.entry, self.path.as_slice());
-        let mut ranges: Vec<(usize, usize, usize)> = self
-            .marks
-            .iter()
-            .enumerate()
-            .filter_map(|(i, (start, end))| {
-                let starts = (start.entry, start.path.0.as_slice()).cmp(&here);
-                let ends = (end.entry, end.path.0.as_slice()).cmp(&here);
-                if starts == Ordering::Greater || ends == Ordering::Less {
-                    return None;
-                }
-                let from = if starts == Ordering::Equal {
-                    start.offset
-                } else {
-                    0
-                };
-                let to = if ends == Ordering::Equal {
-                    end.offset
-                } else {
-                    text.len()
-                };
-                let to = to.min(text.len());
-                (from < to && text.is_char_boundary(from) && text.is_char_boundary(to))
-                    .then_some((from, to, i))
-            })
-            .collect();
-        ranges.sort();
+    /// Wraps rendered HTML in a `div` whose class is the prefix without its trailing `-` or `_`
+    pub fn wrap(&self, html: &str) -> String {
+        let class = self.opts.class_prefix.trim_end_matches(['-', '_']);
+        let mut out = String::from("<div");
+        if !class.is_empty() {
+            out.push_str(" class=\"");
+            escape(class, &mut out);
+            out.push('"');
+        }
+        out.push('>');
+        out.push_str(html);
+        out.push_str("</div>");
+        out
+    }
+}
+
+impl Render<'_> {
+    fn nodes(&mut self, nodes: &[Node], path: &mut Vec<usize>) {
+        for (i, node) in nodes.iter().enumerate() {
+            path.push(i);
+            match node {
+                Node::Text(t) => self.text(t, path),
+                Node::Element(e) => self.element(e, path),
+            }
+            path.pop();
+        }
+    }
+
+    /// The marked parts of a text node, merged, with each part's mark number
+    fn marked_parts(&self, text: &str, path: &[usize]) -> Vec<(usize, usize, usize)> {
+        let here = (self.entry, path);
+        let mut parts = Vec::new();
+        for (n, (start, end)) in self.renderer.marks.iter().enumerate() {
+            let starts_here = (start.entry, start.path.0.as_slice());
+            let ends_here = (end.entry, end.path.0.as_slice());
+            if starts_here > here || ends_here < here {
+                continue;
+            }
+            let from = if starts_here == here { start.offset } else { 0 };
+            let to = if ends_here == here {
+                end.offset.min(text.len())
+            } else {
+                text.len()
+            };
+            if from >= to || !text.is_char_boundary(from) || !text.is_char_boundary(to) {
+                continue;
+            }
+            parts.push((from, to, n));
+        }
+        parts.sort();
         let mut merged: Vec<(usize, usize, usize)> = Vec::new();
-        for (from, to, i) in ranges {
+        for part in parts {
             match merged.last_mut() {
-                Some(last) if from <= last.1 => last.1 = last.1.max(to),
-                _ => merged.push((from, to, i)),
+                Some(last) if part.0 <= last.1 => last.1 = last.1.max(part.1),
+                _ => merged.push(part),
             }
         }
         merged
     }
 
-    /// A text node, with its marks
-    fn text(&self, text: &str, out: &mut String) {
+    fn text(&mut self, text: &str, path: &[usize]) {
+        let words = self.renderer.words.is_some() && self.in_words == 0 && !text.trim().is_empty();
+        if words {
+            self.open_tag("span", &[Kind::WordsOfJesus.class_name()], &[]);
+        }
+        let parts = self.marked_parts(text, path);
+        let prefix = self.renderer.opts.class_prefix.clone();
         let mut at = 0;
-        for (from, to, i) in self.marked(text) {
-            escape(&text[at..from], out);
-            let class = self.class(&["mark"]);
-            open(out, "mark", &class, &[("data-mark", Some(&i.to_string()))]);
-            escape(&text[from..to], out);
-            out.push_str("</mark>");
+        for (from, to, n) in parts {
+            escape(text.get(at..from).unwrap_or(""), &mut self.out);
+            let _ = write!(
+                self.out,
+                "<mark class=\"{}\" data-mark=\"{n}\">",
+                escaped(&format!("{prefix}mark"))
+            );
+            escape(text.get(from..to).unwrap_or(""), &mut self.out);
+            self.out.push_str("</mark>");
             at = to;
         }
-        escape(&text[at..], out);
-    }
-
-    /// Wraps rendered HTML in a `div` whose class is the prefix without its trailing `-` or `_`
-    pub fn wrap(&self, html: &str) -> String {
-        let class = self.opts.class_prefix.trim_end_matches(['-', '_']);
-        if class.is_empty() {
-            format!("<div>{html}</div>")
-        } else {
-            let mut out = String::from("<div class=\"");
-            escape(class, &mut out);
-            out.push_str("\">");
-            out.push_str(html);
-            out.push_str("</div>");
-            out
+        escape(text.get(at..).unwrap_or(""), &mut self.out);
+        if words {
+            self.out.push_str("</span>");
         }
     }
 
-    fn class(&self, names: &[&str]) -> String {
-        let mut out = String::new();
-        for name in names.iter().filter(|n| !n.is_empty()) {
-            if !out.is_empty() {
-                out.push(' ');
+    /// Writes `<tag class="…" data-…>`
+    fn open_tag(&mut self, tag: &str, classes: &[&str], data: &[(&str, Option<String>)]) {
+        let prefix = self.renderer.opts.class_prefix.clone();
+        let classes: Vec<String> = classes
+            .iter()
+            .filter(|c| !c.is_empty())
+            .map(|c| format!("{prefix}{c}"))
+            .collect();
+        self.out.push('<');
+        self.out.push_str(tag);
+        if !classes.is_empty() {
+            self.out.push_str(" class=\"");
+            escape(&classes.join(" "), &mut self.out);
+            self.out.push('"');
+        }
+        for (name, value) in data {
+            if let Some(value) = value {
+                let _ = write!(self.out, " {name}=\"");
+                escape(value, &mut self.out);
+                self.out.push('"');
             }
-            out.push_str(&self.opts.class_prefix);
-            out.push_str(name);
         }
-        out
+        self.out.push('>');
     }
 
-    fn nodes(&mut self, nodes: &[Node], out: &mut String, in_woj: bool) {
-        for (i, n) in nodes.iter().enumerate() {
-            self.path.push(i);
-            match n {
-                Node::Text(t) => {
-                    if self.woj.is_some() && !in_woj && !t.trim().is_empty() {
-                        let class = self.class(&[Kind::WordsOfJesus.class_name()]);
-                        open(out, "span", &class, &[]);
-                        self.text(t, out);
-                        out.push_str("</span>");
-                    } else {
-                        self.text(t, out);
-                    }
+    fn close_tag(&mut self, tag: &str) {
+        let _ = write!(self.out, "</{tag}>");
+    }
+
+    fn element(&mut self, e: &Element, path: &mut Vec<usize>) {
+        match self.renderer.opts.filter.action(e) {
+            Action::Drop => {}
+            Action::Unwrap => {
+                // An unwrapped words-of-Jesus element still holds its text: open words of Jesus
+                // don't mark it again
+                let words = e.kind == Kind::WordsOfJesus;
+                if words {
+                    self.in_words += 1;
                 }
-                Node::Element(e) => self.element(e, out, in_woj),
+                self.nodes(&e.children, path);
+                if words {
+                    self.in_words -= 1;
+                }
             }
-            self.path.pop();
+            Action::Keep => self.keep(e, path),
         }
     }
 
-    fn wrap_element(
+    fn keep(&mut self, e: &Element, path: &mut Vec<usize>) {
+        let plan = self.open(e);
+        if plan.children {
+            if plan.words {
+                self.in_words += 1;
+            }
+            self.nodes(&e.children, path);
+            if plan.words {
+                self.in_words -= 1;
+            }
+        }
+        self.close(&plan);
+    }
+
+    /// Writes what comes after an element's contents
+    #[inline(never)]
+    fn close(&mut self, plan: &Plan) {
+        if let Some(tag) = plan.close {
+            self.close_tag(tag);
+        }
+        if plan.line_break {
+            self.open_tag("br", &["l"], &[]);
+        }
+        if plan.open_words {
+            self.renderer.words = Some(None);
+        }
+    }
+
+    /// Writes an opening tag; the contents and the end tag follow
+    fn open_wrapped(
         &mut self,
-        tag: &str,
+        tag: &'static str,
         classes: &[&str],
-        data: &[(&str, Option<&str>)],
-        e: &Element,
-        out: &mut String,
-        in_woj: bool,
-    ) {
-        let class = self.class(classes);
-        open(out, tag, &class, data);
-        self.nodes(&e.children, out, in_woj);
-        out.push_str("</");
-        out.push_str(tag);
-        out.push('>');
-    }
-
-    fn empty(&self, tag: &str, classes: &[&str], data: &[(&str, Option<&str>)], out: &mut String) {
-        let class = self.class(classes);
-        open(out, tag, &class, data);
-        if tag != "br" {
-            out.push_str("</");
-            out.push_str(tag);
-            out.push('>');
+        data: &[(&str, Option<String>)],
+    ) -> Plan {
+        self.open_tag(tag, classes, data);
+        Plan {
+            children: true,
+            close: Some(tag),
+            ..Plan::default()
         }
     }
 
-    fn element(&mut self, e: &Element, out: &mut String, in_woj: bool) {
-        match self.opts.filter.action(e) {
-            Action::Drop => return,
-            Action::Unwrap => return self.nodes(&e.children, out, in_woj),
-            Action::Keep => {}
-        }
-        let kind = e.kind.class_name();
+    /// Writes an element's opening tag (or the whole of an element without contents) and says
+    /// what follows; kept apart from the recursion so each level of nesting takes little stack
+    #[inline(never)]
+    fn open(&mut self, e: &Element) -> Plan {
+        let attr = |name: &str| e.attr(name).map(str::to_string);
         match e.kind {
             Kind::WordsOfJesus | Kind::Quote if e.milestone.is_some() => match e.milestone {
                 Some(Milestone::Start) if e.kind == Kind::WordsOfJesus => {
-                    self.woj = Some(e.attr("sID").map(str::to_string));
+                    self.renderer.words = Some(e.attr("sID").map(str::to_string));
                 }
-                Some(Milestone::End)
-                    if self
-                        .woj
-                        .as_ref()
-                        .is_some_and(|id| ends_woj(id.as_deref(), e)) =>
-                {
-                    self.woj = None;
+                Some(Milestone::End) => {
+                    if let Some(open) = &self.renderer.words
+                        && words_match(open.as_deref(), e)
+                    {
+                        self.renderer.words = None;
+                    }
                 }
                 _ => {}
             },
             Kind::WordsOfJesus => {
-                self.wrap_element("span", &[kind], &[], e, out, true);
-                if e.unclosed {
-                    // Continues into the next entry
-                    self.woj = Some(None);
-                }
+                let mut plan = self.open_wrapped("span", &["woj"], &[]);
+                plan.words = true;
+                plan.open_words = e.unclosed;
+                return plan;
             }
             Kind::Word => {
                 let strongs: Vec<String> = e.strongs().iter().map(ToString::to_string).collect();
-                let strongs = strongs.join(" ");
+                let strong = (!strongs.is_empty()).then(|| strongs.join(" "));
                 let data = [
-                    (
-                        "data-strong",
-                        (!strongs.is_empty()).then_some(strongs.as_str()),
-                    ),
-                    ("data-lemma", e.attr("lemma")),
-                    ("data-morph", e.attr("morph")),
+                    ("data-strong", strong),
+                    ("data-lemma", attr("lemma")),
+                    ("data-morph", attr("morph")),
                 ];
-                self.wrap_element("span", &[kind], &data, e, out, in_woj);
+                return self.open_wrapped("span", &["w"], &data);
             }
             Kind::Note if !e.children.is_empty() => {
-                let note_type = e.note_type().map(note_class).unwrap_or_default();
+                let class = e.note_type().map(|t| {
+                    if t.eq_ignore_ascii_case("crossReference") {
+                        String::from("crossref")
+                    } else {
+                        class_safe(t)
+                    }
+                });
                 let data = [
-                    ("data-note-type", e.note_type()),
-                    ("data-n", e.attr("n").or_else(|| e.attr("caller"))),
-                    ("data-osis-ref", e.attr("osisRef")),
+                    ("data-note-type", attr("type")),
+                    ("data-n", attr("n").or_else(|| attr("caller"))),
+                    ("data-osis-ref", attr("osisRef")),
                 ];
-                self.wrap_element("span", &[kind, &note_type], &data, e, out, in_woj);
+                let classes = ["note", class.as_deref().unwrap_or("")];
+                return self.open_wrapped("span", &classes, &data);
             }
             Kind::Reference => {
-                let data = [("data-osis-ref", e.reference_target())];
-                self.wrap_element("a", &[kind], &data, e, out, in_woj);
+                let data = [("data-osis-ref", e.reference_target().map(str::to_string))];
+                return self.open_wrapped("a", &["ref"], &data);
             }
             Kind::Title if !e.children.is_empty() && e.milestone.is_none() => {
-                let title_type = e.title_type().map(class_safe).unwrap_or_default();
-                let data = [("data-title-type", e.title_type())];
-                self.wrap_element("div", &[kind, &title_type], &data, e, out, in_woj);
+                let class = e.title_type().map(class_safe);
+                let data = [("data-title-type", attr("type"))];
+                let classes = ["title", class.as_deref().unwrap_or("")];
+                return self.open_wrapped("div", &classes, &data);
             }
             Kind::Quote | Kind::Added | Kind::DivineName | Kind::Foreign => {
-                self.wrap_element("span", &[kind], &[], e, out, in_woj)
+                return self.open_wrapped("span", &[e.kind.class_name()], &[]);
             }
             Kind::Highlight => {
-                let style = e.style().map(class_safe).unwrap_or_default();
-                let tag = match style.as_str() {
-                    "italic" => "i",
-                    "bold" => "b",
-                    "super" => "sup",
-                    "sub" => "sub",
+                let style = e.style().map(class_safe);
+                let tag = match style.as_deref() {
+                    Some("italic") => "i",
+                    Some("bold") => "b",
+                    Some("super") => "sup",
+                    Some("sub") => "sub",
                     _ => "span",
                 };
-                self.wrap_element(tag, &[kind, &style], &[], e, out, in_woj);
+                let classes = ["hi", style.as_deref().unwrap_or("")];
+                return self.open_wrapped(tag, &classes, &[]);
             }
-            Kind::LineBreak => self.empty("br", &[kind], &[], out),
+            Kind::LineBreak => self.open_tag("br", &["lb"], &[]),
             Kind::Paragraph => match e.milestone {
                 Some(Milestone::End) => {}
-                None if !e.children.is_empty() => {
-                    self.wrap_element("p", &[kind], &[], e, out, in_woj)
-                }
-                _ => self.empty("br", &[kind], &[], out),
+                None if !e.children.is_empty() => return self.open_wrapped("p", &["p"], &[]),
+                _ => self.open_tag("br", &["p"], &[]),
             },
             Kind::LineGroup if e.milestone.is_none() => {
-                self.wrap_element("div", &[kind], &[], e, out, in_woj)
+                return self.open_wrapped("div", &["lg"], &[]);
             }
             Kind::Line => match e.milestone {
-                Some(Milestone::End) => self.empty("br", &[kind], &[], out),
+                Some(Milestone::End) => self.open_tag("br", &["l"], &[]),
                 Some(Milestone::Start) => {}
                 None => {
-                    self.wrap_element("span", &[kind], &[], e, out, in_woj);
-                    self.empty("br", &[kind], &[], out);
+                    let mut plan = self.open_wrapped("span", &["l"], &[]);
+                    plan.line_break = true;
+                    return plan;
                 }
             },
             Kind::Verse | Kind::Chapter if e.children.is_empty() => {
                 if e.milestone != Some(Milestone::End) {
                     let data = [
-                        ("data-osis-id", e.attr("osisID").or_else(|| e.attr("sID"))),
-                        ("data-n", e.attr("n").or_else(|| e.attr("number"))),
+                        ("data-osis-id", attr("osisID").or_else(|| attr("sID"))),
+                        ("data-n", attr("n").or_else(|| attr("number"))),
                     ];
-                    self.empty("span", &[kind], &data, out);
+                    self.open_tag("span", &[e.kind.class_name()], &data);
+                    self.close_tag("span");
                 }
             }
-            Kind::Entry => self.wrap_element("div", &[kind], &[], e, out, in_woj),
-            _ => self.nodes(&e.children, out, in_woj),
+            Kind::Entry => return self.open_wrapped("div", &["entry"], &[]),
+            _ => return Plan::children(),
         }
+        Plan::default()
     }
 }
 
-/// A note type as a class: `crossReference` is `crossref`, others are lowercased
-fn note_class(note_type: &str) -> String {
-    if note_type.eq_ignore_ascii_case("crossReference") {
-        "crossref".to_string()
-    } else {
-        class_safe(note_type)
-    }
-}
-
-/// Lowercase letters, digits, and `-`, with anything else as `-`
-fn class_safe(s: &str) -> String {
-    s.chars()
-        .map(|c| {
-            if c.is_ascii_alphanumeric() || c == '-' {
-                c.to_ascii_lowercase()
-            } else {
-                '-'
-            }
-        })
-        .collect()
-}
-
-fn open(out: &mut String, tag: &str, class: &str, data: &[(&str, Option<&str>)]) {
-    out.push('<');
-    out.push_str(tag);
-    if !class.is_empty() {
-        out.push_str(" class=\"");
-        escape(class, out);
-        out.push('"');
-    }
-    for (name, value) in data {
-        if let Some(value) = value {
-            out.push(' ');
-            out.push_str(name);
-            out.push_str("=\"");
-            escape(value, out);
-            out.push('"');
-        }
-    }
-    out.push('>');
-}
-
-fn escape(s: &str, out: &mut String) {
-    for c in s.chars() {
-        match c {
-            '&' => out.push_str("&amp;"),
-            '<' => out.push_str("&lt;"),
-            '>' => out.push_str("&gt;"),
-            '"' => out.push_str("&quot;"),
-            _ => out.push(c),
-        }
-    }
+/// An escaped copy
+fn escaped(s: &str) -> String {
+    let mut out = String::new();
+    escape(s, &mut out);
+    out
 }

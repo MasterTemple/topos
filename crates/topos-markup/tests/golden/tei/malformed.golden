@@ -1,0 +1,43 @@
+#### markup ####
+tei
+#### input ####
+<entryFree>unclosed <hi rend="italic">it</entryFree> after</hi> <ref target="x">
+#### tree ####
+Entry entryFree
+  text "unclosed "
+  Highlight hi @unclosed rend="italic" type="italic"
+    text "it"
+text " after"
+Highlight hi @end
+text " "
+Reference ref @unclosed target="x"
+
+#### text ####
+unclosed it
+after
+#### text-all ####
+unclosed it
+after
+#### text-nobreaks ####
+unclosed it after
+#### spans ####
+entries: 0..17
+Highlight 9..11 entry=0 path=/0/1 "it"
+Entry 0..11 entry=0 path=/0 "unclosed it"
+Reference 17..17 entry=0 path=/4 ""
+
+#### sources ####
+0..8 entry=0 path=/0/0 offset=0
+9..11 entry=0 path=/0/1/0 offset=0
+12..17 entry=0 path=/1 offset=1
+
+#### html ####
+<div class="topos-entry">unclosed <i class="topos-hi topos-italic">it</i></div> after<span class="topos-hi"></span> <a class="topos-ref" data-osis-ref="x"></a>
+#### html-bare ####
+<div class="entry">unclosed <i class="hi italic">it</i></div> after<span class="hi"></span> <a class="ref" data-osis-ref="x"></a>
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+/4 target="x" passages=[]
+

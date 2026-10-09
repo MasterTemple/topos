@@ -1,0 +1,49 @@
+#### markup ####
+osis
+#### input ####
+<title type="psalm" canonical="true">To the chief musician</title><title type="chapter">Chapter 3</title><title>Plain</title><title type="x-Odd type">odd</title><title sID="t1"/>between<title eID="t1"/><title></title>after
+#### tree ####
+Title title type="psalm" canonical="true"
+  text "To the chief musician"
+Title title type="chapter"
+  text "Chapter 3"
+Title title
+  text "Plain"
+Title title type="x-Odd type"
+  text "odd"
+Title title @start sID="t1"
+text "between"
+Title title @end eID="t1"
+Title title
+text "after"
+
+#### text ####
+betweenafter
+#### text-all ####
+## To the chief musician
+## Chapter 3
+## Plain
+## odd
+## 
+between
+## 
+## 
+after
+#### text-nobreaks ####
+betweenafter
+#### spans ####
+entries: 0..12
+
+#### sources ####
+0..7 entry=0 path=/5 offset=0
+7..12 entry=0 path=/8 offset=0
+
+#### html ####
+<div class="topos-title topos-psalm" data-title-type="psalm">To the chief musician</div><div class="topos-title topos-chapter" data-title-type="chapter">Chapter 3</div><div class="topos-title">Plain</div><div class="topos-title topos-x-odd-type" data-title-type="x-Odd type">odd</div>betweenafter
+#### html-bare ####
+<div class="title psalm" data-title-type="psalm">To the chief musician</div><div class="title chapter" data-title-type="chapter">Chapter 3</div><div class="title">Plain</div><div class="title x-odd-type" data-title-type="x-Odd type">odd</div>betweenafter
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+

@@ -1,0 +1,82 @@
+#### markup ####
+osis
+#### input ####
+<reference osisRef="John.3.16">one</reference> <reference osisRef="Bible:Gen.1.1-Gen.1.3">work</reference> <reference osisRef="Gen.1.1 Gen.1.3 Exod.2.1">many</reference> <reference osisRef="Matt.5">chapter</reference> <reference>Romans 8:28</reference> <reference osisRef="not a ref">John 1:1</reference> <reference osisRef="">empty</reference> <reference osisRef="KJV:Rev.22.21">kjv</reference> <reference type="x-other">nothing here</reference>
+#### tree ####
+Reference reference osisRef="John.3.16"
+  text "one"
+text " "
+Reference reference osisRef="Bible:Gen.1.1-Gen.1.3"
+  text "work"
+text " "
+Reference reference osisRef="Gen.1.1 Gen.1.3 Exod.2.1"
+  text "many"
+text " "
+Reference reference osisRef="Matt.5"
+  text "chapter"
+text " "
+Reference reference
+  text "Romans 8:28"
+text " "
+Reference reference osisRef="not a ref"
+  text "John 1:1"
+text " "
+Reference reference osisRef=""
+  text "empty"
+text " "
+Reference reference osisRef="KJV:Rev.22.21"
+  text "kjv"
+text " "
+Reference reference type="x-other"
+  text "nothing here"
+
+#### text ####
+one work many chapter Romans 8:28 John 1:1 empty kjv nothing here
+#### text-all ####
+one work many chapter Romans 8:28 John 1:1 empty kjv nothing here
+#### text-nobreaks ####
+one work many chapter Romans 8:28 John 1:1 empty kjv nothing here
+#### spans ####
+entries: 0..65
+Reference 0..3 entry=0 path=/0 "one"
+Reference 4..8 entry=0 path=/2 "work"
+Reference 9..13 entry=0 path=/4 "many"
+Reference 14..21 entry=0 path=/6 "chapter"
+Reference 22..33 entry=0 path=/8 "Romans 8:28"
+Reference 34..42 entry=0 path=/10 "John 1:1"
+Reference 43..48 entry=0 path=/12 "empty"
+Reference 49..52 entry=0 path=/14 "kjv"
+Reference 53..65 entry=0 path=/16 "nothing here"
+
+#### sources ####
+0..3 entry=0 path=/0/0 offset=0
+4..8 entry=0 path=/2/0 offset=0
+9..13 entry=0 path=/4/0 offset=0
+14..21 entry=0 path=/6/0 offset=0
+22..28 entry=0 path=/8/0 offset=0
+29..33 entry=0 path=/8/0 offset=7
+34..38 entry=0 path=/10/0 offset=0
+39..42 entry=0 path=/10/0 offset=5
+43..48 entry=0 path=/12/0 offset=0
+49..52 entry=0 path=/14/0 offset=0
+53..60 entry=0 path=/16/0 offset=0
+61..65 entry=0 path=/16/0 offset=8
+
+#### html ####
+<a class="topos-ref" data-osis-ref="John.3.16">one</a> <a class="topos-ref" data-osis-ref="Bible:Gen.1.1-Gen.1.3">work</a> <a class="topos-ref" data-osis-ref="Gen.1.1 Gen.1.3 Exod.2.1">many</a> <a class="topos-ref" data-osis-ref="Matt.5">chapter</a> <a class="topos-ref">Romans 8:28</a> <a class="topos-ref" data-osis-ref="not a ref">John 1:1</a> <a class="topos-ref" data-osis-ref="">empty</a> <a class="topos-ref" data-osis-ref="KJV:Rev.22.21">kjv</a> <a class="topos-ref">nothing here</a>
+#### html-bare ####
+<a class="ref" data-osis-ref="John.3.16">one</a> <a class="ref" data-osis-ref="Bible:Gen.1.1-Gen.1.3">work</a> <a class="ref" data-osis-ref="Gen.1.1 Gen.1.3 Exod.2.1">many</a> <a class="ref" data-osis-ref="Matt.5">chapter</a> <a class="ref">Romans 8:28</a> <a class="ref" data-osis-ref="not a ref">John 1:1</a> <a class="ref" data-osis-ref="">empty</a> <a class="ref" data-osis-ref="KJV:Rev.22.21">kjv</a> <a class="ref">nothing here</a>
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+/0 target="John.3.16" passages=[John.3.16]
+/2 target="Bible:Gen.1.1-Gen.1.3" passages=[Gen.1.1-Gen.1.3]
+/4 target="Gen.1.1 Gen.1.3 Exod.2.1" passages=[Gen.1.1 Gen.1.3, Exod.2.1]
+/6 target="Matt.5" passages=[Matt.5]
+/8 target=- passages=[Rom.8.28]
+/10 target="not a ref" passages=[John.1.1]
+/12 target="" passages=[]
+/14 target="KJV:Rev.22.21" passages=[Rev.22.21]
+/16 target=- passages=[]
+

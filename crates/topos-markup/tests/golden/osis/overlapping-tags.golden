@@ -1,0 +1,35 @@
+#### markup ####
+osis
+#### input ####
+<hi type="bold"><w lemma="strong:G1">x</hi></w>y
+#### tree ####
+Highlight hi type="bold"
+  Word w @unclosed lemma="strong:G1"
+    text "x"
+Word w @end
+text "y"
+
+#### text ####
+xy
+#### text-all ####
+x [G1]y
+#### text-nobreaks ####
+xy
+#### spans ####
+entries: 0..2
+Word 0..1 entry=0 path=/0/0 "x"
+Highlight 0..1 entry=0 path=/0 "x"
+
+#### sources ####
+0..1 entry=0 path=/0/0/0 offset=0
+1..2 entry=0 path=/2 offset=0
+
+#### html ####
+<b class="topos-hi topos-bold"><span class="topos-w" data-strong="G1" data-lemma="strong:G1">x</span></b><span class="topos-w"></span>y
+#### html-bare ####
+<b class="hi bold"><span class="w" data-strong="G1" data-lemma="strong:G1">x</span></b><span class="w"></span>y
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+

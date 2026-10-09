@@ -1,0 +1,69 @@
+#### markup ####
+osis
+#### input ####
+<q who="Jesus" sID="a">inner woj</q> <q sID="b">inner quote</q> <p sID="c">para text</p> <l sID="d">line text</l> <l eID="d">end text</l> <title sID="e">title text</title> <lg sID="f">group text</lg> <verse sID="g" n="3">verse text</verse>
+#### tree ####
+WordsOfJesus q @start who="Jesus" sID="a"
+  text "inner woj"
+text " "
+Quote q @start sID="b"
+  text "inner quote"
+text " "
+Paragraph p @start sID="c"
+  text "para text"
+text " "
+Line l @start sID="d"
+  text "line text"
+text " "
+Line l @end eID="d"
+  text "end text"
+text " "
+Title title @start sID="e"
+  text "title text"
+text " "
+LineGroup lg @start sID="f"
+  text "group text"
+text " "
+Verse verse @start sID="g" n="3"
+  text "verse text"
+
+#### text ####
+para text
+line text end text
+group text
+verse text
+#### text-all ####
+“
+para text
+line text end text
+## title text
+group text
+[g :3] verse text”
+#### text-nobreaks ####
+para text line text end text group text verse text
+#### spans ####
+entries: 0..50
+WordsOfJesus 0..50 entry=0 path=/0 "para text\nline text end text\ngroup text\nverse text"
+
+#### sources ####
+0..4 entry=0 path=/4/0 offset=0
+5..9 entry=0 path=/4/0 offset=5
+10..14 entry=0 path=/6/0 offset=0
+15..19 entry=0 path=/6/0 offset=5
+20..23 entry=0 path=/8/0 offset=0
+24..28 entry=0 path=/8/0 offset=4
+29..34 entry=0 path=/12/0 offset=0
+35..39 entry=0 path=/12/0 offset=6
+40..45 entry=0 path=/14/0 offset=0
+46..50 entry=0 path=/14/0 offset=6
+
+#### html ####
+  <br class="topos-p">  <br class="topos-l"> <span class="topos-woj">title text</span> <span class="topos-woj">group text</span> <span class="topos-woj">verse text</span>
+#### html-bare ####
+  <br class="p">  <br class="l"> <span class="woj">title text</span> <span class="woj">group text</span> <span class="woj">verse text</span>
+#### verses ####
+0:3-3 marker=/14 start=/14 end=/15 "verse text"
+chapter_verses: []
+
+#### refs ####
+

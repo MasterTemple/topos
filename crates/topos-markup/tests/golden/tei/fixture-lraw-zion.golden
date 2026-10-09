@@ -1,0 +1,49 @@
+#### markup ####
+tei
+#### input ####
+<entryFree n="Zion"><orth>Zion</orth> <def>Definition of Zion with <ref target="X:Zion">ref</ref> &amp; moresecond line</def></entryFree>
+#### tree ####
+Entry entryFree n="Zion"
+  Other orth
+    text "Zion"
+  text " "
+  Other def
+    text "Definition of Zion with "
+    Reference ref target="X:Zion"
+      text "ref"
+    text " & moresecond line"
+
+#### text ####
+Zion Definition of Zion with ref & moresecond line
+#### text-all ####
+Zion Definition of Zion with ref & moresecond line
+#### text-nobreaks ####
+Zion Definition of Zion with ref & moresecond line
+#### spans ####
+entries: 0..50
+Other 0..4 entry=0 path=/0/0 "Zion"
+Reference 29..32 entry=0 path=/0/2/1 "ref"
+Other 5..50 entry=0 path=/0/2 "Definition of Zion with ref & moresecond line"
+Entry 0..50 entry=0 path=/0 "Zion Definition of Zion with ref & moresecond line"
+
+#### sources ####
+0..4 entry=0 path=/0/0/0 offset=0
+5..15 entry=0 path=/0/2/0 offset=0
+16..18 entry=0 path=/0/2/0 offset=11
+19..23 entry=0 path=/0/2/0 offset=14
+24..28 entry=0 path=/0/2/0 offset=19
+29..32 entry=0 path=/0/2/1/0 offset=0
+33..34 entry=0 path=/0/2/2 offset=1
+35..45 entry=0 path=/0/2/2 offset=3
+46..50 entry=0 path=/0/2/2 offset=14
+
+#### html ####
+<div class="topos-entry">Zion Definition of Zion with <a class="topos-ref" data-osis-ref="X:Zion">ref</a> &amp; moresecond line</div>
+#### html-bare ####
+<div class="entry">Zion Definition of Zion with <a class="ref" data-osis-ref="X:Zion">ref</a> &amp; moresecond line</div>
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+/0/2/1 target="X:Zion" passages=[]
+

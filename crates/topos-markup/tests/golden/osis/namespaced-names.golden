@@ -1,0 +1,35 @@
+#### markup ####
+osis
+#### input ####
+<osis:w lemma="strong:G1">x</osis:w> <w xml:lang="grc">y</w>
+#### tree ####
+Other osis:w lemma="strong:G1"
+  text "x"
+text " "
+Word w xml:lang="grc"
+  text "y"
+
+#### text ####
+x y
+#### text-all ####
+x y
+#### text-nobreaks ####
+x y
+#### spans ####
+entries: 0..3
+Other 0..1 entry=0 path=/0 "x"
+Word 2..3 entry=0 path=/2 "y"
+
+#### sources ####
+0..1 entry=0 path=/0/0 offset=0
+2..3 entry=0 path=/2/0 offset=0
+
+#### html ####
+x <span class="topos-w">y</span>
+#### html-bare ####
+x <span class="w">y</span>
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+

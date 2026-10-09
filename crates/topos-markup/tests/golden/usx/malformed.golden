@@ -1,0 +1,49 @@
+#### markup ####
+usx
+#### input ####
+<usx><para style="p">unclosed <char style="wj">red <verse number="1" style="v" sid="X 1:1"/>more</para> trailing</char>
+#### tree ####
+Other usx @unclosed
+  Paragraph para style="p"
+    text "unclosed "
+    WordsOfJesus char @unclosed style="wj"
+      text "red "
+      Verse verse @start number="1" style="v" sid="X 1:1"
+      text "more"
+  text " trailing"
+  Other char @end
+
+#### text ####
+unclosed red more
+trailing
+#### text-all ####
+unclosed “red [X 1:1] more
+trailing”
+#### text-nobreaks ####
+unclosed red more trailing
+#### spans ####
+entries: 0..26
+Verse 12..12 entry=0 path=/0/0/1/1 ""
+Paragraph 0..17 entry=0 path=/0/0 "unclosed red more"
+Other 0..26 entry=0 path=/0 "unclosed red more\ntrailing"
+WordsOfJesus 9..26 entry=0 path=/0/0/1 "red more\ntrailing"
+
+#### sources ####
+0..8 entry=0 path=/0/0/0 offset=0
+9..12 entry=0 path=/0/0/1/0 offset=0
+13..17 entry=0 path=/0/0/1/2 offset=0
+18..26 entry=0 path=/0/1 offset=1
+
+#### html ####
+<p class="topos-p">unclosed <span class="topos-woj">red <span class="topos-verse" data-osis-id="X 1:1" data-n="1"></span>more</span></p><span class="topos-woj"> trailing</span>
+#### html-bare ####
+<p class="p">unclosed <span class="woj">red <span class="verse" data-osis-id="X 1:1" data-n="1"></span>more</span></p><span class="woj"> trailing</span>
+#### verses ####
+0:1-1 marker=/0/0/1/1 start=/0/0/1/1 end=/1 "more\ntrailing"
+chapter_verses: []
+
+#### usx-chapter-verses ####
+[]
+
+#### refs ####
+

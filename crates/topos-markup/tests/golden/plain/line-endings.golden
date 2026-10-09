@@ -1,0 +1,43 @@
+#### markup ####
+plain
+#### input ####
+a
+b
+cd
+
+#### tree ####
+text "a"
+LineBreak br
+text "b"
+LineBreak br
+text "c\rd"
+LineBreak br
+
+#### text ####
+a
+b
+c d
+#### text-all ####
+a
+b
+c d
+#### text-nobreaks ####
+a b c d
+#### spans ####
+entries: 0..7
+
+#### sources ####
+0..1 entry=0 path=/0 offset=0
+2..3 entry=0 path=/2 offset=0
+4..5 entry=0 path=/4 offset=0
+6..7 entry=0 path=/4 offset=2
+
+#### html ####
+a<br class="topos-lb">b<br class="topos-lb">cd<br class="topos-lb">
+#### html-bare ####
+a<br class="lb">b<br class="lb">cd<br class="lb">
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+

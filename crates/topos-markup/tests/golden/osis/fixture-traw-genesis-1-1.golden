@@ -1,0 +1,65 @@
+#### markup ####
+osis
+#### input ####
+created <w lemma="strong:G4390" morph="robinson:N-NSM">the</w> God the <w lemma="strong:G3553" morph="robinson:N-NSM">and</w> <w lemma="strong:G744" morph="robinson:N-NSM">é</w> <w lemma="strong:G4633" morph="robinson:N-NSM">é</w> God the <w lemma="strong:G1812" morph="robinson:N-NSM">Ä</w> the <w lemma="strong:G1182" morph="robinson:N-NSM">created</w> God &amp;end.
+#### tree ####
+text "created "
+Word w lemma="strong:G4390" morph="robinson:N-NSM"
+  text "the"
+text " God the "
+Word w lemma="strong:G3553" morph="robinson:N-NSM"
+  text "and"
+text " "
+Word w lemma="strong:G744" morph="robinson:N-NSM"
+  text "é"
+text " "
+Word w lemma="strong:G4633" morph="robinson:N-NSM"
+  text "é"
+text " God the "
+Word w lemma="strong:G1812" morph="robinson:N-NSM"
+  text "Ä"
+text " the "
+Word w lemma="strong:G1182" morph="robinson:N-NSM"
+  text "created"
+text " God &end."
+
+#### text ####
+created the God the and é é God the Ä the created God &end.
+#### text-all ####
+created the [G4390] God the and [G3553] é [G744] é [G4633] God the Ä [G1812] the created [G1182] God &end.
+#### text-nobreaks ####
+created the God the and é é God the Ä the created God &end.
+#### spans ####
+entries: 0..62
+Word 8..11 entry=0 path=/1 "the"
+Word 20..23 entry=0 path=/3 "and"
+Word 24..26 entry=0 path=/5 "é"
+Word 27..29 entry=0 path=/7 "é"
+Word 38..40 entry=0 path=/9 "Ä"
+Word 45..52 entry=0 path=/11 "created"
+
+#### sources ####
+0..7 entry=0 path=/0 offset=0
+8..11 entry=0 path=/1/0 offset=0
+12..15 entry=0 path=/2 offset=1
+16..19 entry=0 path=/2 offset=5
+20..23 entry=0 path=/3/0 offset=0
+24..26 entry=0 path=/5/0 offset=0
+27..29 entry=0 path=/7/0 offset=0
+30..33 entry=0 path=/8 offset=1
+34..37 entry=0 path=/8 offset=5
+38..40 entry=0 path=/9/0 offset=0
+41..44 entry=0 path=/10 offset=1
+45..52 entry=0 path=/11/0 offset=0
+53..56 entry=0 path=/12 offset=1
+57..62 entry=0 path=/12 offset=5
+
+#### html ####
+created <span class="topos-w" data-strong="G4390" data-lemma="strong:G4390" data-morph="robinson:N-NSM">the</span> God the <span class="topos-w" data-strong="G3553" data-lemma="strong:G3553" data-morph="robinson:N-NSM">and</span> <span class="topos-w" data-strong="G744" data-lemma="strong:G744" data-morph="robinson:N-NSM">é</span> <span class="topos-w" data-strong="G4633" data-lemma="strong:G4633" data-morph="robinson:N-NSM">é</span> God the <span class="topos-w" data-strong="G1812" data-lemma="strong:G1812" data-morph="robinson:N-NSM">Ä</span> the <span class="topos-w" data-strong="G1182" data-lemma="strong:G1182" data-morph="robinson:N-NSM">created</span> God &amp;end.
+#### html-bare ####
+created <span class="w" data-strong="G4390" data-lemma="strong:G4390" data-morph="robinson:N-NSM">the</span> God the <span class="w" data-strong="G3553" data-lemma="strong:G3553" data-morph="robinson:N-NSM">and</span> <span class="w" data-strong="G744" data-lemma="strong:G744" data-morph="robinson:N-NSM">é</span> <span class="w" data-strong="G4633" data-lemma="strong:G4633" data-morph="robinson:N-NSM">é</span> God the <span class="w" data-strong="G1812" data-lemma="strong:G1812" data-morph="robinson:N-NSM">Ä</span> the <span class="w" data-strong="G1182" data-lemma="strong:G1182" data-morph="robinson:N-NSM">created</span> God &amp;end.
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+

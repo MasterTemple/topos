@@ -1,0 +1,46 @@
+#### markup ####
+osis
+#### input ####
+<title type="psalm">A Psalm</title><w lemma="strong:H3068" morph="x">LORD</w><note type="crossReference" n="a">Ps 1:1</note><note type="explanation">Or, Jehovah</note> <hi type="small-caps">x</hi><transChange type="added">is</transChange>
+#### tree ####
+Title title type="psalm"
+  text "A Psalm"
+Word w lemma="strong:H3068" morph="x"
+  text "LORD"
+Note note type="crossReference" n="a"
+  text "Ps 1:1"
+Note note type="explanation"
+  text "Or, Jehovah"
+text " "
+Highlight hi type="small-caps"
+  text "x"
+Added transChange type="added"
+  text "is"
+
+#### text ####
+LORD xis
+#### text-all ####
+## A Psalm
+LORD [H3068] (Ps 1:1) (Or, Jehovah) xis*
+#### text-nobreaks ####
+LORD xis
+#### spans ####
+entries: 0..8
+Word 0..4 entry=0 path=/1 "LORD"
+Highlight 5..6 entry=0 path=/5 "x"
+Added 6..8 entry=0 path=/6 "is"
+
+#### sources ####
+0..4 entry=0 path=/1/0 offset=0
+5..6 entry=0 path=/5/0 offset=0
+6..8 entry=0 path=/6/0 offset=0
+
+#### html ####
+<div class="topos-title topos-psalm" data-title-type="psalm">A Psalm</div><span class="topos-w" data-strong="H3068" data-lemma="strong:H3068" data-morph="x">LORD</span><span class="topos-note topos-crossref" data-note-type="crossReference" data-n="a">Ps 1:1</span><span class="topos-note topos-explanation" data-note-type="explanation">Or, Jehovah</span> <span class="topos-hi topos-small-caps">x</span><span class="topos-added">is</span>
+#### html-bare ####
+<div class="title psalm" data-title-type="psalm">A Psalm</div><span class="w" data-strong="H3068" data-lemma="strong:H3068" data-morph="x">LORD</span><span class="note crossref" data-note-type="crossReference" data-n="a">Ps 1:1</span><span class="note explanation" data-note-type="explanation">Or, Jehovah</span> <span class="hi small-caps">x</span><span class="added">is</span>
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+

@@ -1,0 +1,35 @@
+#### markup ####
+osis
+#### input ####
+x << <hi type="bold">bold</hi> y
+#### tree ####
+text "x "
+Other < @unclosed type="bold"
+  text "bold"
+  Highlight hi @end
+  text " y"
+
+#### text ####
+x bold y
+#### text-all ####
+x bold y
+#### text-nobreaks ####
+x bold y
+#### spans ####
+entries: 0..8
+Other 2..8 entry=0 path=/1 "bold y"
+
+#### sources ####
+0..1 entry=0 path=/0 offset=0
+2..6 entry=0 path=/1/0 offset=0
+7..8 entry=0 path=/1/2 offset=1
+
+#### html ####
+x bold<span class="topos-hi"></span> y
+#### html-bare ####
+x bold<span class="hi"></span> y
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+

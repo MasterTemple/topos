@@ -1,0 +1,34 @@
+#### markup ####
+gbf
+#### input ####
+<AB<CD> <<Ge>
+#### tree ####
+text "<AB"
+Other CD
+text " <"
+Other Ge
+
+#### text ####
+<AB <
+#### text-all ####
+<AB <
+#### text-nobreaks ####
+<AB <
+#### spans ####
+entries: 0..5
+Other 3..3 entry=0 path=/1 ""
+Other 5..5 entry=0 path=/3 ""
+
+#### sources ####
+0..3 entry=0 path=/0 offset=0
+4..5 entry=0 path=/2 offset=1
+
+#### html ####
+&lt;AB &lt;
+#### html-bare ####
+&lt;AB &lt;
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+

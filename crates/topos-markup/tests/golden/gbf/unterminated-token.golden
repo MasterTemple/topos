@@ -1,0 +1,31 @@
+#### markup ####
+gbf
+#### input ####
+text <FI and more
+#### tree ####
+text "text <FI and more"
+
+#### text ####
+text <FI and more
+#### text-all ####
+text <FI and more
+#### text-nobreaks ####
+text <FI and more
+#### spans ####
+entries: 0..17
+
+#### sources ####
+0..4 entry=0 path=/0 offset=0
+5..8 entry=0 path=/0 offset=5
+9..12 entry=0 path=/0 offset=9
+13..17 entry=0 path=/0 offset=13
+
+#### html ####
+text &lt;FI and more
+#### html-bare ####
+text &lt;FI and more
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+

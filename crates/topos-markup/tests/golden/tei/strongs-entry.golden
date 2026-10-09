@@ -1,0 +1,54 @@
+#### markup ####
+tei
+#### input ####
+<entryFree n="00025"><orth>ἀγαπάω</orth> <pron rend="italic">ag-ap-ah'-o</pron><lb/> <def>to love</def>. See <ref target="StrongsGreek:00026">G26</ref></entryFree>
+#### tree ####
+Entry entryFree n="00025"
+  Other orth
+    text "ἀγαπάω"
+  text " "
+  Other pron rend="italic"
+    text "ag-ap-ah'-o"
+  LineBreak lb
+  text " "
+  Other def
+    text "to love"
+  text ". See "
+  Reference ref target="StrongsGreek:00026"
+    text "G26"
+
+#### text ####
+ἀγαπάω ag-ap-ah'-o
+to love. See G26
+#### text-all ####
+ἀγαπάω ag-ap-ah'-o
+to love. See G26
+#### text-nobreaks ####
+ἀγαπάω ag-ap-ah'-o to love. See G26
+#### spans ####
+entries: 0..42
+Other 0..13 entry=0 path=/0/0 "ἀγαπάω"
+Other 14..25 entry=0 path=/0/2 "ag-ap-ah'-o"
+Other 26..33 entry=0 path=/0/5 "to love"
+Reference 39..42 entry=0 path=/0/7 "G26"
+Entry 0..42 entry=0 path=/0 "ἀγαπάω ag-ap-ah'-o\nto love. See G26"
+
+#### sources ####
+0..13 entry=0 path=/0/0/0 offset=0
+14..25 entry=0 path=/0/2/0 offset=0
+26..28 entry=0 path=/0/5/0 offset=0
+29..33 entry=0 path=/0/5/0 offset=3
+33..34 entry=0 path=/0/6 offset=0
+35..38 entry=0 path=/0/6 offset=2
+39..42 entry=0 path=/0/7/0 offset=0
+
+#### html ####
+<div class="topos-entry">ἀγαπάω ag-ap-ah'-o<br class="topos-lb"> to love. See <a class="topos-ref" data-osis-ref="StrongsGreek:00026">G26</a></div>
+#### html-bare ####
+<div class="entry">ἀγαπάω ag-ap-ah'-o<br class="lb"> to love. See <a class="ref" data-osis-ref="StrongsGreek:00026">G26</a></div>
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+/0/7 target="StrongsGreek:00026" passages=[]
+

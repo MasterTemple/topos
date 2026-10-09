@@ -1,0 +1,36 @@
+#### markup ####
+gbf
+#### input ####
+light<RF>See <RXJohn.1.5>John 1:5<Rx><Rf>, and
+#### tree ####
+text "light"
+Note RF
+  text "See "
+  Reference RX value="John.1.5"
+    text "John 1:5"
+text ", and"
+
+#### text ####
+light, and
+#### text-all ####
+light (See John 1:5), and
+#### text-nobreaks ####
+light, and
+#### spans ####
+entries: 0..10
+
+#### sources ####
+0..5 entry=0 path=/0 offset=0
+5..6 entry=0 path=/2 offset=0
+7..10 entry=0 path=/2 offset=2
+
+#### html ####
+light<span class="topos-note">See <a class="topos-ref">John 1:5</a></span>, and
+#### html-bare ####
+light<span class="note">See <a class="ref">John 1:5</a></span>, and
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+/1/1 target=- passages=[John.1.5]
+

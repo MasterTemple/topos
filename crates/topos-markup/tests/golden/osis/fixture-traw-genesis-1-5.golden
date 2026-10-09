@@ -1,0 +1,42 @@
+#### markup ####
+osis
+#### input ####
+and created spirit <w lemma="strong:G3999" morph="robinson:N-NSM">ἀγάπη</w> ß <note n="a" type="crossReference"><reference osisRef="John.3.16">John 3:16</reference></note> &amp;end.
+#### tree ####
+text "and created spirit "
+Word w lemma="strong:G3999" morph="robinson:N-NSM"
+  text "ἀγάπη"
+text " ß "
+Note note n="a" type="crossReference"
+  Reference reference osisRef="John.3.16"
+    text "John 3:16"
+text " &end."
+
+#### text ####
+and created spirit ἀγάπη ß &end.
+#### text-all ####
+and created spirit ἀγάπη [G3999] ß (John 3:16) &end.
+#### text-nobreaks ####
+and created spirit ἀγάπη ß &end.
+#### spans ####
+entries: 0..39
+Word 19..30 entry=0 path=/1 "ἀγάπη"
+
+#### sources ####
+0..3 entry=0 path=/0 offset=0
+4..11 entry=0 path=/0 offset=4
+12..18 entry=0 path=/0 offset=12
+19..30 entry=0 path=/1/0 offset=0
+31..33 entry=0 path=/2 offset=1
+34..39 entry=0 path=/4 offset=1
+
+#### html ####
+and created spirit <span class="topos-w" data-strong="G3999" data-lemma="strong:G3999" data-morph="robinson:N-NSM">ἀγάπη</span> ß <span class="topos-note topos-crossref" data-note-type="crossReference" data-n="a"><a class="topos-ref" data-osis-ref="John.3.16">John 3:16</a></span> &amp;end.
+#### html-bare ####
+and created spirit <span class="w" data-strong="G3999" data-lemma="strong:G3999" data-morph="robinson:N-NSM">ἀγάπη</span> ß <span class="note crossref" data-note-type="crossReference" data-n="a"><a class="ref" data-osis-ref="John.3.16">John 3:16</a></span> &amp;end.
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+/3/0 target="John.3.16" passages=[John.3.16]
+

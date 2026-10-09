@@ -1,0 +1,46 @@
+#### markup ####
+osis
+#### input ####
+<chapter sID="John.3" osisID="John.3"/><verse sID="John.3.16" osisID="John.3.16"/>For God<verse eID="John.3.16"/><verse sID="John.3.17" osisID="John.3.17"/>sent<verse eID="John.3.17"/><chapter eID="John.3"/>
+#### tree ####
+Chapter chapter @start sID="John.3" osisID="John.3"
+Verse verse @start sID="John.3.16" osisID="John.3.16"
+text "For God"
+Verse verse @end eID="John.3.16"
+Verse verse @start sID="John.3.17" osisID="John.3.17"
+text "sent"
+Verse verse @end eID="John.3.17"
+Chapter chapter @end eID="John.3"
+
+#### text ####
+For Godsent
+#### text-all ####
+John 3
+[John 3:16] For God [John 3:17] sent
+#### text-nobreaks ####
+For Godsent
+#### spans ####
+entries: 0..11
+Chapter 0..0 entry=0 path=/0 ""
+Verse 0..0 entry=0 path=/1 ""
+Verse 7..7 entry=0 path=/3 ""
+Verse 7..7 entry=0 path=/4 ""
+Verse 11..11 entry=0 path=/6 ""
+Chapter 11..11 entry=0 path=/7 ""
+
+#### sources ####
+0..3 entry=0 path=/2 offset=0
+4..7 entry=0 path=/2 offset=4
+7..11 entry=0 path=/5 offset=0
+
+#### html ####
+<span class="topos-chapter" data-osis-id="John.3"></span><span class="topos-verse" data-osis-id="John.3.16"></span>For God<span class="topos-verse" data-osis-id="John.3.17"></span>sent
+#### html-bare ####
+<span class="chapter" data-osis-id="John.3"></span><span class="verse" data-osis-id="John.3.16"></span>For God<span class="verse" data-osis-id="John.3.17"></span>sent
+#### verses ####
+3:16-16 marker=/1 start=/1 end=/3 "For God"
+3:17-17 marker=/4 start=/4 end=/6 "sent"
+chapter_verses: [0, 0, 17]
+
+#### refs ####
+

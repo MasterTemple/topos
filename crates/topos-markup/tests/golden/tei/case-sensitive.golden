@@ -1,0 +1,35 @@
+#### markup ####
+tei
+#### input ####
+<EntryFree>x</EntryFree> <Ref target="a">y</Ref>
+#### tree ####
+Other EntryFree
+  text "x"
+text " "
+Other Ref target="a"
+  text "y"
+
+#### text ####
+x y
+#### text-all ####
+x y
+#### text-nobreaks ####
+x y
+#### spans ####
+entries: 0..3
+Other 0..1 entry=0 path=/0 "x"
+Other 2..3 entry=0 path=/2 "y"
+
+#### sources ####
+0..1 entry=0 path=/0/0 offset=0
+2..3 entry=0 path=/2/0 offset=0
+
+#### html ####
+x y
+#### html-bare ####
+x y
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+

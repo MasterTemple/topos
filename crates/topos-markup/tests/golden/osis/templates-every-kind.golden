@@ -1,0 +1,77 @@
+#### markup ####
+osis
+#### input ####
+<title>T</title><q who="Jesus">J</q> <q>Q</q> <transChange>A</transChange> <divineName>D</divineName> <hi>H</hi> <foreign>F</foreign> <reference>R</reference> <w>W</w> <note>N</note> <seg>O</seg>
+#### tree ####
+Title title
+  text "T"
+WordsOfJesus q who="Jesus"
+  text "J"
+text " "
+Quote q
+  text "Q"
+text " "
+Added transChange
+  text "A"
+text " "
+DivineName divineName
+  text "D"
+text " "
+Highlight hi
+  text "H"
+text " "
+Foreign foreign
+  text "F"
+text " "
+Reference reference
+  text "R"
+text " "
+Word w
+  text "W"
+text " "
+Note note
+  text "N"
+text " "
+Other seg
+  text "O"
+
+#### text ####
+J Q A D H F R W O
+#### text-all ####
+## T
+“J” Q A* ^D H F R W (N) O
+#### text-nobreaks ####
+J Q A D H F R W O
+#### spans ####
+entries: 0..17
+WordsOfJesus 0..1 entry=0 path=/1 "J"
+Quote 2..3 entry=0 path=/3 "Q"
+Added 4..5 entry=0 path=/5 "A"
+DivineName 6..7 entry=0 path=/7 "D"
+Highlight 8..9 entry=0 path=/9 "H"
+Foreign 10..11 entry=0 path=/11 "F"
+Reference 12..13 entry=0 path=/13 "R"
+Word 14..15 entry=0 path=/15 "W"
+Other 16..17 entry=0 path=/19 "O"
+
+#### sources ####
+0..1 entry=0 path=/1/0 offset=0
+2..3 entry=0 path=/3/0 offset=0
+4..5 entry=0 path=/5/0 offset=0
+6..7 entry=0 path=/7/0 offset=0
+8..9 entry=0 path=/9/0 offset=0
+10..11 entry=0 path=/11/0 offset=0
+12..13 entry=0 path=/13/0 offset=0
+14..15 entry=0 path=/15/0 offset=0
+16..17 entry=0 path=/19/0 offset=0
+
+#### html ####
+<div class="topos-title">T</div><span class="topos-woj">J</span> <span class="topos-quote">Q</span> <span class="topos-added">A</span> <span class="topos-divine-name">D</span> <span class="topos-hi">H</span> <span class="topos-foreign">F</span> <a class="topos-ref">R</a> <span class="topos-w">W</span> <span class="topos-note">N</span> O
+#### html-bare ####
+<div class="title">T</div><span class="woj">J</span> <span class="quote">Q</span> <span class="added">A</span> <span class="divine-name">D</span> <span class="hi">H</span> <span class="foreign">F</span> <a class="ref">R</a> <span class="w">W</span> <span class="note">N</span> O
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+/13 target=- passages=[]
+

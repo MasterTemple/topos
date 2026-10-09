@@ -1,0 +1,37 @@
+#### markup ####
+thml
+#### input ####
+<a href="sword://StrongsGreek/00025">G25</a> <a name="top">anchor</a>
+#### tree ####
+Reference a href="sword://StrongsGreek/00025"
+  text "G25"
+text " "
+Reference a name="top"
+  text "anchor"
+
+#### text ####
+G25 anchor
+#### text-all ####
+G25 anchor
+#### text-nobreaks ####
+G25 anchor
+#### spans ####
+entries: 0..10
+Reference 0..3 entry=0 path=/0 "G25"
+Reference 4..10 entry=0 path=/2 "anchor"
+
+#### sources ####
+0..3 entry=0 path=/0/0 offset=0
+4..10 entry=0 path=/2/0 offset=0
+
+#### html ####
+<a class="topos-ref" data-osis-ref="sword://StrongsGreek/00025">G25</a> <a class="topos-ref">anchor</a>
+#### html-bare ####
+<a class="ref" data-osis-ref="sword://StrongsGreek/00025">G25</a> <a class="ref">anchor</a>
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+/0 target="sword://StrongsGreek/00025" passages=[]
+/2 target=- passages=[]
+

@@ -1,0 +1,46 @@
+#### markup ####
+osis
+#### input ####
+<reference>John 3:16</reference> <reference>not a reference</reference> <reference osisRef="Jn 3:16">x</reference>
+#### tree ####
+Reference reference
+  text "John 3:16"
+text " "
+Reference reference
+  text "not a reference"
+text " "
+Reference reference osisRef="Jn 3:16"
+  text "x"
+
+#### text ####
+John 3:16 not a reference x
+#### text-all ####
+John 3:16 not a reference x
+#### text-nobreaks ####
+John 3:16 not a reference x
+#### spans ####
+entries: 0..27
+Reference 0..9 entry=0 path=/0 "John 3:16"
+Reference 10..25 entry=0 path=/2 "not a reference"
+Reference 26..27 entry=0 path=/4 "x"
+
+#### sources ####
+0..4 entry=0 path=/0/0 offset=0
+5..9 entry=0 path=/0/0 offset=5
+10..13 entry=0 path=/2/0 offset=0
+14..15 entry=0 path=/2/0 offset=4
+16..25 entry=0 path=/2/0 offset=6
+26..27 entry=0 path=/4/0 offset=0
+
+#### html ####
+<a class="topos-ref">John 3:16</a> <a class="topos-ref">not a reference</a> <a class="topos-ref" data-osis-ref="Jn 3:16">x</a>
+#### html-bare ####
+<a class="ref">John 3:16</a> <a class="ref">not a reference</a> <a class="ref" data-osis-ref="Jn 3:16">x</a>
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+/0 target=- passages=[John.3.16]
+/2 target=- passages=[]
+/4 target="Jn 3:16" passages=[John.3.16]
+

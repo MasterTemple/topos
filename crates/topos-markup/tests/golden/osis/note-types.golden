@@ -1,0 +1,59 @@
+#### markup ####
+osis
+#### input ####
+a<note type="crossReference" n="a" osisRef="Gen.1.1">x</note> b<note type="explanation" n="1">e</note> c<note type="translation">t</note> d<note type="study">s</note> e<note>untyped</note> f<note type="CROSSREFERENCE">upper</note> g<note type="x-My Type">odd</note> h<note type="footnote"/> i
+#### tree ####
+text "a"
+Note note type="crossReference" n="a" osisRef="Gen.1.1"
+  text "x"
+text " b"
+Note note type="explanation" n="1"
+  text "e"
+text " c"
+Note note type="translation"
+  text "t"
+text " d"
+Note note type="study"
+  text "s"
+text " e"
+Note note
+  text "untyped"
+text " f"
+Note note type="CROSSREFERENCE"
+  text "upper"
+text " g"
+Note note type="x-My Type"
+  text "odd"
+text " h"
+Note note type="footnote"
+text " i"
+
+#### text ####
+a b c d e f g h i
+#### text-all ####
+a (x) b (e) c (t) d (s) e (untyped) f (upper) g (odd) h i
+#### text-nobreaks ####
+a b c d e f g h i
+#### spans ####
+entries: 0..17
+
+#### sources ####
+0..1 entry=0 path=/0 offset=0
+2..3 entry=0 path=/2 offset=1
+4..5 entry=0 path=/4 offset=1
+6..7 entry=0 path=/6 offset=1
+8..9 entry=0 path=/8 offset=1
+10..11 entry=0 path=/10 offset=1
+12..13 entry=0 path=/12 offset=1
+14..15 entry=0 path=/14 offset=1
+16..17 entry=0 path=/16 offset=1
+
+#### html ####
+a<span class="topos-note topos-crossref" data-note-type="crossReference" data-n="a" data-osis-ref="Gen.1.1">x</span> b<span class="topos-note topos-explanation" data-note-type="explanation" data-n="1">e</span> c<span class="topos-note topos-translation" data-note-type="translation">t</span> d<span class="topos-note topos-study" data-note-type="study">s</span> e<span class="topos-note">untyped</span> f<span class="topos-note topos-crossref" data-note-type="CROSSREFERENCE">upper</span> g<span class="topos-note topos-x-my-type" data-note-type="x-My Type">odd</span> h i
+#### html-bare ####
+a<span class="note crossref" data-note-type="crossReference" data-n="a" data-osis-ref="Gen.1.1">x</span> b<span class="note explanation" data-note-type="explanation" data-n="1">e</span> c<span class="note translation" data-note-type="translation">t</span> d<span class="note study" data-note-type="study">s</span> e<span class="note">untyped</span> f<span class="note crossref" data-note-type="CROSSREFERENCE">upper</span> g<span class="note x-my-type" data-note-type="x-My Type">odd</span> h i
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+

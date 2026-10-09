@@ -1,0 +1,41 @@
+#### markup ####
+osis
+#### input ####
+<verse n="4–6"/>dash<verse n="7,8"/>comma<verse n=" 9 "/>spaces
+#### tree ####
+Verse verse n="4–6"
+text "dash"
+Verse verse n="7,8"
+text "comma"
+Verse verse n=" 9 "
+text "spaces"
+
+#### text ####
+dashcommaspaces
+#### text-all ####
+[ :4–6] dash [ :7,8] comma [ : 9 ] spaces
+#### text-nobreaks ####
+dashcommaspaces
+#### spans ####
+entries: 0..15
+Verse 0..0 entry=0 path=/0 ""
+Verse 4..4 entry=0 path=/2 ""
+Verse 9..9 entry=0 path=/4 ""
+
+#### sources ####
+0..4 entry=0 path=/1 offset=0
+4..9 entry=0 path=/3 offset=0
+9..15 entry=0 path=/5 offset=0
+
+#### html ####
+<span class="topos-verse" data-n="4–6"></span>dash<span class="topos-verse" data-n="7,8"></span>comma<span class="topos-verse" data-n=" 9 "></span>spaces
+#### html-bare ####
+<span class="verse" data-n="4–6"></span>dash<span class="verse" data-n="7,8"></span>comma<span class="verse" data-n=" 9 "></span>spaces
+#### verses ####
+0:4-6 marker=/0 start=/0 end=/2 "dash"
+0:7-8 marker=/2 start=/2 end=/4 "comma"
+0:9-9 marker=/4 start=/4 end=/6 "spaces"
+chapter_verses: []
+
+#### refs ####
+

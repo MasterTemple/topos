@@ -1,0 +1,75 @@
+#### markup ####
+thml
+#### input ####
+a<br>b<BR>c<br></br>d<hr>e<img src="x.png">f<pb n="3">g<meta name="m">h<link href="l">i<col>j<area>k<input>l
+#### tree ####
+text "a"
+LineBreak br
+text "b"
+LineBreak BR
+text "c"
+LineBreak br
+text "d"
+Other hr
+text "e"
+Image img src="x.png"
+text "f"
+Other pb n="3"
+text "g"
+Other meta name="m"
+text "h"
+Other link href="l"
+text "i"
+Other col
+text "j"
+Other area
+text "k"
+Other input
+text "l"
+
+#### text ####
+a
+b
+c
+defghijkl
+#### text-all ####
+a
+b
+c
+defghijkl
+#### text-nobreaks ####
+a b c defghijkl
+#### spans ####
+entries: 0..15
+Other 7..7 entry=0 path=/7 ""
+Image 8..8 entry=0 path=/9 ""
+Other 9..9 entry=0 path=/11 ""
+Other 10..10 entry=0 path=/13 ""
+Other 11..11 entry=0 path=/15 ""
+Other 12..12 entry=0 path=/17 ""
+Other 13..13 entry=0 path=/19 ""
+Other 14..14 entry=0 path=/21 ""
+
+#### sources ####
+0..1 entry=0 path=/0 offset=0
+2..3 entry=0 path=/2 offset=0
+4..5 entry=0 path=/4 offset=0
+6..7 entry=0 path=/6 offset=0
+7..8 entry=0 path=/8 offset=0
+8..9 entry=0 path=/10 offset=0
+9..10 entry=0 path=/12 offset=0
+10..11 entry=0 path=/14 offset=0
+11..12 entry=0 path=/16 offset=0
+12..13 entry=0 path=/18 offset=0
+13..14 entry=0 path=/20 offset=0
+14..15 entry=0 path=/22 offset=0
+
+#### html ####
+a<br class="topos-lb">b<br class="topos-lb">c<br class="topos-lb">defghijkl
+#### html-bare ####
+a<br class="lb">b<br class="lb">c<br class="lb">defghijkl
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+

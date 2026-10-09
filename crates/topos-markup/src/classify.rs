@@ -1,26 +1,58 @@
-//! Maps format-specific tags to the shared [`Kind`]s.
+//! Each markup's rules for what an element is: its kind, milestone, and default style.
 
-use super::{Element, Kind, Milestone};
+use crate::{Element, Kind, Markup, Milestone};
 
-fn milestone_attrs(e: &mut Element) {
-    if e.milestone.is_none() {
+/// Gives a complete element its kind (and milestone and default `type`, where the markup says so)
+pub(crate) fn classify(markup: Markup, e: &mut Element) {
+    if markup != Markup::Gbf && markup != Markup::Plaintext && e.milestone.is_none() {
         if e.attr("sID").is_some() {
             e.milestone = Some(Milestone::Start);
         } else if e.attr("eID").is_some() {
             e.milestone = Some(Milestone::End);
         }
     }
-}
-
-fn set_style(e: &mut Element, style: &str) {
-    if e.attr("type").is_none() {
-        e.set_attr("type", style.to_string());
+    let (kind, style) = match markup {
+        Markup::Osis => (osis(e), None),
+        Markup::Thml => thml(e),
+        Markup::Tei => tei(e),
+        Markup::Usx => usx(e),
+        Markup::Gbf => gbf(&e.name),
+        Markup::Plaintext => (
+            if e.name == "br" {
+                Kind::LineBreak
+            } else {
+                Kind::Other
+            },
+            None,
+        ),
+    };
+    e.kind = kind;
+    if let Some(style) = style {
+        default_type(e, style);
+    }
+    if markup == Markup::Usx && e.kind == Kind::Title && e.name == "para" {
+        let style = e.attr("style").unwrap_or("").to_string();
+        default_type(e, &style);
+    }
+    if markup == Markup::Tei
+        && e.kind == Kind::Highlight
+        && e.attr("type").is_none()
+        && let Some(rend) = e.attr("rend")
+    {
+        let rend = rend.to_string();
+        e.attrs.push((String::from("type"), rend));
     }
 }
 
-pub(crate) fn osis(e: &mut Element) {
-    milestone_attrs(e);
-    e.kind = match e.name.as_str() {
+/// Adds `type` when the element has none (in any case)
+fn default_type(e: &mut Element, style: &str) {
+    if e.attr("type").is_none() {
+        e.attrs.push((String::from("type"), style.to_string()));
+    }
+}
+
+fn osis(e: &Element) -> Kind {
+    match e.name.as_str() {
         "w" => Kind::Word,
         "note" => Kind::Note,
         "reference" => Kind::Reference,
@@ -51,199 +83,129 @@ pub(crate) fn osis(e: &mut Element) {
         "milestone" => Kind::Milestone,
         "figure" => Kind::Image,
         _ => Kind::Other,
-    };
-}
-
-pub(crate) fn thml(e: &mut Element) {
-    milestone_attrs(e);
-    let lname = e.name.to_ascii_lowercase();
-    e.kind = match lname.as_str() {
-        "scripref" => Kind::Reference,
-        "a" => Kind::Reference,
-        "note" => Kind::Note,
-        "i" | "em" | "cite" => {
-            set_style(e, "italic");
-            Kind::Highlight
-        }
-        "b" | "strong" => {
-            set_style(e, "bold");
-            Kind::Highlight
-        }
-        "u" => {
-            set_style(e, "underline");
-            Kind::Highlight
-        }
-        "sup" => {
-            set_style(e, "super");
-            Kind::Highlight
-        }
-        "sub" => {
-            set_style(e, "sub");
-            Kind::Highlight
-        }
-        "font" | "span" => Kind::Highlight,
-        "br" => Kind::LineBreak,
-        "p" => Kind::Paragraph,
-        "h1" | "h2" | "h3" | "h4" | "h5" | "h6" => Kind::Title,
-        "div" => {
-            if e.attr("class").is_some_and(|c| c.contains("sechead")) {
-                Kind::Title
-            } else {
-                Kind::Division
-            }
-        }
-        "added" => Kind::Added,
-        "foreign" => Kind::Foreign,
-        "q" | "blockquote" => Kind::Quote,
-        "img" => Kind::Image,
-        "w" => Kind::Word,
-        _ => Kind::Other,
-    };
-}
-
-pub(crate) fn tei(e: &mut Element) {
-    milestone_attrs(e);
-    e.kind = match e.name.as_str() {
-        "entryFree" | "entry" | "superentry" => Kind::Entry,
-        "ref" | "xr" => Kind::Reference,
-        "hi" => Kind::Highlight,
-        "emph" => {
-            set_style(e, "italic");
-            Kind::Highlight
-        }
-        "lb" => Kind::LineBreak,
-        "p" => Kind::Paragraph,
-        "note" => Kind::Note,
-        "foreign" => Kind::Foreign,
-        "q" | "quote" => Kind::Quote,
-        "w" => Kind::Word,
-        "figure" | "graphic" => Kind::Image,
-        "title" => {
-            set_style(e, "italic");
-            Kind::Highlight
-        }
-        _ => Kind::Other,
-    };
-    if e.kind == Kind::Highlight
-        && e.attr("type").is_none()
-        && let Some(r) = e.attr("rend").map(str::to_string)
-    {
-        e.set_attr("type", r);
     }
 }
 
-/// GBF: names are token codes; paired tokens are opened by `XY` and closed by `Xy`.
-pub(crate) fn gbf(e: &mut Element) {
-    e.kind = match e.name.as_str() {
-        "FI" => {
-            set_style(e, "italic");
-            Kind::Highlight
+fn thml(e: &Element) -> (Kind, Option<&'static str>) {
+    let name = e.name.to_ascii_lowercase();
+    match name.as_str() {
+        "scripref" | "a" => (Kind::Reference, None),
+        "note" => (Kind::Note, None),
+        "i" | "em" | "cite" => (Kind::Highlight, Some("italic")),
+        "b" | "strong" => (Kind::Highlight, Some("bold")),
+        "u" => (Kind::Highlight, Some("underline")),
+        "sup" => (Kind::Highlight, Some("super")),
+        "sub" => (Kind::Highlight, Some("sub")),
+        "font" | "span" => (Kind::Highlight, None),
+        "br" => (Kind::LineBreak, None),
+        "p" => (Kind::Paragraph, None),
+        "h1" | "h2" | "h3" | "h4" | "h5" | "h6" => (Kind::Title, None),
+        "div" => {
+            if e.attr("class").is_some_and(|c| c.contains("sechead")) {
+                (Kind::Title, None)
+            } else {
+                (Kind::Division, None)
+            }
         }
-        "FB" => {
-            set_style(e, "bold");
-            Kind::Highlight
-        }
-        "FU" => {
-            set_style(e, "underline");
-            Kind::Highlight
-        }
-        "FS" => {
-            set_style(e, "super");
-            Kind::Highlight
-        }
-        "FV" => {
-            set_style(e, "sub");
-            Kind::Highlight
-        }
-        "FC" => {
-            set_style(e, "small-caps");
-            Kind::Highlight
-        }
-        "FN" => Kind::Highlight,
-        "FR" => Kind::WordsOfJesus,
-        "FO" => Kind::Quote,
-        "RF" => Kind::Note,
-        "RX" => Kind::Reference,
-        "TS" | "TT" | "TH" => Kind::Title,
-        "PP" => Kind::LineGroup,
-        "CM" => Kind::Paragraph,
-        "CL" => Kind::LineBreak,
-        "w" => Kind::Word,
-        _ => Kind::Other,
-    };
+        "added" => (Kind::Added, None),
+        "foreign" => (Kind::Foreign, None),
+        "q" | "blockquote" => (Kind::Quote, None),
+        "img" => (Kind::Image, None),
+        "w" => (Kind::Word, None),
+        _ => (Kind::Other, None),
+    }
 }
 
-/// USX: `para` and `char` say what they are with `style` (USFM markers)
-pub(crate) fn usx(e: &mut Element) {
-    milestone_attrs(e);
-    let style = e.attr("style").unwrap_or("").to_string();
-    // `q1`, `s2`, `mt1` are their marker with a level
-    let marker = style.trim_end_matches(|c: char| c.is_ascii_digit());
-    e.kind = match e.name.as_str() {
-        "book" => Kind::Metadata,
-        "chapter" => Kind::Chapter,
-        "verse" => Kind::Verse,
-        "note" => {
-            let kind = match style.as_str() {
+fn tei(e: &Element) -> (Kind, Option<&'static str>) {
+    match e.name.as_str() {
+        "entryFree" | "entry" | "superentry" => (Kind::Entry, None),
+        "ref" | "xr" => (Kind::Reference, None),
+        "hi" => (Kind::Highlight, None),
+        "emph" | "title" => (Kind::Highlight, Some("italic")),
+        "lb" => (Kind::LineBreak, None),
+        "p" => (Kind::Paragraph, None),
+        "note" => (Kind::Note, None),
+        "foreign" => (Kind::Foreign, None),
+        "q" | "quote" => (Kind::Quote, None),
+        "w" => (Kind::Word, None),
+        "figure" | "graphic" => (Kind::Image, None),
+        _ => (Kind::Other, None),
+    }
+}
+
+/// A USFM marker without its trailing digits (`q1` → `q`)
+fn marker(style: &str) -> &str {
+    style.trim_end_matches(|c: char| c.is_ascii_digit())
+}
+
+fn usx(e: &Element) -> (Kind, Option<&'static str>) {
+    let style = e.attr("style").unwrap_or("");
+    match e.name.as_str() {
+        "book" => (Kind::Metadata, None),
+        "chapter" => (Kind::Chapter, None),
+        "verse" => (Kind::Verse, None),
+        "note" => (
+            Kind::Note,
+            Some(match style {
                 "x" | "ex" => "crossReference",
                 "ef" => "study",
                 _ => "footnote",
-            };
-            set_style(e, kind);
-            Kind::Note
-        }
-        "ref" => Kind::Reference,
-        "figure" => Kind::Image,
-        "optbreak" => Kind::LineBreak,
-        "para" => match marker {
+            }),
+        ),
+        "ref" => (Kind::Reference, None),
+        "figure" => (Kind::Image, None),
+        "optbreak" => (Kind::LineBreak, None),
+        "para" => match marker(style) {
             "s" | "ms" | "mt" | "mte" | "mr" | "sr" | "r" | "d" | "sp" | "cl" | "cd" | "is"
-            | "imt" | "sd" => {
-                set_style(e, &style);
-                Kind::Title
-            }
-            "q" | "qr" | "qc" | "qm" | "qa" | "qd" => Kind::Line,
-            "b" => Kind::LineBreak,
+            | "imt" | "sd" => (Kind::Title, None),
+            "q" | "qr" | "qc" | "qm" | "qa" | "qd" => (Kind::Line, None),
+            "b" => (Kind::LineBreak, None),
             "rem" | "h" | "toc" | "toca" | "ide" | "sts" | "restore" | "cat" | "usfm" => {
-                Kind::Metadata
+                (Kind::Metadata, None)
             }
-            _ => Kind::Paragraph,
+            _ => (Kind::Paragraph, None),
         },
-        "char" => match marker {
-            "wj" => Kind::WordsOfJesus,
-            "add" => Kind::Added,
-            "nd" => Kind::DivineName,
-            "w" => Kind::Word,
-            "xt" => Kind::Reference,
-            "qt" => Kind::Quote,
-            "tl" => Kind::Foreign,
-            "it" | "em" | "bk" => {
-                set_style(e, "italic");
-                Kind::Highlight
-            }
-            "bd" => {
-                set_style(e, "bold");
-                Kind::Highlight
-            }
-            "bdit" => {
-                set_style(e, "bold-italic");
-                Kind::Highlight
-            }
-            "sc" => {
-                set_style(e, "small-caps");
-                Kind::Highlight
-            }
-            "sup" => {
-                set_style(e, "super");
-                Kind::Highlight
-            }
-            "no" => {
-                set_style(e, "normal");
-                Kind::Highlight
-            }
-            _ => Kind::Other,
+        "char" => match marker(style) {
+            "wj" => (Kind::WordsOfJesus, None),
+            "add" => (Kind::Added, None),
+            "nd" => (Kind::DivineName, None),
+            "w" => (Kind::Word, None),
+            "xt" => (Kind::Reference, None),
+            "qt" => (Kind::Quote, None),
+            "tl" => (Kind::Foreign, None),
+            "it" | "em" | "bk" => (Kind::Highlight, Some("italic")),
+            "bd" => (Kind::Highlight, Some("bold")),
+            "bdit" => (Kind::Highlight, Some("bold-italic")),
+            "sc" => (Kind::Highlight, Some("small-caps")),
+            "sup" => (Kind::Highlight, Some("super")),
+            "no" => (Kind::Highlight, Some("normal")),
+            _ => (Kind::Other, None),
         },
-        "table" | "sidebar" | "periph" => Kind::Division,
-        "row" => Kind::Paragraph,
-        _ => Kind::Other,
-    };
+        "table" | "sidebar" | "periph" => (Kind::Division, None),
+        "row" => (Kind::Paragraph, None),
+        _ => (Kind::Other, None),
+    }
+}
+
+/// The paired and single GBF codes
+fn gbf(name: &str) -> (Kind, Option<&'static str>) {
+    match name {
+        "FI" => (Kind::Highlight, Some("italic")),
+        "FB" => (Kind::Highlight, Some("bold")),
+        "FU" => (Kind::Highlight, Some("underline")),
+        "FS" => (Kind::Highlight, Some("super")),
+        "FV" => (Kind::Highlight, Some("sub")),
+        "FC" => (Kind::Highlight, Some("small-caps")),
+        "FN" => (Kind::Highlight, None),
+        "FR" => (Kind::WordsOfJesus, None),
+        "FO" => (Kind::Quote, None),
+        "RF" => (Kind::Note, None),
+        "RX" => (Kind::Reference, None),
+        "TS" | "TT" | "TH" => (Kind::Title, None),
+        "PP" => (Kind::LineGroup, None),
+        "CM" => (Kind::Paragraph, None),
+        "CL" => (Kind::LineBreak, None),
+        "w" => (Kind::Word, None),
+        _ => (Kind::Other, None),
+    }
 }

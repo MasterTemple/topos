@@ -1,0 +1,40 @@
+#### markup ####
+thml
+#### input ####
+<i type="bold">x</i> <font type="small-caps">sc</font> <span class="sc">s</span>
+#### tree ####
+Highlight i type="bold"
+  text "x"
+text " "
+Highlight font type="small-caps"
+  text "sc"
+text " "
+Highlight span class="sc"
+  text "s"
+
+#### text ####
+x sc s
+#### text-all ####
+x sc s
+#### text-nobreaks ####
+x sc s
+#### spans ####
+entries: 0..6
+Highlight 0..1 entry=0 path=/0 "x"
+Highlight 2..4 entry=0 path=/2 "sc"
+Highlight 5..6 entry=0 path=/4 "s"
+
+#### sources ####
+0..1 entry=0 path=/0/0 offset=0
+2..4 entry=0 path=/2/0 offset=0
+5..6 entry=0 path=/4/0 offset=0
+
+#### html ####
+<b class="topos-hi topos-bold">x</b> <span class="topos-hi topos-small-caps">sc</span> <span class="topos-hi">s</span>
+#### html-bare ####
+<b class="hi bold">x</b> <span class="hi small-caps">sc</span> <span class="hi">s</span>
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+

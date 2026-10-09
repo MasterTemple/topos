@@ -1,0 +1,30 @@
+#### markup ####
+thml
+#### input ####
+λογος<sync type="morph" value="N-NSM"/>
+#### tree ####
+Word w morph="N-NSM"
+  text "λογος"
+
+#### text ####
+λογος
+#### text-all ####
+λογος
+#### text-nobreaks ####
+λογος
+#### spans ####
+entries: 0..10
+Word 0..10 entry=0 path=/0 "λογος"
+
+#### sources ####
+0..10 entry=0 path=/0/0 offset=0
+
+#### html ####
+<span class="topos-w" data-morph="N-NSM">λογος</span>
+#### html-bare ####
+<span class="w" data-morph="N-NSM">λογος</span>
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+

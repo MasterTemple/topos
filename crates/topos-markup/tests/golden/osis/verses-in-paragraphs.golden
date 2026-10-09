@@ -1,0 +1,63 @@
+#### markup ####
+osis
+#### input ####
+<p><verse osisID="John.1.1" sID="a"/>In the beginning</p><title>Heading</title><p>was the Word.<verse eID="a"/><verse osisID="John.1.2" sID="b"/>He was</p><p>with God.<verse eID="b"/></p>
+#### tree ####
+Paragraph p
+  Verse verse @start osisID="John.1.1" sID="a"
+  text "In the beginning"
+Title title
+  text "Heading"
+Paragraph p
+  text "was the Word."
+  Verse verse @end eID="a"
+  Verse verse @start osisID="John.1.2" sID="b"
+  text "He was"
+Paragraph p
+  text "with God."
+  Verse verse @end eID="b"
+
+#### text ####
+In the beginning
+was the Word.He was
+with God.
+#### text-all ####
+[a :] In the beginning
+## Heading
+was the Word. [b :] He was
+with God.
+#### text-nobreaks ####
+In the beginning was the Word.He was with God.
+#### spans ####
+entries: 0..46
+Verse 0..0 entry=0 path=/0/0 ""
+Paragraph 0..16 entry=0 path=/0 "In the beginning"
+Verse 30..30 entry=0 path=/2/1 ""
+Verse 30..30 entry=0 path=/2/2 ""
+Paragraph 17..36 entry=0 path=/2 "was the Word.He was"
+Verse 46..46 entry=0 path=/3/1 ""
+Paragraph 37..46 entry=0 path=/3 "with God."
+
+#### sources ####
+0..2 entry=0 path=/0/1 offset=0
+3..6 entry=0 path=/0/1 offset=3
+7..16 entry=0 path=/0/1 offset=7
+17..20 entry=0 path=/2/0 offset=0
+21..24 entry=0 path=/2/0 offset=4
+25..30 entry=0 path=/2/0 offset=8
+30..32 entry=0 path=/2/3 offset=0
+33..36 entry=0 path=/2/3 offset=3
+37..41 entry=0 path=/3/0 offset=0
+42..46 entry=0 path=/3/0 offset=5
+
+#### html ####
+<p class="topos-p"><span class="topos-verse" data-osis-id="John.1.1"></span>In the beginning</p><div class="topos-title">Heading</div><p class="topos-p">was the Word.<span class="topos-verse" data-osis-id="John.1.2"></span>He was</p><p class="topos-p">with God.</p>
+#### html-bare ####
+<p class="p"><span class="verse" data-osis-id="John.1.1"></span>In the beginning</p><div class="title">Heading</div><p class="p">was the Word.<span class="verse" data-osis-id="John.1.2"></span>He was</p><p class="p">with God.</p>
+#### verses ####
+0:1-1 marker=/0/0 start=/0/0 end=/2/1 "In the beginning\nHeading\nwas the Word."
+0:2-2 marker=/2/2 start=/2/2 end=/3/1 "He was\nwith God."
+chapter_verses: []
+
+#### refs ####
+

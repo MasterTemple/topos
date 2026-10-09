@@ -1,0 +1,1530 @@
+#### markup ####
+osis
+#### input ####
+<?xml version="1.0" encoding="UTF-8"?>
+<osis xmlns="http://www.bibletechnologies.net/2003/OSIS/namespace"><osisText osisIDWork="T" osisRefWork="Bible" xml:lang="en"><header><work osisWork="T"/></header>
+<div type="book" osisID="Gen"><title type="main">Book Gen</title>
+<chapter osisID="Gen.1"><title>Chapter 1</title>
+<verse osisID="Gen.1.1">created <w lemma="strong:G4390" morph="robinson:N-NSM">the</w> God the <w lemma="strong:G3553" morph="robinson:N-NSM">and</w> <w lemma="strong:G744" morph="robinson:N-NSM">é</w> <w lemma="strong:G4633" morph="robinson:N-NSM">é</w> God the <w lemma="strong:G1812" morph="robinson:N-NSM">Ä</w> the <w lemma="strong:G1182" morph="robinson:N-NSM">created</w> God &amp; end.</verse>
+<verse osisID="Gen.1.2"><w lemma="strong:G4680" morph="robinson:N-NSM">heaven</w> and beginning and é ß ß earth <w lemma="strong:G2460" morph="robinson:N-NSM">earth</w> שָׁלוֹם waters darkness <w lemma="strong:G3426" morph="robinson:N-NSM">beginning</w> heaven created <w lemma="strong:G5475" morph="robinson:N-NSM">é</w> beginning <transChange type="added">waters</transChange> spirit <w lemma="strong:G767" morph="robinson:N-NSM">ß</w> &amp; end.</verse>
+<verse osisID="Gen.1.3">ἀγάπη <w lemma="strong:G2537" morph="robinson:N-NSM">beginning</w> <w lemma="strong:G3161" morph="robinson:N-NSM">ß</w> <w lemma="strong:G3783" morph="robinson:N-NSM">spirit</w> <w lemma="strong:G960" morph="robinson:N-NSM">spirit</w> <w lemma="strong:G2355" morph="robinson:N-NSM">ἀγάπη</w> created Ä <w lemma="strong:G3680" morph="robinson:N-NSM">ἀγάπη</w> Ä created &amp; end.</verse>
+<verse osisID="Gen.1.4">light spirit Ä <w lemma="strong:G1240" morph="robinson:N-NSM">created</w> earth in <w lemma="strong:G34" morph="robinson:N-NSM">heaven</w> created spirit waters שָׁלוֹם the Ä <w lemma="strong:G5197" morph="robinson:N-NSM">Ä</w> <w lemma="strong:G552" morph="robinson:N-NSM">Ä</w> and <transChange type="added">God</transChange> <w lemma="strong:G4644" morph="robinson:N-NSM">the</w> created spirit &amp; end.</verse>
+<verse osisID="Gen.1.5">and created spirit <w lemma="strong:G3999" morph="robinson:N-NSM">ἀγάπη</w> ß <note type="crossReference" n="a"><reference osisRef="John.3.16">John 3:16</reference></note> &amp; end.</verse>
+<verse osisID="Gen.1.6"><w lemma="strong:G2807" morph="robinson:N-NSM">beginning</w> light heaven and שָׁלוֹם in darkness beginning light heaven earth <transChange type="added">שָׁלוֹם</transChange> &amp; end.</verse>
+<verse osisID="Gen.1.7"><q who="Jesus" marker=""> and Ä <w lemma="strong:G4037" morph="robinson:N-NSM">earth</w> spirit in <w lemma="strong:G4958" morph="robinson:N-NSM">ἀγάπη</w> spirit spirit <w lemma="strong:G837" morph="robinson:N-NSM">spirit</w> earth </q> &amp; end.</verse>
+<verse osisID="Gen.1.8">and in spirit beginning God and heaven <w lemma="strong:G3243" morph="robinson:N-NSM">waters</w> ß beginning heaven <w lemma="strong:G3813" morph="robinson:N-NSM">in</w> created &amp; end.</verse>
+<verse osisID="Gen.1.9">ἀγάπη <w lemma="strong:G4492" morph="robinson:N-NSM">spirit</w> <w lemma="strong:G5323" morph="robinson:N-NSM">created</w> God created and <w lemma="strong:G1744" morph="robinson:N-NSM">and</w> darkness <w lemma="strong:G3433" morph="robinson:N-NSM">waters</w> <w lemma="strong:G2899" morph="robinson:N-NSM">created</w> ß שָׁלוֹם <w lemma="strong:G1244" morph="robinson:N-NSM">שָׁלוֹם</w> שָׁלוֹם ß in <w lemma="strong:G3879" morph="robinson:N-NSM">created</w> God waters שָׁלוֹם God <w lemma="strong:G2269" morph="robinson:N-NSM">the</w> &amp; end.</verse>
+<verse osisID="Gen.1.10">God in beginning שָׁלוֹם <note type="crossReference" n="a"><reference osisRef="John.3.16">John 3:16</reference></note> &amp; end.</verse>
+<verse osisID="Gen.1.11">light ἀγάπη earth light and created Ä beginning <w lemma="strong:G5485" morph="robinson:N-NSM">é</w> &amp; end.</verse>
+<verse osisID="Gen.1.12">God created <w lemma="strong:G1125" morph="robinson:N-NSM">spirit</w> <w lemma="strong:G772" morph="robinson:N-NSM">ß</w> Ä heaven <w lemma="strong:G3536" morph="robinson:N-NSM">earth</w> שָׁלוֹם <w lemma="strong:G2610" morph="robinson:N-NSM">é</w> beginning <transChange type="added">in</transChange> ß &amp; end.</verse>
+<verse osisID="Gen.1.13"><transChange type="added">Ä</transChange> darkness <w lemma="strong:G1873" morph="robinson:N-NSM">beginning</w> &amp; end.</verse>
+<verse osisID="Gen.1.14"><q who="Jesus" marker=""> <w lemma="strong:G325" morph="robinson:N-NSM">beginning</w> <w lemma="strong:G1062" morph="robinson:N-NSM">heaven</w> é light שָׁלוֹם <w lemma="strong:G472" morph="robinson:N-NSM">waters</w> </q> &amp; end.</verse>
+<verse osisID="Gen.1.15">heaven <w lemma="strong:G138" morph="robinson:N-NSM">beginning</w> beginning beginning <w lemma="strong:G997" morph="robinson:N-NSM">earth</w> <w lemma="strong:G4531" morph="robinson:N-NSM">ß</w> é light the earth <w lemma="strong:G1484" morph="robinson:N-NSM">heaven</w> and darkness <w lemma="strong:G4097" morph="robinson:N-NSM">and</w> <w lemma="strong:G149" morph="robinson:N-NSM">heaven</w> <w lemma="strong:G152" morph="robinson:N-NSM">light</w> שָׁלוֹם and earth God é Ä darkness <transChange type="added">earth</transChange> created <note type="crossReference" n="a"><reference osisRef="John.3.16">John 3:16</reference></note> &amp; end.</verse>
+<verse osisID="Gen.1.16">the <w lemma="strong:G2094" morph="robinson:N-NSM">in</w> <w lemma="strong:G693" morph="robinson:N-NSM">é</w> Ä darkness <w lemma="strong:G1519" morph="robinson:N-NSM">darkness</w> <w lemma="strong:G30" morph="robinson:N-NSM">heaven</w> light waters <w lemma="strong:G2536" morph="robinson:N-NSM">waters</w> and <transChange type="added">in</transChange> beginning שָׁלוֹם &amp; end.</verse>
+<verse osisID="Gen.1.17">שָׁלוֹם <w lemma="strong:G736" morph="robinson:N-NSM">beginning</w> created the <transChange type="added">darkness</transChange> <w lemma="strong:G4336" morph="robinson:N-NSM">earth</w> created Ä <w lemma="strong:G5069" morph="robinson:N-NSM">ἀγάπη</w> <w lemma="strong:G4203" morph="robinson:N-NSM">created</w> &amp; end.</verse>
+<verse osisID="Gen.1.18">é <w lemma="strong:G4291" morph="robinson:N-NSM">שָׁלוֹם</w> שָׁלוֹם in <w lemma="strong:G343" morph="robinson:N-NSM">earth</w> created God ß in earth in beginning שָׁלוֹם beginning beginning <w lemma="strong:G610" morph="robinson:N-NSM">ἀγάπη</w> <w lemma="strong:G1682" morph="robinson:N-NSM">light</w> earth ß <w lemma="strong:G2354" morph="robinson:N-NSM">Ä</w> the <w lemma="strong:G1208" morph="robinson:N-NSM">and</w> <w lemma="strong:G2494" morph="robinson:N-NSM">waters</w> &amp; end.</verse>
+<verse osisID="Gen.1.19"><w lemma="strong:G497" morph="robinson:N-NSM">created</w> <w lemma="strong:G5506" morph="robinson:N-NSM">ἀγάπη</w> God <w lemma="strong:G4232" morph="robinson:N-NSM">ἀγάπη</w> darkness ß <transChange type="added">and</transChange> beginning <w lemma="strong:G627" morph="robinson:N-NSM">in</w> שָׁלוֹם ß <w lemma="strong:G1727" morph="robinson:N-NSM">Ä</w> beginning created light created <w lemma="strong:G924" morph="robinson:N-NSM">שָׁלוֹם</w> <w lemma="strong:G3983" morph="robinson:N-NSM">spirit</w> <w lemma="strong:G30" morph="robinson:N-NSM">Ä</w> ἀγάπη <transChange type="added">Ä</transChange> created &amp; end.</verse>
+<verse osisID="Gen.1.20"><w lemma="strong:G2715" morph="robinson:N-NSM">waters</w> <transChange type="added">in</transChange> waters God and <w lemma="strong:G533" morph="robinson:N-NSM">darkness</w> Ä beginning é <w lemma="strong:G423" morph="robinson:N-NSM">the</w> darkness <w lemma="strong:G2177" morph="robinson:N-NSM">created</w> é and é <note type="crossReference" n="a"><reference osisRef="John.3.16">John 3:16</reference></note> &amp; end.</verse>
+<verse osisID="Gen.1.21"><q who="Jesus" marker=""> Ä and the é created darkness <w lemma="strong:G3399" morph="robinson:N-NSM">created</w> <w lemma="strong:G2096" morph="robinson:N-NSM">waters</w> light <transChange type="added">earth</transChange> <w lemma="strong:G5270" morph="robinson:N-NSM">Ä</w> <w lemma="strong:G4101" morph="robinson:N-NSM">heaven</w> ἀγάπη ß ß <w lemma="strong:G1432" morph="robinson:N-NSM">and</w> waters <w lemma="strong:G2117" morph="robinson:N-NSM">waters</w> and é <w lemma="strong:G2214" morph="robinson:N-NSM">שָׁלוֹם</w> waters <w lemma="strong:G2951" morph="robinson:N-NSM">ἀγάπη</w> </q> &amp; end.</verse>
+<verse osisID="Gen.1.22">שָׁלוֹם <w lemma="strong:G2036" morph="robinson:N-NSM">and</w> Ä ß darkness <w lemma="strong:G3484" morph="robinson:N-NSM">in</w> ἀγάπη &amp; end.</verse>
+<verse osisID="Gen.1.23"><w lemma="strong:G4325" morph="robinson:N-NSM">in</w> ß earth <w lemma="strong:G4280" morph="robinson:N-NSM">earth</w> God <w lemma="strong:G324" morph="robinson:N-NSM">ß</w> in earth the darkness light é <w lemma="strong:G2461" morph="robinson:N-NSM">God</w> שָׁלוֹם and earth <w lemma="strong:G2471" morph="robinson:N-NSM">in</w> <w lemma="strong:G2592" morph="robinson:N-NSM">ß</w> &amp; end.</verse>
+<verse osisID="Gen.1.24">earth earth in <w lemma="strong:G1591" morph="robinson:N-NSM">darkness</w> ἀγάπη <w lemma="strong:G1867" morph="robinson:N-NSM">é</w> é earth waters spirit <w lemma="strong:G2393" morph="robinson:N-NSM">and</w> <w lemma="strong:G4061" morph="robinson:N-NSM">שָׁלוֹם</w> <transChange type="added">and</transChange> <w lemma="strong:G1815" morph="robinson:N-NSM">and</w> light <w lemma="strong:G5109" morph="robinson:N-NSM">darkness</w> ἀγάπη earth the created <w lemma="strong:G4884" morph="robinson:N-NSM">the</w> created <w lemma="strong:G3684" morph="robinson:N-NSM">the</w> &amp; end.</verse>
+<verse osisID="Gen.1.25">waters beginning <w lemma="strong:G5346" morph="robinson:N-NSM">waters</w> שָׁלוֹם <transChange type="added">the</transChange> Ä waters <w lemma="strong:G2293" morph="robinson:N-NSM">God</w> beginning God and darkness <w lemma="strong:G3879" morph="robinson:N-NSM">é</w> and <w lemma="strong:G2984" morph="robinson:N-NSM">ß</w> <w lemma="strong:G3366" morph="robinson:N-NSM">ἀγάπη</w> earth <w lemma="strong:G286" morph="robinson:N-NSM">Ä</w> <w lemma="strong:G508" morph="robinson:N-NSM">ß</w> <w lemma="strong:G515" morph="robinson:N-NSM">light</w> waters waters <w lemma="strong:G2593" morph="robinson:N-NSM">the</w> <w lemma="strong:G4879" morph="robinson:N-NSM">light</w> <w lemma="strong:G1916" morph="robinson:N-NSM">beginning</w> <note type="crossReference" n="a"><reference osisRef="John.3.16">John 3:16</reference></note> &amp; end.</verse>
+<verse osisID="Gen.1.26">ἀγάπη ß Ä é created <w lemma="strong:G2485" morph="robinson:N-NSM">heaven</w> &amp; end.</verse>
+<verse osisID="Gen.1.27">created waters ß beginning Ä earth the <w lemma="strong:G3495" morph="robinson:N-NSM">waters</w> God light <w lemma="strong:G4084" morph="robinson:N-NSM">and</w> <w lemma="strong:G1089" morph="robinson:N-NSM">ß</w> é earth God <w lemma="strong:G4644" morph="robinson:N-NSM">darkness</w> light <w lemma="strong:G2027" morph="robinson:N-NSM">light</w> <w lemma="strong:G1257" morph="robinson:N-NSM">heaven</w> darkness <transChange type="added">and</transChange> <w lemma="strong:G2015" morph="robinson:N-NSM">Ä</w> שָׁלוֹם God <w lemma="strong:G3890" morph="robinson:N-NSM">the</w> &amp; end.</verse>
+<verse osisID="Gen.1.28"><q who="Jesus" marker=""> ß the <w lemma="strong:G1553" morph="robinson:N-NSM">earth</w> and spirit heaven light <w lemma="strong:G4884" morph="robinson:N-NSM">in</w> <w lemma="strong:G3021" morph="robinson:N-NSM">spirit</w> <w lemma="strong:G1671" morph="robinson:N-NSM">waters</w> </q> &amp; end.</verse>
+<verse osisID="Gen.1.29">the and waters <w lemma="strong:G2558" morph="robinson:N-NSM">spirit</w> <w lemma="strong:G4061" morph="robinson:N-NSM">beginning</w> <w lemma="strong:G831" morph="robinson:N-NSM">ἀγάπη</w> Ä created beginning Ä é &amp; end.</verse>
+<verse osisID="Gen.1.30">darkness <transChange type="added">the</transChange> spirit in spirit Ä and é <w lemma="strong:G742" morph="robinson:N-NSM">é</w> Ä spirit <w lemma="strong:G424" morph="robinson:N-NSM">heaven</w> created <w lemma="strong:G5098" morph="robinson:N-NSM">Ä</w> spirit <w lemma="strong:G2321" morph="robinson:N-NSM">heaven</w> heaven <w lemma="strong:G4019" morph="robinson:N-NSM">beginning</w> <transChange type="added">and</transChange> the <transChange type="added">ἀγάπη</transChange> <w lemma="strong:G5082" morph="robinson:N-NSM">Ä</w> heaven earth <note type="crossReference" n="a"><reference osisRef="John.3.16">John 3:16</reference></note> &amp; end.</verse>
+<verse osisID="Gen.1.31">and heaven the <w lemma="strong:G2943" morph="robinson:N-NSM">שָׁלוֹם</w> <w lemma="strong:G1578" morph="robinson:N-NSM">God</w> the the <w lemma="strong:G4912" morph="robinson:N-NSM">waters</w> ß darkness darkness é spirit <w lemma="strong:G29" morph="robinson:N-NSM">ß</w> ἀγάπη ß ß ἀγάπη <w lemma="strong:G3528" morph="robinson:N-NSM">beginning</w> <w lemma="strong:G3621" morph="robinson:N-NSM">spirit</w> שָׁלוֹם <w lemma="strong:G1068" morph="robinson:N-NSM">the</w> &amp; end.</verse>
+</chapter>
+</div></osisText></osis>
+
+#### tree ####
+text "\n"
+Other osis xmlns="http://www.bibletechnologies.net/2003/OSIS/namespace"
+  Other osisText osisIDWork="T" osisRefWork="Bible" xml:lang="en"
+    Other header
+      Other work osisWork="T"
+    text "\n"
+    Division div type="book" osisID="Gen"
+      Title title type="main"
+        text "Book Gen"
+      text "\n"
+      Chapter chapter osisID="Gen.1"
+        Title title
+          text "Chapter 1"
+        text "\n"
+        Verse verse osisID="Gen.1.1"
+          text "created "
+          Word w lemma="strong:G4390" morph="robinson:N-NSM"
+            text "the"
+          text " God the "
+          Word w lemma="strong:G3553" morph="robinson:N-NSM"
+            text "and"
+          text " "
+          Word w lemma="strong:G744" morph="robinson:N-NSM"
+            text "é"
+          text " "
+          Word w lemma="strong:G4633" morph="robinson:N-NSM"
+            text "é"
+          text " God the "
+          Word w lemma="strong:G1812" morph="robinson:N-NSM"
+            text "Ä"
+          text " the "
+          Word w lemma="strong:G1182" morph="robinson:N-NSM"
+            text "created"
+          text " God & end."
+        text "\n"
+        Verse verse osisID="Gen.1.2"
+          Word w lemma="strong:G4680" morph="robinson:N-NSM"
+            text "heaven"
+          text " and beginning and é ß ß earth "
+          Word w lemma="strong:G2460" morph="robinson:N-NSM"
+            text "earth"
+          text " שָׁלוֹם waters darkness "
+          Word w lemma="strong:G3426" morph="robinson:N-NSM"
+            text "beginning"
+          text " heaven created "
+          Word w lemma="strong:G5475" morph="robinson:N-NSM"
+            text "é"
+          text " beginning "
+          Added transChange type="added"
+            text "waters"
+          text " spirit "
+          Word w lemma="strong:G767" morph="robinson:N-NSM"
+            text "ß"
+          text " & end."
+        text "\n"
+        Verse verse osisID="Gen.1.3"
+          text "ἀγάπη "
+          Word w lemma="strong:G2537" morph="robinson:N-NSM"
+            text "beginning"
+          text " "
+          Word w lemma="strong:G3161" morph="robinson:N-NSM"
+            text "ß"
+          text " "
+          Word w lemma="strong:G3783" morph="robinson:N-NSM"
+            text "spirit"
+          text " "
+          Word w lemma="strong:G960" morph="robinson:N-NSM"
+            text "spirit"
+          text " "
+          Word w lemma="strong:G2355" morph="robinson:N-NSM"
+            text "ἀγάπη"
+          text " created Ä "
+          Word w lemma="strong:G3680" morph="robinson:N-NSM"
+            text "ἀγάπη"
+          text " Ä created & end."
+        text "\n"
+        Verse verse osisID="Gen.1.4"
+          text "light spirit Ä "
+          Word w lemma="strong:G1240" morph="robinson:N-NSM"
+            text "created"
+          text " earth in "
+          Word w lemma="strong:G34" morph="robinson:N-NSM"
+            text "heaven"
+          text " created spirit waters שָׁלוֹם the Ä "
+          Word w lemma="strong:G5197" morph="robinson:N-NSM"
+            text "Ä"
+          text " "
+          Word w lemma="strong:G552" morph="robinson:N-NSM"
+            text "Ä"
+          text " and "
+          Added transChange type="added"
+            text "God"
+          text " "
+          Word w lemma="strong:G4644" morph="robinson:N-NSM"
+            text "the"
+          text " created spirit & end."
+        text "\n"
+        Verse verse osisID="Gen.1.5"
+          text "and created spirit "
+          Word w lemma="strong:G3999" morph="robinson:N-NSM"
+            text "ἀγάπη"
+          text " ß "
+          Note note type="crossReference" n="a"
+            Reference reference osisRef="John.3.16"
+              text "John 3:16"
+          text " & end."
+        text "\n"
+        Verse verse osisID="Gen.1.6"
+          Word w lemma="strong:G2807" morph="robinson:N-NSM"
+            text "beginning"
+          text " light heaven and שָׁלוֹם in darkness beginning light heaven earth "
+          Added transChange type="added"
+            text "שָׁלוֹם"
+          text " & end."
+        text "\n"
+        Verse verse osisID="Gen.1.7"
+          WordsOfJesus q who="Jesus" marker=""
+            text " and Ä "
+            Word w lemma="strong:G4037" morph="robinson:N-NSM"
+              text "earth"
+            text " spirit in "
+            Word w lemma="strong:G4958" morph="robinson:N-NSM"
+              text "ἀγάπη"
+            text " spirit spirit "
+            Word w lemma="strong:G837" morph="robinson:N-NSM"
+              text "spirit"
+            text " earth "
+          text " & end."
+        text "\n"
+        Verse verse osisID="Gen.1.8"
+          text "and in spirit beginning God and heaven "
+          Word w lemma="strong:G3243" morph="robinson:N-NSM"
+            text "waters"
+          text " ß beginning heaven "
+          Word w lemma="strong:G3813" morph="robinson:N-NSM"
+            text "in"
+          text " created & end."
+        text "\n"
+        Verse verse osisID="Gen.1.9"
+          text "ἀγάπη "
+          Word w lemma="strong:G4492" morph="robinson:N-NSM"
+            text "spirit"
+          text " "
+          Word w lemma="strong:G5323" morph="robinson:N-NSM"
+            text "created"
+          text " God created and "
+          Word w lemma="strong:G1744" morph="robinson:N-NSM"
+            text "and"
+          text " darkness "
+          Word w lemma="strong:G3433" morph="robinson:N-NSM"
+            text "waters"
+          text " "
+          Word w lemma="strong:G2899" morph="robinson:N-NSM"
+            text "created"
+          text " ß שָׁלוֹם "
+          Word w lemma="strong:G1244" morph="robinson:N-NSM"
+            text "שָׁלוֹם"
+          text " שָׁלוֹם ß in "
+          Word w lemma="strong:G3879" morph="robinson:N-NSM"
+            text "created"
+          text " God waters שָׁלוֹם God "
+          Word w lemma="strong:G2269" morph="robinson:N-NSM"
+            text "the"
+          text " & end."
+        text "\n"
+        Verse verse osisID="Gen.1.10"
+          text "God in beginning שָׁלוֹם "
+          Note note type="crossReference" n="a"
+            Reference reference osisRef="John.3.16"
+              text "John 3:16"
+          text " & end."
+        text "\n"
+        Verse verse osisID="Gen.1.11"
+          text "light ἀγάπη earth light and created Ä beginning "
+          Word w lemma="strong:G5485" morph="robinson:N-NSM"
+            text "é"
+          text " & end."
+        text "\n"
+        Verse verse osisID="Gen.1.12"
+          text "God created "
+          Word w lemma="strong:G1125" morph="robinson:N-NSM"
+            text "spirit"
+          text " "
+          Word w lemma="strong:G772" morph="robinson:N-NSM"
+            text "ß"
+          text " Ä heaven "
+          Word w lemma="strong:G3536" morph="robinson:N-NSM"
+            text "earth"
+          text " שָׁלוֹם "
+          Word w lemma="strong:G2610" morph="robinson:N-NSM"
+            text "é"
+          text " beginning "
+          Added transChange type="added"
+            text "in"
+          text " ß & end."
+        text "\n"
+        Verse verse osisID="Gen.1.13"
+          Added transChange type="added"
+            text "Ä"
+          text " darkness "
+          Word w lemma="strong:G1873" morph="robinson:N-NSM"
+            text "beginning"
+          text " & end."
+        text "\n"
+        Verse verse osisID="Gen.1.14"
+          WordsOfJesus q who="Jesus" marker=""
+            text " "
+            Word w lemma="strong:G325" morph="robinson:N-NSM"
+              text "beginning"
+            text " "
+            Word w lemma="strong:G1062" morph="robinson:N-NSM"
+              text "heaven"
+            text " é light שָׁלוֹם "
+            Word w lemma="strong:G472" morph="robinson:N-NSM"
+              text "waters"
+            text " "
+          text " & end."
+        text "\n"
+        Verse verse osisID="Gen.1.15"
+          text "heaven "
+          Word w lemma="strong:G138" morph="robinson:N-NSM"
+            text "beginning"
+          text " beginning beginning "
+          Word w lemma="strong:G997" morph="robinson:N-NSM"
+            text "earth"
+          text " "
+          Word w lemma="strong:G4531" morph="robinson:N-NSM"
+            text "ß"
+          text " é light the earth "
+          Word w lemma="strong:G1484" morph="robinson:N-NSM"
+            text "heaven"
+          text " and darkness "
+          Word w lemma="strong:G4097" morph="robinson:N-NSM"
+            text "and"
+          text " "
+          Word w lemma="strong:G149" morph="robinson:N-NSM"
+            text "heaven"
+          text " "
+          Word w lemma="strong:G152" morph="robinson:N-NSM"
+            text "light"
+          text " שָׁלוֹם and earth God é Ä darkness "
+          Added transChange type="added"
+            text "earth"
+          text " created "
+          Note note type="crossReference" n="a"
+            Reference reference osisRef="John.3.16"
+              text "John 3:16"
+          text " & end."
+        text "\n"
+        Verse verse osisID="Gen.1.16"
+          text "the "
+          Word w lemma="strong:G2094" morph="robinson:N-NSM"
+            text "in"
+          text " "
+          Word w lemma="strong:G693" morph="robinson:N-NSM"
+            text "é"
+          text " Ä darkness "
+          Word w lemma="strong:G1519" morph="robinson:N-NSM"
+            text "darkness"
+          text " "
+          Word w lemma="strong:G30" morph="robinson:N-NSM"
+            text "heaven"
+          text " light waters "
+          Word w lemma="strong:G2536" morph="robinson:N-NSM"
+            text "waters"
+          text " and "
+          Added transChange type="added"
+            text "in"
+          text " beginning שָׁלוֹם & end."
+        text "\n"
+        Verse verse osisID="Gen.1.17"
+          text "שָׁלוֹם "
+          Word w lemma="strong:G736" morph="robinson:N-NSM"
+            text "beginning"
+          text " created the "
+          Added transChange type="added"
+            text "darkness"
+          text " "
+          Word w lemma="strong:G4336" morph="robinson:N-NSM"
+            text "earth"
+          text " created Ä "
+          Word w lemma="strong:G5069" morph="robinson:N-NSM"
+            text "ἀγάπη"
+          text " "
+          Word w lemma="strong:G4203" morph="robinson:N-NSM"
+            text "created"
+          text " & end."
+        text "\n"
+        Verse verse osisID="Gen.1.18"
+          text "é "
+          Word w lemma="strong:G4291" morph="robinson:N-NSM"
+            text "שָׁלוֹם"
+          text " שָׁלוֹם in "
+          Word w lemma="strong:G343" morph="robinson:N-NSM"
+            text "earth"
+          text " created God ß in earth in beginning שָׁלוֹם beginning beginning "
+          Word w lemma="strong:G610" morph="robinson:N-NSM"
+            text "ἀγάπη"
+          text " "
+          Word w lemma="strong:G1682" morph="robinson:N-NSM"
+            text "light"
+          text " earth ß "
+          Word w lemma="strong:G2354" morph="robinson:N-NSM"
+            text "Ä"
+          text " the "
+          Word w lemma="strong:G1208" morph="robinson:N-NSM"
+            text "and"
+          text " "
+          Word w lemma="strong:G2494" morph="robinson:N-NSM"
+            text "waters"
+          text " & end."
+        text "\n"
+        Verse verse osisID="Gen.1.19"
+          Word w lemma="strong:G497" morph="robinson:N-NSM"
+            text "created"
+          text " "
+          Word w lemma="strong:G5506" morph="robinson:N-NSM"
+            text "ἀγάπη"
+          text " God "
+          Word w lemma="strong:G4232" morph="robinson:N-NSM"
+            text "ἀγάπη"
+          text " darkness ß "
+          Added transChange type="added"
+            text "and"
+          text " beginning "
+          Word w lemma="strong:G627" morph="robinson:N-NSM"
+            text "in"
+          text " שָׁלוֹם ß "
+          Word w lemma="strong:G1727" morph="robinson:N-NSM"
+            text "Ä"
+          text " beginning created light created "
+          Word w lemma="strong:G924" morph="robinson:N-NSM"
+            text "שָׁלוֹם"
+          text " "
+          Word w lemma="strong:G3983" morph="robinson:N-NSM"
+            text "spirit"
+          text " "
+          Word w lemma="strong:G30" morph="robinson:N-NSM"
+            text "Ä"
+          text " ἀγάπη "
+          Added transChange type="added"
+            text "Ä"
+          text " created & end."
+        text "\n"
+        Verse verse osisID="Gen.1.20"
+          Word w lemma="strong:G2715" morph="robinson:N-NSM"
+            text "waters"
+          text " "
+          Added transChange type="added"
+            text "in"
+          text " waters God and "
+          Word w lemma="strong:G533" morph="robinson:N-NSM"
+            text "darkness"
+          text " Ä beginning é "
+          Word w lemma="strong:G423" morph="robinson:N-NSM"
+            text "the"
+          text " darkness "
+          Word w lemma="strong:G2177" morph="robinson:N-NSM"
+            text "created"
+          text " é and é "
+          Note note type="crossReference" n="a"
+            Reference reference osisRef="John.3.16"
+              text "John 3:16"
+          text " & end."
+        text "\n"
+        Verse verse osisID="Gen.1.21"
+          WordsOfJesus q who="Jesus" marker=""
+            text " Ä and the é created darkness "
+            Word w lemma="strong:G3399" morph="robinson:N-NSM"
+              text "created"
+            text " "
+            Word w lemma="strong:G2096" morph="robinson:N-NSM"
+              text "waters"
+            text " light "
+            Added transChange type="added"
+              text "earth"
+            text " "
+            Word w lemma="strong:G5270" morph="robinson:N-NSM"
+              text "Ä"
+            text " "
+            Word w lemma="strong:G4101" morph="robinson:N-NSM"
+              text "heaven"
+            text " ἀγάπη ß ß "
+            Word w lemma="strong:G1432" morph="robinson:N-NSM"
+              text "and"
+            text " waters "
+            Word w lemma="strong:G2117" morph="robinson:N-NSM"
+              text "waters"
+            text " and é "
+            Word w lemma="strong:G2214" morph="robinson:N-NSM"
+              text "שָׁלוֹם"
+            text " waters "
+            Word w lemma="strong:G2951" morph="robinson:N-NSM"
+              text "ἀγάπη"
+            text " "
+          text " & end."
+        text "\n"
+        Verse verse osisID="Gen.1.22"
+          text "שָׁלוֹם "
+          Word w lemma="strong:G2036" morph="robinson:N-NSM"
+            text "and"
+          text " Ä ß darkness "
+          Word w lemma="strong:G3484" morph="robinson:N-NSM"
+            text "in"
+          text " ἀγάπη & end."
+        text "\n"
+        Verse verse osisID="Gen.1.23"
+          Word w lemma="strong:G4325" morph="robinson:N-NSM"
+            text "in"
+          text " ß earth "
+          Word w lemma="strong:G4280" morph="robinson:N-NSM"
+            text "earth"
+          text " God "
+          Word w lemma="strong:G324" morph="robinson:N-NSM"
+            text "ß"
+          text " in earth the darkness light é "
+          Word w lemma="strong:G2461" morph="robinson:N-NSM"
+            text "God"
+          text " שָׁלוֹם and earth "
+          Word w lemma="strong:G2471" morph="robinson:N-NSM"
+            text "in"
+          text " "
+          Word w lemma="strong:G2592" morph="robinson:N-NSM"
+            text "ß"
+          text " & end."
+        text "\n"
+        Verse verse osisID="Gen.1.24"
+          text "earth earth in "
+          Word w lemma="strong:G1591" morph="robinson:N-NSM"
+            text "darkness"
+          text " ἀγάπη "
+          Word w lemma="strong:G1867" morph="robinson:N-NSM"
+            text "é"
+          text " é earth waters spirit "
+          Word w lemma="strong:G2393" morph="robinson:N-NSM"
+            text "and"
+          text " "
+          Word w lemma="strong:G4061" morph="robinson:N-NSM"
+            text "שָׁלוֹם"
+          text " "
+          Added transChange type="added"
+            text "and"
+          text " "
+          Word w lemma="strong:G1815" morph="robinson:N-NSM"
+            text "and"
+          text " light "
+          Word w lemma="strong:G5109" morph="robinson:N-NSM"
+            text "darkness"
+          text " ἀγάπη earth the created "
+          Word w lemma="strong:G4884" morph="robinson:N-NSM"
+            text "the"
+          text " created "
+          Word w lemma="strong:G3684" morph="robinson:N-NSM"
+            text "the"
+          text " & end."
+        text "\n"
+        Verse verse osisID="Gen.1.25"
+          text "waters beginning "
+          Word w lemma="strong:G5346" morph="robinson:N-NSM"
+            text "waters"
+          text " שָׁלוֹם "
+          Added transChange type="added"
+            text "the"
+          text " Ä waters "
+          Word w lemma="strong:G2293" morph="robinson:N-NSM"
+            text "God"
+          text " beginning God and darkness "
+          Word w lemma="strong:G3879" morph="robinson:N-NSM"
+            text "é"
+          text " and "
+          Word w lemma="strong:G2984" morph="robinson:N-NSM"
+            text "ß"
+          text " "
+          Word w lemma="strong:G3366" morph="robinson:N-NSM"
+            text "ἀγάπη"
+          text " earth "
+          Word w lemma="strong:G286" morph="robinson:N-NSM"
+            text "Ä"
+          text " "
+          Word w lemma="strong:G508" morph="robinson:N-NSM"
+            text "ß"
+          text " "
+          Word w lemma="strong:G515" morph="robinson:N-NSM"
+            text "light"
+          text " waters waters "
+          Word w lemma="strong:G2593" morph="robinson:N-NSM"
+            text "the"
+          text " "
+          Word w lemma="strong:G4879" morph="robinson:N-NSM"
+            text "light"
+          text " "
+          Word w lemma="strong:G1916" morph="robinson:N-NSM"
+            text "beginning"
+          text " "
+          Note note type="crossReference" n="a"
+            Reference reference osisRef="John.3.16"
+              text "John 3:16"
+          text " & end."
+        text "\n"
+        Verse verse osisID="Gen.1.26"
+          text "ἀγάπη ß Ä é created "
+          Word w lemma="strong:G2485" morph="robinson:N-NSM"
+            text "heaven"
+          text " & end."
+        text "\n"
+        Verse verse osisID="Gen.1.27"
+          text "created waters ß beginning Ä earth the "
+          Word w lemma="strong:G3495" morph="robinson:N-NSM"
+            text "waters"
+          text " God light "
+          Word w lemma="strong:G4084" morph="robinson:N-NSM"
+            text "and"
+          text " "
+          Word w lemma="strong:G1089" morph="robinson:N-NSM"
+            text "ß"
+          text " é earth God "
+          Word w lemma="strong:G4644" morph="robinson:N-NSM"
+            text "darkness"
+          text " light "
+          Word w lemma="strong:G2027" morph="robinson:N-NSM"
+            text "light"
+          text " "
+          Word w lemma="strong:G1257" morph="robinson:N-NSM"
+            text "heaven"
+          text " darkness "
+          Added transChange type="added"
+            text "and"
+          text " "
+          Word w lemma="strong:G2015" morph="robinson:N-NSM"
+            text "Ä"
+          text " שָׁלוֹם God "
+          Word w lemma="strong:G3890" morph="robinson:N-NSM"
+            text "the"
+          text " & end."
+        text "\n"
+        Verse verse osisID="Gen.1.28"
+          WordsOfJesus q who="Jesus" marker=""
+            text " ß the "
+            Word w lemma="strong:G1553" morph="robinson:N-NSM"
+              text "earth"
+            text " and spirit heaven light "
+            Word w lemma="strong:G4884" morph="robinson:N-NSM"
+              text "in"
+            text " "
+            Word w lemma="strong:G3021" morph="robinson:N-NSM"
+              text "spirit"
+            text " "
+            Word w lemma="strong:G1671" morph="robinson:N-NSM"
+              text "waters"
+            text " "
+          text " & end."
+        text "\n"
+        Verse verse osisID="Gen.1.29"
+          text "the and waters "
+          Word w lemma="strong:G2558" morph="robinson:N-NSM"
+            text "spirit"
+          text " "
+          Word w lemma="strong:G4061" morph="robinson:N-NSM"
+            text "beginning"
+          text " "
+          Word w lemma="strong:G831" morph="robinson:N-NSM"
+            text "ἀγάπη"
+          text " Ä created beginning Ä é & end."
+        text "\n"
+        Verse verse osisID="Gen.1.30"
+          text "darkness "
+          Added transChange type="added"
+            text "the"
+          text " spirit in spirit Ä and é "
+          Word w lemma="strong:G742" morph="robinson:N-NSM"
+            text "é"
+          text " Ä spirit "
+          Word w lemma="strong:G424" morph="robinson:N-NSM"
+            text "heaven"
+          text " created "
+          Word w lemma="strong:G5098" morph="robinson:N-NSM"
+            text "Ä"
+          text " spirit "
+          Word w lemma="strong:G2321" morph="robinson:N-NSM"
+            text "heaven"
+          text " heaven "
+          Word w lemma="strong:G4019" morph="robinson:N-NSM"
+            text "beginning"
+          text " "
+          Added transChange type="added"
+            text "and"
+          text " the "
+          Added transChange type="added"
+            text "ἀγάπη"
+          text " "
+          Word w lemma="strong:G5082" morph="robinson:N-NSM"
+            text "Ä"
+          text " heaven earth "
+          Note note type="crossReference" n="a"
+            Reference reference osisRef="John.3.16"
+              text "John 3:16"
+          text " & end."
+        text "\n"
+        Verse verse osisID="Gen.1.31"
+          text "and heaven the "
+          Word w lemma="strong:G2943" morph="robinson:N-NSM"
+            text "שָׁלוֹם"
+          text " "
+          Word w lemma="strong:G1578" morph="robinson:N-NSM"
+            text "God"
+          text " the the "
+          Word w lemma="strong:G4912" morph="robinson:N-NSM"
+            text "waters"
+          text " ß darkness darkness é spirit "
+          Word w lemma="strong:G29" morph="robinson:N-NSM"
+            text "ß"
+          text " ἀγάπη ß ß ἀγάπη "
+          Word w lemma="strong:G3528" morph="robinson:N-NSM"
+            text "beginning"
+          text " "
+          Word w lemma="strong:G3621" morph="robinson:N-NSM"
+            text "spirit"
+          text " שָׁלוֹם "
+          Word w lemma="strong:G1068" morph="robinson:N-NSM"
+            text "the"
+          text " & end."
+        text "\n"
+      text "\n"
+text "\n"
+
+#### text ####
+created the God the and é é God the Ä the created God & end. heaven and beginning and é ß ß earth earth שָׁלוֹם waters darkness beginning heaven created é beginning waters spirit ß & end. ἀγάπη beginning ß spirit spirit ἀγάπη created Ä ἀγάπη Ä created & end. light spirit Ä created earth in heaven created spirit waters שָׁלוֹם the Ä Ä Ä and God the created spirit & end. and created spirit ἀγάπη ß & end. beginning light heaven and שָׁלוֹם in darkness beginning light heaven earth שָׁלוֹם & end. and Ä earth spirit in ἀγάπη spirit spirit spirit earth & end. and in spirit beginning God and heaven waters ß beginning heaven in created & end. ἀγάπη spirit created God created and and darkness waters created ß שָׁלוֹם שָׁלוֹם שָׁלוֹם ß in created God waters שָׁלוֹם God the & end. God in beginning שָׁלוֹם & end. light ἀγάπη earth light and created Ä beginning é & end. God created spirit ß Ä heaven earth שָׁלוֹם é beginning in ß & end. Ä darkness beginning & end. beginning heaven é light שָׁלוֹם waters & end. heaven beginning beginning beginning earth ß é light the earth heaven and darkness and heaven light שָׁלוֹם and earth God é Ä darkness earth created & end. the in é Ä darkness darkness heaven light waters waters and in beginning שָׁלוֹם & end. שָׁלוֹם beginning created the darkness earth created Ä ἀγάπη created & end. é שָׁלוֹם שָׁלוֹם in earth created God ß in earth in beginning שָׁלוֹם beginning beginning ἀγάπη light earth ß Ä the and waters & end. created ἀγάπη God ἀγάπη darkness ß and beginning in שָׁלוֹם ß Ä beginning created light created שָׁלוֹם spirit Ä ἀγάπη Ä created & end. waters in waters God and darkness Ä beginning é the darkness created é and é & end. Ä and the é created darkness created waters light earth Ä heaven ἀγάπη ß ß and waters waters and é שָׁלוֹם waters ἀγάπη & end. שָׁלוֹם and Ä ß darkness in ἀγάπη & end. in ß earth earth God ß in earth the darkness light é God שָׁלוֹם and earth in ß & end. earth earth in darkness ἀγάπη é é earth waters spirit and שָׁלוֹם and and light darkness ἀγάπη earth the created the created the & end. waters beginning waters שָׁלוֹם the Ä waters God beginning God and darkness é and ß ἀγάπη earth Ä ß light waters waters the light beginning & end. ἀγάπη ß Ä é created heaven & end. created waters ß beginning Ä earth the waters God light and ß é earth God darkness light light heaven darkness and Ä שָׁלוֹם God the & end. ß the earth and spirit heaven light in spirit waters & end. the and waters spirit beginning ἀγάπη Ä created beginning Ä é & end. darkness the spirit in spirit Ä and é é Ä spirit heaven created Ä spirit heaven heaven beginning and the ἀγάπη Ä heaven earth & end. and heaven the שָׁלוֹם God the the waters ß darkness darkness é spirit ß ἀγάπη ß ß ἀγάπη beginning spirit שָׁלוֹם the & end.
+#### text-all ####
+## Book Gen
+Gen 1
+## Chapter 1
+[Gen 1:1] created the [G4390] God the and [G3553] é [G744] é [G4633] God the Ä [G1812] the created [G1182] God & end. [Gen 1:2] heaven [G4680] and beginning and é ß ß earth earth [G2460] שָׁלוֹם waters darkness beginning [G3426] heaven created é [G5475] beginning waters* spirit ß [G767] & end. [Gen 1:3] ἀγάπη beginning [G2537] ß [G3161] spirit [G3783] spirit [G960] ἀγάπη [G2355] created Ä ἀγάπη [G3680] Ä created & end. [Gen 1:4] light spirit Ä created [G1240] earth in heaven [G34] created spirit waters שָׁלוֹם the Ä Ä [G5197] Ä [G552] and God* the [G4644] created spirit & end. [Gen 1:5] and created spirit ἀγάπη [G3999] ß (John 3:16) & end. [Gen 1:6] beginning [G2807] light heaven and שָׁלוֹם in darkness beginning light heaven earth שָׁלוֹם* & end. [Gen 1:7] “and Ä earth [G4037] spirit in ἀγάπη [G4958] spirit spirit spirit [G837] earth” & end. [Gen 1:8] and in spirit beginning God and heaven waters [G3243] ß beginning heaven in [G3813] created & end. [Gen 1:9] ἀγάπη spirit [G4492] created [G5323] God created and and [G1744] darkness waters [G3433] created [G2899] ß שָׁלוֹם שָׁלוֹם [G1244] שָׁלוֹם ß in created [G3879] God waters שָׁלוֹם God the [G2269] & end. [Gen 1:10] God in beginning שָׁלוֹם (John 3:16) & end. [Gen 1:11] light ἀγάπη earth light and created Ä beginning é [G5485] & end. [Gen 1:12] God created spirit [G1125] ß [G772] Ä heaven earth [G3536] שָׁלוֹם é [G2610] beginning in* ß & end. [Gen 1:13] Ä* darkness beginning [G1873] & end. [Gen 1:14] “beginning [G325] heaven [G1062] é light שָׁלוֹם waters [G472]” & end. [Gen 1:15] heaven beginning [G138] beginning beginning earth [G997] ß [G4531] é light the earth heaven [G1484] and darkness and [G4097] heaven [G149] light [G152] שָׁלוֹם and earth God é Ä darkness earth* created (John 3:16) & end. [Gen 1:16] the in [G2094] é [G693] Ä darkness darkness [G1519] heaven [G30] light waters waters [G2536] and in* beginning שָׁלוֹם & end. [Gen 1:17] שָׁלוֹם beginning [G736] created the darkness* earth [G4336] created Ä ἀγάπη [G5069] created [G4203] & end. [Gen 1:18] é שָׁלוֹם [G4291] שָׁלוֹם in earth [G343] created God ß in earth in beginning שָׁלוֹם beginning beginning ἀγάπη [G610] light [G1682] earth ß Ä [G2354] the and [G1208] waters [G2494] & end. [Gen 1:19] created [G497] ἀγάπη [G5506] God ἀγάπη [G4232] darkness ß and* beginning in [G627] שָׁלוֹם ß Ä [G1727] beginning created light created שָׁלוֹם [G924] spirit [G3983] Ä [G30] ἀγάπη Ä* created & end. [Gen 1:20] waters [G2715] in* waters God and darkness [G533] Ä beginning é the [G423] darkness created [G2177] é and é (John 3:16) & end. [Gen 1:21] “Ä and the é created darkness created [G3399] waters [G2096] light earth* Ä [G5270] heaven [G4101] ἀγάπη ß ß and [G1432] waters waters [G2117] and é שָׁלוֹם [G2214] waters ἀγάπη [G2951]” & end. [Gen 1:22] שָׁלוֹם and [G2036] Ä ß darkness in [G3484] ἀγάπη & end. [Gen 1:23] in [G4325] ß earth earth [G4280] God ß [G324] in earth the darkness light é God [G2461] שָׁלוֹם and earth in [G2471] ß [G2592] & end. [Gen 1:24] earth earth in darkness [G1591] ἀγάπη é [G1867] é earth waters spirit and [G2393] שָׁלוֹם [G4061] and* and [G1815] light darkness [G5109] ἀγάπη earth the created the [G4884] created the [G3684] & end. [Gen 1:25] waters beginning waters [G5346] שָׁלוֹם the* Ä waters God [G2293] beginning God and darkness é [G3879] and ß [G2984] ἀγάπη [G3366] earth Ä [G286] ß [G508] light [G515] waters waters the [G2593] light [G4879] beginning [G1916] (John 3:16) & end. [Gen 1:26] ἀγάπη ß Ä é created heaven [G2485] & end. [Gen 1:27] created waters ß beginning Ä earth the waters [G3495] God light and [G4084] ß [G1089] é earth God darkness [G4644] light light [G2027] heaven [G1257] darkness and* Ä [G2015] שָׁלוֹם God the [G3890] & end. [Gen 1:28] “ß the earth [G1553] and spirit heaven light in [G4884] spirit [G3021] waters [G1671]” & end. [Gen 1:29] the and waters spirit [G2558] beginning [G4061] ἀγάπη [G831] Ä created beginning Ä é & end. [Gen 1:30] darkness the* spirit in spirit Ä and é é [G742] Ä spirit heaven [G424] created Ä [G5098] spirit heaven [G2321] heaven beginning [G4019] and* the ἀγάπη* Ä [G5082] heaven earth (John 3:16) & end. [Gen 1:31] and heaven the שָׁלוֹם [G2943] God [G1578] the the waters [G4912] ß darkness darkness é spirit ß [G29] ἀγάπη ß ß ἀγάπη beginning [G3528] spirit [G3621] שָׁלוֹם the [G1068] & end.
+#### text-nobreaks ####
+created the God the and é é God the Ä the created God & end. heaven and beginning and é ß ß earth earth שָׁלוֹם waters darkness beginning heaven created é beginning waters spirit ß & end. ἀγάπη beginning ß spirit spirit ἀγάπη created Ä ἀγάπη Ä created & end. light spirit Ä created earth in heaven created spirit waters שָׁלוֹם the Ä Ä Ä and God the created spirit & end. and created spirit ἀγάπη ß & end. beginning light heaven and שָׁלוֹם in darkness beginning light heaven earth שָׁלוֹם & end. and Ä earth spirit in ἀγάπη spirit spirit spirit earth & end. and in spirit beginning God and heaven waters ß beginning heaven in created & end. ἀγάπη spirit created God created and and darkness waters created ß שָׁלוֹם שָׁלוֹם שָׁלוֹם ß in created God waters שָׁלוֹם God the & end. God in beginning שָׁלוֹם & end. light ἀγάπη earth light and created Ä beginning é & end. God created spirit ß Ä heaven earth שָׁלוֹם é beginning in ß & end. Ä darkness beginning & end. beginning heaven é light שָׁלוֹם waters & end. heaven beginning beginning beginning earth ß é light the earth heaven and darkness and heaven light שָׁלוֹם and earth God é Ä darkness earth created & end. the in é Ä darkness darkness heaven light waters waters and in beginning שָׁלוֹם & end. שָׁלוֹם beginning created the darkness earth created Ä ἀγάπη created & end. é שָׁלוֹם שָׁלוֹם in earth created God ß in earth in beginning שָׁלוֹם beginning beginning ἀγάπη light earth ß Ä the and waters & end. created ἀγάπη God ἀγάπη darkness ß and beginning in שָׁלוֹם ß Ä beginning created light created שָׁלוֹם spirit Ä ἀγάπη Ä created & end. waters in waters God and darkness Ä beginning é the darkness created é and é & end. Ä and the é created darkness created waters light earth Ä heaven ἀγάπη ß ß and waters waters and é שָׁלוֹם waters ἀγάπη & end. שָׁלוֹם and Ä ß darkness in ἀγάπη & end. in ß earth earth God ß in earth the darkness light é God שָׁלוֹם and earth in ß & end. earth earth in darkness ἀγάπη é é earth waters spirit and שָׁלוֹם and and light darkness ἀγάπη earth the created the created the & end. waters beginning waters שָׁלוֹם the Ä waters God beginning God and darkness é and ß ἀγάπη earth Ä ß light waters waters the light beginning & end. ἀγάπη ß Ä é created heaven & end. created waters ß beginning Ä earth the waters God light and ß é earth God darkness light light heaven darkness and Ä שָׁלוֹם God the & end. ß the earth and spirit heaven light in spirit waters & end. the and waters spirit beginning ἀγάπη Ä created beginning Ä é & end. darkness the spirit in spirit Ä and é é Ä spirit heaven created Ä spirit heaven heaven beginning and the ἀγάπη Ä heaven earth & end. and heaven the שָׁלוֹם God the the waters ß darkness darkness é spirit ß ἀγάπη ß ß ἀγάπη beginning spirit שָׁלוֹם the & end.
+#### spans ####
+entries: 0..3202
+Other 0..0 entry=0 path=/1/0/0/0 ""
+Other 0..0 entry=0 path=/1/0/0 ""
+Word 8..11 entry=0 path=/1/0/2/2/2/1 "the"
+Word 20..23 entry=0 path=/1/0/2/2/2/3 "and"
+Word 24..26 entry=0 path=/1/0/2/2/2/5 "é"
+Word 27..29 entry=0 path=/1/0/2/2/2/7 "é"
+Word 38..40 entry=0 path=/1/0/2/2/2/9 "Ä"
+Word 45..52 entry=0 path=/1/0/2/2/2/11 "created"
+Verse 0..63 entry=0 path=/1/0/2/2/2 "created the God the and é é God the Ä the created God & end."
+Word 64..70 entry=0 path=/1/0/2/2/4/0 "heaven"
+Word 104..109 entry=0 path=/1/0/2/2/4/2 "earth"
+Word 141..150 entry=0 path=/1/0/2/2/4/4 "beginning"
+Word 166..168 entry=0 path=/1/0/2/2/4/6 "é"
+Added 179..185 entry=0 path=/1/0/2/2/4/8 "waters"
+Word 193..195 entry=0 path=/1/0/2/2/4/10 "ß"
+Verse 64..202 entry=0 path=/1/0/2/2/4 "heaven and beginning and é ß ß earth earth שָׁלוֹם waters darkness beginning heaven created é beginning waters spirit ß & end."
+Word 215..224 entry=0 path=/1/0/2/2/6/1 "beginning"
+Word 225..227 entry=0 path=/1/0/2/2/6/3 "ß"
+Word 228..234 entry=0 path=/1/0/2/2/6/5 "spirit"
+Word 235..241 entry=0 path=/1/0/2/2/6/7 "spirit"
+Word 242..253 entry=0 path=/1/0/2/2/6/9 "ἀγάπη"
+Word 265..276 entry=0 path=/1/0/2/2/6/11 "ἀγάπη"
+Verse 203..294 entry=0 path=/1/0/2/2/6 "ἀγάπη beginning ß spirit spirit ἀγάπη created Ä ἀγάπη Ä created & end."
+Word 311..318 entry=0 path=/1/0/2/2/8/1 "created"
+Word 328..334 entry=0 path=/1/0/2/2/8/3 "heaven"
+Word 379..381 entry=0 path=/1/0/2/2/8/5 "Ä"
+Word 382..384 entry=0 path=/1/0/2/2/8/7 "Ä"
+Added 389..392 entry=0 path=/1/0/2/2/8/9 "God"
+Word 393..396 entry=0 path=/1/0/2/2/8/11 "the"
+Verse 295..418 entry=0 path=/1/0/2/2/8 "light spirit Ä created earth in heaven created spirit waters שָׁלוֹם the Ä Ä Ä and God the created spirit & end."
+Word 438..449 entry=0 path=/1/0/2/2/10/1 "ἀγάπη"
+Verse 419..459 entry=0 path=/1/0/2/2/10 "and created spirit ἀγάπη ß & end."
+Word 460..469 entry=0 path=/1/0/2/2/12/0 "beginning"
+Added 543..557 entry=0 path=/1/0/2/2/12/2 "שָׁלוֹם"
+Verse 460..564 entry=0 path=/1/0/2/2/12 "beginning light heaven and שָׁלוֹם in darkness beginning light heaven earth שָׁלוֹם & end."
+Word 572..577 entry=0 path=/1/0/2/2/14/0/1 "earth"
+Word 588..599 entry=0 path=/1/0/2/2/14/0/3 "ἀγάπη"
+Word 614..620 entry=0 path=/1/0/2/2/14/0/5 "spirit"
+WordsOfJesus 565..626 entry=0 path=/1/0/2/2/14/0 "and Ä earth spirit in ἀγάπη spirit spirit spirit earth"
+Verse 565..633 entry=0 path=/1/0/2/2/14 "and Ä earth spirit in ἀγάπη spirit spirit spirit earth & end."
+Word 673..679 entry=0 path=/1/0/2/2/16/1 "waters"
+Word 700..702 entry=0 path=/1/0/2/2/16/3 "in"
+Verse 634..717 entry=0 path=/1/0/2/2/16 "and in spirit beginning God and heaven waters ß beginning heaven in created & end."
+Word 730..736 entry=0 path=/1/0/2/2/18/1 "spirit"
+Word 737..744 entry=0 path=/1/0/2/2/18/3 "created"
+Word 761..764 entry=0 path=/1/0/2/2/18/5 "and"
+Word 774..780 entry=0 path=/1/0/2/2/18/7 "waters"
+Word 781..788 entry=0 path=/1/0/2/2/18/9 "created"
+Word 807..821 entry=0 path=/1/0/2/2/18/11 "שָׁלוֹם"
+Word 843..850 entry=0 path=/1/0/2/2/18/13 "created"
+Word 881..884 entry=0 path=/1/0/2/2/18/15 "the"
+Verse 718..891 entry=0 path=/1/0/2/2/18 "ἀγάπη spirit created God created and and darkness waters created ß שָׁלוֹם שָׁלוֹם שָׁלוֹם ß in created God waters שָׁלוֹם God the & end."
+Verse 892..930 entry=0 path=/1/0/2/2/20 "God in beginning שָׁלוֹם & end."
+Word 986..988 entry=0 path=/1/0/2/2/22/1 "é"
+Verse 931..995 entry=0 path=/1/0/2/2/22 "light ἀγάπη earth light and created Ä beginning é & end."
+Word 1008..1014 entry=0 path=/1/0/2/2/24/1 "spirit"
+Word 1015..1017 entry=0 path=/1/0/2/2/24/3 "ß"
+Word 1028..1033 entry=0 path=/1/0/2/2/24/5 "earth"
+Word 1049..1051 entry=0 path=/1/0/2/2/24/7 "é"
+Added 1062..1064 entry=0 path=/1/0/2/2/24/9 "in"
+Verse 996..1074 entry=0 path=/1/0/2/2/24 "God created spirit ß Ä heaven earth שָׁלוֹם é beginning in ß & end."
+Added 1075..1077 entry=0 path=/1/0/2/2/26/0 "Ä"
+Word 1087..1096 entry=0 path=/1/0/2/2/26/2 "beginning"
+Verse 1075..1103 entry=0 path=/1/0/2/2/26 "Ä darkness beginning & end."
+Word 1104..1113 entry=0 path=/1/0/2/2/28/0/1 "beginning"
+Word 1114..1120 entry=0 path=/1/0/2/2/28/0/3 "heaven"
+Word 1145..1151 entry=0 path=/1/0/2/2/28/0/5 "waters"
+WordsOfJesus 1104..1151 entry=0 path=/1/0/2/2/28/0 "beginning heaven é light שָׁלוֹם waters"
+Verse 1104..1158 entry=0 path=/1/0/2/2/28 "beginning heaven é light שָׁלוֹם waters & end."
+Word 1166..1175 entry=0 path=/1/0/2/2/30/1 "beginning"
+Word 1196..1201 entry=0 path=/1/0/2/2/30/3 "earth"
+Word 1202..1204 entry=0 path=/1/0/2/2/30/5 "ß"
+Word 1224..1230 entry=0 path=/1/0/2/2/30/7 "heaven"
+Word 1244..1247 entry=0 path=/1/0/2/2/30/9 "and"
+Word 1248..1254 entry=0 path=/1/0/2/2/30/11 "heaven"
+Word 1255..1260 entry=0 path=/1/0/2/2/30/13 "light"
+Added 1305..1310 entry=0 path=/1/0/2/2/30/15 "earth"
+Verse 1159..1325 entry=0 path=/1/0/2/2/30 "heaven beginning beginning beginning earth ß é light the earth heaven and darkness and heaven light שָׁלוֹם and earth God é Ä darkness earth created & end."
+Word 1330..1332 entry=0 path=/1/0/2/2/32/1 "in"
+Word 1333..1335 entry=0 path=/1/0/2/2/32/3 "é"
+Word 1348..1356 entry=0 path=/1/0/2/2/32/5 "darkness"
+Word 1357..1363 entry=0 path=/1/0/2/2/32/7 "heaven"
+Word 1377..1383 entry=0 path=/1/0/2/2/32/9 "waters"
+Added 1388..1390 entry=0 path=/1/0/2/2/32/11 "in"
+Verse 1326..1422 entry=0 path=/1/0/2/2/32 "the in é Ä darkness darkness heaven light waters waters and in beginning שָׁלוֹם & end."
+Word 1438..1447 entry=0 path=/1/0/2/2/34/1 "beginning"
+Added 1460..1468 entry=0 path=/1/0/2/2/34/3 "darkness"
+Word 1469..1474 entry=0 path=/1/0/2/2/34/5 "earth"
+Word 1486..1497 entry=0 path=/1/0/2/2/34/7 "ἀγάπη"
+Word 1498..1505 entry=0 path=/1/0/2/2/34/9 "created"
+Verse 1423..1512 entry=0 path=/1/0/2/2/34 "שָׁלוֹם beginning created the darkness earth created Ä ἀγάπη created & end."
+Word 1516..1530 entry=0 path=/1/0/2/2/36/1 "שָׁלוֹם"
+Word 1549..1554 entry=0 path=/1/0/2/2/36/3 "earth"
+Word 1627..1638 entry=0 path=/1/0/2/2/36/5 "ἀγάπη"
+Word 1639..1644 entry=0 path=/1/0/2/2/36/7 "light"
+Word 1654..1656 entry=0 path=/1/0/2/2/36/9 "Ä"
+Word 1661..1664 entry=0 path=/1/0/2/2/36/11 "and"
+Word 1665..1671 entry=0 path=/1/0/2/2/36/13 "waters"
+Verse 1513..1678 entry=0 path=/1/0/2/2/36 "é שָׁלוֹם שָׁלוֹם in earth created God ß in earth in beginning שָׁלוֹם beginning beginning ἀγάπη light earth ß Ä the and waters & end."
+Word 1679..1686 entry=0 path=/1/0/2/2/38/0 "created"
+Word 1687..1698 entry=0 path=/1/0/2/2/38/2 "ἀγάπη"
+Word 1703..1714 entry=0 path=/1/0/2/2/38/4 "ἀγάπη"
+Added 1727..1730 entry=0 path=/1/0/2/2/38/6 "and"
+Word 1741..1743 entry=0 path=/1/0/2/2/38/8 "in"
+Word 1762..1764 entry=0 path=/1/0/2/2/38/10 "Ä"
+Word 1797..1811 entry=0 path=/1/0/2/2/38/12 "שָׁלוֹם"
+Word 1812..1818 entry=0 path=/1/0/2/2/38/14 "spirit"
+Word 1819..1821 entry=0 path=/1/0/2/2/38/16 "Ä"
+Added 1834..1836 entry=0 path=/1/0/2/2/38/18 "Ä"
+Verse 1679..1851 entry=0 path=/1/0/2/2/38 "created ἀγάπη God ἀγάπη darkness ß and beginning in שָׁלוֹם ß Ä beginning created light created שָׁלוֹם spirit Ä ἀγάπη Ä created & end."
+Word 1852..1858 entry=0 path=/1/0/2/2/40/0 "waters"
+Added 1859..1861 entry=0 path=/1/0/2/2/40/2 "in"
+Word 1877..1885 entry=0 path=/1/0/2/2/40/4 "darkness"
+Word 1902..1905 entry=0 path=/1/0/2/2/40/6 "the"
+Word 1915..1922 entry=0 path=/1/0/2/2/40/8 "created"
+Verse 1852..1939 entry=0 path=/1/0/2/2/40 "waters in waters God and darkness Ä beginning é the darkness created é and é & end."
+Word 1971..1978 entry=0 path=/1/0/2/2/42/0/1 "created"
+Word 1979..1985 entry=0 path=/1/0/2/2/42/0/3 "waters"
+Added 1992..1997 entry=0 path=/1/0/2/2/42/0/5 "earth"
+Word 1998..2000 entry=0 path=/1/0/2/2/42/0/7 "Ä"
+Word 2001..2007 entry=0 path=/1/0/2/2/42/0/9 "heaven"
+Word 2026..2029 entry=0 path=/1/0/2/2/42/0/11 "and"
+Word 2037..2043 entry=0 path=/1/0/2/2/42/0/13 "waters"
+Word 2051..2065 entry=0 path=/1/0/2/2/42/0/15 "שָׁלוֹם"
+Word 2073..2084 entry=0 path=/1/0/2/2/42/0/17 "ἀγάπη"
+WordsOfJesus 1940..2084 entry=0 path=/1/0/2/2/42/0 "Ä and the é created darkness created waters light earth Ä heaven ἀγάπη ß ß and waters waters and é שָׁלוֹם waters ἀγάπη"
+Verse 1940..2091 entry=0 path=/1/0/2/2/42 "Ä and the é created darkness created waters light earth Ä heaven ἀγάπη ß ß and waters waters and é שָׁלוֹם waters ἀγάπη & end."
+Word 2107..2110 entry=0 path=/1/0/2/2/44/1 "and"
+Word 2126..2128 entry=0 path=/1/0/2/2/44/3 "in"
+Verse 2092..2147 entry=0 path=/1/0/2/2/44 "שָׁלוֹם and Ä ß darkness in ἀγάπη & end."
+Word 2148..2150 entry=0 path=/1/0/2/2/46/0 "in"
+Word 2160..2165 entry=0 path=/1/0/2/2/46/2 "earth"
+Word 2170..2172 entry=0 path=/1/0/2/2/46/4 "ß"
+Word 2204..2207 entry=0 path=/1/0/2/2/46/6 "God"
+Word 2233..2235 entry=0 path=/1/0/2/2/46/8 "in"
+Word 2236..2238 entry=0 path=/1/0/2/2/46/10 "ß"
+Verse 2148..2245 entry=0 path=/1/0/2/2/46 "in ß earth earth God ß in earth the darkness light é God שָׁלוֹם and earth in ß & end."
+Word 2261..2269 entry=0 path=/1/0/2/2/48/1 "darkness"
+Word 2282..2284 entry=0 path=/1/0/2/2/48/3 "é"
+Word 2308..2311 entry=0 path=/1/0/2/2/48/5 "and"
+Word 2312..2326 entry=0 path=/1/0/2/2/48/7 "שָׁלוֹם"
+Added 2327..2330 entry=0 path=/1/0/2/2/48/9 "and"
+Word 2331..2334 entry=0 path=/1/0/2/2/48/11 "and"
+Word 2341..2349 entry=0 path=/1/0/2/2/48/13 "darkness"
+Word 2380..2383 entry=0 path=/1/0/2/2/48/15 "the"
+Word 2392..2395 entry=0 path=/1/0/2/2/48/17 "the"
+Verse 2246..2402 entry=0 path=/1/0/2/2/48 "earth earth in darkness ἀγάπη é é earth waters spirit and שָׁלוֹם and and light darkness ἀγάπη earth the created the created the & end."
+Word 2420..2426 entry=0 path=/1/0/2/2/50/1 "waters"
+Added 2442..2445 entry=0 path=/1/0/2/2/50/3 "the"
+Word 2456..2459 entry=0 path=/1/0/2/2/50/5 "God"
+Word 2487..2489 entry=0 path=/1/0/2/2/50/7 "é"
+Word 2494..2496 entry=0 path=/1/0/2/2/50/9 "ß"
+Word 2497..2508 entry=0 path=/1/0/2/2/50/11 "ἀγάπη"
+Word 2515..2517 entry=0 path=/1/0/2/2/50/13 "Ä"
+Word 2518..2520 entry=0 path=/1/0/2/2/50/15 "ß"
+Word 2521..2526 entry=0 path=/1/0/2/2/50/17 "light"
+Word 2541..2544 entry=0 path=/1/0/2/2/50/19 "the"
+Word 2545..2550 entry=0 path=/1/0/2/2/50/21 "light"
+Word 2551..2560 entry=0 path=/1/0/2/2/50/23 "beginning"
+Verse 2403..2567 entry=0 path=/1/0/2/2/50 "waters beginning waters שָׁלוֹם the Ä waters God beginning God and darkness é and ß ἀγάπη earth Ä ß light waters waters the light beginning & end."
+Word 2597..2603 entry=0 path=/1/0/2/2/52/1 "heaven"
+Verse 2568..2610 entry=0 path=/1/0/2/2/52 "ἀγάπη ß Ä é created heaven & end."
+Word 2652..2658 entry=0 path=/1/0/2/2/54/1 "waters"
+Word 2669..2672 entry=0 path=/1/0/2/2/54/3 "and"
+Word 2673..2675 entry=0 path=/1/0/2/2/54/5 "ß"
+Word 2689..2697 entry=0 path=/1/0/2/2/54/7 "darkness"
+Word 2704..2709 entry=0 path=/1/0/2/2/54/9 "light"
+Word 2710..2716 entry=0 path=/1/0/2/2/54/11 "heaven"
+Added 2726..2729 entry=0 path=/1/0/2/2/54/13 "and"
+Word 2730..2732 entry=0 path=/1/0/2/2/54/15 "Ä"
+Word 2752..2755 entry=0 path=/1/0/2/2/54/17 "the"
+Verse 2611..2762 entry=0 path=/1/0/2/2/54 "created waters ß beginning Ä earth the waters God light and ß é earth God darkness light light heaven darkness and Ä שָׁלוֹם God the & end."
+Word 2770..2775 entry=0 path=/1/0/2/2/56/0/1 "earth"
+Word 2800..2802 entry=0 path=/1/0/2/2/56/0/3 "in"
+Word 2803..2809 entry=0 path=/1/0/2/2/56/0/5 "spirit"
+Word 2810..2816 entry=0 path=/1/0/2/2/56/0/7 "waters"
+WordsOfJesus 2763..2816 entry=0 path=/1/0/2/2/56/0 "ß the earth and spirit heaven light in spirit waters"
+Verse 2763..2823 entry=0 path=/1/0/2/2/56 "ß the earth and spirit heaven light in spirit waters & end."
+Word 2839..2845 entry=0 path=/1/0/2/2/58/1 "spirit"
+Word 2846..2855 entry=0 path=/1/0/2/2/58/3 "beginning"
+Word 2856..2867 entry=0 path=/1/0/2/2/58/5 "ἀγάπη"
+Verse 2824..2901 entry=0 path=/1/0/2/2/58 "the and waters spirit beginning ἀγάπη Ä created beginning Ä é & end."
+Added 2911..2914 entry=0 path=/1/0/2/2/60/1 "the"
+Word 2942..2944 entry=0 path=/1/0/2/2/60/3 "é"
+Word 2955..2961 entry=0 path=/1/0/2/2/60/5 "heaven"
+Word 2970..2972 entry=0 path=/1/0/2/2/60/7 "Ä"
+Word 2980..2986 entry=0 path=/1/0/2/2/60/9 "heaven"
+Word 2994..3003 entry=0 path=/1/0/2/2/60/11 "beginning"
+Added 3004..3007 entry=0 path=/1/0/2/2/60/13 "and"
+Added 3012..3023 entry=0 path=/1/0/2/2/60/15 "ἀγάπη"
+Word 3024..3026 entry=0 path=/1/0/2/2/60/17 "Ä"
+Verse 2902..3046 entry=0 path=/1/0/2/2/60 "darkness the spirit in spirit Ä and é é Ä spirit heaven created Ä spirit heaven heaven beginning and the ἀγάπη Ä heaven earth & end."
+Word 3062..3076 entry=0 path=/1/0/2/2/62/1 "שָׁלוֹם"
+Word 3077..3080 entry=0 path=/1/0/2/2/62/3 "God"
+Word 3089..3095 entry=0 path=/1/0/2/2/62/5 "waters"
+Word 3127..3129 entry=0 path=/1/0/2/2/62/7 "ß"
+Word 3160..3169 entry=0 path=/1/0/2/2/62/9 "beginning"
+Word 3170..3176 entry=0 path=/1/0/2/2/62/11 "spirit"
+Word 3192..3195 entry=0 path=/1/0/2/2/62/13 "the"
+Verse 3047..3202 entry=0 path=/1/0/2/2/62 "and heaven the שָׁלוֹם God the the waters ß darkness darkness é spirit ß ἀγάπη ß ß ἀγάπη beginning spirit שָׁלוֹם the & end."
+Chapter 0..3202 entry=0 path=/1/0/2/2 "created the God the and é é God the Ä the created God & end. heaven and beginning and é ß ß earth earth שָׁלוֹם waters darkness beginning heaven created é beginning waters spirit ß & end. ἀγάπη beginning ß spirit spirit ἀγάπη created Ä ἀγάπη Ä created & end. light spirit Ä created earth in heaven created spirit waters שָׁלוֹם the Ä Ä Ä and God the created spirit & end. and created spirit ἀγάπη ß & end. beginning light heaven and שָׁלוֹם in darkness beginning light heaven earth שָׁלוֹם & end. and Ä earth spirit in ἀγάπη spirit spirit spirit earth & end. and in spirit beginning God and heaven waters ß beginning heaven in created & end. ἀγάπη spirit created God created and and darkness waters created ß שָׁלוֹם שָׁלוֹם שָׁלוֹם ß in created God waters שָׁלוֹם God the & end. God in beginning שָׁלוֹם & end. light ἀγάπη earth light and created Ä beginning é & end. God created spirit ß Ä heaven earth שָׁלוֹם é beginning in ß & end. Ä darkness beginning & end. beginning heaven é light שָׁלוֹם waters & end. heaven beginning beginning beginning earth ß é light the earth heaven and darkness and heaven light שָׁלוֹם and earth God é Ä darkness earth created & end. the in é Ä darkness darkness heaven light waters waters and in beginning שָׁלוֹם & end. שָׁלוֹם beginning created the darkness earth created Ä ἀγάπη created & end. é שָׁלוֹם שָׁלוֹם in earth created God ß in earth in beginning שָׁלוֹם beginning beginning ἀγάπη light earth ß Ä the and waters & end. created ἀγάπη God ἀγάπη darkness ß and beginning in שָׁלוֹם ß Ä beginning created light created שָׁלוֹם spirit Ä ἀγάπη Ä created & end. waters in waters God and darkness Ä beginning é the darkness created é and é & end. Ä and the é created darkness created waters light earth Ä heaven ἀγάπη ß ß and waters waters and é שָׁלוֹם waters ἀγάπη & end. שָׁלוֹם and Ä ß darkness in ἀγάπη & end. in ß earth earth God ß in earth the darkness light é God שָׁלוֹם and earth in ß & end. earth earth in darkness ἀγάπη é é earth waters spirit and שָׁלוֹם and and light darkness ἀγάπη earth the created the created the & end. waters beginning waters שָׁלוֹם the Ä waters God beginning God and darkness é and ß ἀγάπη earth Ä ß light waters waters the light beginning & end. ἀγάπη ß Ä é created heaven & end. created waters ß beginning Ä earth the waters God light and ß é earth God darkness light light heaven darkness and Ä שָׁלוֹם God the & end. ß the earth and spirit heaven light in spirit waters & end. the and waters spirit beginning ἀγάπη Ä created beginning Ä é & end. darkness the spirit in spirit Ä and é é Ä spirit heaven created Ä spirit heaven heaven beginning and the ἀγάπη Ä heaven earth & end. and heaven the שָׁלוֹם God the the waters ß darkness darkness é spirit ß ἀγάπη ß ß ἀγάπη beginning spirit שָׁלוֹם the & end."
+Division 0..3202 entry=0 path=/1/0/2 "created the God the and é é God the Ä the created God & end. heaven and beginning and é ß ß earth earth שָׁלוֹם waters darkness beginning heaven created é beginning waters spirit ß & end. ἀγάπη beginning ß spirit spirit ἀγάπη created Ä ἀγάπη Ä created & end. light spirit Ä created earth in heaven created spirit waters שָׁלוֹם the Ä Ä Ä and God the created spirit & end. and created spirit ἀγάπη ß & end. beginning light heaven and שָׁלוֹם in darkness beginning light heaven earth שָׁלוֹם & end. and Ä earth spirit in ἀγάπη spirit spirit spirit earth & end. and in spirit beginning God and heaven waters ß beginning heaven in created & end. ἀγάπη spirit created God created and and darkness waters created ß שָׁלוֹם שָׁלוֹם שָׁלוֹם ß in created God waters שָׁלוֹם God the & end. God in beginning שָׁלוֹם & end. light ἀγάπη earth light and created Ä beginning é & end. God created spirit ß Ä heaven earth שָׁלוֹם é beginning in ß & end. Ä darkness beginning & end. beginning heaven é light שָׁלוֹם waters & end. heaven beginning beginning beginning earth ß é light the earth heaven and darkness and heaven light שָׁלוֹם and earth God é Ä darkness earth created & end. the in é Ä darkness darkness heaven light waters waters and in beginning שָׁלוֹם & end. שָׁלוֹם beginning created the darkness earth created Ä ἀγάπη created & end. é שָׁלוֹם שָׁלוֹם in earth created God ß in earth in beginning שָׁלוֹם beginning beginning ἀγάπη light earth ß Ä the and waters & end. created ἀγάπη God ἀγάπη darkness ß and beginning in שָׁלוֹם ß Ä beginning created light created שָׁלוֹם spirit Ä ἀγάπη Ä created & end. waters in waters God and darkness Ä beginning é the darkness created é and é & end. Ä and the é created darkness created waters light earth Ä heaven ἀγάπη ß ß and waters waters and é שָׁלוֹם waters ἀγάπη & end. שָׁלוֹם and Ä ß darkness in ἀγάπη & end. in ß earth earth God ß in earth the darkness light é God שָׁלוֹם and earth in ß & end. earth earth in darkness ἀγάπη é é earth waters spirit and שָׁלוֹם and and light darkness ἀγάπη earth the created the created the & end. waters beginning waters שָׁלוֹם the Ä waters God beginning God and darkness é and ß ἀγάπη earth Ä ß light waters waters the light beginning & end. ἀγάπη ß Ä é created heaven & end. created waters ß beginning Ä earth the waters God light and ß é earth God darkness light light heaven darkness and Ä שָׁלוֹם God the & end. ß the earth and spirit heaven light in spirit waters & end. the and waters spirit beginning ἀγάπη Ä created beginning Ä é & end. darkness the spirit in spirit Ä and é é Ä spirit heaven created Ä spirit heaven heaven beginning and the ἀγάπη Ä heaven earth & end. and heaven the שָׁלוֹם God the the waters ß darkness darkness é spirit ß ἀγάπη ß ß ἀγάπη beginning spirit שָׁלוֹם the & end."
+Other 0..3202 entry=0 path=/1/0 "created the God the and é é God the Ä the created God & end. heaven and beginning and é ß ß earth earth שָׁלוֹם waters darkness beginning heaven created é beginning waters spirit ß & end. ἀγάπη beginning ß spirit spirit ἀγάπη created Ä ἀγάπη Ä created & end. light spirit Ä created earth in heaven created spirit waters שָׁלוֹם the Ä Ä Ä and God the created spirit & end. and created spirit ἀγάπη ß & end. beginning light heaven and שָׁלוֹם in darkness beginning light heaven earth שָׁלוֹם & end. and Ä earth spirit in ἀγάπη spirit spirit spirit earth & end. and in spirit beginning God and heaven waters ß beginning heaven in created & end. ἀγάπη spirit created God created and and darkness waters created ß שָׁלוֹם שָׁלוֹם שָׁלוֹם ß in created God waters שָׁלוֹם God the & end. God in beginning שָׁלוֹם & end. light ἀγάπη earth light and created Ä beginning é & end. God created spirit ß Ä heaven earth שָׁלוֹם é beginning in ß & end. Ä darkness beginning & end. beginning heaven é light שָׁלוֹם waters & end. heaven beginning beginning beginning earth ß é light the earth heaven and darkness and heaven light שָׁלוֹם and earth God é Ä darkness earth created & end. the in é Ä darkness darkness heaven light waters waters and in beginning שָׁלוֹם & end. שָׁלוֹם beginning created the darkness earth created Ä ἀγάπη created & end. é שָׁלוֹם שָׁלוֹם in earth created God ß in earth in beginning שָׁלוֹם beginning beginning ἀγάπη light earth ß Ä the and waters & end. created ἀγάπη God ἀγάπη darkness ß and beginning in שָׁלוֹם ß Ä beginning created light created שָׁלוֹם spirit Ä ἀγάπη Ä created & end. waters in waters God and darkness Ä beginning é the darkness created é and é & end. Ä and the é created darkness created waters light earth Ä heaven ἀγάπη ß ß and waters waters and é שָׁלוֹם waters ἀγάπη & end. שָׁלוֹם and Ä ß darkness in ἀγάπη & end. in ß earth earth God ß in earth the darkness light é God שָׁלוֹם and earth in ß & end. earth earth in darkness ἀγάπη é é earth waters spirit and שָׁלוֹם and and light darkness ἀγάπη earth the created the created the & end. waters beginning waters שָׁלוֹם the Ä waters God beginning God and darkness é and ß ἀγάπη earth Ä ß light waters waters the light beginning & end. ἀγάπη ß Ä é created heaven & end. created waters ß beginning Ä earth the waters God light and ß é earth God darkness light light heaven darkness and Ä שָׁלוֹם God the & end. ß the earth and spirit heaven light in spirit waters & end. the and waters spirit beginning ἀγάπη Ä created beginning Ä é & end. darkness the spirit in spirit Ä and é é Ä spirit heaven created Ä spirit heaven heaven beginning and the ἀγάπη Ä heaven earth & end. and heaven the שָׁלוֹם God the the waters ß darkness darkness é spirit ß ἀγάπη ß ß ἀγάπη beginning spirit שָׁלוֹם the & end."
+Other 0..3202 entry=0 path=/1 "created the God the and é é God the Ä the created God & end. heaven and beginning and é ß ß earth earth שָׁלוֹם waters darkness beginning heaven created é beginning waters spirit ß & end. ἀγάπη beginning ß spirit spirit ἀγάπη created Ä ἀγάπη Ä created & end. light spirit Ä created earth in heaven created spirit waters שָׁלוֹם the Ä Ä Ä and God the created spirit & end. and created spirit ἀγάπη ß & end. beginning light heaven and שָׁלוֹם in darkness beginning light heaven earth שָׁלוֹם & end. and Ä earth spirit in ἀγάπη spirit spirit spirit earth & end. and in spirit beginning God and heaven waters ß beginning heaven in created & end. ἀγάπη spirit created God created and and darkness waters created ß שָׁלוֹם שָׁלוֹם שָׁלוֹם ß in created God waters שָׁלוֹם God the & end. God in beginning שָׁלוֹם & end. light ἀγάπη earth light and created Ä beginning é & end. God created spirit ß Ä heaven earth שָׁלוֹם é beginning in ß & end. Ä darkness beginning & end. beginning heaven é light שָׁלוֹם waters & end. heaven beginning beginning beginning earth ß é light the earth heaven and darkness and heaven light שָׁלוֹם and earth God é Ä darkness earth created & end. the in é Ä darkness darkness heaven light waters waters and in beginning שָׁלוֹם & end. שָׁלוֹם beginning created the darkness earth created Ä ἀγάπη created & end. é שָׁלוֹם שָׁלוֹם in earth created God ß in earth in beginning שָׁלוֹם beginning beginning ἀγάπη light earth ß Ä the and waters & end. created ἀγάπη God ἀγάπη darkness ß and beginning in שָׁלוֹם ß Ä beginning created light created שָׁלוֹם spirit Ä ἀγάπη Ä created & end. waters in waters God and darkness Ä beginning é the darkness created é and é & end. Ä and the é created darkness created waters light earth Ä heaven ἀγάπη ß ß and waters waters and é שָׁלוֹם waters ἀγάπη & end. שָׁלוֹם and Ä ß darkness in ἀγάπη & end. in ß earth earth God ß in earth the darkness light é God שָׁלוֹם and earth in ß & end. earth earth in darkness ἀγάπη é é earth waters spirit and שָׁלוֹם and and light darkness ἀγάπη earth the created the created the & end. waters beginning waters שָׁלוֹם the Ä waters God beginning God and darkness é and ß ἀγάπη earth Ä ß light waters waters the light beginning & end. ἀγάπη ß Ä é created heaven & end. created waters ß beginning Ä earth the waters God light and ß é earth God darkness light light heaven darkness and Ä שָׁלוֹם God the & end. ß the earth and spirit heaven light in spirit waters & end. the and waters spirit beginning ἀγάπη Ä created beginning Ä é & end. darkness the spirit in spirit Ä and é é Ä spirit heaven created Ä spirit heaven heaven beginning and the ἀγάπη Ä heaven earth & end. and heaven the שָׁלוֹם God the the waters ß darkness darkness é spirit ß ἀγάπη ß ß ἀγάπη beginning spirit שָׁלוֹם the & end."
+
+#### sources ####
+0..7 entry=0 path=/1/0/2/2/2/0 offset=0
+8..11 entry=0 path=/1/0/2/2/2/1/0 offset=0
+12..15 entry=0 path=/1/0/2/2/2/2 offset=1
+16..19 entry=0 path=/1/0/2/2/2/2 offset=5
+20..23 entry=0 path=/1/0/2/2/2/3/0 offset=0
+24..26 entry=0 path=/1/0/2/2/2/5/0 offset=0
+27..29 entry=0 path=/1/0/2/2/2/7/0 offset=0
+30..33 entry=0 path=/1/0/2/2/2/8 offset=1
+34..37 entry=0 path=/1/0/2/2/2/8 offset=5
+38..40 entry=0 path=/1/0/2/2/2/9/0 offset=0
+41..44 entry=0 path=/1/0/2/2/2/10 offset=1
+45..52 entry=0 path=/1/0/2/2/2/11/0 offset=0
+53..56 entry=0 path=/1/0/2/2/2/12 offset=1
+57..58 entry=0 path=/1/0/2/2/2/12 offset=5
+59..63 entry=0 path=/1/0/2/2/2/12 offset=7
+64..70 entry=0 path=/1/0/2/2/4/0/0 offset=0
+71..74 entry=0 path=/1/0/2/2/4/1 offset=1
+75..84 entry=0 path=/1/0/2/2/4/1 offset=5
+85..88 entry=0 path=/1/0/2/2/4/1 offset=15
+89..91 entry=0 path=/1/0/2/2/4/1 offset=19
+92..94 entry=0 path=/1/0/2/2/4/1 offset=22
+95..97 entry=0 path=/1/0/2/2/4/1 offset=25
+98..103 entry=0 path=/1/0/2/2/4/1 offset=28
+104..109 entry=0 path=/1/0/2/2/4/2/0 offset=0
+110..124 entry=0 path=/1/0/2/2/4/3 offset=1
+125..131 entry=0 path=/1/0/2/2/4/3 offset=16
+132..140 entry=0 path=/1/0/2/2/4/3 offset=23
+141..150 entry=0 path=/1/0/2/2/4/4/0 offset=0
+151..157 entry=0 path=/1/0/2/2/4/5 offset=1
+158..165 entry=0 path=/1/0/2/2/4/5 offset=8
+166..168 entry=0 path=/1/0/2/2/4/6/0 offset=0
+169..178 entry=0 path=/1/0/2/2/4/7 offset=1
+179..185 entry=0 path=/1/0/2/2/4/8/0 offset=0
+186..192 entry=0 path=/1/0/2/2/4/9 offset=1
+193..195 entry=0 path=/1/0/2/2/4/10/0 offset=0
+196..197 entry=0 path=/1/0/2/2/4/11 offset=1
+198..202 entry=0 path=/1/0/2/2/4/11 offset=3
+203..214 entry=0 path=/1/0/2/2/6/0 offset=0
+215..224 entry=0 path=/1/0/2/2/6/1/0 offset=0
+225..227 entry=0 path=/1/0/2/2/6/3/0 offset=0
+228..234 entry=0 path=/1/0/2/2/6/5/0 offset=0
+235..241 entry=0 path=/1/0/2/2/6/7/0 offset=0
+242..253 entry=0 path=/1/0/2/2/6/9/0 offset=0
+254..261 entry=0 path=/1/0/2/2/6/10 offset=1
+262..264 entry=0 path=/1/0/2/2/6/10 offset=9
+265..276 entry=0 path=/1/0/2/2/6/11/0 offset=0
+277..279 entry=0 path=/1/0/2/2/6/12 offset=1
+280..287 entry=0 path=/1/0/2/2/6/12 offset=4
+288..289 entry=0 path=/1/0/2/2/6/12 offset=12
+290..294 entry=0 path=/1/0/2/2/6/12 offset=14
+295..300 entry=0 path=/1/0/2/2/8/0 offset=0
+301..307 entry=0 path=/1/0/2/2/8/0 offset=6
+308..310 entry=0 path=/1/0/2/2/8/0 offset=13
+311..318 entry=0 path=/1/0/2/2/8/1/0 offset=0
+319..324 entry=0 path=/1/0/2/2/8/2 offset=1
+325..327 entry=0 path=/1/0/2/2/8/2 offset=7
+328..334 entry=0 path=/1/0/2/2/8/3/0 offset=0
+335..342 entry=0 path=/1/0/2/2/8/4 offset=1
+343..349 entry=0 path=/1/0/2/2/8/4 offset=9
+350..356 entry=0 path=/1/0/2/2/8/4 offset=16
+357..371 entry=0 path=/1/0/2/2/8/4 offset=23
+372..375 entry=0 path=/1/0/2/2/8/4 offset=38
+376..378 entry=0 path=/1/0/2/2/8/4 offset=42
+379..381 entry=0 path=/1/0/2/2/8/5/0 offset=0
+382..384 entry=0 path=/1/0/2/2/8/7/0 offset=0
+385..388 entry=0 path=/1/0/2/2/8/8 offset=1
+389..392 entry=0 path=/1/0/2/2/8/9/0 offset=0
+393..396 entry=0 path=/1/0/2/2/8/11/0 offset=0
+397..404 entry=0 path=/1/0/2/2/8/12 offset=1
+405..411 entry=0 path=/1/0/2/2/8/12 offset=9
+412..413 entry=0 path=/1/0/2/2/8/12 offset=16
+414..418 entry=0 path=/1/0/2/2/8/12 offset=18
+419..422 entry=0 path=/1/0/2/2/10/0 offset=0
+423..430 entry=0 path=/1/0/2/2/10/0 offset=4
+431..437 entry=0 path=/1/0/2/2/10/0 offset=12
+438..449 entry=0 path=/1/0/2/2/10/1/0 offset=0
+450..452 entry=0 path=/1/0/2/2/10/2 offset=1
+453..454 entry=0 path=/1/0/2/2/10/4 offset=1
+455..459 entry=0 path=/1/0/2/2/10/4 offset=3
+460..469 entry=0 path=/1/0/2/2/12/0/0 offset=0
+470..475 entry=0 path=/1/0/2/2/12/1 offset=1
+476..482 entry=0 path=/1/0/2/2/12/1 offset=7
+483..486 entry=0 path=/1/0/2/2/12/1 offset=14
+487..501 entry=0 path=/1/0/2/2/12/1 offset=18
+502..504 entry=0 path=/1/0/2/2/12/1 offset=33
+505..513 entry=0 path=/1/0/2/2/12/1 offset=36
+514..523 entry=0 path=/1/0/2/2/12/1 offset=45
+524..529 entry=0 path=/1/0/2/2/12/1 offset=55
+530..536 entry=0 path=/1/0/2/2/12/1 offset=61
+537..542 entry=0 path=/1/0/2/2/12/1 offset=68
+543..557 entry=0 path=/1/0/2/2/12/2/0 offset=0
+558..559 entry=0 path=/1/0/2/2/12/3 offset=1
+560..564 entry=0 path=/1/0/2/2/12/3 offset=3
+565..568 entry=0 path=/1/0/2/2/14/0/0 offset=1
+569..571 entry=0 path=/1/0/2/2/14/0/0 offset=5
+572..577 entry=0 path=/1/0/2/2/14/0/1/0 offset=0
+578..584 entry=0 path=/1/0/2/2/14/0/2 offset=1
+585..587 entry=0 path=/1/0/2/2/14/0/2 offset=8
+588..599 entry=0 path=/1/0/2/2/14/0/3/0 offset=0
+600..606 entry=0 path=/1/0/2/2/14/0/4 offset=1
+607..613 entry=0 path=/1/0/2/2/14/0/4 offset=8
+614..620 entry=0 path=/1/0/2/2/14/0/5/0 offset=0
+621..626 entry=0 path=/1/0/2/2/14/0/6 offset=1
+627..628 entry=0 path=/1/0/2/2/14/1 offset=1
+629..633 entry=0 path=/1/0/2/2/14/1 offset=3
+634..637 entry=0 path=/1/0/2/2/16/0 offset=0
+638..640 entry=0 path=/1/0/2/2/16/0 offset=4
+641..647 entry=0 path=/1/0/2/2/16/0 offset=7
+648..657 entry=0 path=/1/0/2/2/16/0 offset=14
+658..661 entry=0 path=/1/0/2/2/16/0 offset=24
+662..665 entry=0 path=/1/0/2/2/16/0 offset=28
+666..672 entry=0 path=/1/0/2/2/16/0 offset=32
+673..679 entry=0 path=/1/0/2/2/16/1/0 offset=0
+680..682 entry=0 path=/1/0/2/2/16/2 offset=1
+683..692 entry=0 path=/1/0/2/2/16/2 offset=4
+693..699 entry=0 path=/1/0/2/2/16/2 offset=14
+700..702 entry=0 path=/1/0/2/2/16/3/0 offset=0
+703..710 entry=0 path=/1/0/2/2/16/4 offset=1
+711..712 entry=0 path=/1/0/2/2/16/4 offset=9
+713..717 entry=0 path=/1/0/2/2/16/4 offset=11
+718..729 entry=0 path=/1/0/2/2/18/0 offset=0
+730..736 entry=0 path=/1/0/2/2/18/1/0 offset=0
+737..744 entry=0 path=/1/0/2/2/18/3/0 offset=0
+745..748 entry=0 path=/1/0/2/2/18/4 offset=1
+749..756 entry=0 path=/1/0/2/2/18/4 offset=5
+757..760 entry=0 path=/1/0/2/2/18/4 offset=13
+761..764 entry=0 path=/1/0/2/2/18/5/0 offset=0
+765..773 entry=0 path=/1/0/2/2/18/6 offset=1
+774..780 entry=0 path=/1/0/2/2/18/7/0 offset=0
+781..788 entry=0 path=/1/0/2/2/18/9/0 offset=0
+789..791 entry=0 path=/1/0/2/2/18/10 offset=1
+792..806 entry=0 path=/1/0/2/2/18/10 offset=4
+807..821 entry=0 path=/1/0/2/2/18/11/0 offset=0
+822..836 entry=0 path=/1/0/2/2/18/12 offset=1
+837..839 entry=0 path=/1/0/2/2/18/12 offset=16
+840..842 entry=0 path=/1/0/2/2/18/12 offset=19
+843..850 entry=0 path=/1/0/2/2/18/13/0 offset=0
+851..854 entry=0 path=/1/0/2/2/18/14 offset=1
+855..861 entry=0 path=/1/0/2/2/18/14 offset=5
+862..876 entry=0 path=/1/0/2/2/18/14 offset=12
+877..880 entry=0 path=/1/0/2/2/18/14 offset=27
+881..884 entry=0 path=/1/0/2/2/18/15/0 offset=0
+885..886 entry=0 path=/1/0/2/2/18/16 offset=1
+887..891 entry=0 path=/1/0/2/2/18/16 offset=3
+892..895 entry=0 path=/1/0/2/2/20/0 offset=0
+896..898 entry=0 path=/1/0/2/2/20/0 offset=4
+899..908 entry=0 path=/1/0/2/2/20/0 offset=7
+909..923 entry=0 path=/1/0/2/2/20/0 offset=17
+924..925 entry=0 path=/1/0/2/2/20/2 offset=1
+926..930 entry=0 path=/1/0/2/2/20/2 offset=3
+931..936 entry=0 path=/1/0/2/2/22/0 offset=0
+937..948 entry=0 path=/1/0/2/2/22/0 offset=6
+949..954 entry=0 path=/1/0/2/2/22/0 offset=18
+955..960 entry=0 path=/1/0/2/2/22/0 offset=24
+961..964 entry=0 path=/1/0/2/2/22/0 offset=30
+965..972 entry=0 path=/1/0/2/2/22/0 offset=34
+973..975 entry=0 path=/1/0/2/2/22/0 offset=42
+976..985 entry=0 path=/1/0/2/2/22/0 offset=45
+986..988 entry=0 path=/1/0/2/2/22/1/0 offset=0
+989..990 entry=0 path=/1/0/2/2/22/2 offset=1
+991..995 entry=0 path=/1/0/2/2/22/2 offset=3
+996..999 entry=0 path=/1/0/2/2/24/0 offset=0
+1000..1007 entry=0 path=/1/0/2/2/24/0 offset=4
+1008..1014 entry=0 path=/1/0/2/2/24/1/0 offset=0
+1015..1017 entry=0 path=/1/0/2/2/24/3/0 offset=0
+1018..1020 entry=0 path=/1/0/2/2/24/4 offset=1
+1021..1027 entry=0 path=/1/0/2/2/24/4 offset=4
+1028..1033 entry=0 path=/1/0/2/2/24/5/0 offset=0
+1034..1048 entry=0 path=/1/0/2/2/24/6 offset=1
+1049..1051 entry=0 path=/1/0/2/2/24/7/0 offset=0
+1052..1061 entry=0 path=/1/0/2/2/24/8 offset=1
+1062..1064 entry=0 path=/1/0/2/2/24/9/0 offset=0
+1065..1067 entry=0 path=/1/0/2/2/24/10 offset=1
+1068..1069 entry=0 path=/1/0/2/2/24/10 offset=4
+1070..1074 entry=0 path=/1/0/2/2/24/10 offset=6
+1075..1077 entry=0 path=/1/0/2/2/26/0/0 offset=0
+1078..1086 entry=0 path=/1/0/2/2/26/1 offset=1
+1087..1096 entry=0 path=/1/0/2/2/26/2/0 offset=0
+1097..1098 entry=0 path=/1/0/2/2/26/3 offset=1
+1099..1103 entry=0 path=/1/0/2/2/26/3 offset=3
+1104..1113 entry=0 path=/1/0/2/2/28/0/1/0 offset=0
+1114..1120 entry=0 path=/1/0/2/2/28/0/3/0 offset=0
+1121..1123 entry=0 path=/1/0/2/2/28/0/4 offset=1
+1124..1129 entry=0 path=/1/0/2/2/28/0/4 offset=4
+1130..1144 entry=0 path=/1/0/2/2/28/0/4 offset=10
+1145..1151 entry=0 path=/1/0/2/2/28/0/5/0 offset=0
+1152..1153 entry=0 path=/1/0/2/2/28/1 offset=1
+1154..1158 entry=0 path=/1/0/2/2/28/1 offset=3
+1159..1165 entry=0 path=/1/0/2/2/30/0 offset=0
+1166..1175 entry=0 path=/1/0/2/2/30/1/0 offset=0
+1176..1185 entry=0 path=/1/0/2/2/30/2 offset=1
+1186..1195 entry=0 path=/1/0/2/2/30/2 offset=11
+1196..1201 entry=0 path=/1/0/2/2/30/3/0 offset=0
+1202..1204 entry=0 path=/1/0/2/2/30/5/0 offset=0
+1205..1207 entry=0 path=/1/0/2/2/30/6 offset=1
+1208..1213 entry=0 path=/1/0/2/2/30/6 offset=4
+1214..1217 entry=0 path=/1/0/2/2/30/6 offset=10
+1218..1223 entry=0 path=/1/0/2/2/30/6 offset=14
+1224..1230 entry=0 path=/1/0/2/2/30/7/0 offset=0
+1231..1234 entry=0 path=/1/0/2/2/30/8 offset=1
+1235..1243 entry=0 path=/1/0/2/2/30/8 offset=5
+1244..1247 entry=0 path=/1/0/2/2/30/9/0 offset=0
+1248..1254 entry=0 path=/1/0/2/2/30/11/0 offset=0
+1255..1260 entry=0 path=/1/0/2/2/30/13/0 offset=0
+1261..1275 entry=0 path=/1/0/2/2/30/14 offset=1
+1276..1279 entry=0 path=/1/0/2/2/30/14 offset=16
+1280..1285 entry=0 path=/1/0/2/2/30/14 offset=20
+1286..1289 entry=0 path=/1/0/2/2/30/14 offset=26
+1290..1292 entry=0 path=/1/0/2/2/30/14 offset=30
+1293..1295 entry=0 path=/1/0/2/2/30/14 offset=33
+1296..1304 entry=0 path=/1/0/2/2/30/14 offset=36
+1305..1310 entry=0 path=/1/0/2/2/30/15/0 offset=0
+1311..1318 entry=0 path=/1/0/2/2/30/16 offset=1
+1319..1320 entry=0 path=/1/0/2/2/30/18 offset=1
+1321..1325 entry=0 path=/1/0/2/2/30/18 offset=3
+1326..1329 entry=0 path=/1/0/2/2/32/0 offset=0
+1330..1332 entry=0 path=/1/0/2/2/32/1/0 offset=0
+1333..1335 entry=0 path=/1/0/2/2/32/3/0 offset=0
+1336..1338 entry=0 path=/1/0/2/2/32/4 offset=1
+1339..1347 entry=0 path=/1/0/2/2/32/4 offset=4
+1348..1356 entry=0 path=/1/0/2/2/32/5/0 offset=0
+1357..1363 entry=0 path=/1/0/2/2/32/7/0 offset=0
+1364..1369 entry=0 path=/1/0/2/2/32/8 offset=1
+1370..1376 entry=0 path=/1/0/2/2/32/8 offset=7
+1377..1383 entry=0 path=/1/0/2/2/32/9/0 offset=0
+1384..1387 entry=0 path=/1/0/2/2/32/10 offset=1
+1388..1390 entry=0 path=/1/0/2/2/32/11/0 offset=0
+1391..1400 entry=0 path=/1/0/2/2/32/12 offset=1
+1401..1415 entry=0 path=/1/0/2/2/32/12 offset=11
+1416..1417 entry=0 path=/1/0/2/2/32/12 offset=26
+1418..1422 entry=0 path=/1/0/2/2/32/12 offset=28
+1423..1437 entry=0 path=/1/0/2/2/34/0 offset=0
+1438..1447 entry=0 path=/1/0/2/2/34/1/0 offset=0
+1448..1455 entry=0 path=/1/0/2/2/34/2 offset=1
+1456..1459 entry=0 path=/1/0/2/2/34/2 offset=9
+1460..1468 entry=0 path=/1/0/2/2/34/3/0 offset=0
+1469..1474 entry=0 path=/1/0/2/2/34/5/0 offset=0
+1475..1482 entry=0 path=/1/0/2/2/34/6 offset=1
+1483..1485 entry=0 path=/1/0/2/2/34/6 offset=9
+1486..1497 entry=0 path=/1/0/2/2/34/7/0 offset=0
+1498..1505 entry=0 path=/1/0/2/2/34/9/0 offset=0
+1506..1507 entry=0 path=/1/0/2/2/34/10 offset=1
+1508..1512 entry=0 path=/1/0/2/2/34/10 offset=3
+1513..1515 entry=0 path=/1/0/2/2/36/0 offset=0
+1516..1530 entry=0 path=/1/0/2/2/36/1/0 offset=0
+1531..1545 entry=0 path=/1/0/2/2/36/2 offset=1
+1546..1548 entry=0 path=/1/0/2/2/36/2 offset=16
+1549..1554 entry=0 path=/1/0/2/2/36/3/0 offset=0
+1555..1562 entry=0 path=/1/0/2/2/36/4 offset=1
+1563..1566 entry=0 path=/1/0/2/2/36/4 offset=9
+1567..1569 entry=0 path=/1/0/2/2/36/4 offset=13
+1570..1572 entry=0 path=/1/0/2/2/36/4 offset=16
+1573..1578 entry=0 path=/1/0/2/2/36/4 offset=19
+1579..1581 entry=0 path=/1/0/2/2/36/4 offset=25
+1582..1591 entry=0 path=/1/0/2/2/36/4 offset=28
+1592..1606 entry=0 path=/1/0/2/2/36/4 offset=38
+1607..1616 entry=0 path=/1/0/2/2/36/4 offset=53
+1617..1626 entry=0 path=/1/0/2/2/36/4 offset=63
+1627..1638 entry=0 path=/1/0/2/2/36/5/0 offset=0
+1639..1644 entry=0 path=/1/0/2/2/36/7/0 offset=0
+1645..1650 entry=0 path=/1/0/2/2/36/8 offset=1
+1651..1653 entry=0 path=/1/0/2/2/36/8 offset=7
+1654..1656 entry=0 path=/1/0/2/2/36/9/0 offset=0
+1657..1660 entry=0 path=/1/0/2/2/36/10 offset=1
+1661..1664 entry=0 path=/1/0/2/2/36/11/0 offset=0
+1665..1671 entry=0 path=/1/0/2/2/36/13/0 offset=0
+1672..1673 entry=0 path=/1/0/2/2/36/14 offset=1
+1674..1678 entry=0 path=/1/0/2/2/36/14 offset=3
+1679..1686 entry=0 path=/1/0/2/2/38/0/0 offset=0
+1687..1698 entry=0 path=/1/0/2/2/38/2/0 offset=0
+1699..1702 entry=0 path=/1/0/2/2/38/3 offset=1
+1703..1714 entry=0 path=/1/0/2/2/38/4/0 offset=0
+1715..1723 entry=0 path=/1/0/2/2/38/5 offset=1
+1724..1726 entry=0 path=/1/0/2/2/38/5 offset=10
+1727..1730 entry=0 path=/1/0/2/2/38/6/0 offset=0
+1731..1740 entry=0 path=/1/0/2/2/38/7 offset=1
+1741..1743 entry=0 path=/1/0/2/2/38/8/0 offset=0
+1744..1758 entry=0 path=/1/0/2/2/38/9 offset=1
+1759..1761 entry=0 path=/1/0/2/2/38/9 offset=16
+1762..1764 entry=0 path=/1/0/2/2/38/10/0 offset=0
+1765..1774 entry=0 path=/1/0/2/2/38/11 offset=1
+1775..1782 entry=0 path=/1/0/2/2/38/11 offset=11
+1783..1788 entry=0 path=/1/0/2/2/38/11 offset=19
+1789..1796 entry=0 path=/1/0/2/2/38/11 offset=25
+1797..1811 entry=0 path=/1/0/2/2/38/12/0 offset=0
+1812..1818 entry=0 path=/1/0/2/2/38/14/0 offset=0
+1819..1821 entry=0 path=/1/0/2/2/38/16/0 offset=0
+1822..1833 entry=0 path=/1/0/2/2/38/17 offset=1
+1834..1836 entry=0 path=/1/0/2/2/38/18/0 offset=0
+1837..1844 entry=0 path=/1/0/2/2/38/19 offset=1
+1845..1846 entry=0 path=/1/0/2/2/38/19 offset=9
+1847..1851 entry=0 path=/1/0/2/2/38/19 offset=11
+1852..1858 entry=0 path=/1/0/2/2/40/0/0 offset=0
+1859..1861 entry=0 path=/1/0/2/2/40/2/0 offset=0
+1862..1868 entry=0 path=/1/0/2/2/40/3 offset=1
+1869..1872 entry=0 path=/1/0/2/2/40/3 offset=8
+1873..1876 entry=0 path=/1/0/2/2/40/3 offset=12
+1877..1885 entry=0 path=/1/0/2/2/40/4/0 offset=0
+1886..1888 entry=0 path=/1/0/2/2/40/5 offset=1
+1889..1898 entry=0 path=/1/0/2/2/40/5 offset=4
+1899..1901 entry=0 path=/1/0/2/2/40/5 offset=14
+1902..1905 entry=0 path=/1/0/2/2/40/6/0 offset=0
+1906..1914 entry=0 path=/1/0/2/2/40/7 offset=1
+1915..1922 entry=0 path=/1/0/2/2/40/8/0 offset=0
+1923..1925 entry=0 path=/1/0/2/2/40/9 offset=1
+1926..1929 entry=0 path=/1/0/2/2/40/9 offset=4
+1930..1932 entry=0 path=/1/0/2/2/40/9 offset=8
+1933..1934 entry=0 path=/1/0/2/2/40/11 offset=1
+1935..1939 entry=0 path=/1/0/2/2/40/11 offset=3
+1940..1942 entry=0 path=/1/0/2/2/42/0/0 offset=1
+1943..1946 entry=0 path=/1/0/2/2/42/0/0 offset=4
+1947..1950 entry=0 path=/1/0/2/2/42/0/0 offset=8
+1951..1953 entry=0 path=/1/0/2/2/42/0/0 offset=12
+1954..1961 entry=0 path=/1/0/2/2/42/0/0 offset=15
+1962..1970 entry=0 path=/1/0/2/2/42/0/0 offset=23
+1971..1978 entry=0 path=/1/0/2/2/42/0/1/0 offset=0
+1979..1985 entry=0 path=/1/0/2/2/42/0/3/0 offset=0
+1986..1991 entry=0 path=/1/0/2/2/42/0/4 offset=1
+1992..1997 entry=0 path=/1/0/2/2/42/0/5/0 offset=0
+1998..2000 entry=0 path=/1/0/2/2/42/0/7/0 offset=0
+2001..2007 entry=0 path=/1/0/2/2/42/0/9/0 offset=0
+2008..2019 entry=0 path=/1/0/2/2/42/0/10 offset=1
+2020..2022 entry=0 path=/1/0/2/2/42/0/10 offset=13
+2023..2025 entry=0 path=/1/0/2/2/42/0/10 offset=16
+2026..2029 entry=0 path=/1/0/2/2/42/0/11/0 offset=0
+2030..2036 entry=0 path=/1/0/2/2/42/0/12 offset=1
+2037..2043 entry=0 path=/1/0/2/2/42/0/13/0 offset=0
+2044..2047 entry=0 path=/1/0/2/2/42/0/14 offset=1
+2048..2050 entry=0 path=/1/0/2/2/42/0/14 offset=5
+2051..2065 entry=0 path=/1/0/2/2/42/0/15/0 offset=0
+2066..2072 entry=0 path=/1/0/2/2/42/0/16 offset=1
+2073..2084 entry=0 path=/1/0/2/2/42/0/17/0 offset=0
+2085..2086 entry=0 path=/1/0/2/2/42/1 offset=1
+2087..2091 entry=0 path=/1/0/2/2/42/1 offset=3
+2092..2106 entry=0 path=/1/0/2/2/44/0 offset=0
+2107..2110 entry=0 path=/1/0/2/2/44/1/0 offset=0
+2111..2113 entry=0 path=/1/0/2/2/44/2 offset=1
+2114..2116 entry=0 path=/1/0/2/2/44/2 offset=4
+2117..2125 entry=0 path=/1/0/2/2/44/2 offset=7
+2126..2128 entry=0 path=/1/0/2/2/44/3/0 offset=0
+2129..2140 entry=0 path=/1/0/2/2/44/4 offset=1
+2141..2142 entry=0 path=/1/0/2/2/44/4 offset=13
+2143..2147 entry=0 path=/1/0/2/2/44/4 offset=15
+2148..2150 entry=0 path=/1/0/2/2/46/0/0 offset=0
+2151..2153 entry=0 path=/1/0/2/2/46/1 offset=1
+2154..2159 entry=0 path=/1/0/2/2/46/1 offset=4
+2160..2165 entry=0 path=/1/0/2/2/46/2/0 offset=0
+2166..2169 entry=0 path=/1/0/2/2/46/3 offset=1
+2170..2172 entry=0 path=/1/0/2/2/46/4/0 offset=0
+2173..2175 entry=0 path=/1/0/2/2/46/5 offset=1
+2176..2181 entry=0 path=/1/0/2/2/46/5 offset=4
+2182..2185 entry=0 path=/1/0/2/2/46/5 offset=10
+2186..2194 entry=0 path=/1/0/2/2/46/5 offset=14
+2195..2200 entry=0 path=/1/0/2/2/46/5 offset=23
+2201..2203 entry=0 path=/1/0/2/2/46/5 offset=29
+2204..2207 entry=0 path=/1/0/2/2/46/6/0 offset=0
+2208..2222 entry=0 path=/1/0/2/2/46/7 offset=1
+2223..2226 entry=0 path=/1/0/2/2/46/7 offset=16
+2227..2232 entry=0 path=/1/0/2/2/46/7 offset=20
+2233..2235 entry=0 path=/1/0/2/2/46/8/0 offset=0
+2236..2238 entry=0 path=/1/0/2/2/46/10/0 offset=0
+2239..2240 entry=0 path=/1/0/2/2/46/11 offset=1
+2241..2245 entry=0 path=/1/0/2/2/46/11 offset=3
+2246..2251 entry=0 path=/1/0/2/2/48/0 offset=0
+2252..2257 entry=0 path=/1/0/2/2/48/0 offset=6
+2258..2260 entry=0 path=/1/0/2/2/48/0 offset=12
+2261..2269 entry=0 path=/1/0/2/2/48/1/0 offset=0
+2270..2281 entry=0 path=/1/0/2/2/48/2 offset=1
+2282..2284 entry=0 path=/1/0/2/2/48/3/0 offset=0
+2285..2287 entry=0 path=/1/0/2/2/48/4 offset=1
+2288..2293 entry=0 path=/1/0/2/2/48/4 offset=4
+2294..2300 entry=0 path=/1/0/2/2/48/4 offset=10
+2301..2307 entry=0 path=/1/0/2/2/48/4 offset=17
+2308..2311 entry=0 path=/1/0/2/2/48/5/0 offset=0
+2312..2326 entry=0 path=/1/0/2/2/48/7/0 offset=0
+2327..2330 entry=0 path=/1/0/2/2/48/9/0 offset=0
+2331..2334 entry=0 path=/1/0/2/2/48/11/0 offset=0
+2335..2340 entry=0 path=/1/0/2/2/48/12 offset=1
+2341..2349 entry=0 path=/1/0/2/2/48/13/0 offset=0
+2350..2361 entry=0 path=/1/0/2/2/48/14 offset=1
+2362..2367 entry=0 path=/1/0/2/2/48/14 offset=13
+2368..2371 entry=0 path=/1/0/2/2/48/14 offset=19
+2372..2379 entry=0 path=/1/0/2/2/48/14 offset=23
+2380..2383 entry=0 path=/1/0/2/2/48/15/0 offset=0
+2384..2391 entry=0 path=/1/0/2/2/48/16 offset=1
+2392..2395 entry=0 path=/1/0/2/2/48/17/0 offset=0
+2396..2397 entry=0 path=/1/0/2/2/48/18 offset=1
+2398..2402 entry=0 path=/1/0/2/2/48/18 offset=3
+2403..2409 entry=0 path=/1/0/2/2/50/0 offset=0
+2410..2419 entry=0 path=/1/0/2/2/50/0 offset=7
+2420..2426 entry=0 path=/1/0/2/2/50/1/0 offset=0
+2427..2441 entry=0 path=/1/0/2/2/50/2 offset=1
+2442..2445 entry=0 path=/1/0/2/2/50/3/0 offset=0
+2446..2448 entry=0 path=/1/0/2/2/50/4 offset=1
+2449..2455 entry=0 path=/1/0/2/2/50/4 offset=4
+2456..2459 entry=0 path=/1/0/2/2/50/5/0 offset=0
+2460..2469 entry=0 path=/1/0/2/2/50/6 offset=1
+2470..2473 entry=0 path=/1/0/2/2/50/6 offset=11
+2474..2477 entry=0 path=/1/0/2/2/50/6 offset=15
+2478..2486 entry=0 path=/1/0/2/2/50/6 offset=19
+2487..2489 entry=0 path=/1/0/2/2/50/7/0 offset=0
+2490..2493 entry=0 path=/1/0/2/2/50/8 offset=1
+2494..2496 entry=0 path=/1/0/2/2/50/9/0 offset=0
+2497..2508 entry=0 path=/1/0/2/2/50/11/0 offset=0
+2509..2514 entry=0 path=/1/0/2/2/50/12 offset=1
+2515..2517 entry=0 path=/1/0/2/2/50/13/0 offset=0
+2518..2520 entry=0 path=/1/0/2/2/50/15/0 offset=0
+2521..2526 entry=0 path=/1/0/2/2/50/17/0 offset=0
+2527..2533 entry=0 path=/1/0/2/2/50/18 offset=1
+2534..2540 entry=0 path=/1/0/2/2/50/18 offset=8
+2541..2544 entry=0 path=/1/0/2/2/50/19/0 offset=0
+2545..2550 entry=0 path=/1/0/2/2/50/21/0 offset=0
+2551..2560 entry=0 path=/1/0/2/2/50/23/0 offset=0
+2561..2562 entry=0 path=/1/0/2/2/50/26 offset=1
+2563..2567 entry=0 path=/1/0/2/2/50/26 offset=3
+2568..2579 entry=0 path=/1/0/2/2/52/0 offset=0
+2580..2582 entry=0 path=/1/0/2/2/52/0 offset=12
+2583..2585 entry=0 path=/1/0/2/2/52/0 offset=15
+2586..2588 entry=0 path=/1/0/2/2/52/0 offset=18
+2589..2596 entry=0 path=/1/0/2/2/52/0 offset=21
+2597..2603 entry=0 path=/1/0/2/2/52/1/0 offset=0
+2604..2605 entry=0 path=/1/0/2/2/52/2 offset=1
+2606..2610 entry=0 path=/1/0/2/2/52/2 offset=3
+2611..2618 entry=0 path=/1/0/2/2/54/0 offset=0
+2619..2625 entry=0 path=/1/0/2/2/54/0 offset=8
+2626..2628 entry=0 path=/1/0/2/2/54/0 offset=15
+2629..2638 entry=0 path=/1/0/2/2/54/0 offset=18
+2639..2641 entry=0 path=/1/0/2/2/54/0 offset=28
+2642..2647 entry=0 path=/1/0/2/2/54/0 offset=31
+2648..2651 entry=0 path=/1/0/2/2/54/0 offset=37
+2652..2658 entry=0 path=/1/0/2/2/54/1/0 offset=0
+2659..2662 entry=0 path=/1/0/2/2/54/2 offset=1
+2663..2668 entry=0 path=/1/0/2/2/54/2 offset=5
+2669..2672 entry=0 path=/1/0/2/2/54/3/0 offset=0
+2673..2675 entry=0 path=/1/0/2/2/54/5/0 offset=0
+2676..2678 entry=0 path=/1/0/2/2/54/6 offset=1
+2679..2684 entry=0 path=/1/0/2/2/54/6 offset=4
+2685..2688 entry=0 path=/1/0/2/2/54/6 offset=10
+2689..2697 entry=0 path=/1/0/2/2/54/7/0 offset=0
+2698..2703 entry=0 path=/1/0/2/2/54/8 offset=1
+2704..2709 entry=0 path=/1/0/2/2/54/9/0 offset=0
+2710..2716 entry=0 path=/1/0/2/2/54/11/0 offset=0
+2717..2725 entry=0 path=/1/0/2/2/54/12 offset=1
+2726..2729 entry=0 path=/1/0/2/2/54/13/0 offset=0
+2730..2732 entry=0 path=/1/0/2/2/54/15/0 offset=0
+2733..2747 entry=0 path=/1/0/2/2/54/16 offset=1
+2748..2751 entry=0 path=/1/0/2/2/54/16 offset=16
+2752..2755 entry=0 path=/1/0/2/2/54/17/0 offset=0
+2756..2757 entry=0 path=/1/0/2/2/54/18 offset=1
+2758..2762 entry=0 path=/1/0/2/2/54/18 offset=3
+2763..2765 entry=0 path=/1/0/2/2/56/0/0 offset=1
+2766..2769 entry=0 path=/1/0/2/2/56/0/0 offset=4
+2770..2775 entry=0 path=/1/0/2/2/56/0/1/0 offset=0
+2776..2779 entry=0 path=/1/0/2/2/56/0/2 offset=1
+2780..2786 entry=0 path=/1/0/2/2/56/0/2 offset=5
+2787..2793 entry=0 path=/1/0/2/2/56/0/2 offset=12
+2794..2799 entry=0 path=/1/0/2/2/56/0/2 offset=19
+2800..2802 entry=0 path=/1/0/2/2/56/0/3/0 offset=0
+2803..2809 entry=0 path=/1/0/2/2/56/0/5/0 offset=0
+2810..2816 entry=0 path=/1/0/2/2/56/0/7/0 offset=0
+2817..2818 entry=0 path=/1/0/2/2/56/1 offset=1
+2819..2823 entry=0 path=/1/0/2/2/56/1 offset=3
+2824..2827 entry=0 path=/1/0/2/2/58/0 offset=0
+2828..2831 entry=0 path=/1/0/2/2/58/0 offset=4
+2832..2838 entry=0 path=/1/0/2/2/58/0 offset=8
+2839..2845 entry=0 path=/1/0/2/2/58/1/0 offset=0
+2846..2855 entry=0 path=/1/0/2/2/58/3/0 offset=0
+2856..2867 entry=0 path=/1/0/2/2/58/5/0 offset=0
+2868..2870 entry=0 path=/1/0/2/2/58/6 offset=1
+2871..2878 entry=0 path=/1/0/2/2/58/6 offset=4
+2879..2888 entry=0 path=/1/0/2/2/58/6 offset=12
+2889..2891 entry=0 path=/1/0/2/2/58/6 offset=22
+2892..2894 entry=0 path=/1/0/2/2/58/6 offset=25
+2895..2896 entry=0 path=/1/0/2/2/58/6 offset=28
+2897..2901 entry=0 path=/1/0/2/2/58/6 offset=30
+2902..2910 entry=0 path=/1/0/2/2/60/0 offset=0
+2911..2914 entry=0 path=/1/0/2/2/60/1/0 offset=0
+2915..2921 entry=0 path=/1/0/2/2/60/2 offset=1
+2922..2924 entry=0 path=/1/0/2/2/60/2 offset=8
+2925..2931 entry=0 path=/1/0/2/2/60/2 offset=11
+2932..2934 entry=0 path=/1/0/2/2/60/2 offset=18
+2935..2938 entry=0 path=/1/0/2/2/60/2 offset=21
+2939..2941 entry=0 path=/1/0/2/2/60/2 offset=25
+2942..2944 entry=0 path=/1/0/2/2/60/3/0 offset=0
+2945..2947 entry=0 path=/1/0/2/2/60/4 offset=1
+2948..2954 entry=0 path=/1/0/2/2/60/4 offset=4
+2955..2961 entry=0 path=/1/0/2/2/60/5/0 offset=0
+2962..2969 entry=0 path=/1/0/2/2/60/6 offset=1
+2970..2972 entry=0 path=/1/0/2/2/60/7/0 offset=0
+2973..2979 entry=0 path=/1/0/2/2/60/8 offset=1
+2980..2986 entry=0 path=/1/0/2/2/60/9/0 offset=0
+2987..2993 entry=0 path=/1/0/2/2/60/10 offset=1
+2994..3003 entry=0 path=/1/0/2/2/60/11/0 offset=0
+3004..3007 entry=0 path=/1/0/2/2/60/13/0 offset=0
+3008..3011 entry=0 path=/1/0/2/2/60/14 offset=1
+3012..3023 entry=0 path=/1/0/2/2/60/15/0 offset=0
+3024..3026 entry=0 path=/1/0/2/2/60/17/0 offset=0
+3027..3033 entry=0 path=/1/0/2/2/60/18 offset=1
+3034..3039 entry=0 path=/1/0/2/2/60/18 offset=8
+3040..3041 entry=0 path=/1/0/2/2/60/20 offset=1
+3042..3046 entry=0 path=/1/0/2/2/60/20 offset=3
+3047..3050 entry=0 path=/1/0/2/2/62/0 offset=0
+3051..3057 entry=0 path=/1/0/2/2/62/0 offset=4
+3058..3061 entry=0 path=/1/0/2/2/62/0 offset=11
+3062..3076 entry=0 path=/1/0/2/2/62/1/0 offset=0
+3077..3080 entry=0 path=/1/0/2/2/62/3/0 offset=0
+3081..3084 entry=0 path=/1/0/2/2/62/4 offset=1
+3085..3088 entry=0 path=/1/0/2/2/62/4 offset=5
+3089..3095 entry=0 path=/1/0/2/2/62/5/0 offset=0
+3096..3098 entry=0 path=/1/0/2/2/62/6 offset=1
+3099..3107 entry=0 path=/1/0/2/2/62/6 offset=4
+3108..3116 entry=0 path=/1/0/2/2/62/6 offset=13
+3117..3119 entry=0 path=/1/0/2/2/62/6 offset=22
+3120..3126 entry=0 path=/1/0/2/2/62/6 offset=25
+3127..3129 entry=0 path=/1/0/2/2/62/7/0 offset=0
+3130..3141 entry=0 path=/1/0/2/2/62/8 offset=1
+3142..3144 entry=0 path=/1/0/2/2/62/8 offset=13
+3145..3147 entry=0 path=/1/0/2/2/62/8 offset=16
+3148..3159 entry=0 path=/1/0/2/2/62/8 offset=19
+3160..3169 entry=0 path=/1/0/2/2/62/9/0 offset=0
+3170..3176 entry=0 path=/1/0/2/2/62/11/0 offset=0
+3177..3191 entry=0 path=/1/0/2/2/62/12 offset=1
+3192..3195 entry=0 path=/1/0/2/2/62/13/0 offset=0
+3196..3197 entry=0 path=/1/0/2/2/62/14 offset=1
+3198..3202 entry=0 path=/1/0/2/2/62/14 offset=3
+
+#### html ####
+
+
+<div class="topos-title topos-main" data-title-type="main">Book Gen</div>
+<div class="topos-title">Chapter 1</div>
+created <span class="topos-w" data-strong="G4390" data-lemma="strong:G4390" data-morph="robinson:N-NSM">the</span> God the <span class="topos-w" data-strong="G3553" data-lemma="strong:G3553" data-morph="robinson:N-NSM">and</span> <span class="topos-w" data-strong="G744" data-lemma="strong:G744" data-morph="robinson:N-NSM">é</span> <span class="topos-w" data-strong="G4633" data-lemma="strong:G4633" data-morph="robinson:N-NSM">é</span> God the <span class="topos-w" data-strong="G1812" data-lemma="strong:G1812" data-morph="robinson:N-NSM">Ä</span> the <span class="topos-w" data-strong="G1182" data-lemma="strong:G1182" data-morph="robinson:N-NSM">created</span> God &amp; end.
+<span class="topos-w" data-strong="G4680" data-lemma="strong:G4680" data-morph="robinson:N-NSM">heaven</span> and beginning and é ß ß earth <span class="topos-w" data-strong="G2460" data-lemma="strong:G2460" data-morph="robinson:N-NSM">earth</span> שָׁלוֹם waters darkness <span class="topos-w" data-strong="G3426" data-lemma="strong:G3426" data-morph="robinson:N-NSM">beginning</span> heaven created <span class="topos-w" data-strong="G5475" data-lemma="strong:G5475" data-morph="robinson:N-NSM">é</span> beginning <span class="topos-added">waters</span> spirit <span class="topos-w" data-strong="G767" data-lemma="strong:G767" data-morph="robinson:N-NSM">ß</span> &amp; end.
+ἀγάπη <span class="topos-w" data-strong="G2537" data-lemma="strong:G2537" data-morph="robinson:N-NSM">beginning</span> <span class="topos-w" data-strong="G3161" data-lemma="strong:G3161" data-morph="robinson:N-NSM">ß</span> <span class="topos-w" data-strong="G3783" data-lemma="strong:G3783" data-morph="robinson:N-NSM">spirit</span> <span class="topos-w" data-strong="G960" data-lemma="strong:G960" data-morph="robinson:N-NSM">spirit</span> <span class="topos-w" data-strong="G2355" data-lemma="strong:G2355" data-morph="robinson:N-NSM">ἀγάπη</span> created Ä <span class="topos-w" data-strong="G3680" data-lemma="strong:G3680" data-morph="robinson:N-NSM">ἀγάπη</span> Ä created &amp; end.
+light spirit Ä <span class="topos-w" data-strong="G1240" data-lemma="strong:G1240" data-morph="robinson:N-NSM">created</span> earth in <span class="topos-w" data-strong="G34" data-lemma="strong:G34" data-morph="robinson:N-NSM">heaven</span> created spirit waters שָׁלוֹם the Ä <span class="topos-w" data-strong="G5197" data-lemma="strong:G5197" data-morph="robinson:N-NSM">Ä</span> <span class="topos-w" data-strong="G552" data-lemma="strong:G552" data-morph="robinson:N-NSM">Ä</span> and <span class="topos-added">God</span> <span class="topos-w" data-strong="G4644" data-lemma="strong:G4644" data-morph="robinson:N-NSM">the</span> created spirit &amp; end.
+and created spirit <span class="topos-w" data-strong="G3999" data-lemma="strong:G3999" data-morph="robinson:N-NSM">ἀγάπη</span> ß <span class="topos-note topos-crossref" data-note-type="crossReference" data-n="a"><a class="topos-ref" data-osis-ref="John.3.16">John 3:16</a></span> &amp; end.
+<span class="topos-w" data-strong="G2807" data-lemma="strong:G2807" data-morph="robinson:N-NSM">beginning</span> light heaven and שָׁלוֹם in darkness beginning light heaven earth <span class="topos-added">שָׁלוֹם</span> &amp; end.
+<span class="topos-woj"> and Ä <span class="topos-w" data-strong="G4037" data-lemma="strong:G4037" data-morph="robinson:N-NSM">earth</span> spirit in <span class="topos-w" data-strong="G4958" data-lemma="strong:G4958" data-morph="robinson:N-NSM">ἀγάπη</span> spirit spirit <span class="topos-w" data-strong="G837" data-lemma="strong:G837" data-morph="robinson:N-NSM">spirit</span> earth </span> &amp; end.
+and in spirit beginning God and heaven <span class="topos-w" data-strong="G3243" data-lemma="strong:G3243" data-morph="robinson:N-NSM">waters</span> ß beginning heaven <span class="topos-w" data-strong="G3813" data-lemma="strong:G3813" data-morph="robinson:N-NSM">in</span> created &amp; end.
+ἀγάπη <span class="topos-w" data-strong="G4492" data-lemma="strong:G4492" data-morph="robinson:N-NSM">spirit</span> <span class="topos-w" data-strong="G5323" data-lemma="strong:G5323" data-morph="robinson:N-NSM">created</span> God created and <span class="topos-w" data-strong="G1744" data-lemma="strong:G1744" data-morph="robinson:N-NSM">and</span> darkness <span class="topos-w" data-strong="G3433" data-lemma="strong:G3433" data-morph="robinson:N-NSM">waters</span> <span class="topos-w" data-strong="G2899" data-lemma="strong:G2899" data-morph="robinson:N-NSM">created</span> ß שָׁלוֹם <span class="topos-w" data-strong="G1244" data-lemma="strong:G1244" data-morph="robinson:N-NSM">שָׁלוֹם</span> שָׁלוֹם ß in <span class="topos-w" data-strong="G3879" data-lemma="strong:G3879" data-morph="robinson:N-NSM">created</span> God waters שָׁלוֹם God <span class="topos-w" data-strong="G2269" data-lemma="strong:G2269" data-morph="robinson:N-NSM">the</span> &amp; end.
+God in beginning שָׁלוֹם <span class="topos-note topos-crossref" data-note-type="crossReference" data-n="a"><a class="topos-ref" data-osis-ref="John.3.16">John 3:16</a></span> &amp; end.
+light ἀγάπη earth light and created Ä beginning <span class="topos-w" data-strong="G5485" data-lemma="strong:G5485" data-morph="robinson:N-NSM">é</span> &amp; end.
+God created <span class="topos-w" data-strong="G1125" data-lemma="strong:G1125" data-morph="robinson:N-NSM">spirit</span> <span class="topos-w" data-strong="G772" data-lemma="strong:G772" data-morph="robinson:N-NSM">ß</span> Ä heaven <span class="topos-w" data-strong="G3536" data-lemma="strong:G3536" data-morph="robinson:N-NSM">earth</span> שָׁלוֹם <span class="topos-w" data-strong="G2610" data-lemma="strong:G2610" data-morph="robinson:N-NSM">é</span> beginning <span class="topos-added">in</span> ß &amp; end.
+<span class="topos-added">Ä</span> darkness <span class="topos-w" data-strong="G1873" data-lemma="strong:G1873" data-morph="robinson:N-NSM">beginning</span> &amp; end.
+<span class="topos-woj"> <span class="topos-w" data-strong="G325" data-lemma="strong:G325" data-morph="robinson:N-NSM">beginning</span> <span class="topos-w" data-strong="G1062" data-lemma="strong:G1062" data-morph="robinson:N-NSM">heaven</span> é light שָׁלוֹם <span class="topos-w" data-strong="G472" data-lemma="strong:G472" data-morph="robinson:N-NSM">waters</span> </span> &amp; end.
+heaven <span class="topos-w" data-strong="G138" data-lemma="strong:G138" data-morph="robinson:N-NSM">beginning</span> beginning beginning <span class="topos-w" data-strong="G997" data-lemma="strong:G997" data-morph="robinson:N-NSM">earth</span> <span class="topos-w" data-strong="G4531" data-lemma="strong:G4531" data-morph="robinson:N-NSM">ß</span> é light the earth <span class="topos-w" data-strong="G1484" data-lemma="strong:G1484" data-morph="robinson:N-NSM">heaven</span> and darkness <span class="topos-w" data-strong="G4097" data-lemma="strong:G4097" data-morph="robinson:N-NSM">and</span> <span class="topos-w" data-strong="G149" data-lemma="strong:G149" data-morph="robinson:N-NSM">heaven</span> <span class="topos-w" data-strong="G152" data-lemma="strong:G152" data-morph="robinson:N-NSM">light</span> שָׁלוֹם and earth God é Ä darkness <span class="topos-added">earth</span> created <span class="topos-note topos-crossref" data-note-type="crossReference" data-n="a"><a class="topos-ref" data-osis-ref="John.3.16">John 3:16</a></span> &amp; end.
+the <span class="topos-w" data-strong="G2094" data-lemma="strong:G2094" data-morph="robinson:N-NSM">in</span> <span class="topos-w" data-strong="G693" data-lemma="strong:G693" data-morph="robinson:N-NSM">é</span> Ä darkness <span class="topos-w" data-strong="G1519" data-lemma="strong:G1519" data-morph="robinson:N-NSM">darkness</span> <span class="topos-w" data-strong="G30" data-lemma="strong:G30" data-morph="robinson:N-NSM">heaven</span> light waters <span class="topos-w" data-strong="G2536" data-lemma="strong:G2536" data-morph="robinson:N-NSM">waters</span> and <span class="topos-added">in</span> beginning שָׁלוֹם &amp; end.
+שָׁלוֹם <span class="topos-w" data-strong="G736" data-lemma="strong:G736" data-morph="robinson:N-NSM">beginning</span> created the <span class="topos-added">darkness</span> <span class="topos-w" data-strong="G4336" data-lemma="strong:G4336" data-morph="robinson:N-NSM">earth</span> created Ä <span class="topos-w" data-strong="G5069" data-lemma="strong:G5069" data-morph="robinson:N-NSM">ἀγάπη</span> <span class="topos-w" data-strong="G4203" data-lemma="strong:G4203" data-morph="robinson:N-NSM">created</span> &amp; end.
+é <span class="topos-w" data-strong="G4291" data-lemma="strong:G4291" data-morph="robinson:N-NSM">שָׁלוֹם</span> שָׁלוֹם in <span class="topos-w" data-strong="G343" data-lemma="strong:G343" data-morph="robinson:N-NSM">earth</span> created God ß in earth in beginning שָׁלוֹם beginning beginning <span class="topos-w" data-strong="G610" data-lemma="strong:G610" data-morph="robinson:N-NSM">ἀγάπη</span> <span class="topos-w" data-strong="G1682" data-lemma="strong:G1682" data-morph="robinson:N-NSM">light</span> earth ß <span class="topos-w" data-strong="G2354" data-lemma="strong:G2354" data-morph="robinson:N-NSM">Ä</span> the <span class="topos-w" data-strong="G1208" data-lemma="strong:G1208" data-morph="robinson:N-NSM">and</span> <span class="topos-w" data-strong="G2494" data-lemma="strong:G2494" data-morph="robinson:N-NSM">waters</span> &amp; end.
+<span class="topos-w" data-strong="G497" data-lemma="strong:G497" data-morph="robinson:N-NSM">created</span> <span class="topos-w" data-strong="G5506" data-lemma="strong:G5506" data-morph="robinson:N-NSM">ἀγάπη</span> God <span class="topos-w" data-strong="G4232" data-lemma="strong:G4232" data-morph="robinson:N-NSM">ἀγάπη</span> darkness ß <span class="topos-added">and</span> beginning <span class="topos-w" data-strong="G627" data-lemma="strong:G627" data-morph="robinson:N-NSM">in</span> שָׁלוֹם ß <span class="topos-w" data-strong="G1727" data-lemma="strong:G1727" data-morph="robinson:N-NSM">Ä</span> beginning created light created <span class="topos-w" data-strong="G924" data-lemma="strong:G924" data-morph="robinson:N-NSM">שָׁלוֹם</span> <span class="topos-w" data-strong="G3983" data-lemma="strong:G3983" data-morph="robinson:N-NSM">spirit</span> <span class="topos-w" data-strong="G30" data-lemma="strong:G30" data-morph="robinson:N-NSM">Ä</span> ἀγάπη <span class="topos-added">Ä</span> created &amp; end.
+<span class="topos-w" data-strong="G2715" data-lemma="strong:G2715" data-morph="robinson:N-NSM">waters</span> <span class="topos-added">in</span> waters God and <span class="topos-w" data-strong="G533" data-lemma="strong:G533" data-morph="robinson:N-NSM">darkness</span> Ä beginning é <span class="topos-w" data-strong="G423" data-lemma="strong:G423" data-morph="robinson:N-NSM">the</span> darkness <span class="topos-w" data-strong="G2177" data-lemma="strong:G2177" data-morph="robinson:N-NSM">created</span> é and é <span class="topos-note topos-crossref" data-note-type="crossReference" data-n="a"><a class="topos-ref" data-osis-ref="John.3.16">John 3:16</a></span> &amp; end.
+<span class="topos-woj"> Ä and the é created darkness <span class="topos-w" data-strong="G3399" data-lemma="strong:G3399" data-morph="robinson:N-NSM">created</span> <span class="topos-w" data-strong="G2096" data-lemma="strong:G2096" data-morph="robinson:N-NSM">waters</span> light <span class="topos-added">earth</span> <span class="topos-w" data-strong="G5270" data-lemma="strong:G5270" data-morph="robinson:N-NSM">Ä</span> <span class="topos-w" data-strong="G4101" data-lemma="strong:G4101" data-morph="robinson:N-NSM">heaven</span> ἀγάπη ß ß <span class="topos-w" data-strong="G1432" data-lemma="strong:G1432" data-morph="robinson:N-NSM">and</span> waters <span class="topos-w" data-strong="G2117" data-lemma="strong:G2117" data-morph="robinson:N-NSM">waters</span> and é <span class="topos-w" data-strong="G2214" data-lemma="strong:G2214" data-morph="robinson:N-NSM">שָׁלוֹם</span> waters <span class="topos-w" data-strong="G2951" data-lemma="strong:G2951" data-morph="robinson:N-NSM">ἀγάπη</span> </span> &amp; end.
+שָׁלוֹם <span class="topos-w" data-strong="G2036" data-lemma="strong:G2036" data-morph="robinson:N-NSM">and</span> Ä ß darkness <span class="topos-w" data-strong="G3484" data-lemma="strong:G3484" data-morph="robinson:N-NSM">in</span> ἀγάπη &amp; end.
+<span class="topos-w" data-strong="G4325" data-lemma="strong:G4325" data-morph="robinson:N-NSM">in</span> ß earth <span class="topos-w" data-strong="G4280" data-lemma="strong:G4280" data-morph="robinson:N-NSM">earth</span> God <span class="topos-w" data-strong="G324" data-lemma="strong:G324" data-morph="robinson:N-NSM">ß</span> in earth the darkness light é <span class="topos-w" data-strong="G2461" data-lemma="strong:G2461" data-morph="robinson:N-NSM">God</span> שָׁלוֹם and earth <span class="topos-w" data-strong="G2471" data-lemma="strong:G2471" data-morph="robinson:N-NSM">in</span> <span class="topos-w" data-strong="G2592" data-lemma="strong:G2592" data-morph="robinson:N-NSM">ß</span> &amp; end.
+earth earth in <span class="topos-w" data-strong="G1591" data-lemma="strong:G1591" data-morph="robinson:N-NSM">darkness</span> ἀγάπη <span class="topos-w" data-strong="G1867" data-lemma="strong:G1867" data-morph="robinson:N-NSM">é</span> é earth waters spirit <span class="topos-w" data-strong="G2393" data-lemma="strong:G2393" data-morph="robinson:N-NSM">and</span> <span class="topos-w" data-strong="G4061" data-lemma="strong:G4061" data-morph="robinson:N-NSM">שָׁלוֹם</span> <span class="topos-added">and</span> <span class="topos-w" data-strong="G1815" data-lemma="strong:G1815" data-morph="robinson:N-NSM">and</span> light <span class="topos-w" data-strong="G5109" data-lemma="strong:G5109" data-morph="robinson:N-NSM">darkness</span> ἀγάπη earth the created <span class="topos-w" data-strong="G4884" data-lemma="strong:G4884" data-morph="robinson:N-NSM">the</span> created <span class="topos-w" data-strong="G3684" data-lemma="strong:G3684" data-morph="robinson:N-NSM">the</span> &amp; end.
+waters beginning <span class="topos-w" data-strong="G5346" data-lemma="strong:G5346" data-morph="robinson:N-NSM">waters</span> שָׁלוֹם <span class="topos-added">the</span> Ä waters <span class="topos-w" data-strong="G2293" data-lemma="strong:G2293" data-morph="robinson:N-NSM">God</span> beginning God and darkness <span class="topos-w" data-strong="G3879" data-lemma="strong:G3879" data-morph="robinson:N-NSM">é</span> and <span class="topos-w" data-strong="G2984" data-lemma="strong:G2984" data-morph="robinson:N-NSM">ß</span> <span class="topos-w" data-strong="G3366" data-lemma="strong:G3366" data-morph="robinson:N-NSM">ἀγάπη</span> earth <span class="topos-w" data-strong="G286" data-lemma="strong:G286" data-morph="robinson:N-NSM">Ä</span> <span class="topos-w" data-strong="G508" data-lemma="strong:G508" data-morph="robinson:N-NSM">ß</span> <span class="topos-w" data-strong="G515" data-lemma="strong:G515" data-morph="robinson:N-NSM">light</span> waters waters <span class="topos-w" data-strong="G2593" data-lemma="strong:G2593" data-morph="robinson:N-NSM">the</span> <span class="topos-w" data-strong="G4879" data-lemma="strong:G4879" data-morph="robinson:N-NSM">light</span> <span class="topos-w" data-strong="G1916" data-lemma="strong:G1916" data-morph="robinson:N-NSM">beginning</span> <span class="topos-note topos-crossref" data-note-type="crossReference" data-n="a"><a class="topos-ref" data-osis-ref="John.3.16">John 3:16</a></span> &amp; end.
+ἀγάπη ß Ä é created <span class="topos-w" data-strong="G2485" data-lemma="strong:G2485" data-morph="robinson:N-NSM">heaven</span> &amp; end.
+created waters ß beginning Ä earth the <span class="topos-w" data-strong="G3495" data-lemma="strong:G3495" data-morph="robinson:N-NSM">waters</span> God light <span class="topos-w" data-strong="G4084" data-lemma="strong:G4084" data-morph="robinson:N-NSM">and</span> <span class="topos-w" data-strong="G1089" data-lemma="strong:G1089" data-morph="robinson:N-NSM">ß</span> é earth God <span class="topos-w" data-strong="G4644" data-lemma="strong:G4644" data-morph="robinson:N-NSM">darkness</span> light <span class="topos-w" data-strong="G2027" data-lemma="strong:G2027" data-morph="robinson:N-NSM">light</span> <span class="topos-w" data-strong="G1257" data-lemma="strong:G1257" data-morph="robinson:N-NSM">heaven</span> darkness <span class="topos-added">and</span> <span class="topos-w" data-strong="G2015" data-lemma="strong:G2015" data-morph="robinson:N-NSM">Ä</span> שָׁלוֹם God <span class="topos-w" data-strong="G3890" data-lemma="strong:G3890" data-morph="robinson:N-NSM">the</span> &amp; end.
+<span class="topos-woj"> ß the <span class="topos-w" data-strong="G1553" data-lemma="strong:G1553" data-morph="robinson:N-NSM">earth</span> and spirit heaven light <span class="topos-w" data-strong="G4884" data-lemma="strong:G4884" data-morph="robinson:N-NSM">in</span> <span class="topos-w" data-strong="G3021" data-lemma="strong:G3021" data-morph="robinson:N-NSM">spirit</span> <span class="topos-w" data-strong="G1671" data-lemma="strong:G1671" data-morph="robinson:N-NSM">waters</span> </span> &amp; end.
+the and waters <span class="topos-w" data-strong="G2558" data-lemma="strong:G2558" data-morph="robinson:N-NSM">spirit</span> <span class="topos-w" data-strong="G4061" data-lemma="strong:G4061" data-morph="robinson:N-NSM">beginning</span> <span class="topos-w" data-strong="G831" data-lemma="strong:G831" data-morph="robinson:N-NSM">ἀγάπη</span> Ä created beginning Ä é &amp; end.
+darkness <span class="topos-added">the</span> spirit in spirit Ä and é <span class="topos-w" data-strong="G742" data-lemma="strong:G742" data-morph="robinson:N-NSM">é</span> Ä spirit <span class="topos-w" data-strong="G424" data-lemma="strong:G424" data-morph="robinson:N-NSM">heaven</span> created <span class="topos-w" data-strong="G5098" data-lemma="strong:G5098" data-morph="robinson:N-NSM">Ä</span> spirit <span class="topos-w" data-strong="G2321" data-lemma="strong:G2321" data-morph="robinson:N-NSM">heaven</span> heaven <span class="topos-w" data-strong="G4019" data-lemma="strong:G4019" data-morph="robinson:N-NSM">beginning</span> <span class="topos-added">and</span> the <span class="topos-added">ἀγάπη</span> <span class="topos-w" data-strong="G5082" data-lemma="strong:G5082" data-morph="robinson:N-NSM">Ä</span> heaven earth <span class="topos-note topos-crossref" data-note-type="crossReference" data-n="a"><a class="topos-ref" data-osis-ref="John.3.16">John 3:16</a></span> &amp; end.
+and heaven the <span class="topos-w" data-strong="G2943" data-lemma="strong:G2943" data-morph="robinson:N-NSM">שָׁלוֹם</span> <span class="topos-w" data-strong="G1578" data-lemma="strong:G1578" data-morph="robinson:N-NSM">God</span> the the <span class="topos-w" data-strong="G4912" data-lemma="strong:G4912" data-morph="robinson:N-NSM">waters</span> ß darkness darkness é spirit <span class="topos-w" data-strong="G29" data-lemma="strong:G29" data-morph="robinson:N-NSM">ß</span> ἀγάπη ß ß ἀγάπη <span class="topos-w" data-strong="G3528" data-lemma="strong:G3528" data-morph="robinson:N-NSM">beginning</span> <span class="topos-w" data-strong="G3621" data-lemma="strong:G3621" data-morph="robinson:N-NSM">spirit</span> שָׁלוֹם <span class="topos-w" data-strong="G1068" data-lemma="strong:G1068" data-morph="robinson:N-NSM">the</span> &amp; end.
+
+
+
+#### html-bare ####
+
+
+<div class="title main" data-title-type="main">Book Gen</div>
+<div class="title">Chapter 1</div>
+created <span class="w" data-strong="G4390" data-lemma="strong:G4390" data-morph="robinson:N-NSM">the</span> God the <span class="w" data-strong="G3553" data-lemma="strong:G3553" data-morph="robinson:N-NSM">and</span> <span class="w" data-strong="G744" data-lemma="strong:G744" data-morph="robinson:N-NSM">é</span> <span class="w" data-strong="G4633" data-lemma="strong:G4633" data-morph="robinson:N-NSM">é</span> God the <span class="w" data-strong="G1812" data-lemma="strong:G1812" data-morph="robinson:N-NSM">Ä</span> the <span class="w" data-strong="G1182" data-lemma="strong:G1182" data-morph="robinson:N-NSM">created</span> God &amp; end.
+<span class="w" data-strong="G4680" data-lemma="strong:G4680" data-morph="robinson:N-NSM">heaven</span> and beginning and é ß ß earth <span class="w" data-strong="G2460" data-lemma="strong:G2460" data-morph="robinson:N-NSM">earth</span> שָׁלוֹם waters darkness <span class="w" data-strong="G3426" data-lemma="strong:G3426" data-morph="robinson:N-NSM">beginning</span> heaven created <span class="w" data-strong="G5475" data-lemma="strong:G5475" data-morph="robinson:N-NSM">é</span> beginning <span class="added">waters</span> spirit <span class="w" data-strong="G767" data-lemma="strong:G767" data-morph="robinson:N-NSM">ß</span> &amp; end.
+ἀγάπη <span class="w" data-strong="G2537" data-lemma="strong:G2537" data-morph="robinson:N-NSM">beginning</span> <span class="w" data-strong="G3161" data-lemma="strong:G3161" data-morph="robinson:N-NSM">ß</span> <span class="w" data-strong="G3783" data-lemma="strong:G3783" data-morph="robinson:N-NSM">spirit</span> <span class="w" data-strong="G960" data-lemma="strong:G960" data-morph="robinson:N-NSM">spirit</span> <span class="w" data-strong="G2355" data-lemma="strong:G2355" data-morph="robinson:N-NSM">ἀγάπη</span> created Ä <span class="w" data-strong="G3680" data-lemma="strong:G3680" data-morph="robinson:N-NSM">ἀγάπη</span> Ä created &amp; end.
+light spirit Ä <span class="w" data-strong="G1240" data-lemma="strong:G1240" data-morph="robinson:N-NSM">created</span> earth in <span class="w" data-strong="G34" data-lemma="strong:G34" data-morph="robinson:N-NSM">heaven</span> created spirit waters שָׁלוֹם the Ä <span class="w" data-strong="G5197" data-lemma="strong:G5197" data-morph="robinson:N-NSM">Ä</span> <span class="w" data-strong="G552" data-lemma="strong:G552" data-morph="robinson:N-NSM">Ä</span> and <span class="added">God</span> <span class="w" data-strong="G4644" data-lemma="strong:G4644" data-morph="robinson:N-NSM">the</span> created spirit &amp; end.
+and created spirit <span class="w" data-strong="G3999" data-lemma="strong:G3999" data-morph="robinson:N-NSM">ἀγάπη</span> ß <span class="note crossref" data-note-type="crossReference" data-n="a"><a class="ref" data-osis-ref="John.3.16">John 3:16</a></span> &amp; end.
+<span class="w" data-strong="G2807" data-lemma="strong:G2807" data-morph="robinson:N-NSM">beginning</span> light heaven and שָׁלוֹם in darkness beginning light heaven earth <span class="added">שָׁלוֹם</span> &amp; end.
+<span class="woj"> and Ä <span class="w" data-strong="G4037" data-lemma="strong:G4037" data-morph="robinson:N-NSM">earth</span> spirit in <span class="w" data-strong="G4958" data-lemma="strong:G4958" data-morph="robinson:N-NSM">ἀγάπη</span> spirit spirit <span class="w" data-strong="G837" data-lemma="strong:G837" data-morph="robinson:N-NSM">spirit</span> earth </span> &amp; end.
+and in spirit beginning God and heaven <span class="w" data-strong="G3243" data-lemma="strong:G3243" data-morph="robinson:N-NSM">waters</span> ß beginning heaven <span class="w" data-strong="G3813" data-lemma="strong:G3813" data-morph="robinson:N-NSM">in</span> created &amp; end.
+ἀγάπη <span class="w" data-strong="G4492" data-lemma="strong:G4492" data-morph="robinson:N-NSM">spirit</span> <span class="w" data-strong="G5323" data-lemma="strong:G5323" data-morph="robinson:N-NSM">created</span> God created and <span class="w" data-strong="G1744" data-lemma="strong:G1744" data-morph="robinson:N-NSM">and</span> darkness <span class="w" data-strong="G3433" data-lemma="strong:G3433" data-morph="robinson:N-NSM">waters</span> <span class="w" data-strong="G2899" data-lemma="strong:G2899" data-morph="robinson:N-NSM">created</span> ß שָׁלוֹם <span class="w" data-strong="G1244" data-lemma="strong:G1244" data-morph="robinson:N-NSM">שָׁלוֹם</span> שָׁלוֹם ß in <span class="w" data-strong="G3879" data-lemma="strong:G3879" data-morph="robinson:N-NSM">created</span> God waters שָׁלוֹם God <span class="w" data-strong="G2269" data-lemma="strong:G2269" data-morph="robinson:N-NSM">the</span> &amp; end.
+God in beginning שָׁלוֹם <span class="note crossref" data-note-type="crossReference" data-n="a"><a class="ref" data-osis-ref="John.3.16">John 3:16</a></span> &amp; end.
+light ἀγάπη earth light and created Ä beginning <span class="w" data-strong="G5485" data-lemma="strong:G5485" data-morph="robinson:N-NSM">é</span> &amp; end.
+God created <span class="w" data-strong="G1125" data-lemma="strong:G1125" data-morph="robinson:N-NSM">spirit</span> <span class="w" data-strong="G772" data-lemma="strong:G772" data-morph="robinson:N-NSM">ß</span> Ä heaven <span class="w" data-strong="G3536" data-lemma="strong:G3536" data-morph="robinson:N-NSM">earth</span> שָׁלוֹם <span class="w" data-strong="G2610" data-lemma="strong:G2610" data-morph="robinson:N-NSM">é</span> beginning <span class="added">in</span> ß &amp; end.
+<span class="added">Ä</span> darkness <span class="w" data-strong="G1873" data-lemma="strong:G1873" data-morph="robinson:N-NSM">beginning</span> &amp; end.
+<span class="woj"> <span class="w" data-strong="G325" data-lemma="strong:G325" data-morph="robinson:N-NSM">beginning</span> <span class="w" data-strong="G1062" data-lemma="strong:G1062" data-morph="robinson:N-NSM">heaven</span> é light שָׁלוֹם <span class="w" data-strong="G472" data-lemma="strong:G472" data-morph="robinson:N-NSM">waters</span> </span> &amp; end.
+heaven <span class="w" data-strong="G138" data-lemma="strong:G138" data-morph="robinson:N-NSM">beginning</span> beginning beginning <span class="w" data-strong="G997" data-lemma="strong:G997" data-morph="robinson:N-NSM">earth</span> <span class="w" data-strong="G4531" data-lemma="strong:G4531" data-morph="robinson:N-NSM">ß</span> é light the earth <span class="w" data-strong="G1484" data-lemma="strong:G1484" data-morph="robinson:N-NSM">heaven</span> and darkness <span class="w" data-strong="G4097" data-lemma="strong:G4097" data-morph="robinson:N-NSM">and</span> <span class="w" data-strong="G149" data-lemma="strong:G149" data-morph="robinson:N-NSM">heaven</span> <span class="w" data-strong="G152" data-lemma="strong:G152" data-morph="robinson:N-NSM">light</span> שָׁלוֹם and earth God é Ä darkness <span class="added">earth</span> created <span class="note crossref" data-note-type="crossReference" data-n="a"><a class="ref" data-osis-ref="John.3.16">John 3:16</a></span> &amp; end.
+the <span class="w" data-strong="G2094" data-lemma="strong:G2094" data-morph="robinson:N-NSM">in</span> <span class="w" data-strong="G693" data-lemma="strong:G693" data-morph="robinson:N-NSM">é</span> Ä darkness <span class="w" data-strong="G1519" data-lemma="strong:G1519" data-morph="robinson:N-NSM">darkness</span> <span class="w" data-strong="G30" data-lemma="strong:G30" data-morph="robinson:N-NSM">heaven</span> light waters <span class="w" data-strong="G2536" data-lemma="strong:G2536" data-morph="robinson:N-NSM">waters</span> and <span class="added">in</span> beginning שָׁלוֹם &amp; end.
+שָׁלוֹם <span class="w" data-strong="G736" data-lemma="strong:G736" data-morph="robinson:N-NSM">beginning</span> created the <span class="added">darkness</span> <span class="w" data-strong="G4336" data-lemma="strong:G4336" data-morph="robinson:N-NSM">earth</span> created Ä <span class="w" data-strong="G5069" data-lemma="strong:G5069" data-morph="robinson:N-NSM">ἀγάπη</span> <span class="w" data-strong="G4203" data-lemma="strong:G4203" data-morph="robinson:N-NSM">created</span> &amp; end.
+é <span class="w" data-strong="G4291" data-lemma="strong:G4291" data-morph="robinson:N-NSM">שָׁלוֹם</span> שָׁלוֹם in <span class="w" data-strong="G343" data-lemma="strong:G343" data-morph="robinson:N-NSM">earth</span> created God ß in earth in beginning שָׁלוֹם beginning beginning <span class="w" data-strong="G610" data-lemma="strong:G610" data-morph="robinson:N-NSM">ἀγάπη</span> <span class="w" data-strong="G1682" data-lemma="strong:G1682" data-morph="robinson:N-NSM">light</span> earth ß <span class="w" data-strong="G2354" data-lemma="strong:G2354" data-morph="robinson:N-NSM">Ä</span> the <span class="w" data-strong="G1208" data-lemma="strong:G1208" data-morph="robinson:N-NSM">and</span> <span class="w" data-strong="G2494" data-lemma="strong:G2494" data-morph="robinson:N-NSM">waters</span> &amp; end.
+<span class="w" data-strong="G497" data-lemma="strong:G497" data-morph="robinson:N-NSM">created</span> <span class="w" data-strong="G5506" data-lemma="strong:G5506" data-morph="robinson:N-NSM">ἀγάπη</span> God <span class="w" data-strong="G4232" data-lemma="strong:G4232" data-morph="robinson:N-NSM">ἀγάπη</span> darkness ß <span class="added">and</span> beginning <span class="w" data-strong="G627" data-lemma="strong:G627" data-morph="robinson:N-NSM">in</span> שָׁלוֹם ß <span class="w" data-strong="G1727" data-lemma="strong:G1727" data-morph="robinson:N-NSM">Ä</span> beginning created light created <span class="w" data-strong="G924" data-lemma="strong:G924" data-morph="robinson:N-NSM">שָׁלוֹם</span> <span class="w" data-strong="G3983" data-lemma="strong:G3983" data-morph="robinson:N-NSM">spirit</span> <span class="w" data-strong="G30" data-lemma="strong:G30" data-morph="robinson:N-NSM">Ä</span> ἀγάπη <span class="added">Ä</span> created &amp; end.
+<span class="w" data-strong="G2715" data-lemma="strong:G2715" data-morph="robinson:N-NSM">waters</span> <span class="added">in</span> waters God and <span class="w" data-strong="G533" data-lemma="strong:G533" data-morph="robinson:N-NSM">darkness</span> Ä beginning é <span class="w" data-strong="G423" data-lemma="strong:G423" data-morph="robinson:N-NSM">the</span> darkness <span class="w" data-strong="G2177" data-lemma="strong:G2177" data-morph="robinson:N-NSM">created</span> é and é <span class="note crossref" data-note-type="crossReference" data-n="a"><a class="ref" data-osis-ref="John.3.16">John 3:16</a></span> &amp; end.
+<span class="woj"> Ä and the é created darkness <span class="w" data-strong="G3399" data-lemma="strong:G3399" data-morph="robinson:N-NSM">created</span> <span class="w" data-strong="G2096" data-lemma="strong:G2096" data-morph="robinson:N-NSM">waters</span> light <span class="added">earth</span> <span class="w" data-strong="G5270" data-lemma="strong:G5270" data-morph="robinson:N-NSM">Ä</span> <span class="w" data-strong="G4101" data-lemma="strong:G4101" data-morph="robinson:N-NSM">heaven</span> ἀγάπη ß ß <span class="w" data-strong="G1432" data-lemma="strong:G1432" data-morph="robinson:N-NSM">and</span> waters <span class="w" data-strong="G2117" data-lemma="strong:G2117" data-morph="robinson:N-NSM">waters</span> and é <span class="w" data-strong="G2214" data-lemma="strong:G2214" data-morph="robinson:N-NSM">שָׁלוֹם</span> waters <span class="w" data-strong="G2951" data-lemma="strong:G2951" data-morph="robinson:N-NSM">ἀγάπη</span> </span> &amp; end.
+שָׁלוֹם <span class="w" data-strong="G2036" data-lemma="strong:G2036" data-morph="robinson:N-NSM">and</span> Ä ß darkness <span class="w" data-strong="G3484" data-lemma="strong:G3484" data-morph="robinson:N-NSM">in</span> ἀγάπη &amp; end.
+<span class="w" data-strong="G4325" data-lemma="strong:G4325" data-morph="robinson:N-NSM">in</span> ß earth <span class="w" data-strong="G4280" data-lemma="strong:G4280" data-morph="robinson:N-NSM">earth</span> God <span class="w" data-strong="G324" data-lemma="strong:G324" data-morph="robinson:N-NSM">ß</span> in earth the darkness light é <span class="w" data-strong="G2461" data-lemma="strong:G2461" data-morph="robinson:N-NSM">God</span> שָׁלוֹם and earth <span class="w" data-strong="G2471" data-lemma="strong:G2471" data-morph="robinson:N-NSM">in</span> <span class="w" data-strong="G2592" data-lemma="strong:G2592" data-morph="robinson:N-NSM">ß</span> &amp; end.
+earth earth in <span class="w" data-strong="G1591" data-lemma="strong:G1591" data-morph="robinson:N-NSM">darkness</span> ἀγάπη <span class="w" data-strong="G1867" data-lemma="strong:G1867" data-morph="robinson:N-NSM">é</span> é earth waters spirit <span class="w" data-strong="G2393" data-lemma="strong:G2393" data-morph="robinson:N-NSM">and</span> <span class="w" data-strong="G4061" data-lemma="strong:G4061" data-morph="robinson:N-NSM">שָׁלוֹם</span> <span class="added">and</span> <span class="w" data-strong="G1815" data-lemma="strong:G1815" data-morph="robinson:N-NSM">and</span> light <span class="w" data-strong="G5109" data-lemma="strong:G5109" data-morph="robinson:N-NSM">darkness</span> ἀγάπη earth the created <span class="w" data-strong="G4884" data-lemma="strong:G4884" data-morph="robinson:N-NSM">the</span> created <span class="w" data-strong="G3684" data-lemma="strong:G3684" data-morph="robinson:N-NSM">the</span> &amp; end.
+waters beginning <span class="w" data-strong="G5346" data-lemma="strong:G5346" data-morph="robinson:N-NSM">waters</span> שָׁלוֹם <span class="added">the</span> Ä waters <span class="w" data-strong="G2293" data-lemma="strong:G2293" data-morph="robinson:N-NSM">God</span> beginning God and darkness <span class="w" data-strong="G3879" data-lemma="strong:G3879" data-morph="robinson:N-NSM">é</span> and <span class="w" data-strong="G2984" data-lemma="strong:G2984" data-morph="robinson:N-NSM">ß</span> <span class="w" data-strong="G3366" data-lemma="strong:G3366" data-morph="robinson:N-NSM">ἀγάπη</span> earth <span class="w" data-strong="G286" data-lemma="strong:G286" data-morph="robinson:N-NSM">Ä</span> <span class="w" data-strong="G508" data-lemma="strong:G508" data-morph="robinson:N-NSM">ß</span> <span class="w" data-strong="G515" data-lemma="strong:G515" data-morph="robinson:N-NSM">light</span> waters waters <span class="w" data-strong="G2593" data-lemma="strong:G2593" data-morph="robinson:N-NSM">the</span> <span class="w" data-strong="G4879" data-lemma="strong:G4879" data-morph="robinson:N-NSM">light</span> <span class="w" data-strong="G1916" data-lemma="strong:G1916" data-morph="robinson:N-NSM">beginning</span> <span class="note crossref" data-note-type="crossReference" data-n="a"><a class="ref" data-osis-ref="John.3.16">John 3:16</a></span> &amp; end.
+ἀγάπη ß Ä é created <span class="w" data-strong="G2485" data-lemma="strong:G2485" data-morph="robinson:N-NSM">heaven</span> &amp; end.
+created waters ß beginning Ä earth the <span class="w" data-strong="G3495" data-lemma="strong:G3495" data-morph="robinson:N-NSM">waters</span> God light <span class="w" data-strong="G4084" data-lemma="strong:G4084" data-morph="robinson:N-NSM">and</span> <span class="w" data-strong="G1089" data-lemma="strong:G1089" data-morph="robinson:N-NSM">ß</span> é earth God <span class="w" data-strong="G4644" data-lemma="strong:G4644" data-morph="robinson:N-NSM">darkness</span> light <span class="w" data-strong="G2027" data-lemma="strong:G2027" data-morph="robinson:N-NSM">light</span> <span class="w" data-strong="G1257" data-lemma="strong:G1257" data-morph="robinson:N-NSM">heaven</span> darkness <span class="added">and</span> <span class="w" data-strong="G2015" data-lemma="strong:G2015" data-morph="robinson:N-NSM">Ä</span> שָׁלוֹם God <span class="w" data-strong="G3890" data-lemma="strong:G3890" data-morph="robinson:N-NSM">the</span> &amp; end.
+<span class="woj"> ß the <span class="w" data-strong="G1553" data-lemma="strong:G1553" data-morph="robinson:N-NSM">earth</span> and spirit heaven light <span class="w" data-strong="G4884" data-lemma="strong:G4884" data-morph="robinson:N-NSM">in</span> <span class="w" data-strong="G3021" data-lemma="strong:G3021" data-morph="robinson:N-NSM">spirit</span> <span class="w" data-strong="G1671" data-lemma="strong:G1671" data-morph="robinson:N-NSM">waters</span> </span> &amp; end.
+the and waters <span class="w" data-strong="G2558" data-lemma="strong:G2558" data-morph="robinson:N-NSM">spirit</span> <span class="w" data-strong="G4061" data-lemma="strong:G4061" data-morph="robinson:N-NSM">beginning</span> <span class="w" data-strong="G831" data-lemma="strong:G831" data-morph="robinson:N-NSM">ἀγάπη</span> Ä created beginning Ä é &amp; end.
+darkness <span class="added">the</span> spirit in spirit Ä and é <span class="w" data-strong="G742" data-lemma="strong:G742" data-morph="robinson:N-NSM">é</span> Ä spirit <span class="w" data-strong="G424" data-lemma="strong:G424" data-morph="robinson:N-NSM">heaven</span> created <span class="w" data-strong="G5098" data-lemma="strong:G5098" data-morph="robinson:N-NSM">Ä</span> spirit <span class="w" data-strong="G2321" data-lemma="strong:G2321" data-morph="robinson:N-NSM">heaven</span> heaven <span class="w" data-strong="G4019" data-lemma="strong:G4019" data-morph="robinson:N-NSM">beginning</span> <span class="added">and</span> the <span class="added">ἀγάπη</span> <span class="w" data-strong="G5082" data-lemma="strong:G5082" data-morph="robinson:N-NSM">Ä</span> heaven earth <span class="note crossref" data-note-type="crossReference" data-n="a"><a class="ref" data-osis-ref="John.3.16">John 3:16</a></span> &amp; end.
+and heaven the <span class="w" data-strong="G2943" data-lemma="strong:G2943" data-morph="robinson:N-NSM">שָׁלוֹם</span> <span class="w" data-strong="G1578" data-lemma="strong:G1578" data-morph="robinson:N-NSM">God</span> the the <span class="w" data-strong="G4912" data-lemma="strong:G4912" data-morph="robinson:N-NSM">waters</span> ß darkness darkness é spirit <span class="w" data-strong="G29" data-lemma="strong:G29" data-morph="robinson:N-NSM">ß</span> ἀγάπη ß ß ἀγάπη <span class="w" data-strong="G3528" data-lemma="strong:G3528" data-morph="robinson:N-NSM">beginning</span> <span class="w" data-strong="G3621" data-lemma="strong:G3621" data-morph="robinson:N-NSM">spirit</span> שָׁלוֹם <span class="w" data-strong="G1068" data-lemma="strong:G1068" data-morph="robinson:N-NSM">the</span> &amp; end.
+
+
+
+#### verses ####
+1:1-1 marker=/1/0/2/2/2 start=/1/0/2/3 end=/1/0/2/2/3 ""
+1:2-2 marker=/1/0/2/2/4 start=/1/0/2/2/3 end=/1/0/2/2/5 "heaven and beginning and é ß ß earth earth שָׁלוֹם waters darkness beginning heaven created é beginning waters spirit ß & end."
+1:3-3 marker=/1/0/2/2/6 start=/1/0/2/2/5 end=/1/0/2/2/7 "ἀγάπη beginning ß spirit spirit ἀγάπη created Ä ἀγάπη Ä created & end."
+1:4-4 marker=/1/0/2/2/8 start=/1/0/2/2/7 end=/1/0/2/2/9 "light spirit Ä created earth in heaven created spirit waters שָׁלוֹם the Ä Ä Ä and God the created spirit & end."
+1:5-5 marker=/1/0/2/2/10 start=/1/0/2/2/9 end=/1/0/2/2/11 "and created spirit ἀγάπη ß [John 3:16] & end."
+1:6-6 marker=/1/0/2/2/12 start=/1/0/2/2/11 end=/1/0/2/2/13 "beginning light heaven and שָׁלוֹם in darkness beginning light heaven earth שָׁלוֹם & end."
+1:7-7 marker=/1/0/2/2/14 start=/1/0/2/2/13 end=/1/0/2/2/15 "and Ä earth spirit in ἀγάπη spirit spirit spirit earth & end."
+1:8-8 marker=/1/0/2/2/16 start=/1/0/2/2/15 end=/1/0/2/2/17 "and in spirit beginning God and heaven waters ß beginning heaven in created & end."
+1:9-9 marker=/1/0/2/2/18 start=/1/0/2/2/17 end=/1/0/2/2/19 "ἀγάπη spirit created God created and and darkness waters created ß שָׁלוֹם שָׁלוֹם שָׁלוֹם ß in created God waters שָׁלוֹם God the & end."
+1:10-10 marker=/1/0/2/2/20 start=/1/0/2/2/19 end=/1/0/2/2/21 "God in beginning שָׁלוֹם [John 3:16] & end."
+1:11-11 marker=/1/0/2/2/22 start=/1/0/2/2/21 end=/1/0/2/2/23 "light ἀγάπη earth light and created Ä beginning é & end."
+1:12-12 marker=/1/0/2/2/24 start=/1/0/2/2/23 end=/1/0/2/2/25 "God created spirit ß Ä heaven earth שָׁלוֹם é beginning in ß & end."
+1:13-13 marker=/1/0/2/2/26 start=/1/0/2/2/25 end=/1/0/2/2/27 "Ä darkness beginning & end."
+1:14-14 marker=/1/0/2/2/28 start=/1/0/2/2/27 end=/1/0/2/2/29 "beginning heaven é light שָׁלוֹם waters & end."
+1:15-15 marker=/1/0/2/2/30 start=/1/0/2/2/29 end=/1/0/2/2/31 "heaven beginning beginning beginning earth ß é light the earth heaven and darkness and heaven light שָׁלוֹם and earth God é Ä darkness earth created [John 3:16] & end."
+1:16-16 marker=/1/0/2/2/32 start=/1/0/2/2/31 end=/1/0/2/2/33 "the in é Ä darkness darkness heaven light waters waters and in beginning שָׁלוֹם & end."
+1:17-17 marker=/1/0/2/2/34 start=/1/0/2/2/33 end=/1/0/2/2/35 "שָׁלוֹם beginning created the darkness earth created Ä ἀγάπη created & end."
+1:18-18 marker=/1/0/2/2/36 start=/1/0/2/2/35 end=/1/0/2/2/37 "é שָׁלוֹם שָׁלוֹם in earth created God ß in earth in beginning שָׁלוֹם beginning beginning ἀγάπη light earth ß Ä the and waters & end."
+1:19-19 marker=/1/0/2/2/38 start=/1/0/2/2/37 end=/1/0/2/2/39 "created ἀγάπη God ἀγάπη darkness ß and beginning in שָׁלוֹם ß Ä beginning created light created שָׁלוֹם spirit Ä ἀγάπη Ä created & end."
+1:20-20 marker=/1/0/2/2/40 start=/1/0/2/2/39 end=/1/0/2/2/41 "waters in waters God and darkness Ä beginning é the darkness created é and é [John 3:16] & end."
+1:21-21 marker=/1/0/2/2/42 start=/1/0/2/2/41 end=/1/0/2/2/43 "Ä and the é created darkness created waters light earth Ä heaven ἀγάπη ß ß and waters waters and é שָׁלוֹם waters ἀγάπη & end."
+1:22-22 marker=/1/0/2/2/44 start=/1/0/2/2/43 end=/1/0/2/2/45 "שָׁלוֹם and Ä ß darkness in ἀγάπη & end."
+1:23-23 marker=/1/0/2/2/46 start=/1/0/2/2/45 end=/1/0/2/2/47 "in ß earth earth God ß in earth the darkness light é God שָׁלוֹם and earth in ß & end."
+1:24-24 marker=/1/0/2/2/48 start=/1/0/2/2/47 end=/1/0/2/2/49 "earth earth in darkness ἀγάπη é é earth waters spirit and שָׁלוֹם and and light darkness ἀγάπη earth the created the created the & end."
+1:25-25 marker=/1/0/2/2/50 start=/1/0/2/2/49 end=/1/0/2/2/51 "waters beginning waters שָׁלוֹם the Ä waters God beginning God and darkness é and ß ἀγάπη earth Ä ß light waters waters the light beginning [John 3:16] & end."
+1:26-26 marker=/1/0/2/2/52 start=/1/0/2/2/51 end=/1/0/2/2/53 "ἀγάπη ß Ä é created heaven & end."
+1:27-27 marker=/1/0/2/2/54 start=/1/0/2/2/53 end=/1/0/2/2/55 "created waters ß beginning Ä earth the waters God light and ß é earth God darkness light light heaven darkness and Ä שָׁלוֹם God the & end."
+1:28-28 marker=/1/0/2/2/56 start=/1/0/2/2/55 end=/1/0/2/2/57 "ß the earth and spirit heaven light in spirit waters & end."
+1:29-29 marker=/1/0/2/2/58 start=/1/0/2/2/57 end=/1/0/2/2/59 "the and waters spirit beginning ἀγάπη Ä created beginning Ä é & end."
+1:30-30 marker=/1/0/2/2/60 start=/1/0/2/2/59 end=/1/0/2/2/61 "darkness the spirit in spirit Ä and é é Ä spirit heaven created Ä spirit heaven heaven beginning and the ἀγάπη Ä heaven earth [John 3:16] & end."
+1:31-31 marker=/1/0/2/2/62 start=/1/0/2/2/61 end=/1/0/2/2/63 "and heaven the שָׁלוֹם God the the waters ß darkness darkness é spirit ß ἀγάπη ß ß ἀγάπη beginning spirit שָׁלוֹם the & end."
+chapter_verses: [31]
+
+#### refs ####
+/1/0/2/2/10/3/0 target="John.3.16" passages=[John.3.16]
+/1/0/2/2/20/1/0 target="John.3.16" passages=[John.3.16]
+/1/0/2/2/30/17/0 target="John.3.16" passages=[John.3.16]
+/1/0/2/2/40/10/0 target="John.3.16" passages=[John.3.16]
+/1/0/2/2/50/25/0 target="John.3.16" passages=[John.3.16]
+/1/0/2/2/60/19/0 target="John.3.16" passages=[John.3.16]
+

@@ -1,0 +1,73 @@
+#### markup ####
+osis
+#### input ####
+<p/>a<p></p>b<lg/>c<l/>d<title/>e<note/>f<q who="Jesus"/>g<hi/>h<reference/>i<verse/>j<chapter/>k
+#### tree ####
+Paragraph p
+text "a"
+Paragraph p
+text "b"
+LineGroup lg
+text "c"
+Line l
+text "d"
+Title title
+text "e"
+Note note
+text "f"
+WordsOfJesus q who="Jesus"
+text "g"
+Highlight hi
+text "h"
+Reference reference
+text "i"
+Verse verse
+text "j"
+Chapter chapter
+text "k"
+
+#### text ####
+abc
+defghijk
+#### text-all ####
+abc
+d
+## 
+ef“”ghi [ :] jk
+#### text-nobreaks ####
+abc defghijk
+#### spans ####
+entries: 0..12
+Paragraph 0..0 entry=0 path=/0 ""
+Paragraph 1..1 entry=0 path=/2 ""
+LineGroup 2..2 entry=0 path=/4 ""
+Line 3..3 entry=0 path=/6 ""
+WordsOfJesus 7..7 entry=0 path=/12 ""
+Highlight 8..8 entry=0 path=/14 ""
+Reference 9..9 entry=0 path=/16 ""
+Verse 10..10 entry=0 path=/18 ""
+Chapter 11..11 entry=0 path=/20 ""
+
+#### sources ####
+0..1 entry=0 path=/1 offset=0
+1..2 entry=0 path=/3 offset=0
+2..3 entry=0 path=/5 offset=0
+4..5 entry=0 path=/7 offset=0
+5..6 entry=0 path=/9 offset=0
+6..7 entry=0 path=/11 offset=0
+7..8 entry=0 path=/13 offset=0
+8..9 entry=0 path=/15 offset=0
+9..10 entry=0 path=/17 offset=0
+10..11 entry=0 path=/19 offset=0
+11..12 entry=0 path=/21 offset=0
+
+#### html ####
+<br class="topos-p">a<br class="topos-p">b<div class="topos-lg"></div>c<span class="topos-l"></span><br class="topos-l">def<span class="topos-woj"></span>g<span class="topos-hi"></span>h<a class="topos-ref"></a>i<span class="topos-verse"></span>j<span class="topos-chapter"></span>k
+#### html-bare ####
+<br class="p">a<br class="p">b<div class="lg"></div>c<span class="l"></span><br class="l">def<span class="woj"></span>g<span class="hi"></span>h<a class="ref"></a>i<span class="verse"></span>j<span class="chapter"></span>k
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+/16 target=- passages=[]
+

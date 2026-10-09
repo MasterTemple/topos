@@ -1,0 +1,119 @@
+#### markup ####
+tei
+#### input ####
+<entryFree n="1"><orth>o</orth> <ref target="X:1">r</ref> <xr type="see">xr</xr> <hi rend="bold">b</hi> <emph>e</emph> <lb/> <p>p</p> <note>n</note> <foreign>f</foreign> <q>q</q> <quote>quote</quote> <w>w</w> <figure/> <graphic url="u"/> <title>t</title> <sense n="1">s</sense> <def>d</def> <etym>et</etym> <pron>pr</pron></entryFree>
+#### tree ####
+Entry entryFree n="1"
+  Other orth
+    text "o"
+  text " "
+  Reference ref target="X:1"
+    text "r"
+  text " "
+  Reference xr type="see"
+    text "xr"
+  text " "
+  Highlight hi rend="bold" type="bold"
+    text "b"
+  text " "
+  Highlight emph type="italic"
+    text "e"
+  text " "
+  LineBreak lb
+  text " "
+  Paragraph p
+    text "p"
+  text " "
+  Note note
+    text "n"
+  text " "
+  Foreign foreign
+    text "f"
+  text " "
+  Quote q
+    text "q"
+  text " "
+  Quote quote
+    text "quote"
+  text " "
+  Word w
+    text "w"
+  text " "
+  Image figure
+  text " "
+  Image graphic url="u"
+  text " "
+  Highlight title type="italic"
+    text "t"
+  text " "
+  Other sense n="1"
+    text "s"
+  text " "
+  Other def
+    text "d"
+  text " "
+  Other etym
+    text "et"
+  text " "
+  Other pron
+    text "pr"
+
+#### text ####
+o r xr b e
+p
+f q quote w t s d et pr
+#### text-all ####
+o r xr b e
+p
+(n) f q quote w t s d et pr
+#### text-nobreaks ####
+o r xr b e p f q quote w t s d et pr
+#### spans ####
+entries: 0..36
+Other 0..1 entry=0 path=/0/0 "o"
+Reference 2..3 entry=0 path=/0/2 "r"
+Reference 4..6 entry=0 path=/0/4 "xr"
+Highlight 7..8 entry=0 path=/0/6 "b"
+Highlight 9..10 entry=0 path=/0/8 "e"
+Paragraph 11..12 entry=0 path=/0/12 "p"
+Foreign 13..14 entry=0 path=/0/16 "f"
+Quote 15..16 entry=0 path=/0/18 "q"
+Quote 17..22 entry=0 path=/0/20 "quote"
+Word 23..24 entry=0 path=/0/22 "w"
+Image 24..24 entry=0 path=/0/24 ""
+Image 24..24 entry=0 path=/0/26 ""
+Highlight 25..26 entry=0 path=/0/28 "t"
+Other 27..28 entry=0 path=/0/30 "s"
+Other 29..30 entry=0 path=/0/32 "d"
+Other 31..33 entry=0 path=/0/34 "et"
+Other 34..36 entry=0 path=/0/36 "pr"
+Entry 0..36 entry=0 path=/0 "o r xr b e\np\nf q quote w t s d et pr"
+
+#### sources ####
+0..1 entry=0 path=/0/0/0 offset=0
+2..3 entry=0 path=/0/2/0 offset=0
+4..6 entry=0 path=/0/4/0 offset=0
+7..8 entry=0 path=/0/6/0 offset=0
+9..10 entry=0 path=/0/8/0 offset=0
+11..12 entry=0 path=/0/12/0 offset=0
+13..14 entry=0 path=/0/16/0 offset=0
+15..16 entry=0 path=/0/18/0 offset=0
+17..22 entry=0 path=/0/20/0 offset=0
+23..24 entry=0 path=/0/22/0 offset=0
+25..26 entry=0 path=/0/28/0 offset=0
+27..28 entry=0 path=/0/30/0 offset=0
+29..30 entry=0 path=/0/32/0 offset=0
+31..33 entry=0 path=/0/34/0 offset=0
+34..36 entry=0 path=/0/36/0 offset=0
+
+#### html ####
+<div class="topos-entry">o <a class="topos-ref" data-osis-ref="X:1">r</a> <a class="topos-ref">xr</a> <b class="topos-hi topos-bold">b</b> <i class="topos-hi topos-italic">e</i> <br class="topos-lb"> <p class="topos-p">p</p> <span class="topos-note">n</span> <span class="topos-foreign">f</span> <span class="topos-quote">q</span> <span class="topos-quote">quote</span> <span class="topos-w">w</span>   <i class="topos-hi topos-italic">t</i> s d et pr</div>
+#### html-bare ####
+<div class="entry">o <a class="ref" data-osis-ref="X:1">r</a> <a class="ref">xr</a> <b class="hi bold">b</b> <i class="hi italic">e</i> <br class="lb"> <p class="p">p</p> <span class="note">n</span> <span class="foreign">f</span> <span class="quote">q</span> <span class="quote">quote</span> <span class="w">w</span>   <i class="hi italic">t</i> s d et pr</div>
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+/0/2 target="X:1" passages=[]
+/0/4 target=- passages=[]
+

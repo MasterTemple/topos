@@ -1,0 +1,53 @@
+#### markup ####
+osis
+#### input ####
+a</w>b</note>c</title>d</div>e</l>f</lg>g</p>h
+#### tree ####
+text "a"
+Word w @end
+text "b"
+Note note @end
+text "c"
+Title title @end
+text "d"
+Division div @end
+text "e"
+Line l @end
+text "f"
+LineGroup lg @end
+text "g"
+Paragraph p @end
+text "h"
+
+#### text ####
+abcde
+fgh
+#### text-all ####
+abc
+## 
+de
+fgh
+#### text-nobreaks ####
+abcde fgh
+#### spans ####
+entries: 0..9
+
+#### sources ####
+0..1 entry=0 path=/0 offset=0
+1..2 entry=0 path=/2 offset=0
+2..3 entry=0 path=/4 offset=0
+3..4 entry=0 path=/6 offset=0
+4..5 entry=0 path=/8 offset=0
+6..7 entry=0 path=/10 offset=0
+7..8 entry=0 path=/12 offset=0
+8..9 entry=0 path=/14 offset=0
+
+#### html ####
+a<span class="topos-w"></span>bcde<br class="topos-l">fgh
+#### html-bare ####
+a<span class="w"></span>bcde<br class="l">fgh
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+

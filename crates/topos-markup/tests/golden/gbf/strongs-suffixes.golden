@@ -1,0 +1,48 @@
+#### markup ####
+gbf
+#### input ####
+a<WG25!> b<WH0430a> c<WG12x-y> d<WGabc> e<WH>
+#### tree ####
+Word w lemma="strong:G25!"
+  text "a"
+text " "
+Word w lemma="strong:H0430a"
+  text "b"
+text " "
+Word w lemma="strong:G12x-y"
+  text "c"
+text " d"
+Other WG value="abc"
+text " e"
+Other WH
+
+#### text ####
+a b c d e
+#### text-all ####
+a [G25!] b [H430a] c d e
+#### text-nobreaks ####
+a b c d e
+#### spans ####
+entries: 0..9
+Word 0..1 entry=0 path=/0 "a"
+Word 2..3 entry=0 path=/2 "b"
+Word 4..5 entry=0 path=/4 "c"
+Other 7..7 entry=0 path=/6 ""
+Other 9..9 entry=0 path=/8 ""
+
+#### sources ####
+0..1 entry=0 path=/0/0 offset=0
+2..3 entry=0 path=/2/0 offset=0
+4..5 entry=0 path=/4/0 offset=0
+6..7 entry=0 path=/5 offset=1
+8..9 entry=0 path=/7 offset=1
+
+#### html ####
+<span class="topos-w" data-strong="G25!" data-lemma="strong:G25!">a</span> <span class="topos-w" data-strong="H430a" data-lemma="strong:H0430a">b</span> <span class="topos-w" data-lemma="strong:G12x-y">c</span> d e
+#### html-bare ####
+<span class="w" data-strong="G25!" data-lemma="strong:G25!">a</span> <span class="w" data-strong="H430a" data-lemma="strong:H0430a">b</span> <span class="w" data-lemma="strong:G12x-y">c</span> d e
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+

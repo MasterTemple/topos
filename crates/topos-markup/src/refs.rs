@@ -3,7 +3,7 @@
 
 use topos_bible::{data::BibleData, segments::Passage};
 
-use crate::{Element, Kind, Node, path::NodePath};
+use crate::{Element, Kind, Node, NodePath};
 
 /// A [`Kind::Reference`] element and the passages it points to
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -34,37 +34,37 @@ assert_eq!(osis, ["John.3.16-John.3.18", "Rom.8.28"]);
 */
 pub fn tagged_references(nodes: &[Node], data: &BibleData) -> Vec<TaggedReference> {
     let mut out = Vec::new();
-    collect(nodes, &NodePath::default(), data, &mut out);
+    let mut path = Vec::new();
+    collect(nodes, data, &mut path, &mut out);
     out
 }
 
-fn collect(nodes: &[Node], path: &NodePath, data: &BibleData, out: &mut Vec<TaggedReference>) {
+fn collect(
+    nodes: &[Node],
+    data: &BibleData,
+    path: &mut Vec<usize>,
+    out: &mut Vec<TaggedReference>,
+) {
     for (i, node) in nodes.iter().enumerate() {
-        if let Node::Element(e) = node {
-            let path = path.child(i);
-            if e.kind == Kind::Reference {
-                out.push(TaggedReference {
-                    path: path.clone(),
-                    target: e.reference_target().map(str::to_string),
-                    passages: passages(e, data),
-                });
-            }
-            collect(&e.children, &path, data, out);
+        let Node::Element(e) = node else { continue };
+        path.push(i);
+        if e.kind == Kind::Reference {
+            out.push(TaggedReference {
+                path: NodePath(path.clone()),
+                target: e.reference_target().map(str::to_string),
+                passages: passages(e, data),
+            });
         }
+        collect(&e.children, data, path, out);
+        path.pop();
     }
 }
 
 /// The passages an element points to
 pub fn passages(e: &Element, data: &BibleData) -> Vec<Passage> {
     if let Some(target) = e.reference_target() {
-        let without_work = target
-            .split_once(':')
-            .filter(|(work, _)| !work.is_empty() && !work.contains(char::is_whitespace))
-            .map(|(_, rest)| rest);
-        for candidate in [Some(target), without_work].into_iter().flatten() {
-            if let Some(passages) = osis(candidate, data) {
-                return passages;
-            }
+        if let Some(found) = osis(target, data) {
+            return found;
         }
         if let Ok(passage) = data.books().parse_usfm(target) {
             return vec![passage];
@@ -76,13 +76,28 @@ pub fn passages(e: &Element, data: &BibleData) -> Vec<Passage> {
     data.parse(&e.text()).into_iter().collect()
 }
 
-/// Space-separated OSIS references, merged into one passage per run of the same book
+/// The target as space-separated OSIS references, with or without a work prefix
 fn osis(target: &str, data: &BibleData) -> Option<Vec<Passage>> {
+    let mut candidates = vec![target];
+    if let Some((work, rest)) = target.split_once(':')
+        && !work.is_empty()
+        && !work.contains(char::is_whitespace)
+    {
+        candidates.push(rest);
+    }
+    candidates
+        .into_iter()
+        .find_map(|candidate| osis_words(candidate, data))
+}
+
+fn osis_words(candidate: &str, data: &BibleData) -> Option<Vec<Passage>> {
     let mut out: Vec<Passage> = Vec::new();
-    for reference in target.split_whitespace() {
-        let passage = data.books().parse_osis(reference).ok()?;
+    for word in candidate.split_whitespace() {
+        let passage = data.books().parse_osis(word).ok()?;
         match out.last_mut() {
-            Some(last) if last.book == passage.book => last.segments.extend(passage.segments),
+            Some(last) if last.book == passage.book => {
+                last.segments.0.extend(passage.segments.0);
+            }
             _ => out.push(passage),
         }
     }

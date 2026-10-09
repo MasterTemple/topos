@@ -1,0 +1,49 @@
+#### markup ####
+tei
+#### input ####
+<entryFree n="25"><orth>25</orth> <def>Definition of 25 with <ref target="X:25">ref</ref> &amp; moresecond line</def></entryFree>
+#### tree ####
+Entry entryFree n="25"
+  Other orth
+    text "25"
+  text " "
+  Other def
+    text "Definition of 25 with "
+    Reference ref target="X:25"
+      text "ref"
+    text " & moresecond line"
+
+#### text ####
+25 Definition of 25 with ref & moresecond line
+#### text-all ####
+25 Definition of 25 with ref & moresecond line
+#### text-nobreaks ####
+25 Definition of 25 with ref & moresecond line
+#### spans ####
+entries: 0..46
+Other 0..2 entry=0 path=/0/0 "25"
+Reference 25..28 entry=0 path=/0/2/1 "ref"
+Other 3..46 entry=0 path=/0/2 "Definition of 25 with ref & moresecond line"
+Entry 0..46 entry=0 path=/0 "25 Definition of 25 with ref & moresecond line"
+
+#### sources ####
+0..2 entry=0 path=/0/0/0 offset=0
+3..13 entry=0 path=/0/2/0 offset=0
+14..16 entry=0 path=/0/2/0 offset=11
+17..19 entry=0 path=/0/2/0 offset=14
+20..24 entry=0 path=/0/2/0 offset=17
+25..28 entry=0 path=/0/2/1/0 offset=0
+29..30 entry=0 path=/0/2/2 offset=1
+31..41 entry=0 path=/0/2/2 offset=3
+42..46 entry=0 path=/0/2/2 offset=14
+
+#### html ####
+<div class="topos-entry">25 Definition of 25 with <a class="topos-ref" data-osis-ref="X:25">ref</a> &amp; moresecond line</div>
+#### html-bare ####
+<div class="entry">25 Definition of 25 with <a class="ref" data-osis-ref="X:25">ref</a> &amp; moresecond line</div>
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+/0/2/1 target="X:25" passages=[]
+

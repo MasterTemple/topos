@@ -1,0 +1,37 @@
+#### markup ####
+osis
+#### input ####
+<w lemma="strong:G2316">God</w> so loved the world<note type="explanation">Or, cosmos</note>
+#### tree ####
+Word w lemma="strong:G2316"
+  text "God"
+text " so loved the world"
+Note note type="explanation"
+  text "Or, cosmos"
+
+#### text ####
+God so loved the world
+#### text-all ####
+God [G2316] so loved the world (Or, cosmos)
+#### text-nobreaks ####
+God so loved the world
+#### spans ####
+entries: 0..22
+Word 0..3 entry=0 path=/0 "God"
+
+#### sources ####
+0..3 entry=0 path=/0/0 offset=0
+4..6 entry=0 path=/1 offset=1
+7..12 entry=0 path=/1 offset=4
+13..16 entry=0 path=/1 offset=10
+17..22 entry=0 path=/1 offset=14
+
+#### html ####
+<span class="topos-w" data-strong="G2316" data-lemma="strong:G2316">God</span> so loved the world<span class="topos-note topos-explanation" data-note-type="explanation">Or, cosmos</span>
+#### html-bare ####
+<span class="w" data-strong="G2316" data-lemma="strong:G2316">God</span> so loved the world<span class="note explanation" data-note-type="explanation">Or, cosmos</span>
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+

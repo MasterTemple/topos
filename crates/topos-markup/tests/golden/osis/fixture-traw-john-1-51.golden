@@ -1,0 +1,57 @@
+#### markup ####
+osis
+#### input ####
+<transChange type="added">the</transChange> earth Ä in created <transChange type="added">ἀγάπη</transChange> the <w lemma="strong:G489" morph="robinson:N-NSM">in</w> <w lemma="strong:G5310" morph="robinson:N-NSM">earth</w> heaven earth earth &amp;end. <chapter eID="gen167" osisID="John.1"/>
+#### tree ####
+Added transChange type="added"
+  text "the"
+text " earth Ä in created "
+Added transChange type="added"
+  text "ἀγάπη"
+text " the "
+Word w lemma="strong:G489" morph="robinson:N-NSM"
+  text "in"
+text " "
+Word w lemma="strong:G5310" morph="robinson:N-NSM"
+  text "earth"
+text " heaven earth earth &end. "
+Chapter chapter @end eID="gen167" osisID="John.1"
+
+#### text ####
+the earth Ä in created ἀγάπη the in earth heaven earth earth &end.
+#### text-all ####
+the* earth Ä in created ἀγάπη* the in [G489] earth [G5310] heaven earth earth &end.
+#### text-nobreaks ####
+the earth Ä in created ἀγάπη the in earth heaven earth earth &end.
+#### spans ####
+entries: 0..73
+Added 0..3 entry=0 path=/0 "the"
+Added 24..35 entry=0 path=/2 "ἀγάπη"
+Word 40..42 entry=0 path=/4 "in"
+Word 43..48 entry=0 path=/6 "earth"
+Chapter 73..73 entry=0 path=/8 ""
+
+#### sources ####
+0..3 entry=0 path=/0/0 offset=0
+4..9 entry=0 path=/1 offset=1
+10..12 entry=0 path=/1 offset=7
+13..15 entry=0 path=/1 offset=10
+16..23 entry=0 path=/1 offset=13
+24..35 entry=0 path=/2/0 offset=0
+36..39 entry=0 path=/3 offset=1
+40..42 entry=0 path=/4/0 offset=0
+43..48 entry=0 path=/6/0 offset=0
+49..55 entry=0 path=/7 offset=1
+56..61 entry=0 path=/7 offset=8
+62..67 entry=0 path=/7 offset=14
+68..73 entry=0 path=/7 offset=20
+
+#### html ####
+<span class="topos-added">the</span> earth Ä in created <span class="topos-added">ἀγάπη</span> the <span class="topos-w" data-strong="G489" data-lemma="strong:G489" data-morph="robinson:N-NSM">in</span> <span class="topos-w" data-strong="G5310" data-lemma="strong:G5310" data-morph="robinson:N-NSM">earth</span> heaven earth earth &amp;end. 
+#### html-bare ####
+<span class="added">the</span> earth Ä in created <span class="added">ἀγάπη</span> the <span class="w" data-strong="G489" data-lemma="strong:G489" data-morph="robinson:N-NSM">in</span> <span class="w" data-strong="G5310" data-lemma="strong:G5310" data-morph="robinson:N-NSM">earth</span> heaven earth earth &amp;end. 
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+

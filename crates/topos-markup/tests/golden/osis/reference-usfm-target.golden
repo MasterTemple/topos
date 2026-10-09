@@ -1,0 +1,31 @@
+#### markup ####
+osis
+#### input ####
+<reference osisRef="JHN 3:16-18">a</reference>
+#### tree ####
+Reference reference osisRef="JHN 3:16-18"
+  text "a"
+
+#### text ####
+a
+#### text-all ####
+a
+#### text-nobreaks ####
+a
+#### spans ####
+entries: 0..1
+Reference 0..1 entry=0 path=/0 "a"
+
+#### sources ####
+0..1 entry=0 path=/0/0 offset=0
+
+#### html ####
+<a class="topos-ref" data-osis-ref="JHN 3:16-18">a</a>
+#### html-bare ####
+<a class="ref" data-osis-ref="JHN 3:16-18">a</a>
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+/0 target="JHN 3:16-18" passages=[John.3.16-John.3.18]
+

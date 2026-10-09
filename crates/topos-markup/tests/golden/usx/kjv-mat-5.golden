@@ -1,0 +1,843 @@
+#### markup ####
+usx
+#### input ####
+<?xml version="1.0" encoding="utf-8"?><usx version="3.0"><book code="MAT" style="id">The Gospel According to Matthew</book><para style="h">Matthew</para><para style="toc1">THE GOSPEL ACCORDING TO ST. MATTHEW</para><para style="toc2">Matthew</para><para style="toc3">Mat</para><para style="mt1">THE GOSPEL ACCORDING TO ST. MATTHEW</para><chapter number="5" style="c" sid="MAT 5"/><para style="p"><verse number="1" style="v" sid="MAT 5:1"/> <char style="w" strong="G1161">And</char> <char style="w" strong="G1492">seeing</char> the <char style="w" strong="G3793">multitudes</char>, he went <char style="w" strong="G0305">up</char> <char style="w" strong="G1519">into</char> a <char style="w" strong="G3735">mountain</char>: <char style="w" strong="G2532">and</char> <char style="w" strong="G2523">when</char> <char style="w" strong="G0846">he</char> was <char style="w" strong="G2523">set</char>, <char style="w" strong="G0846">his</char> <char style="w" strong="G3101">disciples</char> came <char style="w" strong="G4334">unto</char> <char style="w" strong="G0846">him</char>:  <verse eid="MAT 5:1"/><verse number="2" style="v" sid="MAT 5:2"/> <char style="w" strong="G2532">And</char> he <char style="w" strong="G0455">opened</char> <char style="w" strong="G0846">his</char> <char style="w" strong="G4750">mouth</char>, and <char style="w" strong="G1321">taught</char> <char style="w" strong="G0846">them</char>, <char style="w" strong="G3004">saying</char>,  <verse eid="MAT 5:2"/><verse number="3" style="v" sid="MAT 5:3"/> <char style="wj"><char style="w" strong="G3107">Blessed</char> <char style="add">are</char> <char style="w" strong="G4434">the poor</char> <char style="w" strong="G4151">in spirit</char>: <char style="w" strong="G3754">for</char> <char style="w" strong="G0846">theirs</char> <char style="w" strong="G2076">is</char> <char style="w" strong="G0932">the kingdom</char> <char style="w" strong="G3772">of heaven</char>.</char>  <verse eid="MAT 5:3"/><verse number="4" style="v" sid="MAT 5:4"/> <char style="wj"><char style="w" strong="G3107">Blessed</char> <char style="add">are</char> <char style="w" strong="G3996">they that mourn</char>: <char style="w" strong="G3754">for</char> <char style="w" strong="G0846">they</char> <char style="w" strong="G3870">shall be comforted</char>.</char>  <verse eid="MAT 5:4"/><verse number="5" style="v" sid="MAT 5:5"/> <char style="wj"><char style="w" strong="G3107">Blessed</char> <char style="add">are</char> <char style="w" strong="G4239">the meek</char>: <char style="w" strong="G3754">for</char> <char style="w" strong="G0846">they</char> <char style="w" strong="G2816">shall inherit</char> <char style="w" strong="G1093">the earth</char>.</char>  <verse eid="MAT 5:5"/><verse number="6" style="v" sid="MAT 5:6"/> <char style="wj"><char style="w" strong="G3107">Blessed</char> <char style="add">are</char> <char style="w" strong="G3983">they which do hunger</char> <char style="w" strong="G2532">and</char> <char style="w" strong="G1372">thirst</char> <char style="w" strong="G1343">after righteousness</char>: <char style="w" strong="G3754">for</char> <char style="w" strong="G0846">they</char> <char style="w" strong="G5526">shall be filled</char>.</char>  <verse eid="MAT 5:6"/><verse number="7" style="v" sid="MAT 5:7"/> <char style="wj"><char style="w" strong="G3107">Blessed</char> <char style="add">are</char> <char style="w" strong="G1655">the merciful</char>: <char style="w" strong="G3754">for</char> <char style="w" strong="G0846">they</char> <char style="w" strong="G1653">shall obtain mercy</char>.</char>  <verse eid="MAT 5:7"/><verse number="8" style="v" sid="MAT 5:8"/> <char style="wj"><char style="w" strong="G3107">Blessed</char> <char style="add">are</char> <char style="w" strong="G2513">the pure</char> <char style="w" strong="G2588">in heart</char>: <char style="w" strong="G3754">for</char> <char style="w" strong="G0846">they</char> <char style="w" strong="G3700">shall see</char> <char style="w" strong="G2316">God</char>.</char>  <verse eid="MAT 5:8"/><verse number="9" style="v" sid="MAT 5:9"/> <char style="wj"><char style="w" strong="G3107">Blessed</char> <char style="add">are</char> <char style="w" strong="G1518">the peacemakers</char>: <char style="w" strong="G3754">for</char> <char style="w" strong="G0846">they</char> <char style="w" strong="G2564">shall be called</char> <char style="w" strong="G5207">the children</char> <char style="w" strong="G2316">of God</char>.</char>  <verse eid="MAT 5:9"/><verse number="10" style="v" sid="MAT 5:10"/> <char style="wj"><char style="w" strong="G3107">Blessed</char> <char style="add">are</char> <char style="w" strong="G1377">they which are persecuted</char> <char style="w" strong="G1752">for</char> <char style="w" strong="G1343">righteousness’</char> <char style="w" strong="G1752">sake</char>: <char style="w" strong="G3754">for</char> <char style="w" strong="G0846">theirs</char> <char style="w" strong="G2076">is</char> <char style="w" strong="G0932">the kingdom</char> <char style="w" strong="G3772">of heaven</char>.</char>  <verse eid="MAT 5:10"/><verse number="11" style="v" sid="MAT 5:11"/> <char style="wj"><char style="w" strong="G3107">Blessed</char> <char style="w" strong="G2075">are ye</char>, <char style="w" strong="G3752">when</char> <char style="add">men</char> <char style="w" strong="G3679">shall revile</char> <char style="w" strong="G5209">you</char>, <char style="w" strong="G2532">and</char> <char style="w" strong="G1377">persecute</char> <char style="add">you</char>, <char style="w" strong="G2532">and</char> <char style="w" strong="G2036">shall say</char> <char style="w" strong="G3956">all manner of</char> <char style="w" strong="G4190">evil</char> <char style="w" strong="G2596">against</char> <char style="w" strong="G5216">you</char> <char style="w" strong="G5574">falsely</char>, <char style="w" strong="G1752">for</char> <char style="w" strong="G1700">my</char> <char style="w" strong="G1752">sake</char>.</char>  <verse eid="MAT 5:11"/><verse number="12" style="v" sid="MAT 5:12"/> <char style="wj"><char style="w" strong="G5463">Rejoice</char>, <char style="w" strong="G2532">and</char> <char style="w" strong="G0021">be exceeding glad</char>: <char style="w" strong="G3754">for</char> <char style="w" strong="G4183">great</char> <char style="add">is</char> <char style="w" strong="G5216">your</char> <char style="w" strong="G3408">reward</char> <char style="w" strong="G1722">in</char> <char style="w" strong="G3772">heaven</char>: <char style="w" strong="G1063">for</char> <char style="w" strong="G3779">so</char> <char style="w" strong="G1377">persecuted they</char> <char style="w" strong="G4396">the prophets</char> <char style="w" strong="G3588">which were</char> <char style="w" strong="G4253">before</char> <char style="w" strong="G5216">you</char>.</char></para><para style="p"/><verse eid="MAT 5:12"/><chapter eid="MAT 5"/></usx>
+#### tree ####
+Other usx version="3.0"
+  Metadata book code="MAT" style="id"
+    text "The Gospel According to Matthew"
+  Metadata para style="h"
+    text "Matthew"
+  Metadata para style="toc1"
+    text "THE GOSPEL ACCORDING TO ST. MATTHEW"
+  Metadata para style="toc2"
+    text "Matthew"
+  Metadata para style="toc3"
+    text "Mat"
+  Title para style="mt1" type="mt1"
+    text "THE GOSPEL ACCORDING TO ST. MATTHEW"
+  Chapter chapter @start number="5" style="c" sid="MAT 5"
+  Paragraph para style="p"
+    Verse verse @start number="1" style="v" sid="MAT 5:1"
+    text " "
+    Word char style="w" strong="G1161"
+      text "And"
+    text " "
+    Word char style="w" strong="G1492"
+      text "seeing"
+    text " the "
+    Word char style="w" strong="G3793"
+      text "multitudes"
+    text ", he went "
+    Word char style="w" strong="G0305"
+      text "up"
+    text " "
+    Word char style="w" strong="G1519"
+      text "into"
+    text " a "
+    Word char style="w" strong="G3735"
+      text "mountain"
+    text ": "
+    Word char style="w" strong="G2532"
+      text "and"
+    text " "
+    Word char style="w" strong="G2523"
+      text "when"
+    text " "
+    Word char style="w" strong="G0846"
+      text "he"
+    text " was "
+    Word char style="w" strong="G2523"
+      text "set"
+    text ", "
+    Word char style="w" strong="G0846"
+      text "his"
+    text " "
+    Word char style="w" strong="G3101"
+      text "disciples"
+    text " came "
+    Word char style="w" strong="G4334"
+      text "unto"
+    text " "
+    Word char style="w" strong="G0846"
+      text "him"
+    text ":  "
+    Verse verse @end eid="MAT 5:1"
+    Verse verse @start number="2" style="v" sid="MAT 5:2"
+    text " "
+    Word char style="w" strong="G2532"
+      text "And"
+    text " he "
+    Word char style="w" strong="G0455"
+      text "opened"
+    text " "
+    Word char style="w" strong="G0846"
+      text "his"
+    text " "
+    Word char style="w" strong="G4750"
+      text "mouth"
+    text ", and "
+    Word char style="w" strong="G1321"
+      text "taught"
+    text " "
+    Word char style="w" strong="G0846"
+      text "them"
+    text ", "
+    Word char style="w" strong="G3004"
+      text "saying"
+    text ",  "
+    Verse verse @end eid="MAT 5:2"
+    Verse verse @start number="3" style="v" sid="MAT 5:3"
+    text " "
+    WordsOfJesus char style="wj"
+      Word char style="w" strong="G3107"
+        text "Blessed"
+      text " "
+      Added char style="add"
+        text "are"
+      text " "
+      Word char style="w" strong="G4434"
+        text "the poor"
+      text " "
+      Word char style="w" strong="G4151"
+        text "in spirit"
+      text ": "
+      Word char style="w" strong="G3754"
+        text "for"
+      text " "
+      Word char style="w" strong="G0846"
+        text "theirs"
+      text " "
+      Word char style="w" strong="G2076"
+        text "is"
+      text " "
+      Word char style="w" strong="G0932"
+        text "the kingdom"
+      text " "
+      Word char style="w" strong="G3772"
+        text "of heaven"
+      text "."
+    text "  "
+    Verse verse @end eid="MAT 5:3"
+    Verse verse @start number="4" style="v" sid="MAT 5:4"
+    text " "
+    WordsOfJesus char style="wj"
+      Word char style="w" strong="G3107"
+        text "Blessed"
+      text " "
+      Added char style="add"
+        text "are"
+      text " "
+      Word char style="w" strong="G3996"
+        text "they that mourn"
+      text ": "
+      Word char style="w" strong="G3754"
+        text "for"
+      text " "
+      Word char style="w" strong="G0846"
+        text "they"
+      text " "
+      Word char style="w" strong="G3870"
+        text "shall be comforted"
+      text "."
+    text "  "
+    Verse verse @end eid="MAT 5:4"
+    Verse verse @start number="5" style="v" sid="MAT 5:5"
+    text " "
+    WordsOfJesus char style="wj"
+      Word char style="w" strong="G3107"
+        text "Blessed"
+      text " "
+      Added char style="add"
+        text "are"
+      text " "
+      Word char style="w" strong="G4239"
+        text "the meek"
+      text ": "
+      Word char style="w" strong="G3754"
+        text "for"
+      text " "
+      Word char style="w" strong="G0846"
+        text "they"
+      text " "
+      Word char style="w" strong="G2816"
+        text "shall inherit"
+      text " "
+      Word char style="w" strong="G1093"
+        text "the earth"
+      text "."
+    text "  "
+    Verse verse @end eid="MAT 5:5"
+    Verse verse @start number="6" style="v" sid="MAT 5:6"
+    text " "
+    WordsOfJesus char style="wj"
+      Word char style="w" strong="G3107"
+        text "Blessed"
+      text " "
+      Added char style="add"
+        text "are"
+      text " "
+      Word char style="w" strong="G3983"
+        text "they which do hunger"
+      text " "
+      Word char style="w" strong="G2532"
+        text "and"
+      text " "
+      Word char style="w" strong="G1372"
+        text "thirst"
+      text " "
+      Word char style="w" strong="G1343"
+        text "after righteousness"
+      text ": "
+      Word char style="w" strong="G3754"
+        text "for"
+      text " "
+      Word char style="w" strong="G0846"
+        text "they"
+      text " "
+      Word char style="w" strong="G5526"
+        text "shall be filled"
+      text "."
+    text "  "
+    Verse verse @end eid="MAT 5:6"
+    Verse verse @start number="7" style="v" sid="MAT 5:7"
+    text " "
+    WordsOfJesus char style="wj"
+      Word char style="w" strong="G3107"
+        text "Blessed"
+      text " "
+      Added char style="add"
+        text "are"
+      text " "
+      Word char style="w" strong="G1655"
+        text "the merciful"
+      text ": "
+      Word char style="w" strong="G3754"
+        text "for"
+      text " "
+      Word char style="w" strong="G0846"
+        text "they"
+      text " "
+      Word char style="w" strong="G1653"
+        text "shall obtain mercy"
+      text "."
+    text "  "
+    Verse verse @end eid="MAT 5:7"
+    Verse verse @start number="8" style="v" sid="MAT 5:8"
+    text " "
+    WordsOfJesus char style="wj"
+      Word char style="w" strong="G3107"
+        text "Blessed"
+      text " "
+      Added char style="add"
+        text "are"
+      text " "
+      Word char style="w" strong="G2513"
+        text "the pure"
+      text " "
+      Word char style="w" strong="G2588"
+        text "in heart"
+      text ": "
+      Word char style="w" strong="G3754"
+        text "for"
+      text " "
+      Word char style="w" strong="G0846"
+        text "they"
+      text " "
+      Word char style="w" strong="G3700"
+        text "shall see"
+      text " "
+      Word char style="w" strong="G2316"
+        text "God"
+      text "."
+    text "  "
+    Verse verse @end eid="MAT 5:8"
+    Verse verse @start number="9" style="v" sid="MAT 5:9"
+    text " "
+    WordsOfJesus char style="wj"
+      Word char style="w" strong="G3107"
+        text "Blessed"
+      text " "
+      Added char style="add"
+        text "are"
+      text " "
+      Word char style="w" strong="G1518"
+        text "the peacemakers"
+      text ": "
+      Word char style="w" strong="G3754"
+        text "for"
+      text " "
+      Word char style="w" strong="G0846"
+        text "they"
+      text " "
+      Word char style="w" strong="G2564"
+        text "shall be called"
+      text " "
+      Word char style="w" strong="G5207"
+        text "the children"
+      text " "
+      Word char style="w" strong="G2316"
+        text "of God"
+      text "."
+    text "  "
+    Verse verse @end eid="MAT 5:9"
+    Verse verse @start number="10" style="v" sid="MAT 5:10"
+    text " "
+    WordsOfJesus char style="wj"
+      Word char style="w" strong="G3107"
+        text "Blessed"
+      text " "
+      Added char style="add"
+        text "are"
+      text " "
+      Word char style="w" strong="G1377"
+        text "they which are persecuted"
+      text " "
+      Word char style="w" strong="G1752"
+        text "for"
+      text " "
+      Word char style="w" strong="G1343"
+        text "righteousness’"
+      text " "
+      Word char style="w" strong="G1752"
+        text "sake"
+      text ": "
+      Word char style="w" strong="G3754"
+        text "for"
+      text " "
+      Word char style="w" strong="G0846"
+        text "theirs"
+      text " "
+      Word char style="w" strong="G2076"
+        text "is"
+      text " "
+      Word char style="w" strong="G0932"
+        text "the kingdom"
+      text " "
+      Word char style="w" strong="G3772"
+        text "of heaven"
+      text "."
+    text "  "
+    Verse verse @end eid="MAT 5:10"
+    Verse verse @start number="11" style="v" sid="MAT 5:11"
+    text " "
+    WordsOfJesus char style="wj"
+      Word char style="w" strong="G3107"
+        text "Blessed"
+      text " "
+      Word char style="w" strong="G2075"
+        text "are ye"
+      text ", "
+      Word char style="w" strong="G3752"
+        text "when"
+      text " "
+      Added char style="add"
+        text "men"
+      text " "
+      Word char style="w" strong="G3679"
+        text "shall revile"
+      text " "
+      Word char style="w" strong="G5209"
+        text "you"
+      text ", "
+      Word char style="w" strong="G2532"
+        text "and"
+      text " "
+      Word char style="w" strong="G1377"
+        text "persecute"
+      text " "
+      Added char style="add"
+        text "you"
+      text ", "
+      Word char style="w" strong="G2532"
+        text "and"
+      text " "
+      Word char style="w" strong="G2036"
+        text "shall say"
+      text " "
+      Word char style="w" strong="G3956"
+        text "all manner of"
+      text " "
+      Word char style="w" strong="G4190"
+        text "evil"
+      text " "
+      Word char style="w" strong="G2596"
+        text "against"
+      text " "
+      Word char style="w" strong="G5216"
+        text "you"
+      text " "
+      Word char style="w" strong="G5574"
+        text "falsely"
+      text ", "
+      Word char style="w" strong="G1752"
+        text "for"
+      text " "
+      Word char style="w" strong="G1700"
+        text "my"
+      text " "
+      Word char style="w" strong="G1752"
+        text "sake"
+      text "."
+    text "  "
+    Verse verse @end eid="MAT 5:11"
+    Verse verse @start number="12" style="v" sid="MAT 5:12"
+    text " "
+    WordsOfJesus char style="wj"
+      Word char style="w" strong="G5463"
+        text "Rejoice"
+      text ", "
+      Word char style="w" strong="G2532"
+        text "and"
+      text " "
+      Word char style="w" strong="G0021"
+        text "be exceeding glad"
+      text ": "
+      Word char style="w" strong="G3754"
+        text "for"
+      text " "
+      Word char style="w" strong="G4183"
+        text "great"
+      text " "
+      Added char style="add"
+        text "is"
+      text " "
+      Word char style="w" strong="G5216"
+        text "your"
+      text " "
+      Word char style="w" strong="G3408"
+        text "reward"
+      text " "
+      Word char style="w" strong="G1722"
+        text "in"
+      text " "
+      Word char style="w" strong="G3772"
+        text "heaven"
+      text ": "
+      Word char style="w" strong="G1063"
+        text "for"
+      text " "
+      Word char style="w" strong="G3779"
+        text "so"
+      text " "
+      Word char style="w" strong="G1377"
+        text "persecuted they"
+      text " "
+      Word char style="w" strong="G4396"
+        text "the prophets"
+      text " "
+      Word char style="w" strong="G3588"
+        text "which were"
+      text " "
+      Word char style="w" strong="G4253"
+        text "before"
+      text " "
+      Word char style="w" strong="G5216"
+        text "you"
+      text "."
+  Paragraph para style="p"
+  Verse verse @end eid="MAT 5:12"
+  Chapter chapter @end eid="MAT 5"
+
+#### text ####
+And seeing the multitudes, he went up into a mountain: and when he was set, his disciples came unto him: And he opened his mouth, and taught them, saying, Blessed are the poor in spirit: for theirs is the kingdom of heaven. Blessed are they that mourn: for they shall be comforted. Blessed are the meek: for they shall inherit the earth. Blessed are they which do hunger and thirst after righteousness: for they shall be filled. Blessed are the merciful: for they shall obtain mercy. Blessed are the pure in heart: for they shall see God. Blessed are the peacemakers: for they shall be called the children of God. Blessed are they which are persecuted for righteousness’ sake: for theirs is the kingdom of heaven. Blessed are ye, when men shall revile you, and persecute you, and shall say all manner of evil against you falsely, for my sake. Rejoice, and be exceeding glad: for great is your reward in heaven: for so persecuted they the prophets which were before you.
+#### text-all ####
+The Gospel According to MatthewMatthewTHE GOSPEL ACCORDING TO ST. MATTHEWMatthewMat
+## THE GOSPEL ACCORDING TO ST. MATTHEW
+MAT 5
+[MAT 5:1] And [G1161] seeing [G1492] the multitudes [G3793], he went up [G305] into [G1519] a mountain [G3735]: and [G2532] when [G2523] he [G846] was set [G2523], his [G846] disciples [G3101] came unto [G4334] him [G846]: [MAT 5:2] And [G2532] he opened [G455] his [G846] mouth [G4750], and taught [G1321] them [G846], saying [G3004], [MAT 5:3] “Blessed [G3107] are* the poor [G4434] in spirit [G4151]: for [G3754] theirs [G846] is [G2076] the kingdom [G932] of heaven [G3772].” [MAT 5:4] “Blessed [G3107] are* they that mourn [G3996]: for [G3754] they [G846] shall be comforted [G3870].” [MAT 5:5] “Blessed [G3107] are* the meek [G4239]: for [G3754] they [G846] shall inherit [G2816] the earth [G1093].” [MAT 5:6] “Blessed [G3107] are* they which do hunger [G3983] and [G2532] thirst [G1372] after righteousness [G1343]: for [G3754] they [G846] shall be filled [G5526].” [MAT 5:7] “Blessed [G3107] are* the merciful [G1655]: for [G3754] they [G846] shall obtain mercy [G1653].” [MAT 5:8] “Blessed [G3107] are* the pure [G2513] in heart [G2588]: for [G3754] they [G846] shall see [G3700] God [G2316].” [MAT 5:9] “Blessed [G3107] are* the peacemakers [G1518]: for [G3754] they [G846] shall be called [G2564] the children [G5207] of God [G2316].” [MAT 5:10] “Blessed [G3107] are* they which are persecuted [G1377] for [G1752] righteousness’ [G1343] sake [G1752]: for [G3754] theirs [G846] is [G2076] the kingdom [G932] of heaven [G3772].” [MAT 5:11] “Blessed [G3107] are ye [G2075], when [G3752] men* shall revile [G3679] you [G5209], and [G2532] persecute [G1377] you*, and [G2532] shall say [G2036] all manner of [G3956] evil [G4190] against [G2596] you [G5216] falsely [G5574], for [G1752] my [G1700] sake [G1752].” [MAT 5:12] “Rejoice [G5463], and [G2532] be exceeding glad [G21]: for [G3754] great [G4183] is* your [G5216] reward [G3408] in [G1722] heaven [G3772]: for [G1063] so [G3779] persecuted they [G1377] the prophets [G4396] which were [G3588] before [G4253] you [G5216].”
+#### text-nobreaks ####
+And seeing the multitudes, he went up into a mountain: and when he was set, his disciples came unto him: And he opened his mouth, and taught them, saying, Blessed are the poor in spirit: for theirs is the kingdom of heaven. Blessed are they that mourn: for they shall be comforted. Blessed are the meek: for they shall inherit the earth. Blessed are they which do hunger and thirst after righteousness: for they shall be filled. Blessed are the merciful: for they shall obtain mercy. Blessed are the pure in heart: for they shall see God. Blessed are the peacemakers: for they shall be called the children of God. Blessed are they which are persecuted for righteousness’ sake: for theirs is the kingdom of heaven. Blessed are ye, when men shall revile you, and persecute you, and shall say all manner of evil against you falsely, for my sake. Rejoice, and be exceeding glad: for great is your reward in heaven: for so persecuted they the prophets which were before you.
+#### spans ####
+entries: 0..971
+Chapter 0..0 entry=0 path=/0/6 ""
+Verse 0..0 entry=0 path=/0/7/0 ""
+Word 0..3 entry=0 path=/0/7/2 "And"
+Word 4..10 entry=0 path=/0/7/4 "seeing"
+Word 15..25 entry=0 path=/0/7/6 "multitudes"
+Word 35..37 entry=0 path=/0/7/8 "up"
+Word 38..42 entry=0 path=/0/7/10 "into"
+Word 45..53 entry=0 path=/0/7/12 "mountain"
+Word 55..58 entry=0 path=/0/7/14 "and"
+Word 59..63 entry=0 path=/0/7/16 "when"
+Word 64..66 entry=0 path=/0/7/18 "he"
+Word 71..74 entry=0 path=/0/7/20 "set"
+Word 76..79 entry=0 path=/0/7/22 "his"
+Word 80..89 entry=0 path=/0/7/24 "disciples"
+Word 95..99 entry=0 path=/0/7/26 "unto"
+Word 100..103 entry=0 path=/0/7/28 "him"
+Verse 104..104 entry=0 path=/0/7/30 ""
+Verse 104..104 entry=0 path=/0/7/31 ""
+Word 105..108 entry=0 path=/0/7/33 "And"
+Word 112..118 entry=0 path=/0/7/35 "opened"
+Word 119..122 entry=0 path=/0/7/37 "his"
+Word 123..128 entry=0 path=/0/7/39 "mouth"
+Word 134..140 entry=0 path=/0/7/41 "taught"
+Word 141..145 entry=0 path=/0/7/43 "them"
+Word 147..153 entry=0 path=/0/7/45 "saying"
+Verse 154..154 entry=0 path=/0/7/47 ""
+Verse 154..154 entry=0 path=/0/7/48 ""
+Word 155..162 entry=0 path=/0/7/50/0 "Blessed"
+Added 163..166 entry=0 path=/0/7/50/2 "are"
+Word 167..175 entry=0 path=/0/7/50/4 "the poor"
+Word 176..185 entry=0 path=/0/7/50/6 "in spirit"
+Word 187..190 entry=0 path=/0/7/50/8 "for"
+Word 191..197 entry=0 path=/0/7/50/10 "theirs"
+Word 198..200 entry=0 path=/0/7/50/12 "is"
+Word 201..212 entry=0 path=/0/7/50/14 "the kingdom"
+Word 213..222 entry=0 path=/0/7/50/16 "of heaven"
+WordsOfJesus 155..223 entry=0 path=/0/7/50 "Blessed are the poor in spirit: for theirs is the kingdom of heaven."
+Verse 223..223 entry=0 path=/0/7/52 ""
+Verse 223..223 entry=0 path=/0/7/53 ""
+Word 224..231 entry=0 path=/0/7/55/0 "Blessed"
+Added 232..235 entry=0 path=/0/7/55/2 "are"
+Word 236..251 entry=0 path=/0/7/55/4 "they that mourn"
+Word 253..256 entry=0 path=/0/7/55/6 "for"
+Word 257..261 entry=0 path=/0/7/55/8 "they"
+Word 262..280 entry=0 path=/0/7/55/10 "shall be comforted"
+WordsOfJesus 224..281 entry=0 path=/0/7/55 "Blessed are they that mourn: for they shall be comforted."
+Verse 281..281 entry=0 path=/0/7/57 ""
+Verse 281..281 entry=0 path=/0/7/58 ""
+Word 282..289 entry=0 path=/0/7/60/0 "Blessed"
+Added 290..293 entry=0 path=/0/7/60/2 "are"
+Word 294..302 entry=0 path=/0/7/60/4 "the meek"
+Word 304..307 entry=0 path=/0/7/60/6 "for"
+Word 308..312 entry=0 path=/0/7/60/8 "they"
+Word 313..326 entry=0 path=/0/7/60/10 "shall inherit"
+Word 327..336 entry=0 path=/0/7/60/12 "the earth"
+WordsOfJesus 282..337 entry=0 path=/0/7/60 "Blessed are the meek: for they shall inherit the earth."
+Verse 337..337 entry=0 path=/0/7/62 ""
+Verse 337..337 entry=0 path=/0/7/63 ""
+Word 338..345 entry=0 path=/0/7/65/0 "Blessed"
+Added 346..349 entry=0 path=/0/7/65/2 "are"
+Word 350..370 entry=0 path=/0/7/65/4 "they which do hunger"
+Word 371..374 entry=0 path=/0/7/65/6 "and"
+Word 375..381 entry=0 path=/0/7/65/8 "thirst"
+Word 382..401 entry=0 path=/0/7/65/10 "after righteousness"
+Word 403..406 entry=0 path=/0/7/65/12 "for"
+Word 407..411 entry=0 path=/0/7/65/14 "they"
+Word 412..427 entry=0 path=/0/7/65/16 "shall be filled"
+WordsOfJesus 338..428 entry=0 path=/0/7/65 "Blessed are they which do hunger and thirst after righteousness: for they shall be filled."
+Verse 428..428 entry=0 path=/0/7/67 ""
+Verse 428..428 entry=0 path=/0/7/68 ""
+Word 429..436 entry=0 path=/0/7/70/0 "Blessed"
+Added 437..440 entry=0 path=/0/7/70/2 "are"
+Word 441..453 entry=0 path=/0/7/70/4 "the merciful"
+Word 455..458 entry=0 path=/0/7/70/6 "for"
+Word 459..463 entry=0 path=/0/7/70/8 "they"
+Word 464..482 entry=0 path=/0/7/70/10 "shall obtain mercy"
+WordsOfJesus 429..483 entry=0 path=/0/7/70 "Blessed are the merciful: for they shall obtain mercy."
+Verse 483..483 entry=0 path=/0/7/72 ""
+Verse 483..483 entry=0 path=/0/7/73 ""
+Word 484..491 entry=0 path=/0/7/75/0 "Blessed"
+Added 492..495 entry=0 path=/0/7/75/2 "are"
+Word 496..504 entry=0 path=/0/7/75/4 "the pure"
+Word 505..513 entry=0 path=/0/7/75/6 "in heart"
+Word 515..518 entry=0 path=/0/7/75/8 "for"
+Word 519..523 entry=0 path=/0/7/75/10 "they"
+Word 524..533 entry=0 path=/0/7/75/12 "shall see"
+Word 534..537 entry=0 path=/0/7/75/14 "God"
+WordsOfJesus 484..538 entry=0 path=/0/7/75 "Blessed are the pure in heart: for they shall see God."
+Verse 538..538 entry=0 path=/0/7/77 ""
+Verse 538..538 entry=0 path=/0/7/78 ""
+Word 539..546 entry=0 path=/0/7/80/0 "Blessed"
+Added 547..550 entry=0 path=/0/7/80/2 "are"
+Word 551..566 entry=0 path=/0/7/80/4 "the peacemakers"
+Word 568..571 entry=0 path=/0/7/80/6 "for"
+Word 572..576 entry=0 path=/0/7/80/8 "they"
+Word 577..592 entry=0 path=/0/7/80/10 "shall be called"
+Word 593..605 entry=0 path=/0/7/80/12 "the children"
+Word 606..612 entry=0 path=/0/7/80/14 "of God"
+WordsOfJesus 539..613 entry=0 path=/0/7/80 "Blessed are the peacemakers: for they shall be called the children of God."
+Verse 613..613 entry=0 path=/0/7/82 ""
+Verse 613..613 entry=0 path=/0/7/83 ""
+Word 614..621 entry=0 path=/0/7/85/0 "Blessed"
+Added 622..625 entry=0 path=/0/7/85/2 "are"
+Word 626..651 entry=0 path=/0/7/85/4 "they which are persecuted"
+Word 652..655 entry=0 path=/0/7/85/6 "for"
+Word 656..672 entry=0 path=/0/7/85/8 "righteousness’"
+Word 673..677 entry=0 path=/0/7/85/10 "sake"
+Word 679..682 entry=0 path=/0/7/85/12 "for"
+Word 683..689 entry=0 path=/0/7/85/14 "theirs"
+Word 690..692 entry=0 path=/0/7/85/16 "is"
+Word 693..704 entry=0 path=/0/7/85/18 "the kingdom"
+Word 705..714 entry=0 path=/0/7/85/20 "of heaven"
+WordsOfJesus 614..715 entry=0 path=/0/7/85 "Blessed are they which are persecuted for righteousness’ sake: for theirs is the kingdom of heaven."
+Verse 715..715 entry=0 path=/0/7/87 ""
+Verse 715..715 entry=0 path=/0/7/88 ""
+Word 716..723 entry=0 path=/0/7/90/0 "Blessed"
+Word 724..730 entry=0 path=/0/7/90/2 "are ye"
+Word 732..736 entry=0 path=/0/7/90/4 "when"
+Added 737..740 entry=0 path=/0/7/90/6 "men"
+Word 741..753 entry=0 path=/0/7/90/8 "shall revile"
+Word 754..757 entry=0 path=/0/7/90/10 "you"
+Word 759..762 entry=0 path=/0/7/90/12 "and"
+Word 763..772 entry=0 path=/0/7/90/14 "persecute"
+Added 773..776 entry=0 path=/0/7/90/16 "you"
+Word 778..781 entry=0 path=/0/7/90/18 "and"
+Word 782..791 entry=0 path=/0/7/90/20 "shall say"
+Word 792..805 entry=0 path=/0/7/90/22 "all manner of"
+Word 806..810 entry=0 path=/0/7/90/24 "evil"
+Word 811..818 entry=0 path=/0/7/90/26 "against"
+Word 819..822 entry=0 path=/0/7/90/28 "you"
+Word 823..830 entry=0 path=/0/7/90/30 "falsely"
+Word 832..835 entry=0 path=/0/7/90/32 "for"
+Word 836..838 entry=0 path=/0/7/90/34 "my"
+Word 839..843 entry=0 path=/0/7/90/36 "sake"
+WordsOfJesus 716..844 entry=0 path=/0/7/90 "Blessed are ye, when men shall revile you, and persecute you, and shall say all manner of evil against you falsely, for my sake."
+Verse 844..844 entry=0 path=/0/7/92 ""
+Verse 844..844 entry=0 path=/0/7/93 ""
+Word 845..852 entry=0 path=/0/7/95/0 "Rejoice"
+Word 854..857 entry=0 path=/0/7/95/2 "and"
+Word 858..875 entry=0 path=/0/7/95/4 "be exceeding glad"
+Word 877..880 entry=0 path=/0/7/95/6 "for"
+Word 881..886 entry=0 path=/0/7/95/8 "great"
+Added 887..889 entry=0 path=/0/7/95/10 "is"
+Word 890..894 entry=0 path=/0/7/95/12 "your"
+Word 895..901 entry=0 path=/0/7/95/14 "reward"
+Word 902..904 entry=0 path=/0/7/95/16 "in"
+Word 905..911 entry=0 path=/0/7/95/18 "heaven"
+Word 913..916 entry=0 path=/0/7/95/20 "for"
+Word 917..919 entry=0 path=/0/7/95/22 "so"
+Word 920..935 entry=0 path=/0/7/95/24 "persecuted they"
+Word 936..948 entry=0 path=/0/7/95/26 "the prophets"
+Word 949..959 entry=0 path=/0/7/95/28 "which were"
+Word 960..966 entry=0 path=/0/7/95/30 "before"
+Word 967..970 entry=0 path=/0/7/95/32 "you"
+WordsOfJesus 845..971 entry=0 path=/0/7/95 "Rejoice, and be exceeding glad: for great is your reward in heaven: for so persecuted they the prophets which were before you."
+Paragraph 0..971 entry=0 path=/0/7 "And seeing the multitudes, he went up into a mountain: and when he was set, his disciples came unto him: And he opened his mouth, and taught them, saying, Blessed are the poor in spirit: for theirs is the kingdom of heaven. Blessed are they that mourn: for they shall be comforted. Blessed are the meek: for they shall inherit the earth. Blessed are they which do hunger and thirst after righteousness: for they shall be filled. Blessed are the merciful: for they shall obtain mercy. Blessed are the pure in heart: for they shall see God. Blessed are the peacemakers: for they shall be called the children of God. Blessed are they which are persecuted for righteousness’ sake: for theirs is the kingdom of heaven. Blessed are ye, when men shall revile you, and persecute you, and shall say all manner of evil against you falsely, for my sake. Rejoice, and be exceeding glad: for great is your reward in heaven: for so persecuted they the prophets which were before you."
+Paragraph 971..971 entry=0 path=/0/8 ""
+Verse 971..971 entry=0 path=/0/9 ""
+Chapter 971..971 entry=0 path=/0/10 ""
+Other 0..971 entry=0 path=/0 "And seeing the multitudes, he went up into a mountain: and when he was set, his disciples came unto him: And he opened his mouth, and taught them, saying, Blessed are the poor in spirit: for theirs is the kingdom of heaven. Blessed are they that mourn: for they shall be comforted. Blessed are the meek: for they shall inherit the earth. Blessed are they which do hunger and thirst after righteousness: for they shall be filled. Blessed are the merciful: for they shall obtain mercy. Blessed are the pure in heart: for they shall see God. Blessed are the peacemakers: for they shall be called the children of God. Blessed are they which are persecuted for righteousness’ sake: for theirs is the kingdom of heaven. Blessed are ye, when men shall revile you, and persecute you, and shall say all manner of evil against you falsely, for my sake. Rejoice, and be exceeding glad: for great is your reward in heaven: for so persecuted they the prophets which were before you."
+
+#### sources ####
+0..3 entry=0 path=/0/7/2/0 offset=0
+4..10 entry=0 path=/0/7/4/0 offset=0
+11..14 entry=0 path=/0/7/5 offset=1
+15..25 entry=0 path=/0/7/6/0 offset=0
+25..26 entry=0 path=/0/7/7 offset=0
+27..29 entry=0 path=/0/7/7 offset=2
+30..34 entry=0 path=/0/7/7 offset=5
+35..37 entry=0 path=/0/7/8/0 offset=0
+38..42 entry=0 path=/0/7/10/0 offset=0
+43..44 entry=0 path=/0/7/11 offset=1
+45..53 entry=0 path=/0/7/12/0 offset=0
+53..54 entry=0 path=/0/7/13 offset=0
+55..58 entry=0 path=/0/7/14/0 offset=0
+59..63 entry=0 path=/0/7/16/0 offset=0
+64..66 entry=0 path=/0/7/18/0 offset=0
+67..70 entry=0 path=/0/7/19 offset=1
+71..74 entry=0 path=/0/7/20/0 offset=0
+74..75 entry=0 path=/0/7/21 offset=0
+76..79 entry=0 path=/0/7/22/0 offset=0
+80..89 entry=0 path=/0/7/24/0 offset=0
+90..94 entry=0 path=/0/7/25 offset=1
+95..99 entry=0 path=/0/7/26/0 offset=0
+100..103 entry=0 path=/0/7/28/0 offset=0
+103..104 entry=0 path=/0/7/29 offset=0
+105..108 entry=0 path=/0/7/33/0 offset=0
+109..111 entry=0 path=/0/7/34 offset=1
+112..118 entry=0 path=/0/7/35/0 offset=0
+119..122 entry=0 path=/0/7/37/0 offset=0
+123..128 entry=0 path=/0/7/39/0 offset=0
+128..129 entry=0 path=/0/7/40 offset=0
+130..133 entry=0 path=/0/7/40 offset=2
+134..140 entry=0 path=/0/7/41/0 offset=0
+141..145 entry=0 path=/0/7/43/0 offset=0
+145..146 entry=0 path=/0/7/44 offset=0
+147..153 entry=0 path=/0/7/45/0 offset=0
+153..154 entry=0 path=/0/7/46 offset=0
+155..162 entry=0 path=/0/7/50/0/0 offset=0
+163..166 entry=0 path=/0/7/50/2/0 offset=0
+167..170 entry=0 path=/0/7/50/4/0 offset=0
+171..175 entry=0 path=/0/7/50/4/0 offset=4
+176..178 entry=0 path=/0/7/50/6/0 offset=0
+179..185 entry=0 path=/0/7/50/6/0 offset=3
+185..186 entry=0 path=/0/7/50/7 offset=0
+187..190 entry=0 path=/0/7/50/8/0 offset=0
+191..197 entry=0 path=/0/7/50/10/0 offset=0
+198..200 entry=0 path=/0/7/50/12/0 offset=0
+201..204 entry=0 path=/0/7/50/14/0 offset=0
+205..212 entry=0 path=/0/7/50/14/0 offset=4
+213..215 entry=0 path=/0/7/50/16/0 offset=0
+216..222 entry=0 path=/0/7/50/16/0 offset=3
+222..223 entry=0 path=/0/7/50/17 offset=0
+224..231 entry=0 path=/0/7/55/0/0 offset=0
+232..235 entry=0 path=/0/7/55/2/0 offset=0
+236..240 entry=0 path=/0/7/55/4/0 offset=0
+241..245 entry=0 path=/0/7/55/4/0 offset=5
+246..251 entry=0 path=/0/7/55/4/0 offset=10
+251..252 entry=0 path=/0/7/55/5 offset=0
+253..256 entry=0 path=/0/7/55/6/0 offset=0
+257..261 entry=0 path=/0/7/55/8/0 offset=0
+262..267 entry=0 path=/0/7/55/10/0 offset=0
+268..270 entry=0 path=/0/7/55/10/0 offset=6
+271..280 entry=0 path=/0/7/55/10/0 offset=9
+280..281 entry=0 path=/0/7/55/11 offset=0
+282..289 entry=0 path=/0/7/60/0/0 offset=0
+290..293 entry=0 path=/0/7/60/2/0 offset=0
+294..297 entry=0 path=/0/7/60/4/0 offset=0
+298..302 entry=0 path=/0/7/60/4/0 offset=4
+302..303 entry=0 path=/0/7/60/5 offset=0
+304..307 entry=0 path=/0/7/60/6/0 offset=0
+308..312 entry=0 path=/0/7/60/8/0 offset=0
+313..318 entry=0 path=/0/7/60/10/0 offset=0
+319..326 entry=0 path=/0/7/60/10/0 offset=6
+327..330 entry=0 path=/0/7/60/12/0 offset=0
+331..336 entry=0 path=/0/7/60/12/0 offset=4
+336..337 entry=0 path=/0/7/60/13 offset=0
+338..345 entry=0 path=/0/7/65/0/0 offset=0
+346..349 entry=0 path=/0/7/65/2/0 offset=0
+350..354 entry=0 path=/0/7/65/4/0 offset=0
+355..360 entry=0 path=/0/7/65/4/0 offset=5
+361..363 entry=0 path=/0/7/65/4/0 offset=11
+364..370 entry=0 path=/0/7/65/4/0 offset=14
+371..374 entry=0 path=/0/7/65/6/0 offset=0
+375..381 entry=0 path=/0/7/65/8/0 offset=0
+382..387 entry=0 path=/0/7/65/10/0 offset=0
+388..401 entry=0 path=/0/7/65/10/0 offset=6
+401..402 entry=0 path=/0/7/65/11 offset=0
+403..406 entry=0 path=/0/7/65/12/0 offset=0
+407..411 entry=0 path=/0/7/65/14/0 offset=0
+412..417 entry=0 path=/0/7/65/16/0 offset=0
+418..420 entry=0 path=/0/7/65/16/0 offset=6
+421..427 entry=0 path=/0/7/65/16/0 offset=9
+427..428 entry=0 path=/0/7/65/17 offset=0
+429..436 entry=0 path=/0/7/70/0/0 offset=0
+437..440 entry=0 path=/0/7/70/2/0 offset=0
+441..444 entry=0 path=/0/7/70/4/0 offset=0
+445..453 entry=0 path=/0/7/70/4/0 offset=4
+453..454 entry=0 path=/0/7/70/5 offset=0
+455..458 entry=0 path=/0/7/70/6/0 offset=0
+459..463 entry=0 path=/0/7/70/8/0 offset=0
+464..469 entry=0 path=/0/7/70/10/0 offset=0
+470..476 entry=0 path=/0/7/70/10/0 offset=6
+477..482 entry=0 path=/0/7/70/10/0 offset=13
+482..483 entry=0 path=/0/7/70/11 offset=0
+484..491 entry=0 path=/0/7/75/0/0 offset=0
+492..495 entry=0 path=/0/7/75/2/0 offset=0
+496..499 entry=0 path=/0/7/75/4/0 offset=0
+500..504 entry=0 path=/0/7/75/4/0 offset=4
+505..507 entry=0 path=/0/7/75/6/0 offset=0
+508..513 entry=0 path=/0/7/75/6/0 offset=3
+513..514 entry=0 path=/0/7/75/7 offset=0
+515..518 entry=0 path=/0/7/75/8/0 offset=0
+519..523 entry=0 path=/0/7/75/10/0 offset=0
+524..529 entry=0 path=/0/7/75/12/0 offset=0
+530..533 entry=0 path=/0/7/75/12/0 offset=6
+534..537 entry=0 path=/0/7/75/14/0 offset=0
+537..538 entry=0 path=/0/7/75/15 offset=0
+539..546 entry=0 path=/0/7/80/0/0 offset=0
+547..550 entry=0 path=/0/7/80/2/0 offset=0
+551..554 entry=0 path=/0/7/80/4/0 offset=0
+555..566 entry=0 path=/0/7/80/4/0 offset=4
+566..567 entry=0 path=/0/7/80/5 offset=0
+568..571 entry=0 path=/0/7/80/6/0 offset=0
+572..576 entry=0 path=/0/7/80/8/0 offset=0
+577..582 entry=0 path=/0/7/80/10/0 offset=0
+583..585 entry=0 path=/0/7/80/10/0 offset=6
+586..592 entry=0 path=/0/7/80/10/0 offset=9
+593..596 entry=0 path=/0/7/80/12/0 offset=0
+597..605 entry=0 path=/0/7/80/12/0 offset=4
+606..608 entry=0 path=/0/7/80/14/0 offset=0
+609..612 entry=0 path=/0/7/80/14/0 offset=3
+612..613 entry=0 path=/0/7/80/15 offset=0
+614..621 entry=0 path=/0/7/85/0/0 offset=0
+622..625 entry=0 path=/0/7/85/2/0 offset=0
+626..630 entry=0 path=/0/7/85/4/0 offset=0
+631..636 entry=0 path=/0/7/85/4/0 offset=5
+637..640 entry=0 path=/0/7/85/4/0 offset=11
+641..651 entry=0 path=/0/7/85/4/0 offset=15
+652..655 entry=0 path=/0/7/85/6/0 offset=0
+656..672 entry=0 path=/0/7/85/8/0 offset=0
+673..677 entry=0 path=/0/7/85/10/0 offset=0
+677..678 entry=0 path=/0/7/85/11 offset=0
+679..682 entry=0 path=/0/7/85/12/0 offset=0
+683..689 entry=0 path=/0/7/85/14/0 offset=0
+690..692 entry=0 path=/0/7/85/16/0 offset=0
+693..696 entry=0 path=/0/7/85/18/0 offset=0
+697..704 entry=0 path=/0/7/85/18/0 offset=4
+705..707 entry=0 path=/0/7/85/20/0 offset=0
+708..714 entry=0 path=/0/7/85/20/0 offset=3
+714..715 entry=0 path=/0/7/85/21 offset=0
+716..723 entry=0 path=/0/7/90/0/0 offset=0
+724..727 entry=0 path=/0/7/90/2/0 offset=0
+728..730 entry=0 path=/0/7/90/2/0 offset=4
+730..731 entry=0 path=/0/7/90/3 offset=0
+732..736 entry=0 path=/0/7/90/4/0 offset=0
+737..740 entry=0 path=/0/7/90/6/0 offset=0
+741..746 entry=0 path=/0/7/90/8/0 offset=0
+747..753 entry=0 path=/0/7/90/8/0 offset=6
+754..757 entry=0 path=/0/7/90/10/0 offset=0
+757..758 entry=0 path=/0/7/90/11 offset=0
+759..762 entry=0 path=/0/7/90/12/0 offset=0
+763..772 entry=0 path=/0/7/90/14/0 offset=0
+773..776 entry=0 path=/0/7/90/16/0 offset=0
+776..777 entry=0 path=/0/7/90/17 offset=0
+778..781 entry=0 path=/0/7/90/18/0 offset=0
+782..787 entry=0 path=/0/7/90/20/0 offset=0
+788..791 entry=0 path=/0/7/90/20/0 offset=6
+792..795 entry=0 path=/0/7/90/22/0 offset=0
+796..802 entry=0 path=/0/7/90/22/0 offset=4
+803..805 entry=0 path=/0/7/90/22/0 offset=11
+806..810 entry=0 path=/0/7/90/24/0 offset=0
+811..818 entry=0 path=/0/7/90/26/0 offset=0
+819..822 entry=0 path=/0/7/90/28/0 offset=0
+823..830 entry=0 path=/0/7/90/30/0 offset=0
+830..831 entry=0 path=/0/7/90/31 offset=0
+832..835 entry=0 path=/0/7/90/32/0 offset=0
+836..838 entry=0 path=/0/7/90/34/0 offset=0
+839..843 entry=0 path=/0/7/90/36/0 offset=0
+843..844 entry=0 path=/0/7/90/37 offset=0
+845..852 entry=0 path=/0/7/95/0/0 offset=0
+852..853 entry=0 path=/0/7/95/1 offset=0
+854..857 entry=0 path=/0/7/95/2/0 offset=0
+858..860 entry=0 path=/0/7/95/4/0 offset=0
+861..870 entry=0 path=/0/7/95/4/0 offset=3
+871..875 entry=0 path=/0/7/95/4/0 offset=13
+875..876 entry=0 path=/0/7/95/5 offset=0
+877..880 entry=0 path=/0/7/95/6/0 offset=0
+881..886 entry=0 path=/0/7/95/8/0 offset=0
+887..889 entry=0 path=/0/7/95/10/0 offset=0
+890..894 entry=0 path=/0/7/95/12/0 offset=0
+895..901 entry=0 path=/0/7/95/14/0 offset=0
+902..904 entry=0 path=/0/7/95/16/0 offset=0
+905..911 entry=0 path=/0/7/95/18/0 offset=0
+911..912 entry=0 path=/0/7/95/19 offset=0
+913..916 entry=0 path=/0/7/95/20/0 offset=0
+917..919 entry=0 path=/0/7/95/22/0 offset=0
+920..930 entry=0 path=/0/7/95/24/0 offset=0
+931..935 entry=0 path=/0/7/95/24/0 offset=11
+936..939 entry=0 path=/0/7/95/26/0 offset=0
+940..948 entry=0 path=/0/7/95/26/0 offset=4
+949..954 entry=0 path=/0/7/95/28/0 offset=0
+955..959 entry=0 path=/0/7/95/28/0 offset=6
+960..966 entry=0 path=/0/7/95/30/0 offset=0
+967..970 entry=0 path=/0/7/95/32/0 offset=0
+970..971 entry=0 path=/0/7/95/33 offset=0
+
+#### html ####
+<div class="topos-title topos-mt1" data-title-type="mt1">THE GOSPEL ACCORDING TO ST. MATTHEW</div><span class="topos-chapter" data-osis-id="MAT 5" data-n="5"></span><p class="topos-p"><span class="topos-verse" data-osis-id="MAT 5:1" data-n="1"></span> <span class="topos-w" data-strong="G1161">And</span> <span class="topos-w" data-strong="G1492">seeing</span> the <span class="topos-w" data-strong="G3793">multitudes</span>, he went <span class="topos-w" data-strong="G305">up</span> <span class="topos-w" data-strong="G1519">into</span> a <span class="topos-w" data-strong="G3735">mountain</span>: <span class="topos-w" data-strong="G2532">and</span> <span class="topos-w" data-strong="G2523">when</span> <span class="topos-w" data-strong="G846">he</span> was <span class="topos-w" data-strong="G2523">set</span>, <span class="topos-w" data-strong="G846">his</span> <span class="topos-w" data-strong="G3101">disciples</span> came <span class="topos-w" data-strong="G4334">unto</span> <span class="topos-w" data-strong="G846">him</span>:  <span class="topos-verse" data-osis-id="MAT 5:2" data-n="2"></span> <span class="topos-w" data-strong="G2532">And</span> he <span class="topos-w" data-strong="G455">opened</span> <span class="topos-w" data-strong="G846">his</span> <span class="topos-w" data-strong="G4750">mouth</span>, and <span class="topos-w" data-strong="G1321">taught</span> <span class="topos-w" data-strong="G846">them</span>, <span class="topos-w" data-strong="G3004">saying</span>,  <span class="topos-verse" data-osis-id="MAT 5:3" data-n="3"></span> <span class="topos-woj"><span class="topos-w" data-strong="G3107">Blessed</span> <span class="topos-added">are</span> <span class="topos-w" data-strong="G4434">the poor</span> <span class="topos-w" data-strong="G4151">in spirit</span>: <span class="topos-w" data-strong="G3754">for</span> <span class="topos-w" data-strong="G846">theirs</span> <span class="topos-w" data-strong="G2076">is</span> <span class="topos-w" data-strong="G932">the kingdom</span> <span class="topos-w" data-strong="G3772">of heaven</span>.</span>  <span class="topos-verse" data-osis-id="MAT 5:4" data-n="4"></span> <span class="topos-woj"><span class="topos-w" data-strong="G3107">Blessed</span> <span class="topos-added">are</span> <span class="topos-w" data-strong="G3996">they that mourn</span>: <span class="topos-w" data-strong="G3754">for</span> <span class="topos-w" data-strong="G846">they</span> <span class="topos-w" data-strong="G3870">shall be comforted</span>.</span>  <span class="topos-verse" data-osis-id="MAT 5:5" data-n="5"></span> <span class="topos-woj"><span class="topos-w" data-strong="G3107">Blessed</span> <span class="topos-added">are</span> <span class="topos-w" data-strong="G4239">the meek</span>: <span class="topos-w" data-strong="G3754">for</span> <span class="topos-w" data-strong="G846">they</span> <span class="topos-w" data-strong="G2816">shall inherit</span> <span class="topos-w" data-strong="G1093">the earth</span>.</span>  <span class="topos-verse" data-osis-id="MAT 5:6" data-n="6"></span> <span class="topos-woj"><span class="topos-w" data-strong="G3107">Blessed</span> <span class="topos-added">are</span> <span class="topos-w" data-strong="G3983">they which do hunger</span> <span class="topos-w" data-strong="G2532">and</span> <span class="topos-w" data-strong="G1372">thirst</span> <span class="topos-w" data-strong="G1343">after righteousness</span>: <span class="topos-w" data-strong="G3754">for</span> <span class="topos-w" data-strong="G846">they</span> <span class="topos-w" data-strong="G5526">shall be filled</span>.</span>  <span class="topos-verse" data-osis-id="MAT 5:7" data-n="7"></span> <span class="topos-woj"><span class="topos-w" data-strong="G3107">Blessed</span> <span class="topos-added">are</span> <span class="topos-w" data-strong="G1655">the merciful</span>: <span class="topos-w" data-strong="G3754">for</span> <span class="topos-w" data-strong="G846">they</span> <span class="topos-w" data-strong="G1653">shall obtain mercy</span>.</span>  <span class="topos-verse" data-osis-id="MAT 5:8" data-n="8"></span> <span class="topos-woj"><span class="topos-w" data-strong="G3107">Blessed</span> <span class="topos-added">are</span> <span class="topos-w" data-strong="G2513">the pure</span> <span class="topos-w" data-strong="G2588">in heart</span>: <span class="topos-w" data-strong="G3754">for</span> <span class="topos-w" data-strong="G846">they</span> <span class="topos-w" data-strong="G3700">shall see</span> <span class="topos-w" data-strong="G2316">God</span>.</span>  <span class="topos-verse" data-osis-id="MAT 5:9" data-n="9"></span> <span class="topos-woj"><span class="topos-w" data-strong="G3107">Blessed</span> <span class="topos-added">are</span> <span class="topos-w" data-strong="G1518">the peacemakers</span>: <span class="topos-w" data-strong="G3754">for</span> <span class="topos-w" data-strong="G846">they</span> <span class="topos-w" data-strong="G2564">shall be called</span> <span class="topos-w" data-strong="G5207">the children</span> <span class="topos-w" data-strong="G2316">of God</span>.</span>  <span class="topos-verse" data-osis-id="MAT 5:10" data-n="10"></span> <span class="topos-woj"><span class="topos-w" data-strong="G3107">Blessed</span> <span class="topos-added">are</span> <span class="topos-w" data-strong="G1377">they which are persecuted</span> <span class="topos-w" data-strong="G1752">for</span> <span class="topos-w" data-strong="G1343">righteousness’</span> <span class="topos-w" data-strong="G1752">sake</span>: <span class="topos-w" data-strong="G3754">for</span> <span class="topos-w" data-strong="G846">theirs</span> <span class="topos-w" data-strong="G2076">is</span> <span class="topos-w" data-strong="G932">the kingdom</span> <span class="topos-w" data-strong="G3772">of heaven</span>.</span>  <span class="topos-verse" data-osis-id="MAT 5:11" data-n="11"></span> <span class="topos-woj"><span class="topos-w" data-strong="G3107">Blessed</span> <span class="topos-w" data-strong="G2075">are ye</span>, <span class="topos-w" data-strong="G3752">when</span> <span class="topos-added">men</span> <span class="topos-w" data-strong="G3679">shall revile</span> <span class="topos-w" data-strong="G5209">you</span>, <span class="topos-w" data-strong="G2532">and</span> <span class="topos-w" data-strong="G1377">persecute</span> <span class="topos-added">you</span>, <span class="topos-w" data-strong="G2532">and</span> <span class="topos-w" data-strong="G2036">shall say</span> <span class="topos-w" data-strong="G3956">all manner of</span> <span class="topos-w" data-strong="G4190">evil</span> <span class="topos-w" data-strong="G2596">against</span> <span class="topos-w" data-strong="G5216">you</span> <span class="topos-w" data-strong="G5574">falsely</span>, <span class="topos-w" data-strong="G1752">for</span> <span class="topos-w" data-strong="G1700">my</span> <span class="topos-w" data-strong="G1752">sake</span>.</span>  <span class="topos-verse" data-osis-id="MAT 5:12" data-n="12"></span> <span class="topos-woj"><span class="topos-w" data-strong="G5463">Rejoice</span>, <span class="topos-w" data-strong="G2532">and</span> <span class="topos-w" data-strong="G21">be exceeding glad</span>: <span class="topos-w" data-strong="G3754">for</span> <span class="topos-w" data-strong="G4183">great</span> <span class="topos-added">is</span> <span class="topos-w" data-strong="G5216">your</span> <span class="topos-w" data-strong="G3408">reward</span> <span class="topos-w" data-strong="G1722">in</span> <span class="topos-w" data-strong="G3772">heaven</span>: <span class="topos-w" data-strong="G1063">for</span> <span class="topos-w" data-strong="G3779">so</span> <span class="topos-w" data-strong="G1377">persecuted they</span> <span class="topos-w" data-strong="G4396">the prophets</span> <span class="topos-w" data-strong="G3588">which were</span> <span class="topos-w" data-strong="G4253">before</span> <span class="topos-w" data-strong="G5216">you</span>.</span></p><br class="topos-p">
+#### html-bare ####
+The Gospel According to MatthewMatthewTHE GOSPEL ACCORDING TO ST. MATTHEWMatthewMat<div class="title mt1" data-title-type="mt1">THE GOSPEL ACCORDING TO ST. MATTHEW</div><span class="chapter" data-osis-id="MAT 5" data-n="5"></span><p class="p"><span class="verse" data-osis-id="MAT 5:1" data-n="1"></span> <span class="w" data-strong="G1161">And</span> <span class="w" data-strong="G1492">seeing</span> the <span class="w" data-strong="G3793">multitudes</span>, he went <span class="w" data-strong="G305">up</span> <span class="w" data-strong="G1519">into</span> a <span class="w" data-strong="G3735">mountain</span>: <span class="w" data-strong="G2532">and</span> <span class="w" data-strong="G2523">when</span> <span class="w" data-strong="G846">he</span> was <span class="w" data-strong="G2523">set</span>, <span class="w" data-strong="G846">his</span> <span class="w" data-strong="G3101">disciples</span> came <span class="w" data-strong="G4334">unto</span> <span class="w" data-strong="G846">him</span>:  <span class="verse" data-osis-id="MAT 5:2" data-n="2"></span> <span class="w" data-strong="G2532">And</span> he <span class="w" data-strong="G455">opened</span> <span class="w" data-strong="G846">his</span> <span class="w" data-strong="G4750">mouth</span>, and <span class="w" data-strong="G1321">taught</span> <span class="w" data-strong="G846">them</span>, <span class="w" data-strong="G3004">saying</span>,  <span class="verse" data-osis-id="MAT 5:3" data-n="3"></span> <span class="woj"><span class="w" data-strong="G3107">Blessed</span> <span class="added">are</span> <span class="w" data-strong="G4434">the poor</span> <span class="w" data-strong="G4151">in spirit</span>: <span class="w" data-strong="G3754">for</span> <span class="w" data-strong="G846">theirs</span> <span class="w" data-strong="G2076">is</span> <span class="w" data-strong="G932">the kingdom</span> <span class="w" data-strong="G3772">of heaven</span>.</span>  <span class="verse" data-osis-id="MAT 5:4" data-n="4"></span> <span class="woj"><span class="w" data-strong="G3107">Blessed</span> <span class="added">are</span> <span class="w" data-strong="G3996">they that mourn</span>: <span class="w" data-strong="G3754">for</span> <span class="w" data-strong="G846">they</span> <span class="w" data-strong="G3870">shall be comforted</span>.</span>  <span class="verse" data-osis-id="MAT 5:5" data-n="5"></span> <span class="woj"><span class="w" data-strong="G3107">Blessed</span> <span class="added">are</span> <span class="w" data-strong="G4239">the meek</span>: <span class="w" data-strong="G3754">for</span> <span class="w" data-strong="G846">they</span> <span class="w" data-strong="G2816">shall inherit</span> <span class="w" data-strong="G1093">the earth</span>.</span>  <span class="verse" data-osis-id="MAT 5:6" data-n="6"></span> <span class="woj"><span class="w" data-strong="G3107">Blessed</span> <span class="added">are</span> <span class="w" data-strong="G3983">they which do hunger</span> <span class="w" data-strong="G2532">and</span> <span class="w" data-strong="G1372">thirst</span> <span class="w" data-strong="G1343">after righteousness</span>: <span class="w" data-strong="G3754">for</span> <span class="w" data-strong="G846">they</span> <span class="w" data-strong="G5526">shall be filled</span>.</span>  <span class="verse" data-osis-id="MAT 5:7" data-n="7"></span> <span class="woj"><span class="w" data-strong="G3107">Blessed</span> <span class="added">are</span> <span class="w" data-strong="G1655">the merciful</span>: <span class="w" data-strong="G3754">for</span> <span class="w" data-strong="G846">they</span> <span class="w" data-strong="G1653">shall obtain mercy</span>.</span>  <span class="verse" data-osis-id="MAT 5:8" data-n="8"></span> <span class="woj"><span class="w" data-strong="G3107">Blessed</span> <span class="added">are</span> <span class="w" data-strong="G2513">the pure</span> <span class="w" data-strong="G2588">in heart</span>: <span class="w" data-strong="G3754">for</span> <span class="w" data-strong="G846">they</span> <span class="w" data-strong="G3700">shall see</span> <span class="w" data-strong="G2316">God</span>.</span>  <span class="verse" data-osis-id="MAT 5:9" data-n="9"></span> <span class="woj"><span class="w" data-strong="G3107">Blessed</span> <span class="added">are</span> <span class="w" data-strong="G1518">the peacemakers</span>: <span class="w" data-strong="G3754">for</span> <span class="w" data-strong="G846">they</span> <span class="w" data-strong="G2564">shall be called</span> <span class="w" data-strong="G5207">the children</span> <span class="w" data-strong="G2316">of God</span>.</span>  <span class="verse" data-osis-id="MAT 5:10" data-n="10"></span> <span class="woj"><span class="w" data-strong="G3107">Blessed</span> <span class="added">are</span> <span class="w" data-strong="G1377">they which are persecuted</span> <span class="w" data-strong="G1752">for</span> <span class="w" data-strong="G1343">righteousness’</span> <span class="w" data-strong="G1752">sake</span>: <span class="w" data-strong="G3754">for</span> <span class="w" data-strong="G846">theirs</span> <span class="w" data-strong="G2076">is</span> <span class="w" data-strong="G932">the kingdom</span> <span class="w" data-strong="G3772">of heaven</span>.</span>  <span class="verse" data-osis-id="MAT 5:11" data-n="11"></span> <span class="woj"><span class="w" data-strong="G3107">Blessed</span> <span class="w" data-strong="G2075">are ye</span>, <span class="w" data-strong="G3752">when</span> <span class="added">men</span> <span class="w" data-strong="G3679">shall revile</span> <span class="w" data-strong="G5209">you</span>, <span class="w" data-strong="G2532">and</span> <span class="w" data-strong="G1377">persecute</span> <span class="added">you</span>, <span class="w" data-strong="G2532">and</span> <span class="w" data-strong="G2036">shall say</span> <span class="w" data-strong="G3956">all manner of</span> <span class="w" data-strong="G4190">evil</span> <span class="w" data-strong="G2596">against</span> <span class="w" data-strong="G5216">you</span> <span class="w" data-strong="G5574">falsely</span>, <span class="w" data-strong="G1752">for</span> <span class="w" data-strong="G1700">my</span> <span class="w" data-strong="G1752">sake</span>.</span>  <span class="verse" data-osis-id="MAT 5:12" data-n="12"></span> <span class="woj"><span class="w" data-strong="G5463">Rejoice</span>, <span class="w" data-strong="G2532">and</span> <span class="w" data-strong="G21">be exceeding glad</span>: <span class="w" data-strong="G3754">for</span> <span class="w" data-strong="G4183">great</span> <span class="added">is</span> <span class="w" data-strong="G5216">your</span> <span class="w" data-strong="G3408">reward</span> <span class="w" data-strong="G1722">in</span> <span class="w" data-strong="G3772">heaven</span>: <span class="w" data-strong="G1063">for</span> <span class="w" data-strong="G3779">so</span> <span class="w" data-strong="G1377">persecuted they</span> <span class="w" data-strong="G4396">the prophets</span> <span class="w" data-strong="G3588">which were</span> <span class="w" data-strong="G4253">before</span> <span class="w" data-strong="G5216">you</span>.</span></p><br class="p">
+#### verses ####
+5:1-1 marker=/0/7/0 start=/0/7 end=/0/7/30 "And seeing the multitudes, he went up into a mountain: and when he was set, his disciples came unto him:"
+5:2-2 marker=/0/7/31 start=/0/7/31 end=/0/7/47 "And he opened his mouth, and taught them, saying,"
+5:3-3 marker=/0/7/48 start=/0/7/48 end=/0/7/52 "Blessed are the poor in spirit: for theirs is the kingdom of heaven."
+5:4-4 marker=/0/7/53 start=/0/7/53 end=/0/7/57 "Blessed are they that mourn: for they shall be comforted."
+5:5-5 marker=/0/7/58 start=/0/7/58 end=/0/7/62 "Blessed are the meek: for they shall inherit the earth."
+5:6-6 marker=/0/7/63 start=/0/7/63 end=/0/7/67 "Blessed are they which do hunger and thirst after righteousness: for they shall be filled."
+5:7-7 marker=/0/7/68 start=/0/7/68 end=/0/7/72 "Blessed are the merciful: for they shall obtain mercy."
+5:8-8 marker=/0/7/73 start=/0/7/73 end=/0/7/77 "Blessed are the pure in heart: for they shall see God."
+5:9-9 marker=/0/7/78 start=/0/7/78 end=/0/7/82 "Blessed are the peacemakers: for they shall be called the children of God."
+5:10-10 marker=/0/7/83 start=/0/7/83 end=/0/7/87 "Blessed are they which are persecuted for righteousness’ sake: for theirs is the kingdom of heaven."
+5:11-11 marker=/0/7/88 start=/0/7/88 end=/0/7/92 "Blessed are ye, when men shall revile you, and persecute you, and shall say all manner of evil against you falsely, for my sake."
+5:12-12 marker=/0/7/93 start=/0/7/93 end=/0/9 "Rejoice, and be exceeding glad: for great is your reward in heaven: for so persecuted they the prophets which were before you."
+chapter_verses: [0, 0, 0, 0, 12]
+
+#### usx-chapter-verses ####
+[0, 0, 0, 0, 12]
+
+#### refs ####
+

@@ -1,0 +1,60 @@
+#### markup ####
+thml
+#### input ####
+<I>i</I> <B>b</B> <P>p</P> <BR> <ScripRef Passage="Gen 1:1">g</ScripRef> <SYNC TYPE="STRONGS" VALUE="G1"/>x <H2>h</H2>
+#### tree ####
+Highlight I type="italic"
+  text "i"
+text " "
+Highlight B type="bold"
+  text "b"
+text " "
+Paragraph P
+  text "p"
+text " "
+LineBreak BR
+text " "
+Reference ScripRef Passage="Gen 1:1"
+  text "g"
+text " "
+Word w lemma="strong:G1"
+text "x "
+Title H2
+  text "h"
+
+#### text ####
+i b
+p
+g x
+#### text-all ####
+i b
+p
+g [G1]x
+## h
+#### text-nobreaks ####
+i b p g x
+#### spans ####
+entries: 0..9
+Highlight 0..1 entry=0 path=/0 "i"
+Highlight 2..3 entry=0 path=/2 "b"
+Paragraph 4..5 entry=0 path=/4 "p"
+Reference 6..7 entry=0 path=/8 "g"
+Word 7..7 entry=0 path=/10 ""
+
+#### sources ####
+0..1 entry=0 path=/0/0 offset=0
+2..3 entry=0 path=/2/0 offset=0
+4..5 entry=0 path=/4/0 offset=0
+6..7 entry=0 path=/8/0 offset=0
+8..9 entry=0 path=/11 offset=0
+
+#### html ####
+<i class="topos-hi topos-italic">i</i> <b class="topos-hi topos-bold">b</b> <p class="topos-p">p</p> <br class="topos-lb"> <a class="topos-ref" data-osis-ref="Gen 1:1">g</a> <span class="topos-w" data-strong="G1" data-lemma="strong:G1"></span>x <div class="topos-title">h</div>
+#### html-bare ####
+<i class="hi italic">i</i> <b class="hi bold">b</b> <p class="p">p</p> <br class="lb"> <a class="ref" data-osis-ref="Gen 1:1">g</a> <span class="w" data-strong="G1" data-lemma="strong:G1"></span>x <div class="title">h</div>
+#### verses ####
+chapter_verses: []
+
+#### refs ####
+/8 target="Gen 1:1" passages=[Gen.1.1]
+

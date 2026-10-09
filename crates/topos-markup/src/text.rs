@@ -2,7 +2,7 @@
 
 use std::collections::BTreeMap;
 
-use crate::{Kind, Node, filter::Filter, flatten::flatten};
+use crate::{Filter, Kind, Node};
 
 /// Options for [`plain_text`] and [`Flattener`](crate::Flattener)
 #[derive(Debug, Clone)]
@@ -55,5 +55,5 @@ impl Default for TextOptions {
 
 /// Plain text, with runs of whitespace collapsed (see [`Flat`](crate::Flat))
 pub fn plain_text(nodes: &[Node], opts: &TextOptions) -> String {
-    flatten(nodes, opts).text
+    crate::flatten::flatten(nodes, opts).text
 }
