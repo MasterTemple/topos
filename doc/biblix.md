@@ -386,10 +386,14 @@ biblix-ffi (BoltFFI, like topos-ffi) has biblix's and topos's API in one package
 | `bx import <file or URL>` | Make a package from another format |
 | `bx diff id 1.2.0 1.3.0` | What changed, and the version it needs |
 | `bx release` | Tag a package's new version, after checking it against the last one |
-| `bx list`, `bx info id` | Installed packages: version, license, size, books |
-| `bx clean`, `bx verify` | Remove versions nothing uses; rebuild broken caches |
+| `bx list`, `bx info id` | Installed packages: version, license, size, books (done) |
+| `bx clean`, `bx verify` | Remove versions nothing uses (done: lists them, `--remove` deletes); check a summary |
+| `bx search`, `bx import` | Find packages in catalogs; make eBible.org's or fetch.bible's download into one (done) |
+| `bx media add`, `bx media check` | List a recording by URL and hash; download and check every one (done) |
 
-- Neovim: `:ToposBible add <git URL>`.
+- Neovim (done): `:ToposBibleSearch <words>` (choose one to install), `:ToposBibleAdd <git URL |
+  ebible:id | fetch:id>`, `:ToposBibleRemove <id>`, running `bx` (`bx search --json`) in the current
+  folder, then restarting biblix-lsp.
 - Obsidian: a Bibles section in the settings: the library's location, installed Bibles (version,
   license, remove, default), and *Add a Bible* from a git URL (showing its summary first) or a
   file.
