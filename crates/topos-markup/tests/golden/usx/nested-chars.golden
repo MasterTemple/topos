@@ -34,9 +34,9 @@ Other 0..20 entry=0 path=/0 "Jesus said this Lord"
 16..20 entry=0 path=/0/0/0/3/0 offset=0
 
 #### html ####
-<p class="topos-p"><span class="topos-woj">Jesus said <span class="topos-added">this</span> <span class="topos-divine-name">Lord</span></span></p>
+<p class="topos-p" data-style="p"><span class="topos-woj" data-style="wj">Jesus said <span class="topos-added" data-style="add">this</span> <span class="topos-divine-name" data-style="nd">Lord</span></span></p>
 #### html-bare ####
-<p class="p"><span class="woj">Jesus said <span class="added">this</span> <span class="divine-name">Lord</span></span></p>
+<p class="p" data-style="p"><span class="woj" data-style="wj">Jesus said <span class="added" data-style="add">this</span> <span class="divine-name" data-style="nd">Lord</span></span></p>
 #### verses ####
 chapter_verses: []
 

@@ -152,11 +152,34 @@ fn tags_by_kind() {
     );
     assert_eq!(
         render(Markup::Usx, r#"<note caller="+" style="f">x</note>"#),
-        r#"<span class="topos-note topos-footnote" data-note-type="footnote" data-n="+">x</span>"#
+        r#"<span class="topos-note topos-footnote" data-note-type="footnote" data-n="+" data-style="f">x</span>"#
     );
     assert_eq!(
         render(Markup::Usx, r#"<ref loc="GEN 1:1">x</ref>"#),
         r#"<a class="topos-ref" data-osis-ref="GEN 1:1">x</a>"#
+    );
+}
+
+#[test]
+fn usx_styles() {
+    // Every USX style is a `data-style`, on the element's first tag; character styles without a
+    // kind of their own are `char` spans rather than bare text
+    assert_eq!(
+        render(
+            Markup::Usx,
+            r#"<para style="q2">a <char style="pn">Jordan</char></para><para style="b"/><para style="m">b<note caller="+" style="f"><char style="fr">1:1 </char><char style="ft">c</char></note></para>"#
+        ),
+        concat!(
+            r#"<span class="topos-l" data-style="q2">a <span class="topos-char" data-style="pn">Jordan</span></span><br class="topos-l">"#,
+            r#"<br class="topos-lb" data-style="b">"#,
+            r#"<p class="topos-p" data-style="m">b<span class="topos-note topos-footnote" data-note-type="footnote" data-n="+" data-style="f">"#,
+            r#"<span class="topos-char" data-style="fr">1:1 </span><span class="topos-char" data-style="ft">c</span></span></p>"#,
+        )
+    );
+    // Other markups' `style` is CSS, never a `data-style`
+    assert_eq!(
+        render(Markup::Thml, r#"<span style="color:red">x</span>"#),
+        r#"<span class="topos-hi">x</span>"#
     );
 }
 

@@ -85,6 +85,17 @@ fn golden_files() {
                 continue;
             }
         };
+        // `GOLDEN_BLESS=1` writes what was computed (check the diff)
+        if std::env::var_os("GOLDEN_BLESS").is_some() {
+            let mut sections: Vec<(String, String)> = sections
+                .iter()
+                .filter(|(n, _)| n == "markup" || n == "input")
+                .cloned()
+                .collect();
+            sections.extend(actual.iter().cloned());
+            std::fs::write(path, golden::write(&sections)).expect("a writable golden file");
+            continue;
+        }
         if expected.len() != actual.len() {
             failures.push(format!(
                 "{name}: {} sections expected, {} computed",

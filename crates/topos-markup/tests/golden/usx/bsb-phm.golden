@@ -820,38 +820,38 @@ Other 0..2300 entry=0 path=/1 "Paul, a prisoner of Christ Jesus, and Timothy our
   
   
   
-  <div class="topos-title topos-mt2" data-title-type="mt2">The Letter to</div>
-  <div class="topos-title topos-mt1" data-title-type="mt1">Philemon</div>
+  <div class="topos-title topos-mt2" data-title-type="mt2" data-style="mt2">The Letter to</div>
+  <div class="topos-title topos-mt1" data-title-type="mt1" data-style="mt1">Philemon</div>
   <span class="topos-chapter" data-osis-id="PHM 1" data-n="1"></span>
-  <div class="topos-title topos-s1" data-title-type="s1">Greetings from Paul and Timothy</div>
-  <p class="topos-p">
+  <div class="topos-title topos-s1" data-title-type="s1" data-style="s1">Greetings from Paul and Timothy</div>
+  <p class="topos-p" data-style="p">
     <span class="topos-verse" data-osis-id="PHM 1:1" data-n="1"></span>Paul, a prisoner of Christ Jesus, and Timothy our brother,</p>
-  <p class="topos-p">To Philemon our beloved fellow worker, <span class="topos-verse" data-osis-id="PHM 1:2" data-n="2"></span>to Apphia our sister, to Archippus our fellow soldier, and to the church that meets at your<span class="topos-note topos-footnote" data-note-type="footnote" data-n="+">1:2 You and Your are singular throughout this letter, except in verses 3, 22, and 25.</span> house:</p>
-  <p class="topos-p">
+  <p class="topos-p" data-style="p">To Philemon our beloved fellow worker, <span class="topos-verse" data-osis-id="PHM 1:2" data-n="2"></span>to Apphia our sister, to Archippus our fellow soldier, and to the church that meets at your<span class="topos-note topos-footnote" data-note-type="footnote" data-n="+" data-style="f"><span class="topos-char" data-style="fr">1:2 </span><span class="topos-char" data-style="fqa">You </span><span class="topos-char" data-style="ft">and </span><span class="topos-char" data-style="fqa">Your </span><span class="topos-char" data-style="ft">are singular throughout this letter, except in verses 3, 22, and 25.</span></span> house:</p>
+  <p class="topos-p" data-style="p">
     <span class="topos-verse" data-osis-id="PHM 1:3" data-n="3"></span>Grace and peace to you from God our Father and the Lord Jesus Christ.</p>
-  <div class="topos-title topos-s1" data-title-type="s1">Philemon’s Faith and Love</div>
-  <p class="topos-p">
+  <div class="topos-title topos-s1" data-title-type="s1" data-style="s1">Philemon’s Faith and Love</div>
+  <p class="topos-p" data-style="p">
     <span class="topos-verse" data-osis-id="PHM 1:4" data-n="4"></span>I always thank my God, remembering you in my prayers, <span class="topos-verse" data-osis-id="PHM 1:5" data-n="5"></span>because I hear about your faith in the Lord Jesus and your love for all the saints. <span class="topos-verse" data-osis-id="PHM 1:6" data-n="6"></span>I pray that your partnership in the faith may become effective as you fully acknowledge every good thing that is ours in Christ. <span class="topos-verse" data-osis-id="PHM 1:7" data-n="7"></span>I take great joy and encouragement in your love, because you, brother, have refreshed the hearts of the saints.</p>
-  <div class="topos-title topos-s1" data-title-type="s1">Paul’s Appeal for Onesimus</div>
-  <p class="topos-p">
+  <div class="topos-title topos-s1" data-title-type="s1" data-style="s1">Paul’s Appeal for Onesimus</div>
+  <p class="topos-p" data-style="p">
     <span class="topos-verse" data-osis-id="PHM 1:8" data-n="8"></span>So although in Christ I am bold enough to order you to do what is proper, <span class="topos-verse" data-osis-id="PHM 1:9" data-n="9"></span>I prefer to appeal on the basis of love. For I, Paul, am now aged, and a prisoner of Christ Jesus as well.</p>
-  <p class="topos-p">
-    <span class="topos-verse" data-osis-id="PHM 1:10" data-n="10"></span>I appeal to you for my child Onesimus,<span class="topos-note topos-footnote" data-note-type="footnote" data-n="+">1:10 Onesimus means useful (see verse 11) or beneficial (see verse 20).</span> whose father I became while I was in chains. <span class="topos-verse" data-osis-id="PHM 1:11" data-n="11"></span>Formerly he was useless to you, but now he has become useful both to you and to me. <span class="topos-verse" data-osis-id="PHM 1:12" data-n="12"></span>I am sending back to you him who is my very heart.</p>
-  <p class="topos-p">
+  <p class="topos-p" data-style="p">
+    <span class="topos-verse" data-osis-id="PHM 1:10" data-n="10"></span>I appeal to you for my child Onesimus,<span class="topos-note topos-footnote" data-note-type="footnote" data-n="+" data-style="f"><span class="topos-char" data-style="fr">1:10 </span><span class="topos-char" data-style="fqa">Onesimus </span><span class="topos-char" data-style="ft">means </span><span class="topos-char" data-style="fqa">useful </span><span class="topos-char" data-style="ft">(see verse 11) or </span><span class="topos-char" data-style="fqa">beneficial </span><span class="topos-char" data-style="ft">(see verse 20).</span></span> whose father I became while I was in chains. <span class="topos-verse" data-osis-id="PHM 1:11" data-n="11"></span>Formerly he was useless to you, but now he has become useful both to you and to me. <span class="topos-verse" data-osis-id="PHM 1:12" data-n="12"></span>I am sending back to you him who is my very heart.</p>
+  <p class="topos-p" data-style="p">
     <span class="topos-verse" data-osis-id="PHM 1:13" data-n="13"></span>I would have liked to keep him with me, so that on your behalf he could minister to me in my chains for the gospel. <span class="topos-verse" data-osis-id="PHM 1:14" data-n="14"></span>But I did not want to do anything without your consent, so that your goodness will not be out of compulsion, but by your own free will. <span class="topos-verse" data-osis-id="PHM 1:15" data-n="15"></span>For perhaps this is why he was separated from you for a while, so that you might have him back for good — <span class="topos-verse" data-osis-id="PHM 1:16" data-n="16"></span>no longer as a slave, but better than a slave, as a beloved brother. He is especially beloved to me, but even more so to you, both in person and in the Lord.</p>
-  <p class="topos-p">
+  <p class="topos-p" data-style="p">
     <span class="topos-verse" data-osis-id="PHM 1:17" data-n="17"></span>So if you consider me a partner, receive him as you would receive me. <span class="topos-verse" data-osis-id="PHM 1:18" data-n="18"></span>But if he has wronged you in any way or owes you anything, charge it to my account. <span class="topos-verse" data-osis-id="PHM 1:19" data-n="19"></span>I, Paul, write this with my own hand. I will repay it— not to mention that you owe me your very self.</p>
-  <p class="topos-p">
-    <span class="topos-verse" data-osis-id="PHM 1:20" data-n="20"></span>Yes, brother, let me have some benefit<span class="topos-note topos-footnote" data-note-type="footnote" data-n="+">1:20 Greek onaimēn, a play on the name Onesimus</span> from you in the Lord. Refresh my heart in Christ.</p>
-  <p class="topos-p">
+  <p class="topos-p" data-style="p">
+    <span class="topos-verse" data-osis-id="PHM 1:20" data-n="20"></span>Yes, brother, let me have some benefit<span class="topos-note topos-footnote" data-note-type="footnote" data-n="+" data-style="f"><span class="topos-char" data-style="fr">1:20 </span><span class="topos-char" data-style="ft">Greek </span><span class="topos-char" data-style="fqa">onaimēn</span><span class="topos-char" data-style="ft">, a play on the name </span><span class="topos-char" data-style="fqa">Onesimus</span></span> from you in the Lord. Refresh my heart in Christ.</p>
+  <p class="topos-p" data-style="p">
     <span class="topos-verse" data-osis-id="PHM 1:21" data-n="21"></span>Confident of your obedience, I write to you, knowing that you will do even more than I ask.</p>
-  <p class="topos-p">
+  <p class="topos-p" data-style="p">
     <span class="topos-verse" data-osis-id="PHM 1:22" data-n="22"></span>In the meantime, prepare a guest room for me, because I hope that through your prayers I will be restored to you.</p>
-  <div class="topos-title topos-s1" data-title-type="s1">Additional Greetings</div>
-  <p class="topos-p">
+  <div class="topos-title topos-s1" data-title-type="s1" data-style="s1">Additional Greetings</div>
+  <p class="topos-p" data-style="p">
     <span class="topos-verse" data-osis-id="PHM 1:23" data-n="23"></span>Epaphras, my fellow prisoner in Christ Jesus, sends you greetings, <span class="topos-verse" data-osis-id="PHM 1:24" data-n="24"></span>as do Mark, Aristarchus, Demas, and Luke, my fellow workers.</p>
-  <p class="topos-p">
-    <span class="topos-verse" data-osis-id="PHM 1:25" data-n="25"></span>The grace of the Lord Jesus Christ be with your spirit.<span class="topos-note topos-footnote" data-note-type="footnote" data-n="+">1:25 BYZ and TR include Amen.</span></p>
+  <p class="topos-p" data-style="p">
+    <span class="topos-verse" data-osis-id="PHM 1:25" data-n="25"></span>The grace of the Lord Jesus Christ be with your spirit.<span class="topos-note topos-footnote" data-note-type="footnote" data-n="+" data-style="f"><span class="topos-char" data-style="fr">1:25 </span><span class="topos-char" data-style="ft">BYZ and TR include </span><span class="topos-char" data-style="fqa">Amen.</span></span></p>
   
 
 #### html-bare ####
@@ -863,38 +863,38 @@ Other 0..2300 entry=0 path=/1 "Paul, a prisoner of Christ Jesus, and Timothy our
   The Letter to Philemon
   Philemon
   Phm
-  <div class="title mt2" data-title-type="mt2">The Letter to</div>
-  <div class="title mt1" data-title-type="mt1">Philemon</div>
+  <div class="title mt2" data-title-type="mt2" data-style="mt2">The Letter to</div>
+  <div class="title mt1" data-title-type="mt1" data-style="mt1">Philemon</div>
   <span class="chapter" data-osis-id="PHM 1" data-n="1"></span>
-  <div class="title s1" data-title-type="s1">Greetings from Paul and Timothy</div>
-  <p class="p">
+  <div class="title s1" data-title-type="s1" data-style="s1">Greetings from Paul and Timothy</div>
+  <p class="p" data-style="p">
     <span class="verse" data-osis-id="PHM 1:1" data-n="1"></span>Paul, a prisoner of Christ Jesus, and Timothy our brother,</p>
-  <p class="p">To Philemon our beloved fellow worker, <span class="verse" data-osis-id="PHM 1:2" data-n="2"></span>to Apphia our sister, to Archippus our fellow soldier, and to the church that meets at your<span class="note footnote" data-note-type="footnote" data-n="+">1:2 You and Your are singular throughout this letter, except in verses 3, 22, and 25.</span> house:</p>
-  <p class="p">
+  <p class="p" data-style="p">To Philemon our beloved fellow worker, <span class="verse" data-osis-id="PHM 1:2" data-n="2"></span>to Apphia our sister, to Archippus our fellow soldier, and to the church that meets at your<span class="note footnote" data-note-type="footnote" data-n="+" data-style="f"><span class="char" data-style="fr">1:2 </span><span class="char" data-style="fqa">You </span><span class="char" data-style="ft">and </span><span class="char" data-style="fqa">Your </span><span class="char" data-style="ft">are singular throughout this letter, except in verses 3, 22, and 25.</span></span> house:</p>
+  <p class="p" data-style="p">
     <span class="verse" data-osis-id="PHM 1:3" data-n="3"></span>Grace and peace to you from God our Father and the Lord Jesus Christ.</p>
-  <div class="title s1" data-title-type="s1">Philemon’s Faith and Love</div>
-  <p class="p">
+  <div class="title s1" data-title-type="s1" data-style="s1">Philemon’s Faith and Love</div>
+  <p class="p" data-style="p">
     <span class="verse" data-osis-id="PHM 1:4" data-n="4"></span>I always thank my God, remembering you in my prayers, <span class="verse" data-osis-id="PHM 1:5" data-n="5"></span>because I hear about your faith in the Lord Jesus and your love for all the saints. <span class="verse" data-osis-id="PHM 1:6" data-n="6"></span>I pray that your partnership in the faith may become effective as you fully acknowledge every good thing that is ours in Christ. <span class="verse" data-osis-id="PHM 1:7" data-n="7"></span>I take great joy and encouragement in your love, because you, brother, have refreshed the hearts of the saints.</p>
-  <div class="title s1" data-title-type="s1">Paul’s Appeal for Onesimus</div>
-  <p class="p">
+  <div class="title s1" data-title-type="s1" data-style="s1">Paul’s Appeal for Onesimus</div>
+  <p class="p" data-style="p">
     <span class="verse" data-osis-id="PHM 1:8" data-n="8"></span>So although in Christ I am bold enough to order you to do what is proper, <span class="verse" data-osis-id="PHM 1:9" data-n="9"></span>I prefer to appeal on the basis of love. For I, Paul, am now aged, and a prisoner of Christ Jesus as well.</p>
-  <p class="p">
-    <span class="verse" data-osis-id="PHM 1:10" data-n="10"></span>I appeal to you for my child Onesimus,<span class="note footnote" data-note-type="footnote" data-n="+">1:10 Onesimus means useful (see verse 11) or beneficial (see verse 20).</span> whose father I became while I was in chains. <span class="verse" data-osis-id="PHM 1:11" data-n="11"></span>Formerly he was useless to you, but now he has become useful both to you and to me. <span class="verse" data-osis-id="PHM 1:12" data-n="12"></span>I am sending back to you him who is my very heart.</p>
-  <p class="p">
+  <p class="p" data-style="p">
+    <span class="verse" data-osis-id="PHM 1:10" data-n="10"></span>I appeal to you for my child Onesimus,<span class="note footnote" data-note-type="footnote" data-n="+" data-style="f"><span class="char" data-style="fr">1:10 </span><span class="char" data-style="fqa">Onesimus </span><span class="char" data-style="ft">means </span><span class="char" data-style="fqa">useful </span><span class="char" data-style="ft">(see verse 11) or </span><span class="char" data-style="fqa">beneficial </span><span class="char" data-style="ft">(see verse 20).</span></span> whose father I became while I was in chains. <span class="verse" data-osis-id="PHM 1:11" data-n="11"></span>Formerly he was useless to you, but now he has become useful both to you and to me. <span class="verse" data-osis-id="PHM 1:12" data-n="12"></span>I am sending back to you him who is my very heart.</p>
+  <p class="p" data-style="p">
     <span class="verse" data-osis-id="PHM 1:13" data-n="13"></span>I would have liked to keep him with me, so that on your behalf he could minister to me in my chains for the gospel. <span class="verse" data-osis-id="PHM 1:14" data-n="14"></span>But I did not want to do anything without your consent, so that your goodness will not be out of compulsion, but by your own free will. <span class="verse" data-osis-id="PHM 1:15" data-n="15"></span>For perhaps this is why he was separated from you for a while, so that you might have him back for good — <span class="verse" data-osis-id="PHM 1:16" data-n="16"></span>no longer as a slave, but better than a slave, as a beloved brother. He is especially beloved to me, but even more so to you, both in person and in the Lord.</p>
-  <p class="p">
+  <p class="p" data-style="p">
     <span class="verse" data-osis-id="PHM 1:17" data-n="17"></span>So if you consider me a partner, receive him as you would receive me. <span class="verse" data-osis-id="PHM 1:18" data-n="18"></span>But if he has wronged you in any way or owes you anything, charge it to my account. <span class="verse" data-osis-id="PHM 1:19" data-n="19"></span>I, Paul, write this with my own hand. I will repay it— not to mention that you owe me your very self.</p>
-  <p class="p">
-    <span class="verse" data-osis-id="PHM 1:20" data-n="20"></span>Yes, brother, let me have some benefit<span class="note footnote" data-note-type="footnote" data-n="+">1:20 Greek onaimēn, a play on the name Onesimus</span> from you in the Lord. Refresh my heart in Christ.</p>
-  <p class="p">
+  <p class="p" data-style="p">
+    <span class="verse" data-osis-id="PHM 1:20" data-n="20"></span>Yes, brother, let me have some benefit<span class="note footnote" data-note-type="footnote" data-n="+" data-style="f"><span class="char" data-style="fr">1:20 </span><span class="char" data-style="ft">Greek </span><span class="char" data-style="fqa">onaimēn</span><span class="char" data-style="ft">, a play on the name </span><span class="char" data-style="fqa">Onesimus</span></span> from you in the Lord. Refresh my heart in Christ.</p>
+  <p class="p" data-style="p">
     <span class="verse" data-osis-id="PHM 1:21" data-n="21"></span>Confident of your obedience, I write to you, knowing that you will do even more than I ask.</p>
-  <p class="p">
+  <p class="p" data-style="p">
     <span class="verse" data-osis-id="PHM 1:22" data-n="22"></span>In the meantime, prepare a guest room for me, because I hope that through your prayers I will be restored to you.</p>
-  <div class="title s1" data-title-type="s1">Additional Greetings</div>
-  <p class="p">
+  <div class="title s1" data-title-type="s1" data-style="s1">Additional Greetings</div>
+  <p class="p" data-style="p">
     <span class="verse" data-osis-id="PHM 1:23" data-n="23"></span>Epaphras, my fellow prisoner in Christ Jesus, sends you greetings, <span class="verse" data-osis-id="PHM 1:24" data-n="24"></span>as do Mark, Aristarchus, Demas, and Luke, my fellow workers.</p>
-  <p class="p">
-    <span class="verse" data-osis-id="PHM 1:25" data-n="25"></span>The grace of the Lord Jesus Christ be with your spirit.<span class="note footnote" data-note-type="footnote" data-n="+">1:25 BYZ and TR include Amen.</span></p>
+  <p class="p" data-style="p">
+    <span class="verse" data-osis-id="PHM 1:25" data-n="25"></span>The grace of the Lord Jesus Christ be with your spirit.<span class="note footnote" data-note-type="footnote" data-n="+" data-style="f"><span class="char" data-style="fr">1:25 </span><span class="char" data-style="ft">BYZ and TR include </span><span class="char" data-style="fqa">Amen.</span></span></p>
   
 
 #### verses ####

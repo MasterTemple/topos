@@ -46,7 +46,13 @@ Classes (with the prefix, `topos-` by default):
 | paragraph, line group, line | `p`, `div`, `span` | `p`, `lg`, `l` | |
 | verse, chapter (milestones) | `span` | `verse`, `chapter` | `data-osis-id`, `data-n` |
 | dictionary entry | `div` | `entry` | |
+| any other USX `char` (`pn`, `fr`), or table `cell` | `span` | `char`, `cell` | `data-style` |
 | mark ([`HtmlRenderer::mark`]) | `mark` | `mark` | `data-mark` (`0` for the first mark) |
+
+Every USX `para`, `char`, `note`, `cell`, and `sidebar` also gets its `style` as `data-style`
+(`<p class="topos-p" data-style="m">`, `<span class="topos-l" data-style="q2">`), on its first
+tag (a `para style="b"` is `<br class="topos-lb" data-style="b">`): a stylesheet can style every
+USX marker, even the ones whose kind is shared (`[data-style="q2"]`, `[data-style^="f"]`).
 
 Keep one renderer for a passage, so words of Jesus that continue from one verse into the next
 (`sID`/`eID` milestones or an unclosed `<q>`) stay marked. [`HtmlRenderer::wrap`] puts a
@@ -134,6 +140,8 @@ struct Render<'r> {
     entry: usize,
     /// How many words-of-Jesus elements the current node is in (kept or unwrapped)
     in_words: usize,
+    /// The USX style of the element being opened, for its first tag's `data-style`
+    style: Option<String>,
 }
 
 impl HtmlRenderer {
@@ -157,6 +165,7 @@ impl HtmlRenderer {
             out: String::new(),
             entry,
             in_words: 0,
+            style: None,
         };
         let mut path = Vec::new();
         render.nodes(nodes, &mut path);
@@ -282,7 +291,7 @@ impl Render<'_> {
         }
     }
 
-    /// Writes `<tag class="…" data-…>`
+    /// Writes `<tag class="…" data-…>`, then the opening element's `data-style`
     fn open_tag(&mut self, tag: &str, classes: &[&str], data: &[(&str, Option<String>)]) {
         let prefix = self.renderer.opts.class_prefix.clone();
         let classes: Vec<String> = classes
@@ -303,6 +312,11 @@ impl Render<'_> {
                 escape(value, &mut self.out);
                 self.out.push('"');
             }
+        }
+        if let Some(style) = self.style.take() {
+            self.out.push_str(" data-style=\"");
+            escape(&style, &mut self.out);
+            self.out.push('"');
         }
         self.out.push('>');
     }
@@ -331,7 +345,9 @@ impl Render<'_> {
     }
 
     fn keep(&mut self, e: &Element, path: &mut Vec<usize>) {
+        self.style = usx_style(e).map(str::to_string);
         let plan = self.open(e);
+        self.style = None;
         if plan.children {
             if plan.words {
                 self.in_words += 1;
@@ -478,10 +494,28 @@ impl Render<'_> {
                 }
             }
             Kind::Entry => return self.open_wrapped("div", &["entry"], &[]),
+            Kind::Division if self.style.is_some() => {
+                return self.open_wrapped("div", &["div"], &[]);
+            }
+            Kind::Other if self.style.is_some() && !e.children.is_empty() => {
+                let class = class_safe(&e.name);
+                return self.open_wrapped("span", &[&class], &[]);
+            }
             _ => return Plan::children(),
         }
         Plan::default()
     }
+}
+
+/// A USX element's `style` (`q2`, `pn`): of `para`, `char`, `cell`, `sidebar`, and notes (which
+/// have a `caller`, unlike other markups' `note`s)
+fn usx_style(e: &Element) -> Option<&str> {
+    let usx = match e.name.as_str() {
+        "para" | "char" | "cell" | "sidebar" => true,
+        "note" => e.attr("caller").is_some(),
+        _ => false,
+    };
+    usx.then(|| e.attr("style")).flatten().filter(|s| !s.is_empty())
 }
 
 /// An escaped copy

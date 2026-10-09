@@ -34,9 +34,9 @@ Other 0..11 entry=0 path=/0 "And we know"
 7..11 entry=0 path=/0/2/1 offset=7
 
 #### html ####
-<span class="topos-chapter" data-osis-id="ROM 8" data-n="8"></span><p class="topos-p"><span class="topos-verse" data-osis-id="ROM 8:28" data-n="28"></span>And we know</p>
+<span class="topos-chapter" data-osis-id="ROM 8" data-n="8"></span><p class="topos-p" data-style="p"><span class="topos-verse" data-osis-id="ROM 8:28" data-n="28"></span>And we know</p>
 #### html-bare ####
-<span class="chapter" data-osis-id="ROM 8" data-n="8"></span><p class="p"><span class="verse" data-osis-id="ROM 8:28" data-n="28"></span>And we know</p>
+<span class="chapter" data-osis-id="ROM 8" data-n="8"></span><p class="p" data-style="p"><span class="verse" data-osis-id="ROM 8:28" data-n="28"></span>And we know</p>
 #### verses ####
 8:28-28 marker=/0/2/0 start=/0/2 end=/0/2/2 "And we know"
 chapter_verses: [0, 0, 0, 0, 0, 0, 0, 28]

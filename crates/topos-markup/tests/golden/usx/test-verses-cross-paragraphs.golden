@@ -114,29 +114,29 @@ Other 0..82 entry=0 path=/0 "Blessed is the man\nwho does not walk\nBut his deli
 
 #### html ####
 
-<div class="topos-title topos-mt1" data-title-type="mt1">Psalms</div>
+<div class="topos-title topos-mt1" data-title-type="mt1" data-style="mt1">Psalms</div>
 <span class="topos-chapter" data-osis-id="PSA 1" data-n="1"></span>
-<div class="topos-title topos-d" data-title-type="d">A heading</div>
-<span class="topos-l"><span class="topos-verse" data-osis-id="PSA 1:1" data-n="1"></span>Blessed is the man</span><br class="topos-l">
-<span class="topos-l">who does not walk</span><br class="topos-l">
-<div class="topos-title topos-s1" data-title-type="s1">The way</div>
-<span class="topos-l"><span class="topos-verse" data-osis-id="PSA 1:2-3" data-n="2-3"></span>But his delight<span class="topos-verse" data-osis-id="PSA 1:4" data-n="4"></span>Not so</span><br class="topos-l">
+<div class="topos-title topos-d" data-title-type="d" data-style="d">A heading</div>
+<span class="topos-l" data-style="q1"><span class="topos-verse" data-osis-id="PSA 1:1" data-n="1"></span>Blessed is the man</span><br class="topos-l">
+<span class="topos-l" data-style="q2">who does not walk</span><br class="topos-l">
+<div class="topos-title topos-s1" data-title-type="s1" data-style="s1">The way</div>
+<span class="topos-l" data-style="q1"><span class="topos-verse" data-osis-id="PSA 1:2-3" data-n="2-3"></span>But his delight<span class="topos-verse" data-osis-id="PSA 1:4" data-n="4"></span>Not so</span><br class="topos-l">
 
 <span class="topos-chapter" data-osis-id="PSA 2" data-n="2"></span>
-<span class="topos-l"><span class="topos-verse" data-osis-id="PSA 2:1" data-n="1"></span>Why do the nations rage</span><br class="topos-l">
+<span class="topos-l" data-style="q1"><span class="topos-verse" data-osis-id="PSA 2:1" data-n="1"></span>Why do the nations rage</span><br class="topos-l">
 
 #### html-bare ####
 
-<div class="title mt1" data-title-type="mt1">Psalms</div>
+<div class="title mt1" data-title-type="mt1" data-style="mt1">Psalms</div>
 <span class="chapter" data-osis-id="PSA 1" data-n="1"></span>
-<div class="title d" data-title-type="d">A heading</div>
-<span class="l"><span class="verse" data-osis-id="PSA 1:1" data-n="1"></span>Blessed is the man</span><br class="l">
-<span class="l">who does not walk</span><br class="l">
-<div class="title s1" data-title-type="s1">The way</div>
-<span class="l"><span class="verse" data-osis-id="PSA 1:2-3" data-n="2-3"></span>But his delight<span class="verse" data-osis-id="PSA 1:4" data-n="4"></span>Not so</span><br class="l">
+<div class="title d" data-title-type="d" data-style="d">A heading</div>
+<span class="l" data-style="q1"><span class="verse" data-osis-id="PSA 1:1" data-n="1"></span>Blessed is the man</span><br class="l">
+<span class="l" data-style="q2">who does not walk</span><br class="l">
+<div class="title s1" data-title-type="s1" data-style="s1">The way</div>
+<span class="l" data-style="q1"><span class="verse" data-osis-id="PSA 1:2-3" data-n="2-3"></span>But his delight<span class="verse" data-osis-id="PSA 1:4" data-n="4"></span>Not so</span><br class="l">
 
 <span class="chapter" data-osis-id="PSA 2" data-n="2"></span>
-<span class="l"><span class="verse" data-osis-id="PSA 2:1" data-n="1"></span>Why do the nations rage</span><br class="l">
+<span class="l" data-style="q1"><span class="verse" data-osis-id="PSA 2:1" data-n="1"></span>Why do the nations rage</span><br class="l">
 
 #### verses ####
 1:1-1 marker=/0/8/0 start=/0/5 end=/0/10/1 "A heading\nBlessed is the man\nwho does not walk"

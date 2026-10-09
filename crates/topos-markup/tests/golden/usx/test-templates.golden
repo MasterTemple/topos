@@ -41,9 +41,9 @@ Other 0..37 entry=0 path=/0 "Jesus said, I am the light, and went."
 32..37 entry=0 path=/0/1/4 offset=1
 
 #### html ####
-<div class="topos-title topos-s1" data-title-type="s1">The Word</div><p class="topos-p">Jesus said, <span class="topos-woj"> I am the light</span>, and<span class="topos-note topos-footnote" data-note-type="footnote">Or bread</span> went.</p>
+<div class="topos-title topos-s1" data-title-type="s1" data-style="s1">The Word</div><p class="topos-p" data-style="p">Jesus said, <span class="topos-woj" data-style="wj"> I am the light</span>, and<span class="topos-note topos-footnote" data-note-type="footnote"><span class="topos-char" data-style="ft">Or bread</span></span> went.</p>
 #### html-bare ####
-<div class="title s1" data-title-type="s1">The Word</div><p class="p">Jesus said, <span class="woj"> I am the light</span>, and<span class="note footnote" data-note-type="footnote">Or bread</span> went.</p>
+<div class="title s1" data-title-type="s1" data-style="s1">The Word</div><p class="p" data-style="p">Jesus said, <span class="woj" data-style="wj"> I am the light</span>, and<span class="note footnote" data-note-type="footnote"><span class="char" data-style="ft">Or bread</span></span> went.</p>
 #### verses ####
 chapter_verses: []
 

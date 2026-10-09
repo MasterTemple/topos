@@ -53,10 +53,10 @@ Other 0..34 entry=0 path=/0 "For God so loved the world.For God"
 
 #### html ####
 <span class="topos-chapter" data-osis-id="JHN 3" data-n="3"></span>
-<p class="topos-p"><span class="topos-verse" data-osis-id="JHN 3:16" data-n="16"></span>For God so <span class="topos-woj">loved</span> the world.<span class="topos-verse" data-osis-id="JHN 3:17-18" data-n="17-18"></span>For God</p>
+<p class="topos-p" data-style="p"><span class="topos-verse" data-osis-id="JHN 3:16" data-n="16"></span>For God so <span class="topos-woj" data-style="wj">loved</span> the world.<span class="topos-verse" data-osis-id="JHN 3:17-18" data-n="17-18"></span>For God</p>
 #### html-bare ####
 x<span class="chapter" data-osis-id="JHN 3" data-n="3"></span>
-<p class="p"><span class="verse" data-osis-id="JHN 3:16" data-n="16"></span>For God so <span class="woj">loved</span> the world.<span class="verse" data-osis-id="JHN 3:17-18" data-n="17-18"></span>For God</p>
+<p class="p" data-style="p"><span class="verse" data-osis-id="JHN 3:16" data-n="16"></span>For God so <span class="woj" data-style="wj">loved</span> the world.<span class="verse" data-osis-id="JHN 3:17-18" data-n="17-18"></span>For God</p>
 #### verses ####
 3:16-16 marker=/0/3/0 start=/0/2 end=/0/3/4 "For God so loved the world."
 3:17-18 marker=/0/3/5 start=/0/3/5 end=/0/3/7 "For God"

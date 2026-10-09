@@ -69,9 +69,9 @@ Other 0..33 entry=0 path=/0 "acaptionb\nc\nhc\nside\nperiph\nquoted"
 27..33 entry=0 path=/0/5 offset=0
 
 #### html ####
-<p class="topos-p">acaptionb<br class="topos-lb">c</p><p class="topos-p">hc</p><p class="topos-p">side</p><p class="topos-p">periph</p>quoted
+<p class="topos-p" data-style="p">acaptionb<br class="topos-lb">c</p><p class="topos-p"><span class="topos-cell" data-style="th1">h</span><span class="topos-cell" data-style="tc1">c</span></p><div class="topos-div" data-style="esb"><p class="topos-p" data-style="p">side</p></div><p class="topos-p" data-style="p">periph</p>quoted
 #### html-bare ####
-<p class="p">acaptionb<br class="lb">c</p><p class="p">hc</p><p class="p">side</p><p class="p">periph</p>quoted
+<p class="p" data-style="p">acaptionb<br class="lb">c</p><p class="p"><span class="cell" data-style="th1">h</span><span class="cell" data-style="tc1">c</span></p><div class="div" data-style="esb"><p class="p" data-style="p">side</p></div><p class="p" data-style="p">periph</p>quoted
 #### verses ####
 chapter_verses: []
 

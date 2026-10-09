@@ -39,9 +39,9 @@ Other 0..23 entry=0 path=/0 "beginning love two bare"
 19..23 entry=0 path=/0/0/6/0 offset=0
 
 #### html ####
-<p class="topos-p"><span class="topos-w" data-strong="H7225">beginning</span> <span class="topos-w" data-strong="G25 G26" data-lemma="agapao">love</span> <span class="topos-w" data-strong="H1 H2">two</span> <span class="topos-w">bare</span></p>
+<p class="topos-p" data-style="p"><span class="topos-w" data-strong="H7225" data-style="w">beginning</span> <span class="topos-w" data-strong="G25 G26" data-lemma="agapao" data-style="w">love</span> <span class="topos-w" data-strong="H1 H2" data-style="w">two</span> <span class="topos-w" data-style="w">bare</span></p>
 #### html-bare ####
-<p class="p"><span class="w" data-strong="H7225">beginning</span> <span class="w" data-strong="G25 G26" data-lemma="agapao">love</span> <span class="w" data-strong="H1 H2">two</span> <span class="w">bare</span></p>
+<p class="p" data-style="p"><span class="w" data-strong="H7225" data-style="w">beginning</span> <span class="w" data-strong="G25 G26" data-lemma="agapao" data-style="w">love</span> <span class="w" data-strong="H1 H2" data-style="w">two</span> <span class="w" data-style="w">bare</span></p>
 #### verses ####
 chapter_verses: []
 

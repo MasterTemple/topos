@@ -1233,119 +1233,119 @@ Other 0..2138 entry=0 path=/1 "Blessed is the man\nwho does not walk in the coun
   
   
   
-  <div class="topos-title topos-mt1" data-title-type="mt1">Psalm</div>
+  <div class="topos-title topos-mt1" data-title-type="mt1" data-style="mt1">Psalm</div>
   <span class="topos-chapter" data-osis-id="PSA 1" data-n="1"></span>
-  <div class="topos-title topos-ms" data-title-type="ms">BOOK I</div>
-  <div class="topos-title topos-d" data-title-type="d">Psalms 1–41</div>
-  <div class="topos-title topos-s1" data-title-type="s1">The Two Paths</div>
-  <span class="topos-l">
+  <div class="topos-title topos-ms" data-title-type="ms" data-style="ms">BOOK I</div>
+  <div class="topos-title topos-d" data-title-type="d" data-style="d">Psalms 1–41</div>
+  <div class="topos-title topos-s1" data-title-type="s1" data-style="s1">The Two Paths</div>
+  <span class="topos-l" data-style="q1">
     <span class="topos-verse" data-osis-id="PSA 1:1" data-n="1"></span>Blessed is the man</span><br class="topos-l">
-  <span class="topos-l">who does not walk in the counsel of the wicked,</span><br class="topos-l">
-  <span class="topos-l">or set foot on the path of sinners,</span><br class="topos-l">
-  <span class="topos-l">or sit in the seat of mockers.</span><br class="topos-l">
-  <span class="topos-l">
+  <span class="topos-l" data-style="q2">who does not walk in the counsel of the wicked,</span><br class="topos-l">
+  <span class="topos-l" data-style="q1">or set foot on the path of sinners,</span><br class="topos-l">
+  <span class="topos-l" data-style="q2">or sit in the seat of mockers.</span><br class="topos-l">
+  <span class="topos-l" data-style="q1">
     <span class="topos-verse" data-osis-id="PSA 1:2" data-n="2"></span>But his delight is in the Law of the LORD,</span><br class="topos-l">
-  <span class="topos-l">and on His law he meditates day and night.</span><br class="topos-l">
-  <span class="topos-l">
+  <span class="topos-l" data-style="q2">and on His law he meditates day and night.</span><br class="topos-l">
+  <span class="topos-l" data-style="q1">
     <span class="topos-verse" data-osis-id="PSA 1:3" data-n="3"></span>He is like a tree planted by streams of water,</span><br class="topos-l">
-  <span class="topos-l">yielding its fruit in season,</span><br class="topos-l">
-  <span class="topos-l">whose leaf does not wither,</span><br class="topos-l">
-  <span class="topos-l">and who prospers in all he does.</span><br class="topos-l">
-  <br class="topos-lb">
-  <span class="topos-l">
+  <span class="topos-l" data-style="q2">yielding its fruit in season,</span><br class="topos-l">
+  <span class="topos-l" data-style="q1">whose leaf does not wither,</span><br class="topos-l">
+  <span class="topos-l" data-style="q2">and who prospers in all he does.</span><br class="topos-l">
+  <br class="topos-lb" data-style="b">
+  <span class="topos-l" data-style="q1">
     <span class="topos-verse" data-osis-id="PSA 1:4" data-n="4"></span>Not so the wicked!</span><br class="topos-l">
-  <span class="topos-l">For they are like chaff driven off by the wind.</span><br class="topos-l">
-  <span class="topos-l">
+  <span class="topos-l" data-style="q2">For they are like chaff driven off by the wind.</span><br class="topos-l">
+  <span class="topos-l" data-style="q1">
     <span class="topos-verse" data-osis-id="PSA 1:5" data-n="5"></span>Therefore the wicked will not stand in the judgment,</span><br class="topos-l">
-  <span class="topos-l">nor sinners in the assembly of the righteous.</span><br class="topos-l">
-  <br class="topos-lb">
-  <span class="topos-l">
+  <span class="topos-l" data-style="q2">nor sinners in the assembly of the righteous.</span><br class="topos-l">
+  <br class="topos-lb" data-style="b">
+  <span class="topos-l" data-style="q1">
     <span class="topos-verse" data-osis-id="PSA 1:6" data-n="6"></span>For the LORD guards the path of the righteous,</span><br class="topos-l">
-  <span class="topos-l">but the way of the wicked will perish.</span><br class="topos-l">
+  <span class="topos-l" data-style="q2">but the way of the wicked will perish.</span><br class="topos-l">
   
   <span class="topos-chapter" data-osis-id="PSA 2" data-n="2"></span>
-  <div class="topos-title topos-s1" data-title-type="s1">The Triumphant Messiah</div>
-  <span class="topos-l">
-    <span class="topos-verse" data-osis-id="PSA 2:1" data-n="1"></span>Why do the nations rage<span class="topos-note topos-footnote" data-note-type="footnote" data-n="+">2:1 Or noisily assemble; see Revelation 11:18.</span></span><br class="topos-l">
-  <span class="topos-l">and the peoples plot in vain?</span><br class="topos-l">
-  <span class="topos-l">
+  <div class="topos-title topos-s1" data-title-type="s1" data-style="s1">The Triumphant Messiah</div>
+  <span class="topos-l" data-style="q1">
+    <span class="topos-verse" data-osis-id="PSA 2:1" data-n="1"></span>Why do the nations rage<span class="topos-note topos-footnote" data-note-type="footnote" data-n="+" data-style="f"><span class="topos-char" data-style="fr">2:1 </span><span class="topos-char" data-style="ft">Or </span><span class="topos-char" data-style="fqa">noisily assemble</span><span class="topos-char" data-style="ft">; see Revelation 11:18.</span></span></span><br class="topos-l">
+  <span class="topos-l" data-style="q2">and the peoples plot in vain?</span><br class="topos-l">
+  <span class="topos-l" data-style="q1">
     <span class="topos-verse" data-osis-id="PSA 2:2" data-n="2"></span>The kings of the earth take their stand</span><br class="topos-l">
-  <span class="topos-l">and the rulers gather together,</span><br class="topos-l">
-  <span class="topos-l">against the LORD</span><br class="topos-l">
-  <span class="topos-l">and against His Anointed One:<span class="topos-note topos-footnote" data-note-type="footnote" data-n="+">2:2 Cited in Acts 4:25–26</span></span><br class="topos-l">
-  <span class="topos-l">
+  <span class="topos-l" data-style="q2">and the rulers gather together,</span><br class="topos-l">
+  <span class="topos-l" data-style="q1">against the LORD</span><br class="topos-l">
+  <span class="topos-l" data-style="q2">and against His Anointed One:<span class="topos-note topos-footnote" data-note-type="footnote" data-n="+" data-style="f"><span class="topos-char" data-style="fr">2:2 </span><span class="topos-char" data-style="ft">Cited in Acts 4:25–26</span></span></span><br class="topos-l">
+  <span class="topos-l" data-style="q1">
     <span class="topos-verse" data-osis-id="PSA 2:3" data-n="3"></span>“Let us break Their chains</span><br class="topos-l">
-  <span class="topos-l">and cast away Their cords.”</span><br class="topos-l">
-  <br class="topos-lb">
-  <span class="topos-l">
+  <span class="topos-l" data-style="q2">and cast away Their cords.”</span><br class="topos-l">
+  <br class="topos-lb" data-style="b">
+  <span class="topos-l" data-style="q1">
     <span class="topos-verse" data-osis-id="PSA 2:4" data-n="4"></span>The One enthroned in heaven laughs;</span><br class="topos-l">
-  <span class="topos-l">the Lord taunts them.</span><br class="topos-l">
-  <span class="topos-l">
+  <span class="topos-l" data-style="q2">the Lord taunts them.</span><br class="topos-l">
+  <span class="topos-l" data-style="q1">
     <span class="topos-verse" data-osis-id="PSA 2:5" data-n="5"></span>Then He rebukes them in His anger,</span><br class="topos-l">
-  <span class="topos-l">and terrifies them in His fury:</span><br class="topos-l">
-  <span class="topos-l">
+  <span class="topos-l" data-style="q2">and terrifies them in His fury:</span><br class="topos-l">
+  <span class="topos-l" data-style="q1">
     <span class="topos-verse" data-osis-id="PSA 2:6" data-n="6"></span>“I have installed My King on Zion,</span><br class="topos-l">
-  <span class="topos-l">upon My holy mountain.”</span><br class="topos-l">
-  <br class="topos-lb">
-  <span class="topos-l">
+  <span class="topos-l" data-style="q2">upon My holy mountain.”</span><br class="topos-l">
+  <br class="topos-lb" data-style="b">
+  <span class="topos-l" data-style="q1">
     <span class="topos-verse" data-osis-id="PSA 2:7" data-n="7"></span>I will proclaim the decree</span><br class="topos-l">
-  <span class="topos-l">spoken to Me by the LORD:</span><br class="topos-l">
-  <span class="topos-l">“You are My Son;</span><br class="topos-l">
-  <span class="topos-l">today I have become Your Father.<span class="topos-note topos-footnote" data-note-type="footnote" data-n="+">2:7 Literally today I have begotten You; cited in Acts 13:33, Hebrews 1:5, and Hebrews 5:5</span></span><br class="topos-l">
-  <span class="topos-l">
+  <span class="topos-l" data-style="q2">spoken to Me by the LORD:</span><br class="topos-l">
+  <span class="topos-l" data-style="q1">“You are My Son;</span><br class="topos-l">
+  <span class="topos-l" data-style="q2">today I have become Your Father.<span class="topos-note topos-footnote" data-note-type="footnote" data-n="+" data-style="f"><span class="topos-char" data-style="fr">2:7 </span><span class="topos-char" data-style="ft">Literally </span><span class="topos-char" data-style="fqa">today I have begotten You</span><span class="topos-char" data-style="ft">; cited in Acts 13:33, Hebrews 1:5, and Hebrews 5:5</span></span></span><br class="topos-l">
+  <span class="topos-l" data-style="q1">
     <span class="topos-verse" data-osis-id="PSA 2:8" data-n="8"></span>Ask Me, and I will make the nations Your inheritance,</span><br class="topos-l">
-  <span class="topos-l">the ends of the earth Your possession.</span><br class="topos-l">
-  <span class="topos-l">
-    <span class="topos-verse" data-osis-id="PSA 2:9" data-n="9"></span>You will break them<span class="topos-note topos-footnote" data-note-type="footnote" data-n="+">2:9 LXX You will rule them or You will shepherd them</span> with an iron scepter;</span><br class="topos-l">
-  <span class="topos-l">You will shatter them like pottery.<span class="topos-note topos-footnote" data-note-type="footnote" data-n="+">2:9 Cited in Revelation 2:27; see also Revelation 12:5 and Revelation 19:15.</span>”</span><br class="topos-l">
-  <br class="topos-lb">
-  <span class="topos-l">
+  <span class="topos-l" data-style="q2">the ends of the earth Your possession.</span><br class="topos-l">
+  <span class="topos-l" data-style="q1">
+    <span class="topos-verse" data-osis-id="PSA 2:9" data-n="9"></span>You will break them<span class="topos-note topos-footnote" data-note-type="footnote" data-n="+" data-style="f"><span class="topos-char" data-style="fr">2:9 </span><span class="topos-char" data-style="ft">LXX </span><span class="topos-char" data-style="fqa">You will rule them </span><span class="topos-char" data-style="ft">or </span><span class="topos-char" data-style="fqa">You will shepherd them</span></span> with an iron scepter;</span><br class="topos-l">
+  <span class="topos-l" data-style="q2">You will shatter them like pottery.<span class="topos-note topos-footnote" data-note-type="footnote" data-n="+" data-style="f"><span class="topos-char" data-style="fr">2:9 </span><span class="topos-char" data-style="ft">Cited in Revelation 2:27; see also Revelation 12:5 and Revelation 19:15.</span></span>”</span><br class="topos-l">
+  <br class="topos-lb" data-style="b">
+  <span class="topos-l" data-style="q1">
     <span class="topos-verse" data-osis-id="PSA 2:10" data-n="10"></span>Therefore be wise, O kings;</span><br class="topos-l">
-  <span class="topos-l">be admonished, O judges of the earth.</span><br class="topos-l">
-  <span class="topos-l">
+  <span class="topos-l" data-style="q2">be admonished, O judges of the earth.</span><br class="topos-l">
+  <span class="topos-l" data-style="q1">
     <span class="topos-verse" data-osis-id="PSA 2:11" data-n="11"></span>Serve the LORD with fear,</span><br class="topos-l">
-  <span class="topos-l">and rejoice with trembling.</span><br class="topos-l">
-  <span class="topos-l">
+  <span class="topos-l" data-style="q2">and rejoice with trembling.</span><br class="topos-l">
+  <span class="topos-l" data-style="q1">
     <span class="topos-verse" data-osis-id="PSA 2:12" data-n="12"></span>Kiss the Son, lest He be angry</span><br class="topos-l">
-  <span class="topos-l">and you perish in your rebellion,</span><br class="topos-l">
-  <span class="topos-l">when His wrath ignites in an instant.</span><br class="topos-l">
-  <br class="topos-lb">
-  <span class="topos-l">Blessed are all who take refuge in Him.</span><br class="topos-l">
+  <span class="topos-l" data-style="q2">and you perish in your rebellion,</span><br class="topos-l">
+  <span class="topos-l" data-style="q2">when His wrath ignites in an instant.</span><br class="topos-l">
+  <br class="topos-lb" data-style="b">
+  <span class="topos-l" data-style="q1">Blessed are all who take refuge in Him.</span><br class="topos-l">
   
   <span class="topos-chapter" data-osis-id="PSA 3" data-n="3"></span>
-  <div class="topos-title topos-s1" data-title-type="s1">Deliver Me, O LORD!</div>
-  <div class="topos-title topos-d" data-title-type="d">
+  <div class="topos-title topos-s1" data-title-type="s1" data-style="s1">Deliver Me, O LORD!</div>
+  <div class="topos-title topos-d" data-title-type="d" data-style="d">
     <span class="topos-verse" data-osis-id="PSA 3:1" data-n="1"></span>A Psalm of David, when he fled from his son Absalom.</div>
-  <br class="topos-lb">
-  <span class="topos-l">O LORD, how my foes have increased!</span><br class="topos-l">
-  <span class="topos-l">How many rise up against me!</span><br class="topos-l">
-  <span class="topos-l">
+  <br class="topos-lb" data-style="b">
+  <span class="topos-l" data-style="q1">O LORD, how my foes have increased!</span><br class="topos-l">
+  <span class="topos-l" data-style="q2">How many rise up against me!</span><br class="topos-l">
+  <span class="topos-l" data-style="q1">
     <span class="topos-verse" data-osis-id="PSA 3:2" data-n="2"></span>Many say of me,</span><br class="topos-l">
-  <span class="topos-l">“God will not deliver him.”</span><br class="topos-l">
-  <span class="topos-l">Selah<span class="topos-note topos-footnote" data-note-type="footnote" data-n="+">3:2 Selah or Interlude is probably a musical or literary term; here and throughout the Psalms.</span></span><br class="topos-l">
-  <span class="topos-l">
+  <span class="topos-l" data-style="q2">“God will not deliver him.”</span><br class="topos-l">
+  <span class="topos-l" data-style="qr">Selah<span class="topos-note topos-footnote" data-note-type="footnote" data-n="+" data-style="f"><span class="topos-char" data-style="fr">3:2 </span><span class="topos-char" data-style="fqa">Selah </span><span class="topos-char" data-style="ft">or </span><span class="topos-char" data-style="fqa">Interlude </span><span class="topos-char" data-style="ft">is probably a musical or literary term; here and throughout the Psalms.</span></span></span><br class="topos-l">
+  <span class="topos-l" data-style="q1">
     <span class="topos-verse" data-osis-id="PSA 3:3" data-n="3"></span>But You, O LORD, are a shield around me,</span><br class="topos-l">
-  <span class="topos-l">my glory, and the One who lifts my head.</span><br class="topos-l">
-  <span class="topos-l">
+  <span class="topos-l" data-style="q2">my glory, and the One who lifts my head.</span><br class="topos-l">
+  <span class="topos-l" data-style="q1">
     <span class="topos-verse" data-osis-id="PSA 3:4" data-n="4"></span>To the LORD I cry aloud,</span><br class="topos-l">
-  <span class="topos-l">and He answers me from His holy mountain.</span><br class="topos-l">
-  <span class="topos-l">Selah</span><br class="topos-l">
-  <span class="topos-l">
+  <span class="topos-l" data-style="q2">and He answers me from His holy mountain.</span><br class="topos-l">
+  <span class="topos-l" data-style="qr">Selah</span><br class="topos-l">
+  <span class="topos-l" data-style="q1">
     <span class="topos-verse" data-osis-id="PSA 3:5" data-n="5"></span>I lie down and sleep;</span><br class="topos-l">
-  <span class="topos-l">I wake again, for the LORD sustains me.</span><br class="topos-l">
-  <span class="topos-l">
+  <span class="topos-l" data-style="q2">I wake again, for the LORD sustains me.</span><br class="topos-l">
+  <span class="topos-l" data-style="q1">
     <span class="topos-verse" data-osis-id="PSA 3:6" data-n="6"></span>I will not fear the myriads</span><br class="topos-l">
-  <span class="topos-l">set against me on every side.</span><br class="topos-l">
-  <br class="topos-lb">
-  <span class="topos-l">
+  <span class="topos-l" data-style="q2">set against me on every side.</span><br class="topos-l">
+  <br class="topos-lb" data-style="b">
+  <span class="topos-l" data-style="q1">
     <span class="topos-verse" data-osis-id="PSA 3:7" data-n="7"></span>Arise, O LORD!</span><br class="topos-l">
-  <span class="topos-l">Save me, O my God!</span><br class="topos-l">
-  <span class="topos-l">Strike all my enemies on the jaw;</span><br class="topos-l">
-  <span class="topos-l">break the teeth of the wicked.</span><br class="topos-l">
-  <span class="topos-l">
+  <span class="topos-l" data-style="q2">Save me, O my God!</span><br class="topos-l">
+  <span class="topos-l" data-style="q1">Strike all my enemies on the jaw;</span><br class="topos-l">
+  <span class="topos-l" data-style="q2">break the teeth of the wicked.</span><br class="topos-l">
+  <span class="topos-l" data-style="q1">
     <span class="topos-verse" data-osis-id="PSA 3:8" data-n="8"></span>Salvation belongs to the LORD;</span><br class="topos-l">
-  <span class="topos-l">may Your blessing be on Your people.</span><br class="topos-l">
-  <span class="topos-l">Selah</span><br class="topos-l">
+  <span class="topos-l" data-style="q2">may Your blessing be on Your people.</span><br class="topos-l">
+  <span class="topos-l" data-style="qr">Selah</span><br class="topos-l">
   
   
 
@@ -1358,119 +1358,119 @@ Other 0..2138 entry=0 path=/1 "Blessed is the man\nwho does not walk in the coun
   Psalm
   Psalm
   PSA
-  <div class="title mt1" data-title-type="mt1">Psalm</div>
+  <div class="title mt1" data-title-type="mt1" data-style="mt1">Psalm</div>
   <span class="chapter" data-osis-id="PSA 1" data-n="1"></span>
-  <div class="title ms" data-title-type="ms">BOOK I</div>
-  <div class="title d" data-title-type="d">Psalms 1–41</div>
-  <div class="title s1" data-title-type="s1">The Two Paths</div>
-  <span class="l">
+  <div class="title ms" data-title-type="ms" data-style="ms">BOOK I</div>
+  <div class="title d" data-title-type="d" data-style="d">Psalms 1–41</div>
+  <div class="title s1" data-title-type="s1" data-style="s1">The Two Paths</div>
+  <span class="l" data-style="q1">
     <span class="verse" data-osis-id="PSA 1:1" data-n="1"></span>Blessed is the man</span><br class="l">
-  <span class="l">who does not walk in the counsel of the wicked,</span><br class="l">
-  <span class="l">or set foot on the path of sinners,</span><br class="l">
-  <span class="l">or sit in the seat of mockers.</span><br class="l">
-  <span class="l">
+  <span class="l" data-style="q2">who does not walk in the counsel of the wicked,</span><br class="l">
+  <span class="l" data-style="q1">or set foot on the path of sinners,</span><br class="l">
+  <span class="l" data-style="q2">or sit in the seat of mockers.</span><br class="l">
+  <span class="l" data-style="q1">
     <span class="verse" data-osis-id="PSA 1:2" data-n="2"></span>But his delight is in the Law of the LORD,</span><br class="l">
-  <span class="l">and on His law he meditates day and night.</span><br class="l">
-  <span class="l">
+  <span class="l" data-style="q2">and on His law he meditates day and night.</span><br class="l">
+  <span class="l" data-style="q1">
     <span class="verse" data-osis-id="PSA 1:3" data-n="3"></span>He is like a tree planted by streams of water,</span><br class="l">
-  <span class="l">yielding its fruit in season,</span><br class="l">
-  <span class="l">whose leaf does not wither,</span><br class="l">
-  <span class="l">and who prospers in all he does.</span><br class="l">
-  <br class="lb">
-  <span class="l">
+  <span class="l" data-style="q2">yielding its fruit in season,</span><br class="l">
+  <span class="l" data-style="q1">whose leaf does not wither,</span><br class="l">
+  <span class="l" data-style="q2">and who prospers in all he does.</span><br class="l">
+  <br class="lb" data-style="b">
+  <span class="l" data-style="q1">
     <span class="verse" data-osis-id="PSA 1:4" data-n="4"></span>Not so the wicked!</span><br class="l">
-  <span class="l">For they are like chaff driven off by the wind.</span><br class="l">
-  <span class="l">
+  <span class="l" data-style="q2">For they are like chaff driven off by the wind.</span><br class="l">
+  <span class="l" data-style="q1">
     <span class="verse" data-osis-id="PSA 1:5" data-n="5"></span>Therefore the wicked will not stand in the judgment,</span><br class="l">
-  <span class="l">nor sinners in the assembly of the righteous.</span><br class="l">
-  <br class="lb">
-  <span class="l">
+  <span class="l" data-style="q2">nor sinners in the assembly of the righteous.</span><br class="l">
+  <br class="lb" data-style="b">
+  <span class="l" data-style="q1">
     <span class="verse" data-osis-id="PSA 1:6" data-n="6"></span>For the LORD guards the path of the righteous,</span><br class="l">
-  <span class="l">but the way of the wicked will perish.</span><br class="l">
+  <span class="l" data-style="q2">but the way of the wicked will perish.</span><br class="l">
   
   <span class="chapter" data-osis-id="PSA 2" data-n="2"></span>
-  <div class="title s1" data-title-type="s1">The Triumphant Messiah</div>
-  <span class="l">
-    <span class="verse" data-osis-id="PSA 2:1" data-n="1"></span>Why do the nations rage<span class="note footnote" data-note-type="footnote" data-n="+">2:1 Or noisily assemble; see Revelation 11:18.</span></span><br class="l">
-  <span class="l">and the peoples plot in vain?</span><br class="l">
-  <span class="l">
+  <div class="title s1" data-title-type="s1" data-style="s1">The Triumphant Messiah</div>
+  <span class="l" data-style="q1">
+    <span class="verse" data-osis-id="PSA 2:1" data-n="1"></span>Why do the nations rage<span class="note footnote" data-note-type="footnote" data-n="+" data-style="f"><span class="char" data-style="fr">2:1 </span><span class="char" data-style="ft">Or </span><span class="char" data-style="fqa">noisily assemble</span><span class="char" data-style="ft">; see Revelation 11:18.</span></span></span><br class="l">
+  <span class="l" data-style="q2">and the peoples plot in vain?</span><br class="l">
+  <span class="l" data-style="q1">
     <span class="verse" data-osis-id="PSA 2:2" data-n="2"></span>The kings of the earth take their stand</span><br class="l">
-  <span class="l">and the rulers gather together,</span><br class="l">
-  <span class="l">against the LORD</span><br class="l">
-  <span class="l">and against His Anointed One:<span class="note footnote" data-note-type="footnote" data-n="+">2:2 Cited in Acts 4:25–26</span></span><br class="l">
-  <span class="l">
+  <span class="l" data-style="q2">and the rulers gather together,</span><br class="l">
+  <span class="l" data-style="q1">against the LORD</span><br class="l">
+  <span class="l" data-style="q2">and against His Anointed One:<span class="note footnote" data-note-type="footnote" data-n="+" data-style="f"><span class="char" data-style="fr">2:2 </span><span class="char" data-style="ft">Cited in Acts 4:25–26</span></span></span><br class="l">
+  <span class="l" data-style="q1">
     <span class="verse" data-osis-id="PSA 2:3" data-n="3"></span>“Let us break Their chains</span><br class="l">
-  <span class="l">and cast away Their cords.”</span><br class="l">
-  <br class="lb">
-  <span class="l">
+  <span class="l" data-style="q2">and cast away Their cords.”</span><br class="l">
+  <br class="lb" data-style="b">
+  <span class="l" data-style="q1">
     <span class="verse" data-osis-id="PSA 2:4" data-n="4"></span>The One enthroned in heaven laughs;</span><br class="l">
-  <span class="l">the Lord taunts them.</span><br class="l">
-  <span class="l">
+  <span class="l" data-style="q2">the Lord taunts them.</span><br class="l">
+  <span class="l" data-style="q1">
     <span class="verse" data-osis-id="PSA 2:5" data-n="5"></span>Then He rebukes them in His anger,</span><br class="l">
-  <span class="l">and terrifies them in His fury:</span><br class="l">
-  <span class="l">
+  <span class="l" data-style="q2">and terrifies them in His fury:</span><br class="l">
+  <span class="l" data-style="q1">
     <span class="verse" data-osis-id="PSA 2:6" data-n="6"></span>“I have installed My King on Zion,</span><br class="l">
-  <span class="l">upon My holy mountain.”</span><br class="l">
-  <br class="lb">
-  <span class="l">
+  <span class="l" data-style="q2">upon My holy mountain.”</span><br class="l">
+  <br class="lb" data-style="b">
+  <span class="l" data-style="q1">
     <span class="verse" data-osis-id="PSA 2:7" data-n="7"></span>I will proclaim the decree</span><br class="l">
-  <span class="l">spoken to Me by the LORD:</span><br class="l">
-  <span class="l">“You are My Son;</span><br class="l">
-  <span class="l">today I have become Your Father.<span class="note footnote" data-note-type="footnote" data-n="+">2:7 Literally today I have begotten You; cited in Acts 13:33, Hebrews 1:5, and Hebrews 5:5</span></span><br class="l">
-  <span class="l">
+  <span class="l" data-style="q2">spoken to Me by the LORD:</span><br class="l">
+  <span class="l" data-style="q1">“You are My Son;</span><br class="l">
+  <span class="l" data-style="q2">today I have become Your Father.<span class="note footnote" data-note-type="footnote" data-n="+" data-style="f"><span class="char" data-style="fr">2:7 </span><span class="char" data-style="ft">Literally </span><span class="char" data-style="fqa">today I have begotten You</span><span class="char" data-style="ft">; cited in Acts 13:33, Hebrews 1:5, and Hebrews 5:5</span></span></span><br class="l">
+  <span class="l" data-style="q1">
     <span class="verse" data-osis-id="PSA 2:8" data-n="8"></span>Ask Me, and I will make the nations Your inheritance,</span><br class="l">
-  <span class="l">the ends of the earth Your possession.</span><br class="l">
-  <span class="l">
-    <span class="verse" data-osis-id="PSA 2:9" data-n="9"></span>You will break them<span class="note footnote" data-note-type="footnote" data-n="+">2:9 LXX You will rule them or You will shepherd them</span> with an iron scepter;</span><br class="l">
-  <span class="l">You will shatter them like pottery.<span class="note footnote" data-note-type="footnote" data-n="+">2:9 Cited in Revelation 2:27; see also Revelation 12:5 and Revelation 19:15.</span>”</span><br class="l">
-  <br class="lb">
-  <span class="l">
+  <span class="l" data-style="q2">the ends of the earth Your possession.</span><br class="l">
+  <span class="l" data-style="q1">
+    <span class="verse" data-osis-id="PSA 2:9" data-n="9"></span>You will break them<span class="note footnote" data-note-type="footnote" data-n="+" data-style="f"><span class="char" data-style="fr">2:9 </span><span class="char" data-style="ft">LXX </span><span class="char" data-style="fqa">You will rule them </span><span class="char" data-style="ft">or </span><span class="char" data-style="fqa">You will shepherd them</span></span> with an iron scepter;</span><br class="l">
+  <span class="l" data-style="q2">You will shatter them like pottery.<span class="note footnote" data-note-type="footnote" data-n="+" data-style="f"><span class="char" data-style="fr">2:9 </span><span class="char" data-style="ft">Cited in Revelation 2:27; see also Revelation 12:5 and Revelation 19:15.</span></span>”</span><br class="l">
+  <br class="lb" data-style="b">
+  <span class="l" data-style="q1">
     <span class="verse" data-osis-id="PSA 2:10" data-n="10"></span>Therefore be wise, O kings;</span><br class="l">
-  <span class="l">be admonished, O judges of the earth.</span><br class="l">
-  <span class="l">
+  <span class="l" data-style="q2">be admonished, O judges of the earth.</span><br class="l">
+  <span class="l" data-style="q1">
     <span class="verse" data-osis-id="PSA 2:11" data-n="11"></span>Serve the LORD with fear,</span><br class="l">
-  <span class="l">and rejoice with trembling.</span><br class="l">
-  <span class="l">
+  <span class="l" data-style="q2">and rejoice with trembling.</span><br class="l">
+  <span class="l" data-style="q1">
     <span class="verse" data-osis-id="PSA 2:12" data-n="12"></span>Kiss the Son, lest He be angry</span><br class="l">
-  <span class="l">and you perish in your rebellion,</span><br class="l">
-  <span class="l">when His wrath ignites in an instant.</span><br class="l">
-  <br class="lb">
-  <span class="l">Blessed are all who take refuge in Him.</span><br class="l">
+  <span class="l" data-style="q2">and you perish in your rebellion,</span><br class="l">
+  <span class="l" data-style="q2">when His wrath ignites in an instant.</span><br class="l">
+  <br class="lb" data-style="b">
+  <span class="l" data-style="q1">Blessed are all who take refuge in Him.</span><br class="l">
   
   <span class="chapter" data-osis-id="PSA 3" data-n="3"></span>
-  <div class="title s1" data-title-type="s1">Deliver Me, O LORD!</div>
-  <div class="title d" data-title-type="d">
+  <div class="title s1" data-title-type="s1" data-style="s1">Deliver Me, O LORD!</div>
+  <div class="title d" data-title-type="d" data-style="d">
     <span class="verse" data-osis-id="PSA 3:1" data-n="1"></span>A Psalm of David, when he fled from his son Absalom.</div>
-  <br class="lb">
-  <span class="l">O LORD, how my foes have increased!</span><br class="l">
-  <span class="l">How many rise up against me!</span><br class="l">
-  <span class="l">
+  <br class="lb" data-style="b">
+  <span class="l" data-style="q1">O LORD, how my foes have increased!</span><br class="l">
+  <span class="l" data-style="q2">How many rise up against me!</span><br class="l">
+  <span class="l" data-style="q1">
     <span class="verse" data-osis-id="PSA 3:2" data-n="2"></span>Many say of me,</span><br class="l">
-  <span class="l">“God will not deliver him.”</span><br class="l">
-  <span class="l">Selah<span class="note footnote" data-note-type="footnote" data-n="+">3:2 Selah or Interlude is probably a musical or literary term; here and throughout the Psalms.</span></span><br class="l">
-  <span class="l">
+  <span class="l" data-style="q2">“God will not deliver him.”</span><br class="l">
+  <span class="l" data-style="qr">Selah<span class="note footnote" data-note-type="footnote" data-n="+" data-style="f"><span class="char" data-style="fr">3:2 </span><span class="char" data-style="fqa">Selah </span><span class="char" data-style="ft">or </span><span class="char" data-style="fqa">Interlude </span><span class="char" data-style="ft">is probably a musical or literary term; here and throughout the Psalms.</span></span></span><br class="l">
+  <span class="l" data-style="q1">
     <span class="verse" data-osis-id="PSA 3:3" data-n="3"></span>But You, O LORD, are a shield around me,</span><br class="l">
-  <span class="l">my glory, and the One who lifts my head.</span><br class="l">
-  <span class="l">
+  <span class="l" data-style="q2">my glory, and the One who lifts my head.</span><br class="l">
+  <span class="l" data-style="q1">
     <span class="verse" data-osis-id="PSA 3:4" data-n="4"></span>To the LORD I cry aloud,</span><br class="l">
-  <span class="l">and He answers me from His holy mountain.</span><br class="l">
-  <span class="l">Selah</span><br class="l">
-  <span class="l">
+  <span class="l" data-style="q2">and He answers me from His holy mountain.</span><br class="l">
+  <span class="l" data-style="qr">Selah</span><br class="l">
+  <span class="l" data-style="q1">
     <span class="verse" data-osis-id="PSA 3:5" data-n="5"></span>I lie down and sleep;</span><br class="l">
-  <span class="l">I wake again, for the LORD sustains me.</span><br class="l">
-  <span class="l">
+  <span class="l" data-style="q2">I wake again, for the LORD sustains me.</span><br class="l">
+  <span class="l" data-style="q1">
     <span class="verse" data-osis-id="PSA 3:6" data-n="6"></span>I will not fear the myriads</span><br class="l">
-  <span class="l">set against me on every side.</span><br class="l">
-  <br class="lb">
-  <span class="l">
+  <span class="l" data-style="q2">set against me on every side.</span><br class="l">
+  <br class="lb" data-style="b">
+  <span class="l" data-style="q1">
     <span class="verse" data-osis-id="PSA 3:7" data-n="7"></span>Arise, O LORD!</span><br class="l">
-  <span class="l">Save me, O my God!</span><br class="l">
-  <span class="l">Strike all my enemies on the jaw;</span><br class="l">
-  <span class="l">break the teeth of the wicked.</span><br class="l">
-  <span class="l">
+  <span class="l" data-style="q2">Save me, O my God!</span><br class="l">
+  <span class="l" data-style="q1">Strike all my enemies on the jaw;</span><br class="l">
+  <span class="l" data-style="q2">break the teeth of the wicked.</span><br class="l">
+  <span class="l" data-style="q1">
     <span class="verse" data-osis-id="PSA 3:8" data-n="8"></span>Salvation belongs to the LORD;</span><br class="l">
-  <span class="l">may Your blessing be on Your people.</span><br class="l">
-  <span class="l">Selah</span><br class="l">
+  <span class="l" data-style="q2">may Your blessing be on Your people.</span><br class="l">
+  <span class="l" data-style="qr">Selah</span><br class="l">
   
   
 

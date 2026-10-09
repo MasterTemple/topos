@@ -103,11 +103,11 @@ Other 0..86 entry=0 path=/1 "For God so loved the world, that he gave his one an
 
   
   <span class="topos-chapter" data-osis-id="JHN 3" data-n="3"></span>
-  <div class="topos-title topos-s1" data-title-type="s1">Jesus and Nicodemus</div>
-  <p class="topos-p">
-    <span class="topos-verse" data-osis-id="JHN 3:16" data-n="16"></span><span class="topos-woj">For God so <span class="topos-w" data-strong="G25">loved</span> the world<span class="topos-note topos-crossref" data-note-type="crossReference" data-n="+">3:16 <a class="topos-ref">Rom 5:8</a></span>, that he gave his one and only Son</span>.
+  <div class="topos-title topos-s1" data-title-type="s1" data-style="s1">Jesus and Nicodemus</div>
+  <p class="topos-p" data-style="p">
+    <span class="topos-verse" data-osis-id="JHN 3:16" data-n="16"></span><span class="topos-woj" data-style="wj">For God so <span class="topos-w" data-strong="G25" data-style="w">loved</span> the world<span class="topos-note topos-crossref" data-note-type="crossReference" data-n="+" data-style="x"><span class="topos-char" data-style="xo">3:16 </span><a class="topos-ref" data-style="xt">Rom 5:8</a></span>, that he gave his one and only Son</span>.
   </p>
-  <span class="topos-l">The <span class="topos-divine-name">Lord</span> is my shepherd</span><br class="topos-l">
+  <span class="topos-l" data-style="q1">The <span class="topos-divine-name" data-style="nd">Lord</span> is my shepherd</span><br class="topos-l">
   
 
 #### html-bare ####
@@ -115,11 +115,11 @@ Other 0..86 entry=0 path=/1 "For God so loved the world, that he gave his one an
 
   World English Bible
   <span class="chapter" data-osis-id="JHN 3" data-n="3"></span>
-  <div class="title s1" data-title-type="s1">Jesus and Nicodemus</div>
-  <p class="p">
-    <span class="verse" data-osis-id="JHN 3:16" data-n="16"></span><span class="woj">For God so <span class="w" data-strong="G25">loved</span> the world<span class="note crossref" data-note-type="crossReference" data-n="+">3:16 <a class="ref">Rom 5:8</a></span>, that he gave his one and only Son</span>.
+  <div class="title s1" data-title-type="s1" data-style="s1">Jesus and Nicodemus</div>
+  <p class="p" data-style="p">
+    <span class="verse" data-osis-id="JHN 3:16" data-n="16"></span><span class="woj" data-style="wj">For God so <span class="w" data-strong="G25" data-style="w">loved</span> the world<span class="note crossref" data-note-type="crossReference" data-n="+" data-style="x"><span class="char" data-style="xo">3:16 </span><a class="ref" data-style="xt">Rom 5:8</a></span>, that he gave his one and only Son</span>.
   </p>
-  <span class="l">The <span class="divine-name">Lord</span> is my shepherd</span><br class="l">
+  <span class="l" data-style="q1">The <span class="divine-name" data-style="nd">Lord</span> is my shepherd</span><br class="l">
   
 
 #### verses ####

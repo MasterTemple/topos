@@ -25,10 +25,10 @@ Other 0..4 entry=0 path=/1 "text"
 
 #### html ####
 
-<p class="topos-p">text</p>
+<p class="topos-p" data-style="p">text</p>
 #### html-bare ####
 
-<p class="p">text</p>
+<p class="p" data-style="p">text</p>
 #### verses ####
 chapter_verses: []
 

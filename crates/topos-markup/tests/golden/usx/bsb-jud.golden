@@ -1015,47 +1015,47 @@ Other 0..3490 entry=0 path=/1 "Jude, a servant of Jesus Christ and a brother of 
   
   
   
-  <div class="topos-title topos-mt2" data-title-type="mt2">The Letter of</div>
-  <div class="topos-title topos-mt1" data-title-type="mt1">Jude</div>
+  <div class="topos-title topos-mt2" data-title-type="mt2" data-style="mt2">The Letter of</div>
+  <div class="topos-title topos-mt1" data-title-type="mt1" data-style="mt1">Jude</div>
   <span class="topos-chapter" data-osis-id="JUD 1" data-n="1"></span>
-  <div class="topos-title topos-s1" data-title-type="s1">A Greeting from Jude</div>
-  <p class="topos-p">
+  <div class="topos-title topos-s1" data-title-type="s1" data-style="s1">A Greeting from Jude</div>
+  <p class="topos-p" data-style="p">
     <span class="topos-verse" data-osis-id="JUD 1:1" data-n="1"></span>Jude, a servant of Jesus Christ and a brother of James,</p>
-  <p class="topos-p">To those who are called, loved by God the Father, and kept in Jesus Christ:</p>
-  <p class="topos-p">
+  <p class="topos-p" data-style="p">To those who are called, loved by God the Father, and kept in Jesus Christ:</p>
+  <p class="topos-p" data-style="p">
     <span class="topos-verse" data-osis-id="JUD 1:2" data-n="2"></span>Mercy, peace, and love be multiplied to you.</p>
-  <div class="topos-title topos-s1" data-title-type="s1">God’s Judgment on the Ungodly</div>
-  <p class="topos-p">
+  <div class="topos-title topos-s1" data-title-type="s1" data-style="s1">God’s Judgment on the Ungodly</div>
+  <p class="topos-p" data-style="p">
     <span class="topos-verse" data-osis-id="JUD 1:3" data-n="3"></span>Beloved, although I made every effort to write to you about the salvation we share, I felt it necessary to write and urge you to contend earnestly for the faith entrusted once for all to the saints. <span class="topos-verse" data-osis-id="JUD 1:4" data-n="4"></span>For certain men have crept in among you unnoticed — ungodly ones who were designated long ago for condemnation. They turn the grace of our God into a license for immorality, and they deny our only Master and Lord, Jesus Christ.</p>
-  <p class="topos-p">
-    <span class="topos-verse" data-osis-id="JUD 1:5" data-n="5"></span>Although you are fully aware of this, I want to remind you that after Jesus<span class="topos-note topos-footnote" data-note-type="footnote" data-n="+">1:5 NE, WH, BYZ, and TR the Lord</span> had delivered His people out of the land of Egypt, He destroyed those who did not believe. <span class="topos-verse" data-osis-id="JUD 1:6" data-n="6"></span>And the angels who did not stay within their own domain but abandoned their proper dwelling— these He has kept in eternal chains under darkness, bound for judgment on that great day. <span class="topos-verse" data-osis-id="JUD 1:7" data-n="7"></span>In like manner, Sodom and Gomorrah and the cities around them, who indulged in sexual immorality and pursued strange flesh, are on display as an example of those who sustain the punishment of eternal fire.</p>
-  <p class="topos-p">
-    <span class="topos-verse" data-osis-id="JUD 1:8" data-n="8"></span>Yet in the same way these dreamers defile their bodies, reject authority, and slander glorious beings. <span class="topos-verse" data-osis-id="JUD 1:9" data-n="9"></span>But even the archangel Michael, when he disputed with the devil over the body of Moses, did not presume to bring a slanderous charge against him, but said, “The Lord rebuke you!”<span class="topos-note topos-footnote" data-note-type="footnote" data-n="+">1:9 This account is attributed by Origen to the Testament of Moses, also called the Assumption of Moses.</span> <span class="topos-verse" data-osis-id="JUD 1:10" data-n="10"></span>These men, however, slander what they do not understand, and like irrational animals, they will be destroyed by the things they do instinctively. <span class="topos-verse" data-osis-id="JUD 1:11" data-n="11"></span>Woe to them! They have traveled the path of Cain; they have rushed for profit into the error of Balaam; they have perished in Korah’s rebellion.</p>
-  <p class="topos-p">
-    <span class="topos-verse" data-osis-id="JUD 1:12" data-n="12"></span>These men are hidden reefs<span class="topos-note topos-footnote" data-note-type="footnote" data-n="+">1:12 Or are blemishes</span> in your love feasts, shamelessly feasting with you but shepherding only themselves. They are clouds without water, carried along by the wind; fruitless trees in autumn, twice dead after being uprooted. <span class="topos-verse" data-osis-id="JUD 1:13" data-n="13"></span>They are wild waves of the sea, foaming up their own shame; wandering stars, for whom blackest darkness has been reserved forever.</p>
-  <p class="topos-p">
+  <p class="topos-p" data-style="p">
+    <span class="topos-verse" data-osis-id="JUD 1:5" data-n="5"></span>Although you are fully aware of this, I want to remind you that after Jesus<span class="topos-note topos-footnote" data-note-type="footnote" data-n="+" data-style="f"><span class="topos-char" data-style="fr">1:5 </span><span class="topos-char" data-style="ft">NE, WH, BYZ, and TR </span><span class="topos-char" data-style="fqa">the Lord</span></span> had delivered His people out of the land of Egypt, He destroyed those who did not believe. <span class="topos-verse" data-osis-id="JUD 1:6" data-n="6"></span>And the angels who did not stay within their own domain but abandoned their proper dwelling— these He has kept in eternal chains under darkness, bound for judgment on that great day. <span class="topos-verse" data-osis-id="JUD 1:7" data-n="7"></span>In like manner, Sodom and Gomorrah and the cities around them, who indulged in sexual immorality and pursued strange flesh, are on display as an example of those who sustain the punishment of eternal fire.</p>
+  <p class="topos-p" data-style="p">
+    <span class="topos-verse" data-osis-id="JUD 1:8" data-n="8"></span>Yet in the same way these dreamers defile their bodies, reject authority, and slander glorious beings. <span class="topos-verse" data-osis-id="JUD 1:9" data-n="9"></span>But even the archangel Michael, when he disputed with the devil over the body of Moses, did not presume to bring a slanderous charge against him, but said, “The Lord rebuke you!”<span class="topos-note topos-footnote" data-note-type="footnote" data-n="+" data-style="f"><span class="topos-char" data-style="fr">1:9 </span><span class="topos-char" data-style="ft">This account is attributed by Origen to the Testament of Moses, also called the Assumption of Moses.</span></span> <span class="topos-verse" data-osis-id="JUD 1:10" data-n="10"></span>These men, however, slander what they do not understand, and like irrational animals, they will be destroyed by the things they do instinctively. <span class="topos-verse" data-osis-id="JUD 1:11" data-n="11"></span>Woe to them! They have traveled the path of Cain; they have rushed for profit into the error of Balaam; they have perished in Korah’s rebellion.</p>
+  <p class="topos-p" data-style="p">
+    <span class="topos-verse" data-osis-id="JUD 1:12" data-n="12"></span>These men are hidden reefs<span class="topos-note topos-footnote" data-note-type="footnote" data-n="+" data-style="f"><span class="topos-char" data-style="fr">1:12 </span><span class="topos-char" data-style="ft">Or </span><span class="topos-char" data-style="fqa">are blemishes</span></span> in your love feasts, shamelessly feasting with you but shepherding only themselves. They are clouds without water, carried along by the wind; fruitless trees in autumn, twice dead after being uprooted. <span class="topos-verse" data-osis-id="JUD 1:13" data-n="13"></span>They are wild waves of the sea, foaming up their own shame; wandering stars, for whom blackest darkness has been reserved forever.</p>
+  <p class="topos-p" data-style="p">
     <span class="topos-verse" data-osis-id="JUD 1:14" data-n="14"></span>Enoch, the seventh from Adam, also prophesied about them:</p>
-  <br class="topos-lb">
-  <span class="topos-l">“Behold, the Lord is coming</span><br class="topos-l">
-  <span class="topos-l">with myriads of His holy ones</span><br class="topos-l">
-  <span class="topos-l">
+  <br class="topos-lb" data-style="b">
+  <span class="topos-l" data-style="q1">“Behold, the Lord is coming</span><br class="topos-l">
+  <span class="topos-l" data-style="q2">with myriads of His holy ones</span><br class="topos-l">
+  <span class="topos-l" data-style="q2">
     <span class="topos-verse" data-osis-id="JUD 1:15" data-n="15"></span>to execute judgment on everyone,</span><br class="topos-l">
-  <span class="topos-l">and to convict all the ungodly</span><br class="topos-l">
-  <span class="topos-l">of every ungodly act of wickedness</span><br class="topos-l">
-  <span class="topos-l">and every harsh word spoken against Him by ungodly sinners.”<span class="topos-note topos-footnote" data-note-type="footnote" data-n="+">1:15 See the First Book of Enoch (1 Enoch 1:9).</span></span><br class="topos-l">
-  <p class="topos-p">
+  <span class="topos-l" data-style="q1">and to convict all the ungodly</span><br class="topos-l">
+  <span class="topos-l" data-style="q2">of every ungodly act of wickedness</span><br class="topos-l">
+  <span class="topos-l" data-style="q2">and every harsh word spoken against Him by ungodly sinners.”<span class="topos-note topos-footnote" data-note-type="footnote" data-n="+" data-style="f"><span class="topos-char" data-style="fr">1:15 </span><span class="topos-char" data-style="ft">See the First Book of Enoch (1 Enoch 1:9).</span></span></span><br class="topos-l">
+  <p class="topos-p" data-style="p">
     <span class="topos-verse" data-osis-id="JUD 1:16" data-n="16"></span>These men are discontented grumblers, following after their own lusts; their mouths spew arrogance; they flatter others for their own advantage.</p>
-  <div class="topos-title topos-s1" data-title-type="s1">A Call to Persevere</div>
-  <p class="topos-p">
-    <span class="topos-verse" data-osis-id="JUD 1:17" data-n="17"></span>But you, beloved, remember what was foretold by the apostles of our Lord Jesus Christ <span class="topos-verse" data-osis-id="JUD 1:18" data-n="18"></span>when they said to you, “In the last times there will be scoffers who will follow after their own ungodly desires.”<span class="topos-note topos-footnote" data-note-type="footnote" data-n="+">1:18 See 2 Peter 3:3.</span> <span class="topos-verse" data-osis-id="JUD 1:19" data-n="19"></span>These are the ones who cause divisions, who are worldly and devoid of the Spirit.</p>
-  <p class="topos-p">
+  <div class="topos-title topos-s1" data-title-type="s1" data-style="s1">A Call to Persevere</div>
+  <p class="topos-p" data-style="p">
+    <span class="topos-verse" data-osis-id="JUD 1:17" data-n="17"></span>But you, beloved, remember what was foretold by the apostles of our Lord Jesus Christ <span class="topos-verse" data-osis-id="JUD 1:18" data-n="18"></span>when they said to you, “In the last times there will be scoffers who will follow after their own ungodly desires.”<span class="topos-note topos-footnote" data-note-type="footnote" data-n="+" data-style="f"><span class="topos-char" data-style="fr">1:18 </span><span class="topos-char" data-style="ft">See 2 Peter 3:3.</span></span> <span class="topos-verse" data-osis-id="JUD 1:19" data-n="19"></span>These are the ones who cause divisions, who are worldly and devoid of the Spirit.</p>
+  <p class="topos-p" data-style="p">
     <span class="topos-verse" data-osis-id="JUD 1:20" data-n="20"></span>But you, beloved, by building yourselves up in your most holy faith and praying in the Holy Spirit, <span class="topos-verse" data-osis-id="JUD 1:21" data-n="21"></span>keep yourselves in the love of God as you await the mercy of our Lord Jesus Christ to bring you eternal life.</p>
-  <p class="topos-p">
+  <p class="topos-p" data-style="p">
     <span class="topos-verse" data-osis-id="JUD 1:22" data-n="22"></span>And indeed, have mercy on those who doubt; <span class="topos-verse" data-osis-id="JUD 1:23" data-n="23"></span>save others by snatching them from the fire; and to still others show mercy tempered with fear, hating even the clothing stained by the flesh.</p>
-  <div class="topos-title topos-s1" data-title-type="s1">Doxology</div>
-  <p class="topos-p">
+  <div class="topos-title topos-s1" data-title-type="s1" data-style="s1">Doxology</div>
+  <p class="topos-p" data-style="p">
     <span class="topos-verse" data-osis-id="JUD 1:24" data-n="24"></span>Now to Him who is able to keep you from stumbling and to present you unblemished in His glorious presence, with great joy — <span class="topos-verse" data-osis-id="JUD 1:25" data-n="25"></span>to the only God our Savior be glory, majesty, dominion, and authority through Jesus Christ our Lord before all time, and now, and for all eternity.</p>
-  <p class="topos-p">Amen.</p>
+  <p class="topos-p" data-style="p">Amen.</p>
   
 
 #### html-bare ####
@@ -1067,47 +1067,47 @@ Other 0..3490 entry=0 path=/1 "Jude, a servant of Jesus Christ and a brother of 
   The Letter of Jude
   Jude
   Jud
-  <div class="title mt2" data-title-type="mt2">The Letter of</div>
-  <div class="title mt1" data-title-type="mt1">Jude</div>
+  <div class="title mt2" data-title-type="mt2" data-style="mt2">The Letter of</div>
+  <div class="title mt1" data-title-type="mt1" data-style="mt1">Jude</div>
   <span class="chapter" data-osis-id="JUD 1" data-n="1"></span>
-  <div class="title s1" data-title-type="s1">A Greeting from Jude</div>
-  <p class="p">
+  <div class="title s1" data-title-type="s1" data-style="s1">A Greeting from Jude</div>
+  <p class="p" data-style="p">
     <span class="verse" data-osis-id="JUD 1:1" data-n="1"></span>Jude, a servant of Jesus Christ and a brother of James,</p>
-  <p class="p">To those who are called, loved by God the Father, and kept in Jesus Christ:</p>
-  <p class="p">
+  <p class="p" data-style="p">To those who are called, loved by God the Father, and kept in Jesus Christ:</p>
+  <p class="p" data-style="p">
     <span class="verse" data-osis-id="JUD 1:2" data-n="2"></span>Mercy, peace, and love be multiplied to you.</p>
-  <div class="title s1" data-title-type="s1">God’s Judgment on the Ungodly</div>
-  <p class="p">
+  <div class="title s1" data-title-type="s1" data-style="s1">God’s Judgment on the Ungodly</div>
+  <p class="p" data-style="p">
     <span class="verse" data-osis-id="JUD 1:3" data-n="3"></span>Beloved, although I made every effort to write to you about the salvation we share, I felt it necessary to write and urge you to contend earnestly for the faith entrusted once for all to the saints. <span class="verse" data-osis-id="JUD 1:4" data-n="4"></span>For certain men have crept in among you unnoticed — ungodly ones who were designated long ago for condemnation. They turn the grace of our God into a license for immorality, and they deny our only Master and Lord, Jesus Christ.</p>
-  <p class="p">
-    <span class="verse" data-osis-id="JUD 1:5" data-n="5"></span>Although you are fully aware of this, I want to remind you that after Jesus<span class="note footnote" data-note-type="footnote" data-n="+">1:5 NE, WH, BYZ, and TR the Lord</span> had delivered His people out of the land of Egypt, He destroyed those who did not believe. <span class="verse" data-osis-id="JUD 1:6" data-n="6"></span>And the angels who did not stay within their own domain but abandoned their proper dwelling— these He has kept in eternal chains under darkness, bound for judgment on that great day. <span class="verse" data-osis-id="JUD 1:7" data-n="7"></span>In like manner, Sodom and Gomorrah and the cities around them, who indulged in sexual immorality and pursued strange flesh, are on display as an example of those who sustain the punishment of eternal fire.</p>
-  <p class="p">
-    <span class="verse" data-osis-id="JUD 1:8" data-n="8"></span>Yet in the same way these dreamers defile their bodies, reject authority, and slander glorious beings. <span class="verse" data-osis-id="JUD 1:9" data-n="9"></span>But even the archangel Michael, when he disputed with the devil over the body of Moses, did not presume to bring a slanderous charge against him, but said, “The Lord rebuke you!”<span class="note footnote" data-note-type="footnote" data-n="+">1:9 This account is attributed by Origen to the Testament of Moses, also called the Assumption of Moses.</span> <span class="verse" data-osis-id="JUD 1:10" data-n="10"></span>These men, however, slander what they do not understand, and like irrational animals, they will be destroyed by the things they do instinctively. <span class="verse" data-osis-id="JUD 1:11" data-n="11"></span>Woe to them! They have traveled the path of Cain; they have rushed for profit into the error of Balaam; they have perished in Korah’s rebellion.</p>
-  <p class="p">
-    <span class="verse" data-osis-id="JUD 1:12" data-n="12"></span>These men are hidden reefs<span class="note footnote" data-note-type="footnote" data-n="+">1:12 Or are blemishes</span> in your love feasts, shamelessly feasting with you but shepherding only themselves. They are clouds without water, carried along by the wind; fruitless trees in autumn, twice dead after being uprooted. <span class="verse" data-osis-id="JUD 1:13" data-n="13"></span>They are wild waves of the sea, foaming up their own shame; wandering stars, for whom blackest darkness has been reserved forever.</p>
-  <p class="p">
+  <p class="p" data-style="p">
+    <span class="verse" data-osis-id="JUD 1:5" data-n="5"></span>Although you are fully aware of this, I want to remind you that after Jesus<span class="note footnote" data-note-type="footnote" data-n="+" data-style="f"><span class="char" data-style="fr">1:5 </span><span class="char" data-style="ft">NE, WH, BYZ, and TR </span><span class="char" data-style="fqa">the Lord</span></span> had delivered His people out of the land of Egypt, He destroyed those who did not believe. <span class="verse" data-osis-id="JUD 1:6" data-n="6"></span>And the angels who did not stay within their own domain but abandoned their proper dwelling— these He has kept in eternal chains under darkness, bound for judgment on that great day. <span class="verse" data-osis-id="JUD 1:7" data-n="7"></span>In like manner, Sodom and Gomorrah and the cities around them, who indulged in sexual immorality and pursued strange flesh, are on display as an example of those who sustain the punishment of eternal fire.</p>
+  <p class="p" data-style="p">
+    <span class="verse" data-osis-id="JUD 1:8" data-n="8"></span>Yet in the same way these dreamers defile their bodies, reject authority, and slander glorious beings. <span class="verse" data-osis-id="JUD 1:9" data-n="9"></span>But even the archangel Michael, when he disputed with the devil over the body of Moses, did not presume to bring a slanderous charge against him, but said, “The Lord rebuke you!”<span class="note footnote" data-note-type="footnote" data-n="+" data-style="f"><span class="char" data-style="fr">1:9 </span><span class="char" data-style="ft">This account is attributed by Origen to the Testament of Moses, also called the Assumption of Moses.</span></span> <span class="verse" data-osis-id="JUD 1:10" data-n="10"></span>These men, however, slander what they do not understand, and like irrational animals, they will be destroyed by the things they do instinctively. <span class="verse" data-osis-id="JUD 1:11" data-n="11"></span>Woe to them! They have traveled the path of Cain; they have rushed for profit into the error of Balaam; they have perished in Korah’s rebellion.</p>
+  <p class="p" data-style="p">
+    <span class="verse" data-osis-id="JUD 1:12" data-n="12"></span>These men are hidden reefs<span class="note footnote" data-note-type="footnote" data-n="+" data-style="f"><span class="char" data-style="fr">1:12 </span><span class="char" data-style="ft">Or </span><span class="char" data-style="fqa">are blemishes</span></span> in your love feasts, shamelessly feasting with you but shepherding only themselves. They are clouds without water, carried along by the wind; fruitless trees in autumn, twice dead after being uprooted. <span class="verse" data-osis-id="JUD 1:13" data-n="13"></span>They are wild waves of the sea, foaming up their own shame; wandering stars, for whom blackest darkness has been reserved forever.</p>
+  <p class="p" data-style="p">
     <span class="verse" data-osis-id="JUD 1:14" data-n="14"></span>Enoch, the seventh from Adam, also prophesied about them:</p>
-  <br class="lb">
-  <span class="l">“Behold, the Lord is coming</span><br class="l">
-  <span class="l">with myriads of His holy ones</span><br class="l">
-  <span class="l">
+  <br class="lb" data-style="b">
+  <span class="l" data-style="q1">“Behold, the Lord is coming</span><br class="l">
+  <span class="l" data-style="q2">with myriads of His holy ones</span><br class="l">
+  <span class="l" data-style="q2">
     <span class="verse" data-osis-id="JUD 1:15" data-n="15"></span>to execute judgment on everyone,</span><br class="l">
-  <span class="l">and to convict all the ungodly</span><br class="l">
-  <span class="l">of every ungodly act of wickedness</span><br class="l">
-  <span class="l">and every harsh word spoken against Him by ungodly sinners.”<span class="note footnote" data-note-type="footnote" data-n="+">1:15 See the First Book of Enoch (1 Enoch 1:9).</span></span><br class="l">
-  <p class="p">
+  <span class="l" data-style="q1">and to convict all the ungodly</span><br class="l">
+  <span class="l" data-style="q2">of every ungodly act of wickedness</span><br class="l">
+  <span class="l" data-style="q2">and every harsh word spoken against Him by ungodly sinners.”<span class="note footnote" data-note-type="footnote" data-n="+" data-style="f"><span class="char" data-style="fr">1:15 </span><span class="char" data-style="ft">See the First Book of Enoch (1 Enoch 1:9).</span></span></span><br class="l">
+  <p class="p" data-style="p">
     <span class="verse" data-osis-id="JUD 1:16" data-n="16"></span>These men are discontented grumblers, following after their own lusts; their mouths spew arrogance; they flatter others for their own advantage.</p>
-  <div class="title s1" data-title-type="s1">A Call to Persevere</div>
-  <p class="p">
-    <span class="verse" data-osis-id="JUD 1:17" data-n="17"></span>But you, beloved, remember what was foretold by the apostles of our Lord Jesus Christ <span class="verse" data-osis-id="JUD 1:18" data-n="18"></span>when they said to you, “In the last times there will be scoffers who will follow after their own ungodly desires.”<span class="note footnote" data-note-type="footnote" data-n="+">1:18 See 2 Peter 3:3.</span> <span class="verse" data-osis-id="JUD 1:19" data-n="19"></span>These are the ones who cause divisions, who are worldly and devoid of the Spirit.</p>
-  <p class="p">
+  <div class="title s1" data-title-type="s1" data-style="s1">A Call to Persevere</div>
+  <p class="p" data-style="p">
+    <span class="verse" data-osis-id="JUD 1:17" data-n="17"></span>But you, beloved, remember what was foretold by the apostles of our Lord Jesus Christ <span class="verse" data-osis-id="JUD 1:18" data-n="18"></span>when they said to you, “In the last times there will be scoffers who will follow after their own ungodly desires.”<span class="note footnote" data-note-type="footnote" data-n="+" data-style="f"><span class="char" data-style="fr">1:18 </span><span class="char" data-style="ft">See 2 Peter 3:3.</span></span> <span class="verse" data-osis-id="JUD 1:19" data-n="19"></span>These are the ones who cause divisions, who are worldly and devoid of the Spirit.</p>
+  <p class="p" data-style="p">
     <span class="verse" data-osis-id="JUD 1:20" data-n="20"></span>But you, beloved, by building yourselves up in your most holy faith and praying in the Holy Spirit, <span class="verse" data-osis-id="JUD 1:21" data-n="21"></span>keep yourselves in the love of God as you await the mercy of our Lord Jesus Christ to bring you eternal life.</p>
-  <p class="p">
+  <p class="p" data-style="p">
     <span class="verse" data-osis-id="JUD 1:22" data-n="22"></span>And indeed, have mercy on those who doubt; <span class="verse" data-osis-id="JUD 1:23" data-n="23"></span>save others by snatching them from the fire; and to still others show mercy tempered with fear, hating even the clothing stained by the flesh.</p>
-  <div class="title s1" data-title-type="s1">Doxology</div>
-  <p class="p">
+  <div class="title s1" data-title-type="s1" data-style="s1">Doxology</div>
+  <p class="p" data-style="p">
     <span class="verse" data-osis-id="JUD 1:24" data-n="24"></span>Now to Him who is able to keep you from stumbling and to present you unblemished in His glorious presence, with great joy — <span class="verse" data-osis-id="JUD 1:25" data-n="25"></span>to the only God our Savior be glory, majesty, dominion, and authority through Jesus Christ our Lord before all time, and now, and for all eternity.</p>
-  <p class="p">Amen.</p>
+  <p class="p" data-style="p">Amen.</p>
   
 
 #### verses ####

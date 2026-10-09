@@ -259,7 +259,7 @@ mod tests {
         assert_eq!(
             html,
             [concat!(
-                r#"<p class="topos-p">"#,
+                r#"<p class="topos-p" data-style="p">"#,
                 "\n", // the line break before the verse in the USX
                 r#"<span class="topos-verse" data-osis-id="JHN 3:17" data-n="17"></span>For God did not send His Son.</p>"#
             )]

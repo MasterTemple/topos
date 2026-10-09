@@ -41,11 +41,11 @@ WordsOfJesus 17..29 entry=1 path= "was the Word"
 25..29 entry=1 path=/0 offset=8
 
 #### html ####
-<p class="topos-p"><span class="topos-verse" data-osis-id="JHN 1:1" data-n="1"></span><span class="topos-woj">In the beginning</span></p>
+<p class="topos-p" data-style="p"><span class="topos-verse" data-osis-id="JHN 1:1" data-n="1"></span><span class="topos-woj" data-style="wj">In the beginning</span></p>
 #### html ####
 <span class="topos-woj">was the Word</span>
 #### html-bare ####
-<p class="p"><span class="verse" data-osis-id="JHN 1:1" data-n="1"></span><span class="woj">In the beginning</span></p>
+<p class="p" data-style="p"><span class="verse" data-osis-id="JHN 1:1" data-n="1"></span><span class="woj" data-style="wj">In the beginning</span></p>
 #### html-bare ####
 <span class="woj">was the Word</span>
 #### verses ####

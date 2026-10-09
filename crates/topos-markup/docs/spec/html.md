@@ -57,7 +57,17 @@ order.
 | `Verse` or `Chapter` with no children, not an `End` milestone | `<span class="Pverse">` (or `Pchapter`) `</span>`; `data-osis-id`: `osisID`, else `sID`; `data-n`: `n`, else `number` |
 | `Verse` or `Chapter` with no children, `End` milestone | nothing |
 | `Entry` | `<div class="Pentry">` children `</div>` |
+| `Division` with a USX style (`sidebar`) | `<div class="Pdiv">` children `</div>` |
+| `Other` with a USX style and children (a `char` of no other kind: `pn`, `fr`, `jmp`; a table `cell`) | `<span class="Pname">`, `name` the class-safe tag name (`char`, `cell`), children `</span>` |
 | everything else: `Division`, `Image`, `Metadata` (when kept), `Other`, `Milestone`, `Note` without children, `Title` with a milestone or without children, `LineGroup` with a milestone, `Verse`/`Chapter` with children | children only, no tag of its own |
+
+**USX styles.** An element's USX style is its `style` attribute, when not empty, for elements
+named `para`, `char`, `cell`, `sidebar`, and `note` with a `caller` attribute (other markups'
+`style` is CSS, and their notes have no `caller`). When a kept element has one, the first tag
+written for it ends with ` data-style="…"` after its other data attributes (escaped, not
+class-safe): `<p class="Pp" data-style="m">`, `<span class="Pl" data-style="q2">`, `<br
+class="Plb" data-style="b">`. The `br` after a line and the tags written for its children do
+not get it. An element that writes no tag drops it.
 
 Notes on the table:
 

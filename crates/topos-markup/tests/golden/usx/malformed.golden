@@ -35,9 +35,9 @@ WordsOfJesus 9..26 entry=0 path=/0/0/1 "red more\ntrailing"
 18..26 entry=0 path=/0/1 offset=1
 
 #### html ####
-<p class="topos-p">unclosed <span class="topos-woj">red <span class="topos-verse" data-osis-id="X 1:1" data-n="1"></span>more</span></p><span class="topos-woj"> trailing</span>
+<p class="topos-p" data-style="p">unclosed <span class="topos-woj" data-style="wj">red <span class="topos-verse" data-osis-id="X 1:1" data-n="1"></span>more</span></p><span class="topos-woj"> trailing</span>
 #### html-bare ####
-<p class="p">unclosed <span class="woj">red <span class="verse" data-osis-id="X 1:1" data-n="1"></span>more</span></p><span class="woj"> trailing</span>
+<p class="p" data-style="p">unclosed <span class="woj" data-style="wj">red <span class="verse" data-osis-id="X 1:1" data-n="1"></span>more</span></p><span class="woj"> trailing</span>
 #### verses ####
 0:1-1 marker=/0/0/1/1 start=/0/0/1/1 end=/1 "more\ntrailing"
 chapter_verses: []

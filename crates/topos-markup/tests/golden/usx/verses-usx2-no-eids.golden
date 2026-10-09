@@ -47,9 +47,9 @@ Other 0..36 entry=0 path=/0 "Jude, a servant Mercy to you\nBeloved"
 29..36 entry=0 path=/0/4/1 offset=0
 
 #### html ####
-<span class="topos-chapter" data-n="1"></span><div class="topos-title topos-s1" data-title-type="s1">Greeting</div><p class="topos-p"><span class="topos-verse" data-n="1"></span>Jude, a servant <span class="topos-verse" data-n="2"></span>Mercy to you</p><p class="topos-p"><span class="topos-verse" data-n="3"></span>Beloved</p>
+<span class="topos-chapter" data-n="1"></span><div class="topos-title topos-s1" data-title-type="s1" data-style="s1">Greeting</div><p class="topos-p" data-style="p"><span class="topos-verse" data-n="1"></span>Jude, a servant <span class="topos-verse" data-n="2"></span>Mercy to you</p><p class="topos-p" data-style="p"><span class="topos-verse" data-n="3"></span>Beloved</p>
 #### html-bare ####
-<span class="chapter" data-n="1"></span><div class="title s1" data-title-type="s1">Greeting</div><p class="p"><span class="verse" data-n="1"></span>Jude, a servant <span class="verse" data-n="2"></span>Mercy to you</p><p class="p"><span class="verse" data-n="3"></span>Beloved</p>
+<span class="chapter" data-n="1"></span><div class="title s1" data-title-type="s1" data-style="s1">Greeting</div><p class="p" data-style="p"><span class="verse" data-n="1"></span>Jude, a servant <span class="verse" data-n="2"></span>Mercy to you</p><p class="p" data-style="p"><span class="verse" data-n="3"></span>Beloved</p>
 #### verses ####
 1:1-1 marker=/0/3/0 start=/0/2 end=/0/3/2 "Greeting\nJude, a servant"
 1:2-2 marker=/0/3/2 start=/0/3/2 end=/0/4/0 "Mercy to you"
