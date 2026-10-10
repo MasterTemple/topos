@@ -198,9 +198,11 @@ logoxide-text        what's in a Bible or a book: verses, hashes, titles, .vrs m
 sword-modules        SWORD modules: read from memory (its versification systems for logoxide-text)
 logoxide             packages (logoxide.toml), the library (installed versions), the cache, the
                      lock file, catalogs, summaries as data; never reads text: asks a TextReader
-logoxide-import      eBible.org, fetch.bible, CCEL, SWORD: their lists and downloads into packages
+logoxide-import      eBible.org, fetch.bible, CCEL, SWORD, Door43: their lists and downloads into packages
+logoxide-app         what every front end does: catalogs over HTTP (cached), imports, read, compare
 lx                   the CLI
 logoxide-ffi         logoxide's and topos's API for apps (Python, WASM, Swift, Kotlin)
+logoxide-mcp         an MCP server for AI assistants
 front ends           topos CLI, logoxide-lsp, Neovim, Obsidian
 ```
 
