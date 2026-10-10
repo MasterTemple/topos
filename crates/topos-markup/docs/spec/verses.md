@@ -26,10 +26,15 @@ The markers are the elements of kind `Verse` or `Chapter`, in document order, fo
   none (a USX 2 `<verse number="1"/>` with no `sid` is a start). A marker with children counts as
   what its `milestone` says, usually `None`: an element that holds its text.
 
+A marker's **id word** is the last whitespace-separated word of its `osisID`, else of its `sID`
+(all lookups via `attr`); a marker with neither has none.
+
 Each marker's **number** is read from its first present attribute of `number`, `n`; else from its
-id: the last whitespace-separated word of `osisID`, else of `sID` (all lookups via `attr`), and the
-part of that word after its last `.` or `:` (`John.3.16` → `16`, `JHN 3:16` → `16`, `Gen.1` → `1`,
-`Gen.1.2 Gen.1.3` → `3`). Then:
+id word. When the id word has no `-`, the number is the part of it after its last `.` or `:`
+(`John.3.16` → `16`, `JHN 3:16` → `16`, `Gen.1` → `1`, `Gen.1.2 Gen.1.3` → `3`). When it has one,
+it is cut at its first `-` into a start and an end, and the number is the start's part after its
+last `.` or `:`, then `-`, then the end's part after its last `.` or `:` (`John.3.16-John.3.18` →
+`16-18`, `JHN 3:2-3` → `2-3`, `John.3.36-John.4.2` → `36-2`, `Gen.1.2-` → `2-`). Then:
 
 - the text is split at the first `-`, `–` (U+2013), or `,` into a first part and the rest;
 - each part's value is its leading ASCII digits after trimming whitespace, as a `u8`;
@@ -62,6 +67,24 @@ The id is read the same way, so `osisID="Gen.1.20a"` and `sID="GEN 1:20a"` give 
 A bridge's part belongs to its first verse: `20b-21` is the second part of verse 20 through the
 whole of verse 21.
 
+Each verse marker's **range into a later chapter**, if any, is read from its id word (whatever
+gave its number): the word must have a `-`, and is cut at its first `-` into a start and an end.
+Each side's **chapter** is the part before its last `.` or `:`, from after the `.` or `:` before
+that (or the side's beginning), as its leading ASCII digits after trimming whitespace, a `u8`
+(`John.3.36` → 3, `4:2` → 4, `JHN 3:36` → 3; `36`, `John.x.2` → none); its **verse** is the part
+after its last `.` or `:`, read the same way. When the end has a chapter and a verse, and the end's
+chapter is greater than the start's (or the start has none) and greater than the verse's chapter,
+the range is to that chapter and verse. Otherwise there is none.
+
+| id word | range |
+|---|---|
+| `John.3.36-John.4.2` | to 4:2 |
+| `JHN 3:36-4:2` (`sID`) | to 4:2 |
+| `John.6.71-John.7.0` | to 7:0 |
+| `John.3.16-John.3.18`, `Gen.1.2-3`, `John.3.16` | none |
+| `John.4.2-John.3.36` | none (the end is not later) |
+| `John.3.36-John.x.2`, `John.3.36-John.4.` | none |
+
 ### Building the spans
 
 The markers are read in order with: the current chapter (0 at first), the place where the next
@@ -81,7 +104,8 @@ verse starts (none at first), and the verse that is open (none at first).
   2. If the marker has no number, nothing more happens (the remembered start is kept for the next
      verse).
   3. Otherwise a verse is made: chapter = the current chapter; verse, part, and last from the
-     number;
+     number, and last chapter = the chapter; but when the marker has a range into a later chapter
+     greater than the current chapter, last chapter and last are that range's chapter and verse;
      marker = its path; start = the remembered start, which is then forgotten, or the marker's own
      path when there is none; end = one past the last top-level node (`[nodes.len()]`). But when
      there is a holding chapter and this marker is inside it (the chapter's path is a proper
@@ -111,6 +135,19 @@ Consequences:
   parts 1 and 2, so (chapter, verse, part) tells them apart; the same chapter, verse, and part can
   still appear twice (a repeated marker), and both are listed.
 - Chapter numbers are not checked; markers inside notes or other elements count.
+- A verse across chapters (a commentary's note on `John.3.36-John.4.2`, written in chapter 3) is
+  one span with chapter 3, verse 36, last chapter 4, and last 2. The chapter marker after it (the
+  file's `<chapter osisID="John.4">` before verse 3) ends it as any chapter marker does, and sets
+  the chapter as usual; the verses of chapter 4 it covers have no markers of their own.
+
+### Example (a range across chapters)
+
+`<chapter sID="John.3" osisID="John.3"/><verse sID="a" osisID="John.3.35"/>Loves<verse eID="a"/>
+<verse sID="b" osisID="John.3.36-John.4.2"/>Believes<verse eID="b"/><chapter eID="John.3"/>
+<chapter sID="John.4" osisID="John.4"/><verse sID="c" osisID="John.4.3"/>Left<verse eID="c"/>
+<chapter eID="John.4"/>` gives (chapter, verse, last chapter, last) = (3, 35, 3, 35), (3, 36, 4,
+2), (4, 3, 4, 3). `chapter_verses` is `[36, 3]`. `passage_ranges` for `John 4:1` is `[1..2]`, for
+`John 3:36` `[1..2]`, for `John 4` `[1..3]`, for `John 3` `[0..2]`.
 
 ### Example (USX)
 
@@ -172,9 +209,9 @@ For each part of `passage`, in the passage's order, as given by topos-bible's
 `Passage::ranges(None)` (an inclusive range from (chapter, verse) to (chapter, verse); a whole
 chapter ends at verse 255, `VerseRange::END_OF_CHAPTER`):
 
-- a verse span is **in** the part when `(span.chapter, span.last) >= (start chapter, start verse)`
-  and `(span.chapter, span.verse) <= (end chapter, end verse)` (tuples compared in order), so a
-  bridged verse is in when any of its verses is;
+- a verse span is **in** the part when `(span.last_chapter, span.last) >= (start chapter, start
+  verse)` and `(span.chapter, span.verse) <= (end chapter, end verse)` (tuples compared in order),
+  so a bridged verse, or one across chapters, is in when any of its verses is;
 - the result for the part is `first..last + 1`, where `first` and `last` are the indexes of the
   first and last spans in it; a part with none is left out.
 
@@ -192,7 +229,9 @@ whole of `Psalm 1` (`spans[0].start` to `spans[2].end`) and writing it with `Fil
 
 The verse count of each chapter, as a `Vec<u8>` whose index `i` is chapter `i + 1`: for each span
 with chapter at least 1, the count of its chapter is raised to `max(span.last, span.verse)`
-(parts are not counted: `20a` and `20b` are verse 20). The
+(parts are not counted: `20a` and `20b` are verse 20); but for a span whose last chapter is
+greater than its chapter, its chapter's count is raised to `span.verse` and its last chapter's to
+`span.last` (chapters between them are not raised). The
 vector is as long as the highest chapter that has a span; chapters with no spans are 0. Spans in
 chapter 0 are ignored. No spans → empty.
 

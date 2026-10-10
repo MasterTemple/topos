@@ -16,6 +16,12 @@ Changed on purpose since then (the prose was changed first):
   verses line writes it after the verse (`1:2a-2`). The `verses` sections of
   `usx/verse-variants` and `osis/verse-n-attribute` changed.
 
+- October 2026, verses.md: an id that is a range (`John.3.16-John.3.18`) is numbered by both
+  ends (16 to 18, where 0.5.0 read only the end's 18), and a range into a later chapter
+  (`John.3.36-John.4.2`) is one span to that chapter (`VerseSpan::last_chapter`), which the
+  verses line writes before `last` (`3:36-4:2`). No golden input had either; the case
+  `osis/verse-across-chapters` was added.
+
 ## File format
 
 A golden file is a sequence of sections. Each section starts with a header line
@@ -105,7 +111,8 @@ offsets continue; the grouping is of the observable `source` results, not of the
 ## Verses
 
 One line per `VerseSpan`, `<chapter>:<verse><part>-<last> marker=<path> start=<path> end=<path> "<text>"`,
-where `<part>` is empty for part 0 and the lowercase letter for parts 1 to 26 (`a` to `z`), and
+where `<part>` is empty for part 0 and the lowercase letter for parts 1 to 26 (`a` to `z`),
+`<last>` is `<last_chapter>:<last>` when the last chapter is not the chapter (`3:36-4:2`), and
 the text is the escaped `plain_text` of `slice(nodes, &start, Some(&end))` with
 `TextOptions { filter: Filter::all(), ..default }`. Then `chapter_verses: ` and `Debug` of
 `chapter_verses` (`[2]`), and `\n`.
