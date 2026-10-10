@@ -15,8 +15,8 @@ mod search;
 
 pub use cache::{Cache, Cached, clear, default_root};
 pub use search::{
-    CachedSearch, EpubPlace, FileHits, FileResult, Hit, Searcher, WalkOptions, is_epub, search,
-    search_file, search_text,
+    CachedSearch, EpubPlace, FileHits, FileResult, Hit, PdfPlace, Searcher, WalkOptions, is_epub,
+    search, search_file, search_text,
 };
 pub use topos_bible_formats::epub::CfiOptions;
 

@@ -178,6 +178,37 @@ fn search_doc<R: Read + Seek>(
     Ok(found)
 }
 
+/**
+An EPUB's text as its references' lines and offsets count it ([`CfiLocation::line`],
+[`CfiLocation::text_utf16`]): each content document's text, a blank line after each, so an editor
+showing it can go to a reference by its line and column
+*/
+pub fn epub_text_reader<R: Read + Seek>(reader: R) -> Result<String, EPUBMatchError> {
+    let mut doc =
+        EpubDoc::from_reader(reader).map_err(|e| EPUBMatchError::PackageError(e.to_string()))?;
+    let root_file = doc.root_file.clone();
+    let opf = doc.get_resource_str_by_path(&root_file).ok_or_else(|| {
+        EPUBMatchError::PackageError(format!("missing package {}", root_file.display()))
+    })?;
+    let mut book = String::new();
+    for item in spine_items(&opf)? {
+        let Some(resource) = doc.resources.get(&item.idref) else {
+            continue;
+        };
+        let path = resource.path.clone();
+        let Some(bytes) = doc.get_resource_by_path(&path) else {
+            continue;
+        };
+        // Skipped as the search skips it
+        let Ok(content) = ContentDocument::parse(&String::from_utf8_lossy(&bytes)) else {
+            continue;
+        };
+        book.push_str(&content.text);
+        book.push_str(SEPARATOR);
+    }
+    Ok(book)
+}
+
 /// Converts increasing byte offsets in one text to UTF-16 offsets, counting each byte once
 #[derive(Default)]
 struct Utf16Offsets {
@@ -1301,6 +1332,22 @@ mod tests {
                 (Some("Chapter Two"), 45..57, 5, 20, paragraph),
             ]
         );
+
+        // The book's text has each reference at its line, column, and offsets
+        let text = epub_text_reader(Cursor::new(epub())).unwrap();
+        let lines: Vec<&str> = text.lines().collect();
+        let utf16: Vec<u16> = text.encode_utf16().collect();
+        for m in &found {
+            let l = &m.location;
+            assert_eq!(lines[l.line - 1], l.line_text);
+            let written = String::from_utf16(&utf16[l.text_utf16.clone()]).unwrap();
+            let line: Vec<u16> = l.line_text.encode_utf16().collect();
+            let at = l.utf16_column - 1;
+            assert_eq!(
+                String::from_utf16(&line[at..at + written.encode_utf16().count()]).unwrap(),
+                written
+            );
+        }
     }
 
     #[test]

@@ -5,12 +5,33 @@ use std::{collections::HashSet, sync::Mutex};
 
 use boltffi::*;
 use topos_bible_index::{
-    Detail, EntryMessage, EpubEntryBuilder, EpubRef, FileEntry, Hit, Index, Order, Pack,
+    Detail, EntryMessage, EpubEntryBuilder, EpubRef, FileEntry, FileKind, Hit, Index, Order, Pack,
     PathFilter, Results, Scope, Stamp, Status, Unit, detail_name, text_entry,
 };
 use topos_lib::segments::Passage as CorePassage;
 
 use crate::{OffsetUnit, Passage, Topos, ToposError, ToposQuery};
+
+/// What kind of file an entry is for (by its extension): each kind's packs are apart, so an app
+/// reads only the kinds it searches ([`ToposIndex::pack_kind`])
+#[data]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum IndexKind {
+    /// Anything read as text (Markdown, subtitles, plain text)
+    Text,
+    Epub,
+    Pdf,
+}
+
+impl From<FileKind> for IndexKind {
+    fn from(kind: FileKind) -> Self {
+        match kind {
+            FileKind::Text => Self::Text,
+            FileKind::Epub => Self::Epub,
+            FileKind::Pdf => Self::Pdf,
+        }
+    }
+}
 
 /// Whether the index has a file's references (see [`ToposIndex::check`])
 #[data]
@@ -184,7 +205,8 @@ impl ToposPaths {
     }
 }
 
-/// A file to write: a pack (`<device>-<number>.bin`) or an EPUB's details (`<name>.bin`)
+/// A file to write: a pack (`<device>-<kind>-<number>.bin`) or an EPUB's or PDF's details
+/// (`<name>.bin`)
 #[data]
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct IndexFile {
@@ -200,6 +222,17 @@ pub struct IndexEpub {
     /// Its range CFI (empty until the book's details are loaded)
     pub cfi: String,
     pub chapter: Option<String>,
+}
+
+/// Where a reference in a PDF is
+#[data]
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct IndexPdf {
+    /// 1-based
+    pub page: u32,
+    /// Where it is as PDF++ links write it (`page=3&rect=72,708,126,720`; empty until the
+    /// document's details are loaded)
+    pub locator: String,
 }
 
 /// A reference from the index
@@ -218,6 +251,7 @@ pub struct IndexHit {
     /// other files, whose lines are in the files themselves
     pub line_text: String,
     pub epub: Option<IndexEpub>,
+    pub pdf: Option<IndexPdf>,
 }
 
 /// A reference in an EPUB, for [`ToposIndex::set_epub`]
@@ -309,14 +343,25 @@ impl ToposIndex {
     fn hit(&self, topos: &Topos, hit: &Hit) -> Option<IndexHit> {
         let passage = topos.passage(&hit.reference.passage, &topos.format)?;
         let r = hit.reference;
-        let epub = r.section.map(|section| IndexEpub {
-            spine_index: section.spine,
-            cfi: hit.detail.map(|d| d.cfi.clone()).unwrap_or_default(),
-            chapter: hit.chapter().map(str::to_string),
-        });
+        let locator = || hit.detail.map(|d| d.cfi.clone()).unwrap_or_default();
+        let kind = FileKind::of(hit.path);
+        let epub = (r.section)
+            .filter(|_| kind == FileKind::Epub)
+            .map(|section| IndexEpub {
+                spine_index: section.spine,
+                cfi: locator(),
+                chapter: hit.chapter().map(str::to_string),
+            });
+        // A PDF's page index is where an EPUB's spine item is
+        let pdf = (r.section)
+            .filter(|_| kind == FileKind::Pdf)
+            .map(|section| IndexPdf {
+                page: section.spine + 1,
+                locator: locator(),
+            });
         let (line_text, column) = match hit.detail {
             Some(detail) => (detail.context.clone(), detail.at + 1),
-            None if epub.is_some() => (String::new(), 1),
+            None if r.section.is_some() => (String::new(), 1),
             None => (String::new(), r.column),
         };
         Some(IndexHit {
@@ -328,6 +373,7 @@ impl ToposIndex {
             column,
             line_text,
             epub,
+            pdf,
         })
     }
 }
@@ -480,18 +526,32 @@ impl ToposIndex {
         self.lock().is_dirty()
     }
 
-    /// This device's packs that changed, to write (each replaces the file of the same name)
+    /// This device's packs that changed, to write (each replaces the file of the same name,
+    /// `<device>-<kind>-<number>.bin`)
     pub fn take_dirty_packs(&self) -> Vec<IndexFile> {
-        let mut index = self.lock();
-        let device = index.device().to_string();
-        index
+        self.lock()
             .take_dirty_packs()
             .into_iter()
             .map(|pack| IndexFile {
-                name: format!("{device}-{:02}.bin", pack.number),
+                name: pack.file_name(),
                 bytes: pack.encode(),
             })
             .collect()
+    }
+
+    /// The kind of files a pack (its file name, `laptop-epub-07.bin`) has entries for, so only
+    /// the kinds an app searches are read; `None` for another name (a pack from an older index)
+    pub fn pack_kind(&self, name: String) -> Option<IndexKind> {
+        let stem = name.strip_suffix(".bin")?;
+        let mut parts = stem.rsplitn(3, '-');
+        let (_number, kind) = (parts.next()?, parts.next()?);
+        parts.next()?;
+        FileKind::from_name(kind).map(Into::into)
+    }
+
+    /// The kind of a file, by its extension
+    pub fn kind_of(&self, path: String) -> IndexKind {
+        FileKind::of(&path).into()
     }
 
     /// New EPUB details to write (`<name>.bin`)
@@ -694,6 +754,51 @@ impl Topos {
     }
 
     /**
+    Searches a PDF (its bytes) for [`ToposIndex::insert`], like [`Topos::index_epub`]: UTF-16
+    offsets through the document's text, and each reference's page and PDF++ locator. Native only,
+    with the `pdf` feature (MuPDF): elsewhere it errs
+    */
+    pub fn index_pdf(
+        &self,
+        path: String,
+        size: f64,
+        mtime: f64,
+        bytes: Vec<u8>,
+        written: f64,
+    ) -> Result<Vec<u8>, ToposError> {
+        #[cfg(feature = "pdf")]
+        {
+            let stamp = Stamp {
+                size: whole(size),
+                mtime: whole(mtime),
+                hash: None,
+            };
+            let (entry, detail) = topos_bible_index::pdf_file_entry(
+                &self.matcher,
+                &path,
+                &bytes,
+                stamp,
+                whole(written),
+            )
+            .map_err(invalid)?;
+            Ok(EntryMessage {
+                path,
+                unit: Unit::Utf16,
+                entry,
+                detail,
+            }
+            .encode())
+        }
+        #[cfg(not(feature = "pdf"))]
+        {
+            let _ = (path, size, mtime, bytes, written);
+            Err(invalid(
+                "PDFs need topos built with the pdf feature (MuPDF), natively",
+            ))
+        }
+    }
+
+    /**
     Searches a text file for [`ToposIndex::insert`], in the index's format: lets another thread
     (a Web Worker) search while the index stays where it's queried
     */
@@ -776,5 +881,39 @@ mod tests {
         assert_eq!(bad.problems().len(), 2);
         assert!(matches!(found(bad), Err(ToposError::InvalidQuery { .. })));
         Ok(())
+    }
+
+    #[test]
+    fn packs_are_named_by_kind() {
+        let topos = Topos::new();
+        let index = ToposIndex::create("my-laptop".into(), "test".into(), OffsetUnit::Utf16);
+        index.index_text(&topos, "a.md".into(), 1.0, 1.0, "John 3:16".into(), 1.0);
+        let names: Vec<String> = index
+            .take_dirty_packs()
+            .into_iter()
+            .map(|f| f.name)
+            .collect();
+        assert_eq!(names.len(), 1);
+        assert!(names[0].starts_with("my-laptop-text-"), "{names:?}");
+        assert_eq!(index.pack_kind(names[0].clone()), Some(IndexKind::Text));
+        assert_eq!(
+            index.pack_kind("my-laptop-pdf-03.bin".into()),
+            Some(IndexKind::Pdf)
+        );
+        // Packs from before kinds (`<device>-<number>.bin`) have none
+        assert_eq!(index.pack_kind("my-laptop-03.bin".into()), None);
+        assert_eq!(index.pack_kind("laptop-03.bin".into()), None);
+        assert_eq!(index.kind_of("Books/A.EPUB".into()), IndexKind::Epub);
+    }
+
+    #[cfg(not(feature = "pdf"))]
+    #[test]
+    fn pdfs_need_the_feature() {
+        let topos = Topos::new();
+        assert!(
+            topos
+                .index_pdf("a.pdf".into(), 1.0, 1.0, vec![], 1.0)
+                .is_err()
+        );
     }
 }

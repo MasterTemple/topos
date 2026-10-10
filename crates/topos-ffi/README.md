@@ -148,11 +148,14 @@ carry a `Translation { name, start, end }` (offsets in your unit); completions o
 [`topos-bible-index`](../topos-index)) keeps the references of many files between runs, compactly
 (about 15 bytes each), and searches only files that changed: `check(path, size, mtime)` says
 whether its entry is current; `indexText` searches a text file, `insert` adds an entry made
-elsewhere (`Topos.indexEntry` on another thread, `Topos.indexEpub` for an EPUB's bytes, or the
-CLI's `-m index`). `query(topos, query, scope, path, order)` filters with a `ToposQuery`, sorts,
+elsewhere (`Topos.indexEntry` on another thread, `Topos.indexEpub` for an EPUB's bytes,
+`Topos.indexPdf` for a PDF's in native builds with the `pdf` feature, or the CLI's `-m index`). `query(topos, query, scope, path, order)` filters with a `ToposQuery`, sorts,
 and counts, and `page` reads the results. `takeDirtyPacks` and `takeUnsavedDetails` give the files
 to write, and `loadPack` and `loadDetail` read them back; each device writes its own packs, so
-devices that sync the same files share the index.
+devices that sync the same files share the index. Each kind of file (text, EPUB, PDF) has packs of
+its own (`<device>-<kind>-<number>.bin`; `packKind(name)` says which), so an app reads only the
+kinds it searches: one without PDFs never reads their packs. Packs from before kinds fail to load
+(another format), and their files are searched again.
 
 **Files and folders.** `searchFiles(paths, files, query, unit)` searches like the CLI (not in
 WebAssembly, which has no file access): `ToposFiles` holds the CLI's walking options (`hidden`,

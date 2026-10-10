@@ -246,7 +246,7 @@ pub fn text_entry(
     FileEntry::new(stamp, written, text_refs(matcher, text, unit))
 }
 
-/// Builds an EPUB's entry and details one reference at a time
+/// Builds an EPUB's (or a PDF's) entry and details one reference at a time
 #[derive(Debug, Default)]
 pub struct EpubEntryBuilder {
     chapters: Vec<String>,
@@ -369,6 +369,71 @@ pub fn epub_file_entry(
     })
 }
 
+/**
+A PDF's entry and details from its bytes (with MuPDF, so not in WebAssembly), named for its path;
+the error says why it couldn't be read
+- Like an EPUB's: offsets are UTF-16 through the document's text (each page's), a reference's
+  [`Section::spine`] is its page's index (page 1 is 0), and its detail's `cfi` is where it is
+  as PDF++ links write it: `page=3&rect=72,708,126,720` (the first line it covers, in PDF
+  coordinates from the bottom left)
+*/
+#[cfg(feature = "pdf")]
+pub fn pdf_file_entry(
+    matcher: &BibleMatcher,
+    path: &str,
+    bytes: &[u8],
+    stamp: Stamp,
+    written: u64,
+) -> Result<(FileEntry, Option<Detail>), String> {
+    use topos_bible_formats::{SearchFormat as _, pdf::PDFLocation};
+    let doc = mupdf::Document::from_bytes(bytes, "application/pdf").map_err(|e| e.to_string())?;
+    let matches = matcher
+        .search_format::<PDFLocation>(&doc)
+        .map_err(|e| e.to_string())?;
+    let mut builder = EpubEntryBuilder::default();
+    for m in matches {
+        let l = m.location;
+        builder.push(EpubRef {
+            passage: m.psg,
+            start: l.text_utf16.start as u32,
+            end: l.text_utf16.end as u32,
+            line: l.line as u32,
+            column: l.utf16_column as u32,
+            spine: l.page.saturating_sub(1) as u32,
+            chapter: None,
+            cfi: pdf_locator(l.page, l.rects.first()),
+            line_text: &l.line_text,
+        });
+    }
+    let (entry, detail) = builder.finish(stamp, written, detail_name(path, &stamp));
+    Ok(if entry.refs.is_empty() {
+        (
+            FileEntry {
+                detail: None,
+                ..entry
+            },
+            None,
+        )
+    } else {
+        (entry, Some(detail))
+    })
+}
+
+/// Where a reference in a PDF is, as PDF++ links write it: `page=3&rect=72,708,126,720`
+#[cfg(feature = "pdf")]
+pub fn pdf_locator(page: usize, rect: Option<&topos_bible_formats::pdf::PDFRect>) -> String {
+    match rect {
+        Some(r) => format!(
+            "page={page}&rect={:.0},{:.0},{:.0},{:.0}",
+            r.x,
+            r.y,
+            r.x + r.w,
+            r.y + r.h
+        ),
+        None => format!("page={page}"),
+    }
+}
+
 /// A name for an EPUB's details, from its path and version
 pub fn detail_name(path: &str, stamp: &Stamp) -> String {
     let key = format!("{path}\0{}\0{}", stamp.size, stamp.mtime);
@@ -378,6 +443,64 @@ pub fn detail_name(path: &str, stamp: &Stamp) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// A one-page PDF with a line of text per entry
+    #[cfg(feature = "pdf")]
+    fn pdf(lines: &[&str]) -> Vec<u8> {
+        let mut content = String::from("BT /F1 12 Tf 72 720 Td 14 TL\n");
+        for line in lines {
+            content.push_str(&format!("({line}) Tj T*\n"));
+        }
+        content.push_str("ET");
+        let objects = [
+            "<< /Type /Catalog /Pages 2 0 R >>".to_string(),
+            "<< /Type /Pages /Kids [3 0 R] /Count 1 >>".to_string(),
+            "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>".to_string(),
+            format!("<< /Length {} >>\nstream\n{content}\nendstream", content.len()),
+            "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>".to_string(),
+        ];
+        let mut out = String::from("%PDF-1.4\n");
+        let mut offsets = vec![];
+        for (i, object) in objects.iter().enumerate() {
+            offsets.push(out.len());
+            out.push_str(&format!("{} 0 obj\n{object}\nendobj\n", i + 1));
+        }
+        let xref = out.len();
+        out.push_str(&format!(
+            "xref\n0 {}\n0000000000 65535 f \n",
+            objects.len() + 1
+        ));
+        for offset in offsets {
+            out.push_str(&format!("{offset:010} 00000 n \n"));
+        }
+        out.push_str(&format!(
+            "trailer\n<< /Size {} /Root 1 0 R >>\nstartxref\n{xref}\n%%EOF\n",
+            objects.len() + 1
+        ));
+        out.into_bytes()
+    }
+
+    #[cfg(feature = "pdf")]
+    #[test]
+    fn pdf_entries_have_pages_and_locators() {
+        let matcher = BibleMatcher::default();
+        let stamp = Stamp {
+            size: 1,
+            mtime: 2,
+            hash: None,
+        };
+        let bytes = pdf(&["Notes", "Read John 3:16 today."]);
+        let (entry, detail) = pdf_file_entry(&matcher, "a.pdf", &bytes, stamp, 3).unwrap();
+        let detail = detail.unwrap();
+        assert_eq!(entry.refs.len(), 1);
+        let r = &entry.refs[0];
+        assert_eq!(r.section.map(|s| s.spine), Some(0));
+        assert_eq!((r.line, r.column, r.len), (2, 6, 9));
+        assert!(detail.refs[0].cfi.starts_with("page=1&rect="), "{detail:?}");
+        assert!(detail.refs[0].context.contains("John 3:16"));
+        // Not a PDF
+        assert!(pdf_file_entry(&matcher, "b.pdf", b"text", stamp, 3).is_err());
+    }
 
     #[test]
     fn snippets_keep_the_text_around_a_reference() {

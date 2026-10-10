@@ -27,6 +27,8 @@ pub use entry::{
 };
 #[cfg(feature = "epub")]
 pub use entry::{epub_entry, epub_file_entry};
+#[cfg(feature = "pdf")]
+pub use entry::{pdf_file_entry, pdf_locator};
 pub use index::{Hit, Index, IndexError, Order, PACK_COUNT, Results, Scope, Status};
-pub use pack::{Confirmation, EntryMessage, FORMAT, FormatError, Pack, pack_number};
+pub use pack::{Confirmation, EntryMessage, FORMAT, FileKind, FormatError, Pack, pack_number};
 pub use paths::{PathError, PathFilter};

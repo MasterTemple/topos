@@ -202,16 +202,22 @@ impl Printer {
                                 Some(epub.text_utf16.end),
                                 Some(epub.line_text.as_str()),
                             ),
-                            _ => (None, None, None),
+                            // PDFs: in the document's text (each page's)
+                            _ => match &hit.pdf {
+                                Some(pdf) => (
+                                    Some(pdf.text_utf16.start),
+                                    Some(pdf.text_utf16.end),
+                                    Some(pdf.line_text.as_str()),
+                                ),
+                                None => (None, None, None),
+                            },
                         };
-                    let line = hit
-                        .position
-                        .map(|(s, _)| s.line)
-                        .or(hit.epub.as_ref().map(|e| e.line));
-                    let utf16_column = hit
-                        .position
-                        .map(|(s, _)| s.utf16_column)
-                        .or(hit.epub.as_ref().map(|e| e.utf16_column));
+                    let line = (hit.position.map(|(s, _)| s.line))
+                        .or(hit.epub.as_ref().map(|e| e.line))
+                        .or(hit.pdf.as_ref().map(|p| p.line));
+                    let utf16_column = (hit.position.map(|(s, _)| s.utf16_column))
+                        .or(hit.epub.as_ref().map(|e| e.utf16_column))
+                        .or(hit.pdf.as_ref().map(|p| p.utf16_column));
                     let mut value = json!({
                         "path": file.path,
                         "reference": self.reference(&hit.passage),
@@ -240,6 +246,12 @@ impl Printer {
                                 "cfi": hit.label,
                                 "chapter": epub.chapter,
                             }),
+                        );
+                    }
+                    if let (Some(pdf), serde_json::Value::Object(map)) = (&hit.pdf, &mut value) {
+                        map.insert(
+                            "pdf".into(),
+                            json!({ "page": pdf.page, "locator": pdf.locator }),
                         );
                     }
                     let value = match (value, self.link(file, hit)) {
@@ -408,24 +420,39 @@ fn index_line(file: &FileHits) -> String {
         .unwrap_or_default();
     let mtime = metadata.and_then(|m| m.modified().ok()).map_or(0, millis);
     let written = millis(SystemTime::now());
-    let is_book = file.path.as_deref().is_some_and(is_epub);
+    // EPUBs and PDFs: offsets through the whole book's text, with details
+    let is_book =
+        file.path.as_deref().is_some_and(is_epub) || file.hits.iter().any(|hit| hit.pdf.is_some());
     let (entry, detail) = if is_book {
         let mut builder = EpubEntryBuilder::default();
         for hit in &file.hits {
-            let Some(epub) = &hit.epub else {
-                continue;
+            let reference = match (&hit.epub, &hit.pdf) {
+                (Some(epub), _) => EpubRef {
+                    passage: hit.passage.clone(),
+                    start: epub.text_utf16.start as u32,
+                    end: epub.text_utf16.end as u32,
+                    line: epub.line as u32,
+                    column: epub.utf16_column as u32,
+                    spine: epub.spine_index as u32,
+                    chapter: epub.chapter.as_deref(),
+                    cfi: hit.label.clone().unwrap_or_default(),
+                    line_text: &epub.line_text,
+                },
+                // A page's index stands for its spine item
+                (_, Some(pdf)) => EpubRef {
+                    passage: hit.passage.clone(),
+                    start: pdf.text_utf16.start as u32,
+                    end: pdf.text_utf16.end as u32,
+                    line: pdf.line as u32,
+                    column: pdf.utf16_column as u32,
+                    spine: pdf.page.saturating_sub(1) as u32,
+                    chapter: None,
+                    cfi: pdf.locator.clone(),
+                    line_text: &pdf.line_text,
+                },
+                _ => continue,
             };
-            builder.push(EpubRef {
-                passage: hit.passage.clone(),
-                start: epub.text_utf16.start as u32,
-                end: epub.text_utf16.end as u32,
-                line: epub.line as u32,
-                column: epub.utf16_column as u32,
-                spine: epub.spine_index as u32,
-                chapter: epub.chapter.as_deref(),
-                cfi: hit.label.clone().unwrap_or_default(),
-                line_text: &epub.line_text,
-            });
+            builder.push(reference);
         }
         let stamp = Stamp {
             size,

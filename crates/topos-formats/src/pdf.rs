@@ -11,6 +11,15 @@ pub struct PDFLocation {
     /// 1-based page number
     pub page: usize,
     pub rects: Vec<PDFRect>,
+    /// Where it is in the document's text ([`pdf_text`]: each page's text, its paragraphs a blank
+    /// line apart), in UTF-16 code units
+    pub text_utf16: Range<usize>,
+    /// The 1-based line of the document's text it starts on
+    pub line: usize,
+    /// The 1-based UTF-16 column it starts at
+    pub utf16_column: usize,
+    /// The line it starts on
+    pub line_text: String,
 }
 
 /**
@@ -40,6 +49,8 @@ impl PDFRect {
 
 #[derive(thiserror::Error, Debug)]
 pub enum PDFMatchError {
+    #[error("failed to open the PDF: {0}")]
+    Open(String),
     #[error("failed to read the pages: {0}")]
     ReadPages(String),
     #[error("failed to read page {page}: {error}")]
@@ -102,6 +113,33 @@ impl PageText {
     }
 }
 
+/// A PDF's text as its references' lines and offsets count it ([`PDFLocation::line`],
+/// [`PDFLocation::text_utf16`]), so an editor showing it can go to a reference
+pub fn pdf_text(doc: &Document) -> Result<String, PDFMatchError> {
+    let pages = doc
+        .pages()
+        .map_err(|e| PDFMatchError::ReadPages(e.to_string()))?;
+    let mut text = String::new();
+    for (idx, page) in pages.enumerate() {
+        let read_error = |error: mupdf::Error| PDFMatchError::ReadPage {
+            page: idx + 1,
+            error: error.to_string(),
+        };
+        let page = page.map_err(read_error)?;
+        text.push_str(&PageText::new(&page).map_err(read_error)?.text);
+    }
+    Ok(text)
+}
+
+/// [`pdf_text`] of a PDF file
+pub fn pdf_file_text(path: &std::path::Path) -> Result<String, PDFMatchError> {
+    let path = path
+        .to_str()
+        .ok_or_else(|| PDFMatchError::Open(format!("{} isn't UTF-8", path.display())))?;
+    let doc = Document::open(path).map_err(|e| PDFMatchError::Open(e.to_string()))?;
+    pdf_text(&doc)
+}
+
 impl Format for PDFLocation {
     type Input<'a> = &'a Document;
 
@@ -114,6 +152,8 @@ impl Format for PDFLocation {
             .pages()
             .map_err(|e| PDFMatchError::ReadPages(e.to_string()))?;
         let mut matches = vec![];
+        // Where this page's text starts in the document's
+        let (mut doc_utf16, mut doc_line) = (0, 0);
         for (idx, page) in pages.enumerate() {
             let page_num = idx + 1;
             let read_error = |error: mupdf::Error| PDFMatchError::ReadPage {
@@ -123,18 +163,31 @@ impl Format for PDFLocation {
             let page = page.map_err(read_error)?;
             let bounds = page.bounds().map_err(read_error)?;
             let text = PageText::new(&page).map_err(read_error)?;
-            matches.extend(matcher.search(&text.text).into_iter().map(|m| {
+            let page_text = &text.text;
+            matches.extend(matcher.search(page_text).into_iter().map(|m| {
                 let bytes = m.location.bytes;
                 let rects = text
                     .rects(bytes.start..bytes.end)
                     .into_iter()
                     .map(|rect| PDFRect::new(bounds, rect))
                     .collect();
-                m.map_loc(|_| PDFLocation {
+                let utf16 = |byte: usize| page_text[..byte].encode_utf16().count();
+                let line_start = page_text[..bytes.start].rfind('\n').map_or(0, |i| i + 1);
+                let line_end = page_text[bytes.start..]
+                    .find('\n')
+                    .map_or(page_text.len(), |i| bytes.start + i);
+                let location = PDFLocation {
                     page: page_num,
                     rects,
-                })
+                    text_utf16: doc_utf16 + utf16(bytes.start)..doc_utf16 + utf16(bytes.end),
+                    line: doc_line + m.location.start.line,
+                    utf16_column: m.location.start.utf16_column,
+                    line_text: page_text[line_start..line_end].to_string(),
+                };
+                m.map_loc(|_| location)
             }));
+            doc_utf16 += page_text.encode_utf16().count();
+            doc_line += page_text.matches('\n').count();
         }
         Ok(matches)
     }
@@ -195,5 +248,22 @@ mod tests {
         // The first line is near the top of the page (y is measured from the bottom)
         let rect = matches[0].location.rects[0];
         assert!(rect.y > 700.0 && rect.w > 0.0 && rect.h > 0.0, "{rect:?}");
+        // Lines and columns in the document's text
+        let text = pdf_text(&doc).unwrap();
+        let lines: Vec<&str> = text.lines().collect();
+        for m in &matches {
+            let l = &m.location;
+            assert_eq!(lines[l.line - 1], l.line_text);
+            let at: String = l
+                .line_text
+                .chars()
+                .skip(l.utf16_column - 1)
+                .take(4)
+                .collect();
+            assert!(at == "John" || at == "Roma", "{at}");
+            let utf16: Vec<u16> = text.encode_utf16().collect();
+            let found = String::from_utf16(&utf16[l.text_utf16.clone()]).unwrap();
+            assert!(found.starts_with(&at), "{found}");
+        }
     }
 }

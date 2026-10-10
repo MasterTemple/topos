@@ -14,7 +14,7 @@ use topos_bible::{
 use crate::{
     PathFilter,
     entry::{Detail, FileEntry, RefDetail, Reference, Unit},
-    pack::{Confirmation, EntryMessage, Pack, pack_number},
+    pack::{Confirmation, EntryMessage, FileKind, Pack, pack_number},
 };
 
 /// How many packs a device's entries are split into
@@ -165,7 +165,8 @@ pub struct Index {
     engine: String,
     slots: Vec<Slot>,
     by_path: HashMap<String, u32>,
-    dirty: BTreeSet<u32>,
+    /// Packs to write, by kind and number
+    dirty: BTreeSet<(FileKind, u32)>,
     details: HashMap<String, Detail>,
     detail_order: VecDeque<String>,
     /// Details not written yet (never dropped before they are)
@@ -237,14 +238,16 @@ impl Index {
     }
 
     fn touch(&mut self, path: &str) {
-        self.dirty.insert(pack_number(path, PACK_COUNT));
+        self.dirty
+            .insert((FileKind::of(path), pack_number(path, PACK_COUNT)));
         self.generation += 1;
     }
 
     /**
     Adds a device's pack: this device's own (from an earlier run) or another's (synced). It
-    replaces what the index had from that device's pack of the same number. Files whose entry
-    changed should be checked again.
+    replaces what the index had from that device's pack of the same kind and number. Files whose
+    entry changed should be checked again.
+    - Load only the kinds of files the app searches: the others' entries are never needed
     */
     pub fn load_pack(&mut self, pack: Pack) -> Result<(), IndexError> {
         if pack.unit != self.unit {
@@ -254,8 +257,11 @@ impl Index {
             return Err(IndexError::PackCount(pack.count));
         }
         let own = pack.device == self.device;
+        let in_pack = |path: &str| {
+            FileKind::of(path) == pack.kind && pack_number(path, PACK_COUNT) == pack.number
+        };
         for slot in &mut self.slots {
-            if pack_number(&slot.path, PACK_COUNT) != pack.number {
+            if !in_pack(&slot.path) {
                 continue;
             }
             if own {
@@ -265,7 +271,8 @@ impl Index {
                 slot.others.remove(&pack.device);
             }
         }
-        for (path, entry) in pack.entries {
+        // Entries of another kind or number than the pack's aren't its (a renamed pack)
+        for (path, entry) in pack.entries.into_iter().filter(|(p, _)| in_pack(p)) {
             let id = self.slot_id(&path) as usize;
             let slot = &mut self.slots[id];
             if own {
@@ -275,7 +282,7 @@ impl Index {
             }
         }
         if own {
-            for (path, confirmation) in pack.confirmations {
+            for (path, confirmation) in pack.confirmations.into_iter().filter(|(p, _)| in_pack(p)) {
                 let id = self.slot_id(&path) as usize;
                 self.slots[id].confirmed = Some(confirmation);
             }
@@ -444,19 +451,22 @@ impl Index {
         !self.dirty.is_empty()
     }
 
-    /// This device's packs that changed, to write (as `<device>-<number>`), and forgets that
+    /// This device's packs that changed, to write (as [`Pack::file_name`]), and forgets that
     /// they changed
     pub fn take_dirty_packs(&mut self) -> Vec<Pack> {
-        let numbers = std::mem::take(&mut self.dirty);
-        numbers.into_iter().map(|n| self.pack(n)).collect()
+        let packs = std::mem::take(&mut self.dirty);
+        packs
+            .into_iter()
+            .map(|(kind, number)| self.pack(kind, number))
+            .collect()
     }
 
-    /// This device's pack `number`, with every entry and confirmation in it
-    pub fn pack(&self, number: u32) -> Pack {
+    /// This device's pack of a kind and number, with every entry and confirmation in it
+    pub fn pack(&self, kind: FileKind, number: u32) -> Pack {
         let mut entries = vec![];
         let mut confirmations = vec![];
         for slot in &self.slots {
-            if pack_number(&slot.path, PACK_COUNT) != number {
+            if FileKind::of(&slot.path) != kind || pack_number(&slot.path, PACK_COUNT) != number {
                 continue;
             }
             if let Some(entry) = &slot.own {
@@ -468,6 +478,7 @@ impl Index {
         }
         Pack {
             device: self.device.clone(),
+            kind,
             number,
             count: PACK_COUNT,
             unit: self.unit,
@@ -913,17 +924,47 @@ mod tests {
         laptop.set("a.md", entry("Jn 1:1", 6, 1, 100));
         let number = pack_number("a.md", PACK_COUNT);
         let mut phone = Index::new("phone", Unit::Utf16, "test");
-        phone.load_pack(laptop.pack(number)).unwrap();
+        phone
+            .load_pack(laptop.pack(FileKind::Text, number))
+            .unwrap();
         laptop.remove("a.md");
-        phone.load_pack(laptop.pack(number)).unwrap();
+        phone
+            .load_pack(laptop.pack(FileKind::Text, number))
+            .unwrap();
         assert_eq!(phone.check("a.md", 6, 1), Status::Missing);
         assert_eq!(
             phone.load_pack(Pack {
                 unit: Unit::Byte,
-                ..laptop.pack(number)
+                ..laptop.pack(FileKind::Text, number)
             }),
             Err(IndexError::Unit(Unit::Byte, Unit::Utf16))
         );
+    }
+
+    #[test]
+    fn each_kind_of_file_has_its_own_packs() {
+        let mut laptop = Index::new("laptop", Unit::Utf16, "test");
+        laptop.set("a.md", entry("Jn 1:1", 6, 1, 100));
+        laptop.set("b.epub", entry("Gen 1:1", 500, 1, 100));
+        laptop.set("c.PDF", entry("Rom 8:28", 900, 1, 100));
+        let packs = laptop.take_dirty_packs();
+        let kinds: Vec<FileKind> = packs.iter().map(|p| p.kind).collect();
+        assert_eq!(kinds, [FileKind::Text, FileKind::Epub, FileKind::Pdf]);
+        assert!(packs.iter().all(|p| p.entries.len() == 1));
+        // An app that searches no PDFs reads only the others
+        let mut phone = Index::new("phone", Unit::Utf16, "test");
+        for pack in packs.into_iter().filter(|p| p.kind != FileKind::Pdf) {
+            phone.load_pack(pack).unwrap();
+        }
+        assert_eq!(phone.check("a.md", 6, 1), Status::Fresh);
+        assert_eq!(phone.check("b.epub", 500, 1), Status::Fresh);
+        assert_eq!(phone.check("c.PDF", 900, 1), Status::Missing);
+        // Reloading a text pack of the EPUB's number leaves the EPUB's entry alone
+        let mut empty = laptop.pack(FileKind::Epub, pack_number("b.epub", PACK_COUNT));
+        empty.kind = FileKind::Text;
+        empty.entries.clear();
+        phone.load_pack(empty).unwrap();
+        assert_eq!(phone.check("b.epub", 500, 1), Status::Fresh);
     }
 
     #[test]

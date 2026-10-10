@@ -1,8 +1,10 @@
 //! The binary formats: an 8-byte magic, a format version, whether it's compressed, then postcard
 //! (compressed with deflate for EPUB details)
 //!
-//! - A **pack** holds one device's entries for the paths that hash to one pack number, so an edit
-//!   rewrites one small file, and devices never write the same file (syncing can't conflict)
+//! - A **pack** holds one device's entries of one [`FileKind`] for the paths that hash to one pack
+//!   number, so an edit rewrites one small file, devices never write the same file (syncing can't
+//!   conflict), and an app reads only the kinds of files it searches (an app without PDFs never
+//!   reads their packs)
 //! - A **detail** holds one EPUB's CFIs and context, loaded only when needed
 //! - An **entry** is one file's entry (and details), as a background thread or the CLI sends it
 
@@ -11,7 +13,7 @@ use serde::{Deserialize, Serialize, de::DeserializeOwned};
 use crate::entry::{Detail, FileEntry, Unit};
 
 /// Bumped when any format changes shape, so old files are never misread
-pub const FORMAT: u16 = 2;
+pub const FORMAT: u16 = 3;
 
 /// Deflate's level: fast to write (an edit rewrites a pack), and most of the size saved
 const LEVEL: u8 = 1;
@@ -42,10 +44,47 @@ pub struct Confirmation {
     pub written: u64,
 }
 
-/// One device's entries for one pack number
+/// What kind of file an entry is for, by its extension: each kind's entries are in packs of
+/// their own
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+pub enum FileKind {
+    /// Anything read as text (Markdown, subtitles, plain text)
+    Text,
+    Epub,
+    Pdf,
+}
+
+impl FileKind {
+    pub const ALL: [FileKind; 3] = [FileKind::Text, FileKind::Epub, FileKind::Pdf];
+
+    /// The kind of a path (`.epub` and `.pdf` in any case; anything else is text)
+    pub fn of(path: &str) -> Self {
+        match crate::index::extension(path).as_str() {
+            "epub" => Self::Epub,
+            "pdf" => Self::Pdf,
+            _ => Self::Text,
+        }
+    }
+
+    /// `text`, `epub`, or `pdf`, as pack files are named (`<device>-<kind>-<number>.bin`)
+    pub fn name(self) -> &'static str {
+        match self {
+            Self::Text => "text",
+            Self::Epub => "epub",
+            Self::Pdf => "pdf",
+        }
+    }
+
+    pub fn from_name(name: &str) -> Option<Self> {
+        Self::ALL.into_iter().find(|k| k.name() == name)
+    }
+}
+
+/// One device's entries of one kind for one pack number
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Pack {
     pub device: String,
+    pub kind: FileKind,
     pub number: u32,
     /// How many packs the device splits paths into
     pub count: u32,
@@ -103,6 +142,16 @@ fn decode<T: DeserializeOwned>(magic: &[u8; 8], bytes: &[u8]) -> Result<T, Forma
 }
 
 impl Pack {
+    /// Its file name: `<device>-<kind>-<number>.bin` (`laptop-epub-07.bin`)
+    pub fn file_name(&self) -> String {
+        format!(
+            "{}-{}-{:02}.bin",
+            self.device,
+            self.kind.name(),
+            self.number
+        )
+    }
+
     /// Not compressed: references are already compact, and reading them at startup is what
     /// matters most (inflating took two thirds of the time for a third of the size)
     pub fn encode(&self) -> Vec<u8> {
@@ -158,6 +207,7 @@ mod tests {
         );
         let pack = Pack {
             device: "laptop".into(),
+            kind: FileKind::Text,
             number: 1,
             count: 32,
             unit: Unit::Utf16,
@@ -165,6 +215,7 @@ mod tests {
             entries: vec![("a.md".into(), entry.clone())],
             confirmations: vec![],
         };
+        assert_eq!(pack.file_name(), "laptop-text-01.bin");
         let bytes = pack.encode();
         assert_eq!(Pack::decode(&bytes), Ok(pack));
         assert_eq!(Detail::decode(&bytes), Err(FormatError::NotIndex));
@@ -182,5 +233,16 @@ mod tests {
             detail: None,
         };
         assert_eq!(EntryMessage::decode(&message.encode()), Ok(message));
+    }
+
+    #[test]
+    fn kinds_by_extension() {
+        assert_eq!(FileKind::of("Books/A.EPUB"), FileKind::Epub);
+        assert_eq!(FileKind::of("paper.pdf"), FileKind::Pdf);
+        assert_eq!(FileKind::of("notes.md"), FileKind::Text);
+        assert_eq!(FileKind::of("pdf"), FileKind::Text);
+        for kind in FileKind::ALL {
+            assert_eq!(FileKind::from_name(kind.name()), Some(kind));
+        }
     }
 }

@@ -23,7 +23,7 @@ use topos_bible::data::books::BookId;
 use super::search::Hit;
 
 /// Bumped when entries change shape, so old ones are never misread
-const FORMAT: u32 = 3;
+const FORMAT: u32 = 4;
 /// Prune entries for deleted files at most this often
 const PRUNE_EVERY: Duration = Duration::from_secs(24 * 60 * 60);
 /// Caches for other options (an old version, a data file no longer used) are removed after this
@@ -214,7 +214,7 @@ fn write_atomically(path: &Path, bytes: &[u8]) -> io::Result<()> {
 }
 
 /// Removes older caches: the first was one JSON file per set of options, directly in the cache
-/// folder, and later ones are folders for older entry formats (`v2`)
+/// folder, and later ones are folders for older entry formats (`v3`)
 fn remove_legacy(root: &Path) {
     for entry in fs::read_dir(root).into_iter().flatten().flatten() {
         let path = entry.path();

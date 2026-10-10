@@ -35,6 +35,25 @@ pub struct Hit {
     pub label: Option<String>,
     /// More about where a hit in an EPUB is
     pub epub: Option<EpubPlace>,
+    /// More about where a hit in a PDF is
+    pub pdf: Option<PdfPlace>,
+}
+
+/// Where a hit in a PDF is, besides its page (in `label`)
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct PdfPlace {
+    /// 1-based
+    pub page: usize,
+    /// Where it is as PDF++ links write it (`page=3&rect=72,708,126,720`)
+    pub locator: String,
+    /// Its UTF-16 range in the document's text (each page's)
+    pub text_utf16: Range<usize>,
+    /// 1-based, in the document's text
+    pub line: usize,
+    /// 1-based, in UTF-16 code units
+    pub utf16_column: usize,
+    /// The line it starts on
+    pub line_text: String,
 }
 
 /// Where a hit in an EPUB is, besides its CFI (for JSON, so the Obsidian plugin can use it)
@@ -368,6 +387,7 @@ pub fn search_file(
                         line_text: m.location.line_text,
                     }),
                     label: Some(m.location.cfi),
+                    pdf: None,
                 })
                 .collect();
             Ok(Some(FileHits {
@@ -385,12 +405,23 @@ pub fn search_file(
                 .map_err(|e| e.to_string())?;
             let hits = matches
                 .into_iter()
-                .map(|m| Hit {
-                    passage: m.psg,
-                    position: None,
-                    bytes: None,
-                    label: Some(format!("page {}", m.location.page)),
-                    epub: None,
+                .map(|m| {
+                    let l = m.location;
+                    Hit {
+                        passage: m.psg,
+                        position: None,
+                        bytes: None,
+                        label: Some(format!("page {}", l.page)),
+                        epub: None,
+                        pdf: Some(PdfPlace {
+                            page: l.page,
+                            locator: crate::entry::pdf_locator(l.page, l.rects.first()),
+                            text_utf16: l.text_utf16,
+                            line: l.line,
+                            utf16_column: l.utf16_column,
+                            line_text: l.line_text,
+                        }),
+                    }
                 })
                 .collect();
             Ok(Some(FileHits {
@@ -426,6 +457,7 @@ pub fn search_text(matcher: &BibleMatcher, path: Option<PathBuf>, text: String) 
             bytes: Some(m.location.bytes.start..m.location.bytes.end),
             label: None,
             epub: None,
+            pdf: None,
         })
         .collect();
     FileHits {
