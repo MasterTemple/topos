@@ -65,3 +65,5 @@ license as `cargo metadata` lists them, and sections 4 and 5 of W3C EPUB 3.3. It
 ## Log
 
 1. This record and its rules.
+2. The specification (`docs/spec/epub-container.md`) and interface (`docs/spec/api.md`), from
+   EPUB 3.3 §4–5 and OPF/OCF 2.0.1; choices the standards leave open are marked in it.
