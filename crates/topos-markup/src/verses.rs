@@ -37,8 +37,15 @@ use crate::{Element, Kind, Milestone, Node, NodePath};
 pub struct VerseSpan {
     pub chapter: u8,
     pub verse: u8,
-    /// The last verse, for a bridge like `<verse number="4-5">` (else the same as `verse`)
+    /// The last verse, for a bridge like `<verse number="4-5">` (else the same as `verse`); in
+    /// `last_chapter`, which a range across chapters ends in
     pub last: u8,
+    /**
+    The chapter the verse ends in: the same as `chapter`, unless its id is a range into a later
+    chapter (`osisID="John.3.36-John.4.2"`, a commentary's note on both chapters' verses), when
+    it is that chapter (4) and `last` is the verse there (2)
+    */
+    pub last_chapter: u8,
     /**
     Which part of `verse` this is: 0 for the whole verse, 1 for `a` (`<verse number="20a">`,
     USFM `\v 20a`), 2 for `b`, and so on to 26 for `z`
@@ -111,14 +118,55 @@ fn part(s: &str) -> u8 {
     }
 }
 
+/// The last whitespace-separated word of a marker's `osisID`, else of its `sID`
+fn id_word(e: &Element) -> Option<&str> {
+    let id = e.attr("osisID").or_else(|| e.attr("sID"))?;
+    Some(id.split_whitespace().last().unwrap_or(""))
+}
+
+/// The part of a reference after its last `.` or `:`
+fn after_separator(reference: &str) -> &str {
+    reference.rsplit(['.', ':']).next().unwrap_or("")
+}
+
+/// A reference's chapter (the part before its last `.` or `:`, after the one before that) and
+/// verse (the part after its last), each if it has one
+fn chapter_and_verse(reference: &str) -> (Option<u8>, Option<u8>) {
+    let small = |s: &str| leading_number(s).and_then(|n| u8::try_from(n).ok());
+    match reference.rsplit_once(['.', ':']) {
+        Some((before, verse)) => (small(after_separator(before)), small(verse)),
+        None => (None, small(reference)),
+    }
+}
+
+/**
+Where a marker's id word says a verse ends when it's a range into a later chapter than `chapter`
+(`John.3.36-John.4.2` → (4, 2)), else `None`
+*/
+fn later_chapter(e: &Element, chapter: u8) -> Option<(u8, u8)> {
+    let (start, end) = id_word(e)?.split_once('-')?;
+    let (start_chapter, _) = chapter_and_verse(start);
+    let (Some(end_chapter), Some(end_verse)) = chapter_and_verse(end) else {
+        return None;
+    };
+    let later = start_chapter.is_none_or(|c| end_chapter > c) && end_chapter > chapter;
+    later.then_some((end_chapter, end_verse))
+}
+
 /// A marker's number as (first, part of the first, last)
 fn number(e: &Element) -> Option<(u8, u8, u8)> {
+    let from_id;
     let written = match e.attr("number").or_else(|| e.attr("n")) {
         Some(n) => n,
         None => {
-            let id = e.attr("osisID").or_else(|| e.attr("sID"))?;
-            let word = id.split_whitespace().last().unwrap_or("");
-            word.rsplit(['.', ':']).next().unwrap_or("")
+            let word = id_word(e)?;
+            match word.split_once('-') {
+                Some((start, end)) => {
+                    from_id = format!("{}-{}", after_separator(start), after_separator(end));
+                    from_id.as_str()
+                }
+                None => after_separator(word),
+            }
         }
     };
     let (first, rest) = match written.find(['-', '–', ',']) {
@@ -153,6 +201,8 @@ Every verse in a book's tree, in order
 - Verses that are elements with their text inside (OSIS without milestones) work too: the
   verse is that element
 - A partial verse (`20a`, `20b`) is its own span, told apart by [`VerseSpan::part`]
+- An id that is a range into a later chapter (`John.3.36-John.4.2`) is one span, from the first
+  chapter to [`VerseSpan::last_chapter`]
 */
 pub fn verses(nodes: &[Node]) -> Vec<VerseSpan> {
     let mut found = Vec::new();
@@ -211,10 +261,12 @@ pub fn verses(nodes: &[Node]) -> Vec<VerseSpan> {
             }
             (_, start) => start.unwrap_or_else(|| here.clone()),
         };
+        let (last_chapter, last) = later_chapter(e, chapter).unwrap_or((chapter, last));
         let verse = VerseSpan {
             chapter,
             verse: first,
             last,
+            last_chapter,
             part,
             marker: here.clone(),
             start,
@@ -301,6 +353,8 @@ The places each part of a passage covers, as `start..end` for [`slice`], in the 
 - Verses the book doesn't have are left out; a part with none of its verses is left out
 - A whole chapter is every verse the book has in it, whatever the versification says
 - A verse's parts are all in it: `Genesis 1:20` covers both `20a` and `20b`
+- A span across chapters is in a part that names any of its verses: `John 4:1` finds
+  `John.3.36-John.4.2`
 */
 pub fn passage_ranges(spans: &[VerseSpan], passage: &Passage) -> Vec<Range<usize>> {
     passage
@@ -312,7 +366,7 @@ pub fn passage_ranges(spans: &[VerseSpan], passage: &Passage) -> Vec<Range<usize
             let mut inside = spans
                 .iter()
                 .enumerate()
-                .filter(|(_, s)| (s.chapter, s.last) >= from && (s.chapter, s.verse) <= to)
+                .filter(|(_, s)| (s.last_chapter, s.last) >= from && (s.chapter, s.verse) <= to)
                 .map(|(i, _)| i);
             let first = inside.next()?;
             let last = inside.next_back().unwrap_or(first);
@@ -335,14 +389,22 @@ fn raise(counts: &mut Vec<u8>, chapter: u8, verse: u8) {
 /**
 The number of verses in each chapter, from chapter 1 to the last chapter with verses, as the
 book's own markers number them (a bridge like `4-5` counts to 5; a chapter without verses is 0)
+- A span across chapters counts its first verse in its first chapter and its last in its last
 - This is the book's versification, for checking references against this translation, like
   `Translations::set_chapter_verses` in topos-bible
 */
 pub fn chapter_verses(spans: &[VerseSpan]) -> Vec<u8> {
     let mut counts = Vec::new();
     for span in spans {
-        if span.chapter >= 1 {
-            raise(&mut counts, span.chapter, span.last.max(span.verse));
+        if span.chapter < 1 {
+            continue;
+        }
+        match span.last_chapter > span.chapter {
+            true => {
+                raise(&mut counts, span.chapter, span.verse);
+                raise(&mut counts, span.last_chapter, span.last);
+            }
+            false => raise(&mut counts, span.chapter, span.last.max(span.verse)),
         }
     }
     counts

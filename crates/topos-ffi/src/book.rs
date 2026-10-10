@@ -18,8 +18,11 @@ use crate::{Passage, Topos, ToposError};
 pub struct BookVerse {
     pub chapter: u8,
     pub verse: u8,
-    /// The last verse of a bridge like `4-5` (else the same as `verse`)
+    /// The last verse of a bridge like `4-5` (else the same as `verse`), in `last_chapter`
     pub last: u8,
+    /// The chapter the verse ends in: `chapter`, unless it's a range into a later chapter
+    /// (`John.3.36-John.4.2`, a commentary's note)
+    pub last_chapter: u8,
     /// Which part of `verse` this is: 0 for the whole verse, 1 for `20a`, 2 for `20b`, and so on
     pub part: u8,
 }
@@ -147,6 +150,7 @@ impl ToposBook {
                 chapter: s.chapter,
                 verse: s.verse,
                 last: s.last,
+                last_chapter: s.last_chapter,
                 part: s.part,
             })
             .collect()

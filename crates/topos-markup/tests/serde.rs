@@ -34,7 +34,7 @@ fn json_shape() {
     let json = serde_json::to_string(&spans).expect("serializes");
     assert_eq!(
         json,
-        r#"[{"chapter":0,"verse":1,"last":1,"part":0,"marker":[3],"start":[3],"end":[4]}]"#
+        r#"[{"chapter":0,"verse":1,"last":1,"last_chapter":0,"part":0,"marker":[3],"start":[3],"end":[4]}]"#
     );
     let back: Vec<VerseSpan> = serde_json::from_str(&json).expect("deserializes");
     assert_eq!(back, spans);

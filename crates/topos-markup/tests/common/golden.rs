@@ -191,10 +191,14 @@ fn dump_verses(nodes: &[Node]) -> String {
         let text = topos_bible_markup::plain_text(&slice(nodes, &s.start, Some(&s.end)), &all);
         let _ = writeln!(
             out,
-            "{}:{}{}-{} marker={} start={} end={} {}",
+            "{}:{}{}-{}{} marker={} start={} end={} {}",
             s.chapter,
             s.verse,
             part_letter(s.part),
+            match s.last_chapter == s.chapter {
+                true => String::new(),
+                false => format!("{}:", s.last_chapter),
+            },
             s.last,
             s.marker,
             s.start,

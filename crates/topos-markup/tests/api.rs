@@ -80,6 +80,7 @@ fn shapes() {
         chapter: 1,
         verse: 2,
         last: 3,
+        last_chapter: 1,
         part: 0,
         marker: NodePath(vec![0]),
         start: NodePath::default(),

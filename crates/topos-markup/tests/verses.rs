@@ -313,3 +313,52 @@ fn osis_chapters_holding_their_verses() {
     assert_eq!(verse(1), "Reuben.");
     assert_eq!(verse(2), "And there went.");
 }
+
+fn ends(spans: &[VerseSpan]) -> Vec<(u8, u8, u8, u8)> {
+    spans
+        .iter()
+        .map(|s| (s.chapter, s.verse, s.last_chapter, s.last))
+        .collect()
+}
+
+#[test]
+fn a_verse_across_chapters() {
+    // verses.md's example: a commentary's note on John 3:36 to 4:2, written in chapter 3
+    let osis = r#"<chapter sID="John.3" osisID="John.3"/><verse sID="a" osisID="John.3.35"/>Loves<verse eID="a"/>
+<verse sID="b" osisID="John.3.36-John.4.2"/>Believes<verse eID="b"/><chapter eID="John.3"/>
+<chapter sID="John.4" osisID="John.4"/><verse sID="c" osisID="John.4.3"/>Left<verse eID="c"/>
+<chapter eID="John.4"/>"#;
+    let nodes = parse(Markup::Osis, osis);
+    let spans = verses(&nodes);
+    assert_eq!(ends(&spans), [(3, 35, 3, 35), (3, 36, 4, 2), (4, 3, 4, 3)]);
+    assert_eq!(chapter_verses(&spans), [0, 0, 36, 3]);
+    let data = BibleData::default();
+    let ranges = |r: &str| passage_ranges(&spans, &data.parse(r).expect("a reference"));
+    assert_eq!(ranges("John 4:1"), [1..2]);
+    assert_eq!(ranges("John 3:36"), [1..2]);
+    assert_eq!(ranges("John 4"), [1..3]);
+    assert_eq!(ranges("John 3"), [0..2]);
+    let note = slice(&nodes, &spans[1].start, Some(&spans[1].end));
+    assert_eq!(all_text(&note), "Believes");
+}
+
+#[test]
+fn ranges_in_ids() {
+    // An id range is numbered by both ends; only a range into a later chapter crosses
+    let nodes = parse(
+        Markup::Osis,
+        r#"<chapter n="3"/><verse osisID="John.3.16-John.3.18"/>a<verse sID="JHN 3:19-20"/>b<verse sID="JHN 3:21-4:2"/>c<chapter n="4"/><verse osisID="John.4.3-John.3.1"/>d<verse osisID="John.4.4-John.x.2"/>e<verse n="5" osisID="John.4.5-John.5.1"/>f<chapter n="6"/><verse osisID="John.6.71-John.7.0"/>g"#,
+    );
+    assert_eq!(
+        ends(&verses(&nodes)),
+        [
+            (3, 16, 3, 18),
+            (3, 19, 3, 20),
+            (3, 21, 4, 2),
+            (4, 3, 4, 3),
+            (4, 4, 4, 4),
+            (4, 5, 5, 1),
+            (6, 71, 7, 0)
+        ]
+    );
+}
