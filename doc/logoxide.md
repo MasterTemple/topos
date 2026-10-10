@@ -353,7 +353,9 @@ instead of trusting it:
 - **Links pin what they need.** A verse link needs the major version, and an exact-word link the
   exact version. The lock file says which version a vault uses. A link made against another
   version can carry it (`JHN.usx#v=3:16&ver=1.2.0`). The library keeps every version a lock file
-  or a link asks for, side by side (`packages/bsb/1.2.0/`).
+  or a link asks for, side by side, each in a folder named by its version and where it came
+  from: `packages/bsb/1.2.0+g1a2b3c4d/` (a git commit) or `packages/bsb/1.2.0+a9f86d081/` (a
+  registry archive's hash), so forks at one version never share a folder.
 - **Later: links that follow changes.** For an exact-word link made against an older version:
   1. Read that version's verse (a git tag, so old text is always available).
   2. Find the fragment's words in it.
