@@ -39,6 +39,13 @@ pub struct VerseSpan {
     pub verse: u8,
     /// The last verse, for a bridge like `<verse number="4-5">` (else the same as `verse`)
     pub last: u8,
+    /**
+    Which part of `verse` this is: 0 for the whole verse, 1 for `a` (`<verse number="20a">`,
+    USFM `\v 20a`), 2 for `b`, and so on to 26 for `z`
+    - In a bridge like `20b-21` it is the first verse's part; the last verse counts whole
+    - A verse's parts are separate spans with the same `chapter` and `verse`
+    */
+    pub part: u8,
     /// The verse's marker
     pub marker: NodePath,
     /**
@@ -89,8 +96,23 @@ fn leading_number(s: &str) -> Option<u32> {
     }))
 }
 
-/// A marker's number as (first, last)
-fn number(e: &Element) -> Option<(u8, u8)> {
+/// The part a verse number's letter names (`20a` is 1, `20B` is 2), else 0 for the whole verse:
+/// one ASCII letter right after the leading digits, not followed by another letter
+fn part(s: &str) -> u8 {
+    let s = s.trim();
+    let mut rest = s.trim_start_matches(|c: char| c.is_ascii_digit()).bytes();
+    match (rest.next(), rest.next()) {
+        (Some(letter), next)
+            if letter.is_ascii_alphabetic() && !next.is_some_and(|n| n.is_ascii_alphabetic()) =>
+        {
+            letter.to_ascii_lowercase() - b'a' + 1
+        }
+        _ => 0,
+    }
+}
+
+/// A marker's number as (first, part of the first, last)
+fn number(e: &Element) -> Option<(u8, u8, u8)> {
     let written = match e.attr("number").or_else(|| e.attr("n")) {
         Some(n) => n,
         None => {
@@ -106,12 +128,13 @@ fn number(e: &Element) -> Option<(u8, u8)> {
         }
         None => (written, None),
     };
+    let part = part(first);
     let first = u8::try_from(leading_number(first)?).ok()?;
     let last = rest
         .and_then(leading_number)
         .and_then(|n| u8::try_from(n).ok())
         .unwrap_or(first);
-    Some((first, last.max(first)))
+    Some((first, part, last.max(first)))
 }
 
 /// The place right after a node
@@ -129,6 +152,7 @@ Every verse in a book's tree, in order
   from `number`, `n`, or the last part of `osisID`/`sID` (`John.3.16`, `JHN 3:16`)
 - Verses that are elements with their text inside (OSIS without milestones) work too: the
   verse is that element
+- A partial verse (`20a`, `20b`) is its own span, told apart by [`VerseSpan::part`]
 */
 pub fn verses(nodes: &[Node]) -> Vec<VerseSpan> {
     let mut found = Vec::new();
@@ -158,7 +182,7 @@ pub fn verses(nodes: &[Node]) -> Vec<VerseSpan> {
                 out.push(verse);
             }
             chapter = match number(e) {
-                Some((n, _)) => n,
+                Some((n, _, _)) => n,
                 None => chapter.saturating_add(1),
             };
             next_start = Some(after(&marker.path));
@@ -177,7 +201,7 @@ pub fn verses(nodes: &[Node]) -> Vec<VerseSpan> {
             verse.end = here.clone();
             out.push(verse);
         }
-        let Some((first, last)) = number(e) else {
+        let Some((first, part, last)) = number(e) else {
             continue;
         };
         let start = match (holding.take(), next_start.take()) {
@@ -191,6 +215,7 @@ pub fn verses(nodes: &[Node]) -> Vec<VerseSpan> {
             chapter,
             verse: first,
             last,
+            part,
             marker: here.clone(),
             start,
             end: tree_end.clone(),
@@ -275,6 +300,7 @@ pub fn slice(nodes: &[Node], start: &NodePath, end: Option<&NodePath>) -> Vec<No
 The places each part of a passage covers, as `start..end` for [`slice`], in the passage's order
 - Verses the book doesn't have are left out; a part with none of its verses is left out
 - A whole chapter is every verse the book has in it, whatever the versification says
+- A verse's parts are all in it: `Genesis 1:20` covers both `20a` and `20b`
 */
 pub fn passage_ranges(spans: &[VerseSpan], passage: &Passage) -> Vec<Range<usize>> {
     passage

@@ -170,8 +170,9 @@ uses the CLI's). Each file comes back with its `FileMatch`es (`passage`, offsets
 **A book's text** (feature `markup`, on by default). topos holds no Bible text, but it can read
 a book you bring, through [`topos-bible-markup`](../topos-markup): `ToposBook.parse(topos, "usx",
 text)` parses a whole book (USX, or OSIS with verse milestones; `null` in JavaScript for an unknown
-markup), `bookId()` says which (from USX's `<book code>` or OSIS's book `div`), and `verses()` and
-`chapters()` list what it has, and `chapterVerses()` its verse counts per chapter (for
+markup), `bookId()` says which (from USX's `<book code>` or OSIS's book `div`), and `verses()` (each
+`BookVerse`'s `part` tells a partial verse's halves apart: 1 for `20a`, 2 for `20b`, 0 for a whole
+verse) and `chapters()` list what it has, and `chapterVerses()` its verse counts per chapter (for
 `ToposTranslations.chapterVerses`; `ToposBook.usxChapterVerses(text)` counts a USX book's markers
 without parsing it, fast enough for a whole Bible). `html(passage, options)` and `text(passage, options)` give each part
 of a passage (`John 3:16; 4` has two), and `chapterHtml(chapter, options)` a whole chapter;

@@ -159,6 +159,77 @@ fn numbers_from_attributes_and_ids() {
     );
 }
 
+fn parts(spans: &[VerseSpan]) -> Vec<(u8, u8, u8, u8)> {
+    spans
+        .iter()
+        .map(|s| (s.chapter, s.verse, s.part, s.last))
+        .collect()
+}
+
+#[test]
+fn partial_verses_have_parts() {
+    // As verses.md's table: (first, part, last)
+    let nodes = parse(
+        Markup::Osis,
+        r#"<chapter n="1"/><verse n="16"/>a<verse n="2a"/>b<verse n="2B"/>c<verse n="2ab"/>d<verse n="2 a"/>e<verse n="2.a"/>f<verse n="20b-21"/>g<verse n="20-21a"/>h<verse n="20a-b"/>i<verse n="a"/>j<verse n="3z"/>k"#,
+    );
+    assert_eq!(
+        parts(&verses(&nodes)),
+        [
+            (1, 16, 0, 16),
+            (1, 2, 1, 2),
+            (1, 2, 2, 2),
+            (1, 2, 0, 2),
+            (1, 2, 0, 2),
+            (1, 2, 0, 2),
+            (1, 20, 2, 21),
+            (1, 20, 0, 21),
+            (1, 20, 1, 20),
+            (1, 3, 26, 3),
+        ]
+    );
+    // Ids are read the same way
+    let nodes = parse(
+        Markup::Osis,
+        r#"<chapter osisID="Gen.1"/><verse osisID="Gen.1.20a"/>a<verse sID="GEN 1:20b"/>b"#,
+    );
+    assert_eq!(parts(&verses(&nodes)), [(1, 20, 1, 20), (1, 20, 2, 20)]);
+}
+
+#[test]
+fn passages_cover_every_part() {
+    let usx = r#"<usx version="3.0"><book code="GEN" style="id"/><chapter number="1" style="c" sid="GEN 1"/>
+<para style="p"><verse number="19" style="v" sid="GEN 1:19"/>nineteen<verse eid="GEN 1:19"/><verse number="20a" style="v" sid="GEN 1:20a"/>first half<verse eid="GEN 1:20a"/></para>
+<para style="s1">A heading</para>
+<para style="p"><verse number="20b" style="v" sid="GEN 1:20b"/>second half<verse eid="GEN 1:20b"/><verse number="21" style="v" sid="GEN 1:21"/>twenty-one<verse eid="GEN 1:21"/></para>
+<chapter eid="GEN 1"/></usx>"#;
+    let nodes = parse(Markup::Usx, usx);
+    let spans = verses(&nodes);
+    assert_eq!(
+        parts(&spans),
+        [
+            (1, 19, 0, 19),
+            (1, 20, 1, 20),
+            (1, 20, 2, 20),
+            (1, 21, 0, 21)
+        ]
+    );
+    // Parts count as their verse
+    assert_eq!(chapter_verses(&spans), [21]);
+    assert_eq!(usx_chapter_verses(usx), [21]);
+    let data = BibleData::default();
+    let ranges = |r: &str| passage_ranges(&spans, &data.parse(r).expect("a reference"));
+    assert_eq!(ranges("Genesis 1:20"), [1..3]);
+    assert_eq!(ranges("Genesis 1:19-20"), [0..3]);
+    assert_eq!(ranges("Genesis 1:21"), [3..4]);
+    let r = &ranges("Genesis 1:20")[0];
+    let verse = slice(&nodes, &spans[r.start].start, Some(&spans[r.end - 1].end));
+    assert_eq!(all_text(&verse), "first half\nA heading\nsecond half");
+    // Each part slices alone, the heading with the second
+    let second = slice(&nodes, &spans[2].start, Some(&spans[2].end));
+    assert_eq!(all_text(&second), "A heading\nsecond half");
+}
+
 #[test]
 fn chapters_without_numbers_count_up() {
     let nodes = parse(

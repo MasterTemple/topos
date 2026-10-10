@@ -20,6 +20,8 @@ pub struct BookVerse {
     pub verse: u8,
     /// The last verse of a bridge like `4-5` (else the same as `verse`)
     pub last: u8,
+    /// Which part of `verse` this is: 0 for the whole verse, 1 for `20a`, 2 for `20b`, and so on
+    pub part: u8,
 }
 
 /// How [`ToposBook::html`] and [`ToposBook::text`] write a passage
@@ -145,6 +147,7 @@ impl ToposBook {
                 chapter: s.chapter,
                 verse: s.verse,
                 last: s.last,
+                part: s.part,
             })
             .collect()
     }
@@ -231,6 +234,17 @@ mod tests {
             headings,
             class_prefix: "topos-".into(),
         }
+    }
+
+    #[test]
+    fn partial_verses() {
+        let topos = Topos::new();
+        let usx = r#"<usx><book code="GEN"/><chapter number="1" sid="GEN 1"/><para style="p"><verse number="20a" sid="GEN 1:20a"/>first<verse eid="GEN 1:20a"/><verse number="20b" sid="GEN 1:20b"/>second<verse eid="GEN 1:20b"/></para><chapter eid="GEN 1"/></usx>"#;
+        let book = ToposBook::parse(&topos, "usx".into(), usx.into()).unwrap();
+        let parts: Vec<_> = book.verses().iter().map(|v| (v.verse, v.part)).collect();
+        assert_eq!(parts, [(20, 1), (20, 2)]);
+        let passage = topos.parse("Genesis 1:20".into(), BookStyle::Name).unwrap();
+        assert_eq!(book.text(passage, options(false, false)), ["firstsecond"]);
     }
 
     #[test]

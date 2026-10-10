@@ -77,8 +77,8 @@ Other 0..34 entry=0 path=/0 "onetwo atwo bbridgeno sid alt\nskip"
 <span class="chapter" data-osis-id="GEN 1" data-n="1"></span><p class="p" data-style="p"><span class="verse" data-osis-id="GEN 1:1" data-n="1"></span>one<span class="verse" data-osis-id="GEN 1:2a" data-n="2a"></span>two a<span class="verse" data-osis-id="GEN 1:2b" data-n="2b"></span>two b<span class="verse" data-osis-id="GEN 1:3-5" data-n="3-5"></span>bridge<span class="verse" data-n="6"></span>no sid <span class="verse" data-osis-id="GEN 1:7" data-n="7"></span>alt</p><span class="chapter" data-osis-id="GEN 3" data-n="3"></span><p class="p" data-style="p"><span class="verse" data-osis-id="GEN 3:1" data-n="1"></span>skip</p>
 #### verses ####
 1:1-1 marker=/0/2/0 start=/0/2 end=/0/2/2 "one"
-1:2-2 marker=/0/2/3 start=/0/2/3 end=/0/2/5 "two a"
-1:2-2 marker=/0/2/6 start=/0/2/6 end=/0/2/8 "two b"
+1:2a-2 marker=/0/2/3 start=/0/2/3 end=/0/2/5 "two a"
+1:2b-2 marker=/0/2/6 start=/0/2/6 end=/0/2/8 "two b"
 1:3-5 marker=/0/2/9 start=/0/2/9 end=/0/2/11 "bridge"
 1:6-6 marker=/0/2/12 start=/0/2/12 end=/0/2/14 "no sid"
 1:7-7 marker=/0/2/14 start=/0/2/14 end=/0/4 "alt"

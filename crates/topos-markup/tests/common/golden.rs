@@ -171,6 +171,15 @@ fn dump_sources(flat: &Flat) -> String {
     out
 }
 
+/// A verse's part as written in a golden file: nothing for the whole verse, else `a` to `z`
+fn part_letter(part: u8) -> String {
+    match part {
+        1..=26 => char::from(b'a' + part - 1).to_string(),
+        0 => String::new(),
+        _ => format!("?{part}"),
+    }
+}
+
 fn dump_verses(nodes: &[Node]) -> String {
     let mut out = String::new();
     let spans = verses(nodes);
@@ -182,9 +191,10 @@ fn dump_verses(nodes: &[Node]) -> String {
         let text = topos_bible_markup::plain_text(&slice(nodes, &s.start, Some(&s.end)), &all);
         let _ = writeln!(
             out,
-            "{}:{}-{} marker={} start={} end={} {}",
+            "{}:{}{}-{} marker={} start={} end={} {}",
             s.chapter,
             s.verse,
+            part_letter(s.part),
             s.last,
             s.marker,
             s.start,
