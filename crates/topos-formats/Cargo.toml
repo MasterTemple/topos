@@ -20,20 +20,22 @@ thiserror = { workspace = true }
 line-col = { version = "0.2.1", optional = true }
 regex = { workspace = true, optional = true }
 urlencoding = { version = "2.1.3", optional = true }
-epub = { version = "2.1.5", optional = true }
+# EPUBs are ZIP archives: their container is read by `epub::container` (a clean-room reader,
+# CLEANROOM.md)
+zip = { version = "3.0.0", default-features = false, features = ["deflate"], optional = true }
 roxmltree = { version = "0.21.1", optional = true }
 mupdf = { version = "0.8.0", optional = true }
 serde_json = { workspace = true, optional = true }
 
 [dev-dependencies]
-# Builds a small EPUB in memory (already a dependency of `epub`)
-zip = { version = "3.0.0", default-features = false }
+# Builds a small EPUB in memory
+zip = { version = "3.0.0", default-features = false, features = ["deflate"] }
 
 [features]
 default = ["html", "srt", "epub", "json", "xml"]
 html = ["dep:line-col", "dep:regex", "dep:urlencoding"]
 srt = []
-epub = ["dep:epub", "dep:roxmltree"]
+epub = ["dep:zip", "dep:roxmltree"]
 json = ["dep:serde_json"]
 xml = ["dep:roxmltree"]
 # Bible markup (OSIS, ThML, GBF, TEI, USX) through topos-bible-markup

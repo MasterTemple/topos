@@ -22,14 +22,23 @@ use std::{
     collections::HashMap,
     io::{Read, Seek},
     ops::Range,
-    path::{Path, PathBuf},
+    path::Path,
 };
 
-use epub::doc::EpubDoc;
 use roxmltree::{Document, Node, ParsingOptions};
 use topos_bible::matcher::{BibleMatch, BibleMatcher};
 
 use crate::{Format, FormatError};
+
+pub mod container;
+
+use container::{Container, ContainerError};
+
+impl From<ContainerError> for EPUBMatchError {
+    fn from(error: ContainerError) -> Self {
+        EPUBMatchError::PackageError(error.to_string())
+    }
+}
 
 #[derive(thiserror::Error, Debug)]
 pub enum EPUBMatchError {
@@ -98,8 +107,7 @@ pub fn search_epub(
     path: &Path,
     options: CfiOptions,
 ) -> Result<Vec<BibleMatch<CfiLocation>>, EPUBMatchError> {
-    let doc = EpubDoc::new(path).map_err(|e| EPUBMatchError::PackageError(e.to_string()))?;
-    search_doc(matcher, doc, options)
+    search_doc(matcher, Container::open(path)?, options)
 }
 
 /// Finds the references in an EPUB that is already in memory (or any reader)
@@ -108,20 +116,15 @@ pub fn search_epub_reader<R: Read + Seek>(
     reader: R,
     options: CfiOptions,
 ) -> Result<Vec<BibleMatch<CfiLocation>>, EPUBMatchError> {
-    let doc =
-        EpubDoc::from_reader(reader).map_err(|e| EPUBMatchError::PackageError(e.to_string()))?;
-    search_doc(matcher, doc, options)
+    search_doc(matcher, Container::from_reader(reader)?, options)
 }
 
 fn search_doc<R: Read + Seek>(
     matcher: &BibleMatcher,
-    mut doc: EpubDoc<R>,
+    mut doc: Container<R>,
     options: CfiOptions,
 ) -> Result<Vec<BibleMatch<CfiLocation>>, EPUBMatchError> {
-    let root_file = doc.root_file.clone();
-    let opf = doc.get_resource_str_by_path(&root_file).ok_or_else(|| {
-        EPUBMatchError::PackageError(format!("missing package {}", root_file.display()))
-    })?;
+    let opf = doc.package_text().to_string();
     let items = spine_items(&opf)?;
     let titles = toc_titles(&mut doc, &opf);
 
@@ -131,14 +134,16 @@ fn search_doc<R: Read + Seek>(
     let (mut book_utf16, mut book_line) = (0, 0);
     for item in items {
         // Like EPUB++, itemrefs that aren't in the manifest aren't in the spine
-        let Some(resource) = doc.resources.get(&item.idref) else {
+        let Some(resource) = doc.item(&item.idref) else {
             continue;
         };
         let index = spine_index;
         spine_index += 1;
-        let path = resource.path.clone();
-        let href = archive_path(&path);
-        let Some(bytes) = doc.get_resource_by_path(&path) else {
+        // One that names nothing in the container, or can't be read, has no text
+        let Some(href) = resource.path.clone() else {
+            continue;
+        };
+        let Ok(Some(bytes)) = doc.read(&href) else {
             continue;
         };
         let xhtml = String::from_utf8_lossy(&bytes);
@@ -184,19 +189,14 @@ An EPUB's text as its references' lines and offsets count it ([`CfiLocation::lin
 showing it can go to a reference by its line and column
 */
 pub fn epub_text_reader<R: Read + Seek>(reader: R) -> Result<String, EPUBMatchError> {
-    let mut doc =
-        EpubDoc::from_reader(reader).map_err(|e| EPUBMatchError::PackageError(e.to_string()))?;
-    let root_file = doc.root_file.clone();
-    let opf = doc.get_resource_str_by_path(&root_file).ok_or_else(|| {
-        EPUBMatchError::PackageError(format!("missing package {}", root_file.display()))
-    })?;
+    let mut doc = Container::from_reader(reader)?;
+    let opf = doc.package_text().to_string();
     let mut book = String::new();
     for item in spine_items(&opf)? {
-        let Some(resource) = doc.resources.get(&item.idref) else {
+        let Some(path) = doc.item(&item.idref).and_then(|r| r.path.clone()) else {
             continue;
         };
-        let path = resource.path.clone();
-        let Some(bytes) = doc.get_resource_by_path(&path) else {
+        let Ok(Some(bytes)) = doc.read(&path) else {
             continue;
         };
         // Skipped as the search skips it
@@ -447,14 +447,6 @@ fn child<'a, 'input>(node: Node<'a, 'input>, name: &str) -> Option<Node<'a, 'inp
     element_children(node).find(|el| el.tag_name().name() == name)
 }
 
-/// A path in the archive with forward slashes
-fn archive_path(path: &Path) -> String {
-    path.components()
-        .map(|c| c.as_os_str().to_string_lossy())
-        .collect::<Vec<_>>()
-        .join("/")
-}
-
 // ---------------------------------------------------------------------------------------------
 // The table of contents
 // ---------------------------------------------------------------------------------------------
@@ -464,16 +456,10 @@ Each content document's chapter title, by its path ([`resolve_path`]'s form): th
 the table of contents that points into it, like EPUB++'s section titles. The EPUB 3 navigation
 document is read first, then the NCX.
 */
-fn toc_titles<R: Read + Seek>(doc: &mut EpubDoc<R>, opf: &str) -> HashMap<String, String> {
-    let nav = doc
-        .resources
-        .values()
-        .find(|r| {
-            r.properties
-                .as_deref()
-                .is_some_and(|p| p.split_whitespace().any(|p| p == "nav"))
-        })
-        .map(|r| r.path.clone());
+fn toc_titles<R: Read + Seek>(doc: &mut Container<R>, opf: &str) -> HashMap<String, String> {
+    let nav = (doc.manifest().iter())
+        .find(|r| r.has_property("nav"))
+        .and_then(|r| r.path.clone());
     let toc = with_xml(opf, |xml| {
         child(xml.root_element(), "spine")
             .and_then(|spine| spine.attribute("toc"))
@@ -482,18 +468,13 @@ fn toc_titles<R: Read + Seek>(doc: &mut EpubDoc<R>, opf: &str) -> HashMap<String
     .ok()
     .flatten();
     let ncx = toc
-        .and_then(|id| doc.resources.get(&id))
-        .or_else(|| {
-            doc.resources
-                .values()
-                .find(|r| r.mime == "application/x-dtbncx+xml")
-        })
-        .map(|r| r.path.clone());
-    let mut read = |path: Option<PathBuf>,
-                    entries: fn(&Document, &str) -> Vec<(String, String)>| {
+        .and_then(|id| doc.item(&id))
+        .or_else(|| (doc.manifest().iter()).find(|r| r.media_type == "application/x-dtbncx+xml"))
+        .and_then(|r| r.path.clone());
+    let mut read = |path: Option<String>, entries: fn(&Document, &str) -> Vec<(String, String)>| {
         let path = path?;
-        let text = doc.get_resource_str_by_path(&path)?;
-        let base = resolve_path("", &archive_path(&path));
+        let text = doc.read_text(&path).ok().flatten()?;
+        let base = resolve_path("", &path);
         with_xml(&text, |xml| entries(xml, &base)).ok()
     };
     let mut entries = read(nav, nav_entries).unwrap_or_default();

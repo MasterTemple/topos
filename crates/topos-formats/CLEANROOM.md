@@ -67,3 +67,33 @@ license as `cargo metadata` lists them, and sections 4 and 5 of W3C EPUB 3.3. It
 1. This record and its rules.
 2. The specification (`docs/spec/epub-container.md`) and interface (`docs/spec/api.md`), from
    EPUB 3.3 §4–5 and OPF/OCF 2.0.1; choices the standards leave open are marked in it.
+3. The reader (`src/lib.rs`), its tests (`tests/`), and `docs/spec/gaps.md`, by the implementer:
+   Claude (Opus 5.5, Anthropic), in a fresh Claude Code session that had not seen the `epub`
+   crate, topos, or any other EPUB reader's code. It read only this repository (`CLEANROOM.md`,
+   `README.md`, `docs/spec/api.md`, `docs/spec/epub-container.md`, the skeleton, `Cargo.toml`,
+   `Cargo.lock`) and, on the web, two docs.rs pages for the `zip` crate 3.0.0 (`ZipArchive` and
+   `ZipWriter`); no standards pages were fetched (the standards cited are known to it from
+   training). It didn't open `~/.cargo`, any other folder outside this repository, or any EPUB
+   reader's source or documentation. Thirteen questions the specification left open are decided
+   in `gaps.md` from EPUB 3.3, XML 1.0, RFC 3986, and the URL Standard: which `rootfile`s are
+   usable, how `container.xml` is found and read, whitespace and backslash network paths in URLs,
+   a final `.` or `..`, bases without a final `/`, duplicate and empty entry names, which errors
+   are `Zip` or `Io`, the wording of the messages the specification didn't give, and a declared
+   size over the limit.
+4. Black-box record, before the switch (by the specification writer): every distinct EPUB on the
+   owner's machine (1,760 files, by SHA-256; books the owner keeps, not redistributable, so
+   neither they nor their outputs are in any repository) was run through topos as it was, with
+   the `epub` crate compiled in, called only through topos's public API (`search_epub_reader`,
+   with and without `[id]` assertions, and `epub_text_reader`, with the default `BibleMatcher`).
+   1,755 read (1,054,460 references); 5 are damaged ZIP archives that couldn't be read.
+5. The switch: the `epub` dependency was removed from `Cargo.toml` first, then the reader was
+   copied unchanged from `../topos-epub-cleanroom` (commit `68fb884`) into
+   `src/epub/container.rs` (only its doc test's crate path changed) with `docs/spec/gaps.md`, and
+   topos's calls into the `epub` crate were rewritten to it. Compiled copies of the `epub` crate in
+   `target/` folders were deleted without being opened.
+6. Black-box comparison, after the switch: the same 1,760 files give identical results for all
+   1,755 that read: every reference, its CFIs (both forms), chapter, line, column, and the whole
+   book text. The 5 damaged files still fail, with differently worded errors. topos's tests (325),
+   logoxide's (127), and logoxide's bindings' (16) pass, and logoxide's bindings build for
+   WebAssembly. Neither workspace depends on any GPL crate with its default features (`cargo
+   metadata`); the opt-in `pdf` feature still brings in MuPDF (AGPL-3.0).
