@@ -515,7 +515,9 @@ fn usx_style(e: &Element) -> Option<&str> {
         "note" => e.attr("caller").is_some(),
         _ => false,
     };
-    usx.then(|| e.attr("style")).flatten().filter(|s| !s.is_empty())
+    usx.then(|| e.attr("style"))
+        .flatten()
+        .filter(|s| !s.is_empty())
 }
 
 /// An escaped copy

@@ -140,6 +140,48 @@ Catalogs and imports (from step 7):
   (`biblix.toml`, `usfm/`, `copr.htm` as the license file, versioned by eBible.org's update date,
   `2026.10.8`), used as a path package in `imports/<id>/`. The ASV imports in 0.3 s (`bx`) or 2 s
   (Obsidian), and reads all 31,102 verses.
+- **Importing from CCEL** (`ccel:<id>`, October 2026): CCEL lists its Bibles only on a page
+  (`https://ccel.org/ccel/bible/`, 50 works, titles alone), which is read as a catalog; each
+  work's ThML (`/ccel/bible/<id>.xml`, no login for 47 of the 50; the others answer with a page,
+  which is refused) carries its title, language, rights, edition version (`1.0`), and date in
+  its head, so the import fills in what the page doesn't. The whole Bible stays one file
+  (`thml/kjv.xml`). Checked: the KJV with the Apocrypha (36,807 verses, every verse marker in the
+  file), Luther (31,102), the SBLGNT (7,927), the Hebrew OT (23,212, right to left: judged from
+  its letters, since CCEL's Hebrew transliteration is tagged Hebrew too); 3 s in `bx`, 2.3 s in
+  Obsidian. Public domain is `LicenseRef-PublicDomain`, other rights `LicenseRef-CCEL` with the
+  statement in `COPYRIGHT.txt`.
+- **Importing SWORD modules** (`sword:<repository>/<module>`, October 2026), through
+  sword-modules, which now reads through a `Files` trait (a folder, memory, or a host's files;
+  specified in its `docs/spec/api.md` first, as its clean-room rules ask), so it runs in
+  WebAssembly (the bindings grew by 0.25 MB). A repository's `mods.d.tar.gz` is its catalog
+  (CrossWire's main one is a default; the others CrossWire lists are known by name,
+  `crosswire-beta`, `ebible`, …), listing Bibles and commentaries in OSIS or ThML that aren't
+  locked: of CrossWire's, 252 Bibles and 39 commentaries (25 GBF Bibles and one plain-text one
+  aren't read). The import downloads `packages/<Module>.zip` and writes each book in the
+  module's own markup (`osis/John.xml`, verse milestones around each entry), dropping the
+  entries' own book and chapter milestones; verses SWORD links to one entry become a bridge,
+  and an introduction that is another verse's entry is left out (the ISV's John 1:0 is Luke
+  23:56's text, in libsword's `mod2imp` too). Version, license, and language come from the
+  conf (the KJV is `3.1.0`, GPL). Checked: KJV (31,102 verses, 4 s), KJVA, LXX, Vulgate,
+  RusSynodal (their versifications), ChiUns, Byz, TR, WLC (right to left), the ISV (ThML),
+  NETfree, Geneva1599, and the commentaries MHCC, Barnes, JFB, TSK, and RWP; in Obsidian the
+  Geneva Bible and MHCC import in 3 s each.
+- **Updating imports** (`bx import --update [name] [--dry-run]`, October 2026): an import is a
+  path package with nothing upstream locked, so each is made again from its publisher's download
+  (found by the `upstream` it recorded) and compared with the project's: changed ones are
+  replaced (files beside them stay, declared files the publisher dropped go) and locked again,
+  with the change described as `bx diff` does. eBible.org and SWORD imports are downloaded only
+  when the catalog lists a newer version; fetch.bible's and CCEL's each time, and when their text
+  changed without a newer version, its version is raised by the change (a reworded verse:
+  minor), so a version never names two texts. The bindings do the same for hosts
+  (`findUpstream`, `importIsCurrent`, `updateImport`), and the Obsidian plugin has *Update
+  imports* (Check and Update) in its settings and a command.
+- **Import ids are prefixed** (`ccel-kjv`, `sword-kjv`): catalogs merge by id, the first
+  winning, and CCEL's and SWORD's ids (`kjv`, `web`) are other catalogs' and packages' too.
+- **The Obsidian plugin reads any package's Bible**: a file of several books (a whole Bible in
+  OSIS or ThML) gets a stub for each book (`{"biblix": …, "path": …, "book": "JHN"}`), and books
+  in formats other than USX and USFM are read through biblix (`BiblixPackage.book`) rather than
+  parsed as USX. Commentaries install but get no reader yet.
 
 ## Layers
 
@@ -360,8 +402,8 @@ What exists, from a survey on 2026-10-08:
 
 | Source | What it offers | Format | Licenses | Fit |
 |---|---|---|---|---|
-| [CCEL](https://ccel.org) | Classics, commentaries, and some Bibles | [ThML](https://ccel.org/ThML) (its source format; downloads need a login) | Mostly public domain | topos-bible-markup reads ThML: commentary and book packages |
-| CrossWire and other SWORD repositories (eBible.org, IBT, STEP, Lockman, ...) | Hundreds of Bibles, commentaries, lexicons | SWORD modules | Mixed; some locked with keys | sword-modules already installs them |
+| [CCEL](https://ccel.org) | Classics, commentaries, and some Bibles | [ThML](https://ccel.org/ThML) (its source format; 47 of its 50 Bibles download without a login) | Mostly public domain | topos-bible-markup reads ThML: Bibles imported (`ccel:`); commentary and book packages later |
+| CrossWire and other SWORD repositories (eBible.org, IBT, STEP, Lockman, ...) | Hundreds of Bibles, commentaries, lexicons | SWORD modules | Mixed; some locked with keys | Bibles and commentaries in OSIS or ThML imported through sword-modules (`sword:`) |
 | [eBible.org](https://ebible.org) | About 1,000+ translations, a `translations.csv` index | USFM zips, USFX, a SWORD repository, EPUB, HTML | Mostly public domain or Creative Commons | Large and open: first after SWORD |
 | [fetch.bible](https://fetch.bible) (gracious-tech) | About 1,400 Bibles in 1,100+ languages, a manifest on a CDN | USX or USFM (raw), HTML or text (normalized) | Open licenses only; 66 books | Static files with a manifest: easy to import |
 | [Door43](https://git.door43.org) (unfoldingWord) | Translations as git repositories | USFM + `manifest.yaml` ([Resource Container](https://resource-container.readthedocs.io/)) | Open (CC BY-SA mostly) | Already git: import a repository directly |
@@ -379,7 +421,8 @@ Formats to read:
 - **OSIS** and **ThML** (done: Bibles, a book a file or the whole Bible in one; on the KJV from
   open-bibles' OSIS and CCEL's ThML, 31,102 verses in the 66 books, the same per chapter as USFM.
   ThML's empty `<scripture parsed=…/>` elements are its verse markers)
-- **SWORD** (sword-modules)
+- **SWORD** (sword-modules; done for Bibles and commentaries in OSIS or ThML, imported a book a
+  file in the module's markup)
 - Later: Zefania XML, then the SQLite app formats
 
 ## FFI and WebAssembly
@@ -390,8 +433,9 @@ biblix-ffi (BoltFFI, like topos-ffi) has biblix's and topos's API in one package
 - **WebAssembly** (Obsidian): has no file system and no git, so biblix needs:
   - **Storage**: a trait (read a file, list a folder) that sources and sword-modules read
     through, with a std::fs implementation and a host implementation (the plugin's vault adapter,
-    passed in from JavaScript). sword-modules needs this trait, since today it opens a folder on
-    disk.
+    passed in from JavaScript). sword-modules reads through its own `Files` trait (done, October
+    2026: a folder, `MemoryFiles`, or anything a host gives), which biblix fills from a
+    module's zip.
   - **Fetching without git** (done): a repository's refs and a commit's archive are downloaded
     through the host's HTTP (`requestUrl` in Obsidian, which works on mobile), and biblix
     resolves and unpacks them. Native `bx` runs the `git` command (gitoxide could replace it).
@@ -413,11 +457,11 @@ biblix-ffi (BoltFFI, like topos-ffi) has biblix's and topos's API in one package
 | `bx release` | Tag a package's new version, after checking it against the last one |
 | `bx list`, `bx info id` | Installed packages: version, license, size, books (done) |
 | `bx clean`, `bx verify` | Remove versions nothing uses (done: lists them, `--remove` deletes); check a summary |
-| `bx search`, `bx import` | Find packages in catalogs; make eBible.org's or fetch.bible's download into one (done) |
+| `bx search`, `bx import` | Find packages in catalogs; make eBible.org's, fetch.bible's, CCEL's, or a SWORD repository's download into one (done) |
 | `bx media add`, `bx media check` | List a recording by URL and hash; download and check every one (done) |
 
 - Neovim (done): `:ToposBibleSearch <words>` (choose one to install), `:ToposBibleAdd <git URL |
-  ebible:id | fetch:id>`, `:ToposBibleRemove <id>`, running `bx` (`bx search --json`) in the current
+  ebible:id | fetch:id | ccel:id | sword:repository/module>`, `:ToposBibleRemove <id>`, running `bx` (`bx search --json`) in the current
   folder, then restarting biblix-lsp.
 - Obsidian: a Bibles section in the settings: the library's location, installed Bibles (version,
   license, remove, default), and *Add a Bible* from a git URL (showing its summary first) or a
@@ -446,8 +490,25 @@ biblix-ffi (BoltFFI, like topos-ffi) has biblix's and topos's API in one package
    looks for them by that hash: renumbered, it goes where they are and says so; reworded, it
    says the words changed. No older version is downloaded: the installed one's hashes are
    enough (`BiblixPackage.verseHashes`).
-7. **Importers**: eBible.org and fetch.bible (done, with their catalogs), Door43 (git), CCEL
-   (ThML), SWORD through sword-modules with `Storage`.
+7. **Importers**: eBible.org and fetch.bible (done, with their catalogs), CCEL's Bibles (done:
+   ThML, its page of Bibles as the catalog), SWORD through sword-modules (done: Bibles and
+   commentaries in OSIS or ThML, read from memory through sword-modules' `Files`; repositories'
+   `mods.d.tar.gz` as catalogs). Still to do:
+   - **Door43**: not started, because git.door43.org (its git host and catalog API) timed out
+     from the owner's machine in October 2026 (door43.org itself answered). The plan, to check
+     on real downloads once it's reachable: import rather than use the repositories as git
+     packages. A Door43 repository is git, but it isn't a biblix package: it has no
+     `biblix.toml`, its tags are its publisher's own (not checked here: `v{semver}` can't be assumed), and a
+     generated `biblix.toml` would have to live outside the repository, so the lock's commit and
+     checksum wouldn't describe what's installed. An import of a release's archive (Gitea's
+     `archive/<tag>.tar.gz`, which the archive code already unpacks) into `usfm/` with
+     `manifest.yaml`'s title, language, and license (`dublin_core`), versioned by its
+     `dublin_core.version` (else the tag), gets the same result as eBible.org's. Its catalog: the
+     Door43 catalog API's Bibles (`subject=Bible`, `stage=prod`), `door43:<owner>/<repo>`.
+   - CCEL's commentaries and books (ThML, often a work a file; need `kind = "commentary"`
+     sections tied to verses), GBF SWORD modules (a GBF reader in biblix, or converting through
+     topos-bible-markup's tree), dictionaries and general books, and a commentary reader in the
+     Obsidian plugin.
 8. **Media**: `[media]` in `biblix.toml` (done: each file's path, URL, size, SHA-256, and book;
    `bx media add` and `bx media check`; hosts check downloads with `verify` and keep them by hash),
    the transcript read as a text source (it's the package's `[formats]`, so done), and timings
@@ -458,7 +519,15 @@ biblix-ffi (BoltFFI, like topos-ffi) has biblix's and topos's API in one package
    Transcript++ can. `bx check`, `bx media check --offline`, and `bx release` check them against
    the text (verses it lacks, another book than the file's, out of order, overlapping, a file
    without timings); apps get them from `BiblixPackage.timings(file)`. A timing change is a
-   patch. Still to do: a player in the plugin (play from a verse, follow along).
+   patch. The Obsidian plugin's player (done, October 2026): a book with a recording shows
+   *Listen*; it plays from a verse (its number, the menu, a command), highlights the verse being
+   read and keeps it in view, moves when a link or the contents is followed, and plays a
+   passage from a reference or an `![John 3:16]` embed. A recording is downloaded the first time
+   it's played (its size said first), checked with `verifyMedia`, and kept at `mediaStorePath`
+   in the hidden library (`.biblix/media/`, not synced), so it's downloaded once per device.
+   The player is file-plus-plus's, shared with Transcript++. Still to do: `bx media add` could
+   write `timings = "timings/"` when the package has that folder (without it `timings()` is
+   empty, and `bx media check --offline` says nothing about them).
 9. **Links that follow changes**: renumbered verses are followed (step 6). Still to do: finding a
    reworded verse's exact words (a link's text fragment) when they changed a little.
 10. **Collections** (done): `kind = "collection"`, a package with no `[formats]`, only
