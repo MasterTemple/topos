@@ -4,7 +4,7 @@
 # - Nothing after `=>` means no completions
 # - Every front end runs these: the library (tests/complete.rs), the CLI (--complete), the
 #   bindings (topos-ffi), the language server, and the Obsidian plugin
-#   (obsidian-topos-bible, which reads this file from a topos checkout), so they can't drift apart
+#   (obsidian-logoxide, which reads this file from a topos checkout), so they can't drift apart
 
 # Books: a typed word must be an abbreviation, or start a name, abbreviation, or OSIS id
 Jo => Job | John | Joel | Jonah

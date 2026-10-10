@@ -25,7 +25,7 @@ The writer read:
 - the existing crate's source, README, doc comments, unit tests (`src/tests.rs` and the inline
   test in the entities module), and its fuzz example;
 - how its dependents use it: topos's `topos-formats` and `topos-ffi` (`topos-index` and
-  `topos-cli` do not use it), biblix's `biblix` and `biblix-lsp`, and
+  `topos-cli` do not use it), logoxide's `logoxide` and `logoxide-lsp`, and
   `sword-modules-cleanroom/src`;
 - the topos-bible API it calls (`../topos/crates/topos-lib`);
 - the public standards cited in `docs/spec/README.md`.
@@ -50,7 +50,7 @@ checked are re-expressed as integration tests, and more were added. They use onl
 The inputs in `tests/golden/` were gathered from the existing tests and doc examples, the
 `sword-modules-cleanroom` test fixtures (entries of generated OSIS, TEI, and ThML modules and
 their OSIS source), USX of the Berean Standard Bible and King James Version packages in
-`~/Development/biblix-packages` (the KJV converted from USFM with the `usfm3` crate), and
+`~/Development/logoxide-packages` (the KJV converted from USFM with the `usfm3` crate), and
 hand-made edge cases (malformed markup, unclosed and orphan tags, unknown elements, odd entities
 and attributes).
 

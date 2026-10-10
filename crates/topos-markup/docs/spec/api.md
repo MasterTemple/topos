@@ -37,8 +37,8 @@ Checked in October 2026; nothing here may be removed or changed in type.
 |---|---|
 | topos `topos-formats` (feature `markup`) | `Flat` (`text`, `source_range`), `Point` (as a public field type; needs `Clone`, `Debug`, `PartialEq`, `Eq`), `flatten::flatten`, `parse`, `Markup`, `TextOptions`; doc links to `Filter`, `Flattener`, `HtmlRenderer::mark` |
 | topos `topos-ffi` (feature `markup`) | `Filter::all/drop`, `HtmlOptions` (struct literal with both fields), `HtmlRenderer::with_options/render`, `Kind`, `Markup::from_name`, `Node`, `TextOptions` (struct update syntax), `find_all`, `parse`, `plain_text`, `Element::attr`, `verses::{VerseSpan, chapter_verses, passage_ranges, slice, usx_chapter_verses, verses}`, `VerseSpan.start/.end` |
-| biblix `biblix` | re-exports the crate as `biblix::markup`; `Filter::text`, `Kind`, `Node` (matches `Node::Element`), `Element.kind`, `Element::strongs`, `TextOptions`, `plain_text`, `parse`, `Markup::Usx`, `verses::{VerseSpan, chapter_verses, slice, usx_chapter_verses, verses}`; stores `Vec<Node>` and `Vec<VerseSpan>` with serde (postcard) |
-| biblix `biblix-lsp` | `Filter::all/drop/unwrap`, `Flat` (`text`, `spans`, `entries`), `Flattener::new/push/finish`, `flatten::flatten`, `Kind` (as a `BTreeMap` key in `TextOptions::templates`), `NodePath` (as a `HashMap` key: `Hash` + `Eq`), `TextOptions` (fields `filter`, `verse_label`, `chapter_label`, `templates`), `Span` (`range`, `kind`, `path`), `VerseSpan` (`chapter`, `verse`, `last`, `marker`, `start`, `end`), `passage_ranges`, `slice` |
+| logoxide `logoxide` | re-exports the crate as `logoxide::markup`; `Filter::text`, `Kind`, `Node` (matches `Node::Element`), `Element.kind`, `Element::strongs`, `TextOptions`, `plain_text`, `parse`, `Markup::Usx`, `verses::{VerseSpan, chapter_verses, slice, usx_chapter_verses, verses}`; stores `Vec<Node>` and `Vec<VerseSpan>` with serde (postcard) |
+| logoxide `logoxide-lsp` | `Filter::all/drop/unwrap`, `Flat` (`text`, `spans`, `entries`), `Flattener::new/push/finish`, `flatten::flatten`, `Kind` (as a `BTreeMap` key in `TextOptions::templates`), `NodePath` (as a `HashMap` key: `Hash` + `Eq`), `TextOptions` (fields `filter`, `verse_label`, `chapter_label`, `templates`), `Span` (`range`, `kind`, `path`), `VerseSpan` (`chapter`, `verse`, `last`, `marker`, `start`, `end`), `passage_ranges`, `slice` |
 | sword-modules-cleanroom | re-exports the crate as `markup` and `Filter`, `HtmlRenderer`, `Kind`, `Node`, `Strongs`, `TextOptions`, `Markup`; `parse`, `plain_text`, `strongs_numbers`, `HtmlRenderer::new/render`, `Markup::from_name`, `Markup::{Gbf, Plaintext}` |
 | topos `topos-index`, `topos-cli` | none |
 
@@ -59,7 +59,7 @@ Nothing else derives them: not `Markup`, `Strongs`, `StrongsLang`, `Filter`, `Ac
 `TextOptions`, `Flat`, `Span`, `Point`, `TaggedReference`, or the HTML types. Because derived
 formats such as postcard depend on field and variant order, the field order of `Element` and
 `VerseSpan` and the variant order of `Node`, `Kind`, and `Milestone` below are part of the
-interface (biblix caches parsed books this way).
+interface (logoxide caches parsed books this way).
 
 ## Root
 

@@ -58,7 +58,7 @@ pub struct ToposBook {
 }
 
 impl ToposBook {
-    /// A book parsed elsewhere, like biblix's packages and cache (for Rust crates that build on
+    /// A book parsed elsewhere, like logoxide's packages and cache (for Rust crates that build on
     /// this one; other languages use `parse`)
     pub fn from_tree(nodes: Vec<Node>, spans: Vec<VerseSpan>, book_id: Option<u8>) -> Self {
         Self {

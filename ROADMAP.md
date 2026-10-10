@@ -72,10 +72,10 @@ The phases are in order, and each one leaves the repo working.
 - [x] A `topos-ffi` façade (BoltFFI 0.31) with owned data types and offsets in the caller's unit
 - [x] Remove the old `topos-py`, `topos-ts`, and `topos-ts-boltffi` test crates
 - [x] Python through BoltFFI (`boltffi pack python` builds a working wheel)
-- [x] An LSP server (`topos-lsp`): completion, hover with the normalized reference, and document symbols (moved to biblix as `biblix-lsp`, October 2026)
+- [x] An LSP server (`topos-lsp`): completion, hover with the normalized reference, and document symbols (moved to logoxide as `logoxide-lsp`, October 2026)
 - [x] LSP diagnostics for references that do not exist (`BibleMatcher::problems`)
 - [x] LSP Bible text from a folder of USX files (`bible`, `markup`): passage text in hover, go to definition into a whole book (`topos-bible://BSB/JHN`, colored with semantic tokens), and references from a verse
-- [x] The Neovim plugin moved to its own repository, `topos-bible.nvim`
+- [x] The Neovim plugin moved to its own repository, `logoxide.nvim`
 - [ ] Incremental parsing (re-scan only the edited lines). Deferred: search runs at about 30 MiB/s, so re-searching a document on each LSP request is fast enough for now
 - [x] Criterion benchmarks (`cargo bench -p topos-lib`)
 
@@ -86,7 +86,7 @@ Plan: [doc/translations.md](./doc/translations.md)
 - [x] Search, problems, and completion with translations (`tests/cases/translations.txt`), without slowing plain search
 - [x] A translation's own chapter and verse counts (`Translations::set_chapter_verses`, from a book's USX with `verses::chapter_verses`)
 - [x] The FFI: `ToposTranslations`, `parseWithTranslation`, `searchWithTranslations`, `completeWithTranslations`, `ToposBook.chapterVerses`
-- [ ] Mapping verses between versifications (Malachi 4:1 KJV = 3:19 MT), in biblix
+- [ ] Mapping verses between versifications (Malachi 4:1 KJV = 3:19 MT), in logoxide
 - [x] Several Bibles in the LSP (`bibles`, `default-bible`, `hover-bibles`, `topos/bibles`)
 - [x] Several Bibles in the Neovim plugin (`bibles`, `:ToposBible`, `:ToposParallel`) and the Obsidian plugin (named references, verse counts, compare in embeds, parallel tabs)
-- [ ] biblix, a library and CLI (`bx`) above topos: translations as versioned git packages, cached, shared, and installed from USX, SWORD, and more: [doc/biblix.md](./doc/biblix.md)
+- [ ] logoxide, a library and CLI (`lx`) above topos: translations as versioned git packages, cached, shared, and installed from USX, SWORD, and more: [doc/logoxide.md](./doc/logoxide.md)

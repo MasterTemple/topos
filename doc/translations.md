@@ -17,14 +17,14 @@ Steps 1 to 6 are done, with these differences from the plan below:
   the translation's own USX (`verses::usx_chapter_verses` reads only the markers: the whole BSB in
   15 ms, the same counts as a full parse). topos has no named versification systems or
   `TranslationInfo`; those, and mapping between versifications, moved to
-  [biblix.md](./biblix.md)
+  [logoxide.md](./logoxide.md)
 - Step 5: Neovim chooses Bibles with `vim.ui.select` (Telescope backs it with telescope-ui-select).
   `:ToposParallel` keeps the two books on the same verse through a new request,
   `topos/sameVerse`
 - Step 6: compare is in embeds (`compareBibles`), not hover, since Obsidian's page preview shows
   one file. The parallel tabs keep the verse at the top of either at the top of the other
 - Step 7 (and caching, sharing, and managing translations) is
-  [biblix.md](./biblix.md)
+  [logoxide.md](./logoxide.md)
 
 ## Where things stood
 
@@ -81,7 +81,7 @@ Steps 1 to 6 are done, with these differences from the plan below:
 - Problems: a reference whose named translation lacks the verse (`3 John 1:15 KJV`, where the KJV
   ends at 14) is a problem only once step 4 gives each translation its own versification.
 
-## Step 4: versification per translation (counts done; mapping in biblix.md)
+## Step 4: versification per translation (counts done; mapping in logoxide.md)
 
 Translations number verses differently: Malachi 4 vs. 3:19–24, 3 John 1:14–15, psalm titles as
 verse 1, Romans 16:25–27, and the deuterocanon.
@@ -133,7 +133,7 @@ verse 1, Romans 16:25–27, and the deuterocanon.
 - The index doesn't store translations. If the sidebar groups or filters by translation later,
   keep them in a side table keyed by entry and span, not in `FileEntry`'s codec.
 
-## Step 7: SWORD modules (see biblix.md)
+## Step 7: SWORD modules (see logoxide.md)
 
 sword-modules reads SWORD Bibles with their own versification. When the plugins or the LSP read
 SWORD modules (native only; WASM would need the files in the vault), a module's name is its
