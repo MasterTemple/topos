@@ -1,6 +1,6 @@
 [package]
 name = "topos-ffi"
-version = "0.5.0"
+version = "0.6.0"
 publish = false
 edition = "2024"
 license.workspace = true
@@ -17,13 +17,13 @@ boltffi = "0.31.0"
 serde = { workspace = true }
 serde_json = { workspace = true }
 # Named topos_lib here: this crate's own library is topos_bible (the package name BoltFFI uses)
-topos-lib = { package = "topos-bible", path = "../topos-lib" }
-topos-bible-index = { path = "../topos-index", default-features = false, features = ["epub"] }
-topos-bible-markup = { path = "../topos-markup", optional = true }
+topos-lib = { package = "topos-bible", path = "../topos-lib", version = "0.6.0" }
+topos-bible-index = { path = "../topos-index", version = "0.6.0", default-features = false, features = ["epub"] }
+topos-bible-markup = { path = "../topos-markup", version = "0.6.0", optional = true }
 
 # Searching files and folders (WebAssembly has no file access)
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-topos-bible-index = { path = "../topos-index", default-features = false, features = ["epub", "files"] }
+topos-bible-index = { path = "../topos-index", version = "0.6.0", default-features = false, features = ["epub", "files"] }
 
 [features]
 default = ["markup"]
