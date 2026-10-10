@@ -27,7 +27,7 @@ console.log(topos.contradiction(ToposQuery.create().oldTestament().genre("Paulin
 
 // Translations are only read by the methods that take them, and only the names listed
 const translations = ToposTranslations.create().add("ESV", []).add("KJV", ["AV"]).add("LXX", [])
-  .chapterVerses("ESV", 64, [15]); // 3 John's verse counts in the ESV (from ToposBook.chapterVerses())
+  .chapterVerses("ESV", 64, [15]); // 3 John's verse counts in the ESV (a book's own)
 const named = topos.parseWithTranslation("3 John 15 (esv)", OffsetUnit.Utf16, translations, BookStyle.Name);
 console.log(named?.passage.reference, named?.translation);
 console.log(topos.parseWithTranslation("3 John 15 (av)", OffsetUnit.Utf16, translations, BookStyle.Name)); // the KJV ends at 14

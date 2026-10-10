@@ -50,6 +50,9 @@ Obsidian.
   usfm-onion was faster (0.58 s against 0.86 s). But usfm-onion's USX drops the space between
   adjacent `\w` words (`For</char><char …>God`), so it reads "ForGodsoloved". usfm3 keeps the
   spaces, and it's on crates.io.
+- **The package manager never reads text** (decided 2026-10-10): markup, text, and imports become
+  logoxide's own crates (`PLAN-CRATES.md` in logoxide). topos-bible-markup moved there as
+  `logoxide-markup`, with its history.
 
 ## Status
 
@@ -86,7 +89,7 @@ Steps 2 and 3:
 
 - **The language server moved into logoxide** as `logoxide-lsp` (`crates/logoxide-lsp`, history kept),
   so it can read Bible text from packages without topos depending on logoxide. topos keeps the
-  library, markup, formats, index, CLI, and topos-ffi.
+  library, formats, index, CLI, and topos-ffi.
 
 Step 5, started:
 - **logoxide-ffi** (`crates/logoxide-ffi`, npm and PyPI `logoxide`) re-exports topos-ffi, so one package
@@ -187,7 +190,7 @@ Catalogs and imports (from step 7):
 
 ```
 topos-bible          references: parsing, search, Translations (names, aliases, counts)
-topos-bible-markup   Bible text as one tree (USX, OSIS, ThML, GBF, TEI), Flat, HTML
+logoxide-markup      formats into one tree, text and HTML (logoxide's, from topos-bible-markup)
 sword-modules        SWORD modules: read, install from SWORD repositories
 logoxide               packages (logoxide.toml), sources (formats), the library (installed
                      versions), the cache, the lock file; builds topos's Translations
@@ -384,7 +387,8 @@ instead of trusting it:
 - The topos CLI and LSP find it through `library =` in `~/.config/topos/config.toml` (or
   `LOGOXIDE_HOME`), and name Bibles instead of paths: `bibles = ["bsb", "kjv"]`.
 - The LSP's `bible.rs`, the plugin's `core/bibles.ts` and `VerseCounts`, and `ToposBook` move into
-  logoxide as the USX source and the cache.
+  logoxide as the USX source and the cache (the markup tree is `logoxide-markup`, and the FFI's
+  book is logoxide-ffi's).
 
 ## The cache
 
@@ -404,7 +408,7 @@ What exists, from a survey on 2026-10-08:
 
 | Source | What it offers | Format | Licenses | Fit |
 |---|---|---|---|---|
-| [CCEL](https://ccel.org) | Classics, commentaries, and some Bibles | [ThML](https://ccel.org/ThML) (its source format; 47 of its 50 Bibles download without a login) | Mostly public domain | topos-bible-markup reads ThML: Bibles imported (`ccel:`); commentary and book packages later |
+| [CCEL](https://ccel.org) | Classics, commentaries, and some Bibles | [ThML](https://ccel.org/ThML) (its source format; 47 of its 50 Bibles download without a login) | Mostly public domain | logoxide-markup reads ThML: Bibles imported (`ccel:`); commentary and book packages later |
 | CrossWire and other SWORD repositories (eBible.org, IBT, STEP, Lockman, ...) | Hundreds of Bibles, commentaries, lexicons | SWORD modules | Mixed; some locked with keys | Bibles and commentaries in OSIS or ThML imported through sword-modules (`sword:`) |
 | [eBible.org](https://ebible.org) | About 1,000+ translations, a `translations.csv` index | USFM zips, USFX, a SWORD repository, EPUB, HTML | Mostly public domain or Creative Commons | Large and open: first after SWORD |
 | [fetch.bible](https://fetch.bible) (gracious-tech) | About 1,400 Bibles in 1,100+ languages, a manifest on a CDN | USX or USFM (raw), HTML or text (normalized) | Open licenses only; 66 books | Static files with a manifest: easy to import |
@@ -509,7 +513,7 @@ logoxide-ffi (BoltFFI, like topos-ffi) has logoxide's and topos's API in one pac
      Door43 catalog API's Bibles (`subject=Bible`, `stage=prod`), `door43:<owner>/<repo>`.
    - CCEL's commentaries and books (ThML, often a work a file; need `kind = "commentary"`
      sections tied to verses), GBF SWORD modules (a GBF reader in logoxide, or converting through
-     topos-bible-markup's tree), dictionaries and general books, and a commentary reader in the
+     logoxide-markup's tree), dictionaries and general books, and a commentary reader in the
      Obsidian plugin.
 8. **Media**: `[media]` in `logoxide.toml` (done: each file's path, URL, size, SHA-256, and book;
    `lx media add` and `lx media check`; hosts check downloads with `verify` and keep them by hash),

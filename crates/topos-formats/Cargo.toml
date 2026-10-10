@@ -13,7 +13,6 @@ exclude = ["tests"]
 
 [dependencies]
 topos-bible = { path = "../topos-lib", version = "0.6.0" }
-topos-bible-markup = { path = "../topos-markup", version = "0.6.0", optional = true }
 itertools = { workspace = true }
 thiserror = { workspace = true }
 
@@ -38,7 +37,5 @@ srt = []
 epub = ["dep:zip", "dep:roxmltree"]
 json = ["dep:serde_json"]
 xml = ["dep:roxmltree"]
-# Bible markup (OSIS, ThML, GBF, TEI, USX) through topos-bible-markup
-markup = ["dep:topos-bible-markup"]
 # Needs MuPDF to build
 pdf = ["dep:mupdf"]

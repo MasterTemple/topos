@@ -54,7 +54,7 @@ returns new translations)
 const translations = ToposTranslations.create()
   .add("ESV", [])
   .add("KJV", ["AV"])
-  .chapterVerses("ESV", 64, book.chapterVerses()); // 3 John's verse counts from its USX
+  .chapterVerses("ESV", 64, [15]); // 3 John's verse counts in the ESV
 topos.parseWithTranslation("3 John 15 (esv)", OffsetUnit.Utf16, translations, BookStyle.Name);
 // { passage: 3 John 1:15, translation: { name: "ESV", start: 11, end: 14 } }
 ```
@@ -100,7 +100,7 @@ impl ToposTranslations {
         Self { translations }
     }
 
-    /// A book's verse counts in a translation, one per chapter (`ToposBook.chapterVerses()`)
+    /// A book's verse counts in a translation, one per chapter (a book's own verse counts)
     pub fn chapter_verses(&self, name: String, book_id: u8, counts: Vec<u8>) -> Self {
         let translations = self.translations.clone().with_chapter_verses(
             &name,

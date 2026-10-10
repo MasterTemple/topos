@@ -5,7 +5,7 @@ its translation (`John 3:16 KJV`), hover and embeds can show it (or several tran
 each other), and a book can be opened in any translation at the same verse.
 
 topos only finds and parses references. A translation's **text** stays where it is now (USX
-folders read by `topos-bible-markup`, `ToposBook` in the FFI, the LSP's `bible.rs`, SWORD modules
+folders read by `logoxide-markup`, logoxide-ffi's book, the LSP's `bible.rs`, SWORD modules
 through sword-modules). The library's part is the **name** a reference gives and the
 **versification** a translation uses.
 

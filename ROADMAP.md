@@ -64,7 +64,7 @@ The phases are in order, and each one leaves the repo working.
 - [x] EPUB positions in `-m json` (spine index, chapter, offsets and lines in the book's text)
 - [x] `topos-bible-index`: a persistent, compact index (about 15 bytes a reference) with checks for changed files, per-device packs that sync without conflicts, and filtered, sorted, paged queries; in the bindings (`ToposIndex`) and the CLI (`-m index`); the Obsidian plugin keeps a million references in it and searches only changed files
 - [x] File walking, per-format search, and the cache moved from the CLI into `topos-bible-index` (`files`), shared by the CLI, LSP, and FFI (`Topos.searchFiles` with `ToposFiles`, including `cacheDir`)
-- [x] `ToposBook` in the bindings (feature `markup`): a USX or OSIS book you bring, with passages as HTML or text (verses found by `topos-bible-markup::verses`), for the Obsidian plugin's previews
+- [x] `ToposBook` in the bindings (feature `markup`): a USX or OSIS book you bring, with passages as HTML or text (verses found by `topos-bible-markup::verses`), for the Obsidian plugin's previews (moved to logoxide with the markup crate, October 2026: `logoxide-markup`, and the book in `logoxide-ffi`)
 - [x] EPUBs searched in WebAssembly (`Topos.indexEpub`, the CLI's code), so the Obsidian plugin searches books in its Web Worker instead of through EPUB++ (kept for books the Rust ZIP reader rejects)
 
 ## Phase 6: Bindings and tooling
@@ -85,7 +85,7 @@ Plan: [doc/translations.md](./doc/translations.md)
 - [x] `BibleData::parse_with_translation` and `Translations`: a reference and the translation named after it (`John 3:16 (KJV)`), as a new `TranslatedPassage`
 - [x] Search, problems, and completion with translations (`tests/cases/translations.txt`), without slowing plain search
 - [x] A translation's own chapter and verse counts (`Translations::set_chapter_verses`, from a book's USX with `verses::chapter_verses`)
-- [x] The FFI: `ToposTranslations`, `parseWithTranslation`, `searchWithTranslations`, `completeWithTranslations`, `ToposBook.chapterVerses`
+- [x] The FFI: `ToposTranslations`, `parseWithTranslation`, `searchWithTranslations`, `completeWithTranslations`, `ToposBook.chapterVerses` (moved to logoxide, October 2026)
 - [ ] Mapping verses between versifications (Malachi 4:1 KJV = 3:19 MT), in logoxide
 - [x] Several Bibles in the LSP (`bibles`, `default-bible`, `hover-bibles`, `topos/bibles`)
 - [x] Several Bibles in the Neovim plugin (`bibles`, `:ToposBible`, `:ToposParallel`) and the Obsidian plugin (named references, verse counts, compare in embeds, parallel tabs)

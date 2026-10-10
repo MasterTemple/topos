@@ -18,9 +18,9 @@ part of this rewrite.
 **Two parties.** A *specification writer* writes what the reader must do; an *implementer*, in a
 separate repository (`../topos-epub-cleanroom`), writes the reader from that specification alone.
 
-**No one reads the `epub` crate.** Unlike topos-bible-markup's clean room, nobody on either side
-studies the original: the reader's behaviour comes from the public EPUB standards, not from the
-`epub` crate. Neither party may read, for any purpose:
+**No one reads the `epub` crate.** Unlike topos-bible-markup's clean room (now logoxide-markup's,
+in logoxide), nobody on either side studies the original: the reader's behaviour comes from the
+public EPUB standards, not from the `epub` crate. Neither party may read, for any purpose:
 
 - the `epub` crate's source, in any version (crates.io, `~/.cargo/registry/src/*/epub-*`, its git
   repository), its README, examples, tests, or documentation (docs.rs);

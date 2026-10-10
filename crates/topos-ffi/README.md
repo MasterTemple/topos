@@ -119,7 +119,7 @@ Chain the methods:
 
 ```ts
 const translations = ToposTranslations.create().add("ESV", []).add("KJV", ["AV"])
-  .chapterVerses("ESV", 64, threeJohn.chapterVerses()); // a ToposBook's own verse counts
+  .chapterVerses("ESV", 64, [15]); // a book's own verse counts (3 John in the ESV)
 topos.parseWithTranslation("3 John 15 (av)", OffsetUnit.Utf16, translations, BookStyle.Name);
 // null: the KJV (the default counts) ends 3 John at verse 14
 topos.parseWithTranslation("3 John 15 (esv)", OffsetUnit.Utf16, translations, BookStyle.Name);
@@ -167,24 +167,10 @@ uses the CLI's). Each file comes back with its `FileMatch`es (`passage`, offsets
 `line`, `column`, a `label` like a time or page, and `epub` with the CFI and chapter) or an
 `error`. `listFiles(paths, files)` lists what would be searched.
 
-**A book's text** (feature `markup`, on by default). topos holds no Bible text, but it can read
-a book you bring, through [`topos-bible-markup`](../topos-markup): `ToposBook.parse(topos, "usx",
-text)` parses a whole book (USX, or OSIS with verse milestones; `null` in JavaScript for an unknown
-markup), `bookId()` says which (from USX's `<book code>` or OSIS's book `div`), and `verses()` (each
-`BookVerse`'s `part` tells a partial verse's halves apart: 1 for `20a`, 2 for `20b`, 0 for a whole
-verse; `lastChapter` is where a range into a later chapter ends, `osisID="John.3.36-John.4.2"`) and `chapters()` list what it has, and `chapterVerses()` its verse counts per chapter (for
-`ToposTranslations.chapterVerses`; `ToposBook.usxChapterVerses(text)` counts a USX book's markers
-without parsing it, fast enough for a whole Bible). `html(passage, options)` and `text(passage, options)` give each part
-of a passage (`John 3:16; 4` has two), and `chapterHtml(chapter, options)` a whole chapter;
-`BookTextOptions { notes, headings, classPrefix }` keeps or drops footnotes and headings. A verse
-runs from the end of the one before it, so a heading goes with the verse after it, and paragraphs
-cut by a passage stay paragraphs. The HTML uses topos-bible-markup's classes (verse markers are
-empty `<span class="topos-verse" data-n="16">`s for a stylesheet to number).
-
 **Errors.** `ToposError` is `InvalidConfig { message }`, `InvalidQuery { message }`,
-`InvalidIndex { message }` (an index file that's damaged or from another version), 
-`Files { message }` (a bad glob or ignore file, or no file access), or `InvalidMarkup { message }`. Python
-raises `ToposErrorException`; JavaScript throws `ToposErrorException`, with the error in its
+`InvalidIndex { message }` (an index file that's damaged or from another version), or
+`Files { message }` (a bad glob or ignore file, or no file access). Python raises
+`ToposErrorException`; JavaScript throws `ToposErrorException`, with the error in its
 `value` (`e.value.message`). `Topos.with_config` is older: in JavaScript it returns `null` on bad
 input instead, so prefer `ToposOptions.create().data(json).build()`, which throws everywhere.
 

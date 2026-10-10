@@ -55,7 +55,6 @@ const topos = Topos.new();
 | `contains(outer, inner)` / `overlaps(a, b)` | Whether one passage contains, or shares any verse with, another |
 | `searchWith(text, unit, query)` | The references a `ToposQuery` keeps |
 | `contradiction(query)` | Why nothing can match, if the query's filters contradict each other |
-| `ToposBook.parse(topos, markup, text)` | A Bible book you bring (`usx`, or `osis`): `html(passage, options)` and `text(passage, options)` give each part of a passage, `chapterHtml(chapter, options)` a chapter, `verses()` and `chapters()` what it has (`null` for an unknown markup) |
 | `dispose()` | Frees the Rust object now instead of waiting for garbage collection |
 
 - `Passage { bookId, book, reference, segments, osis }`, with `reference` written in the
