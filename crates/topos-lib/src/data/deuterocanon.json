@@ -23,10 +23,23 @@
     {"id": 87, "book": "Odes", "abbreviation": "Odes", "osis": "Odes", "usfm": "ODA", "abbreviations": ["odes of solomon"], "ambiguous": ["odes"]},
     {"id": 88, "book": "Psalms of Solomon", "abbreviation": "Pss Sol", "osis": "PssSol", "usfm": "PSS", "abbreviations": ["pss sol", "psssol", "ps sol", "pssol"]},
     {"id": 89, "book": "1 Enoch", "abbreviation": "1 En", "osis": "1En", "usfm": "ENO", "abbreviations": ["1enoch", "i enoch", "1st enoch", "first enoch", "1 en", "1en", "i en", "1st en", "first en", "enoch"]},
-    {"id": 90, "book": "Laodiceans", "abbreviation": "Laod", "osis": "EpLao", "usfm": "LAO", "abbreviations": ["laod", "eplao", "ep lao", "epistle to the laodiceans"]}
+    {"id": 90, "book": "Laodiceans", "abbreviation": "Laod", "osis": "EpLao", "usfm": "LAO", "abbreviations": ["laod", "eplao", "ep lao", "epistle to the laodiceans"]},
+    {"id": 91, "book": "Greek Daniel", "abbreviation": "Gk Dan", "osis": "DanGr", "usfm": "DAG", "abbreviations": ["gk dan", "gkdan", "dangr", "gr dan", "greek dan"]},
+    {"id": 92, "book": "Syriac Psalms", "abbreviation": "Syr Pss", "osis": "5ApocSyrPss", "usfm": "PS3", "abbreviations": ["syr pss", "syrpss", "syr ps", "5apocsyrpss"]},
+    {"id": 93, "book": "2 Baruch", "abbreviation": "2 Bar", "osis": "2Bar", "usfm": "2BA", "abbreviations": ["2baruch", "ii baruch", "2nd baruch", "second baruch", "2 bar", "2bar", "ii bar", "2nd bar", "second bar", "syriac apocalypse of baruch"]},
+    {"id": 94, "book": "Letter of Baruch", "abbreviation": "Ep Bar", "osis": "EpBar", "usfm": "LBA", "abbreviations": ["ep bar", "epbar", "let bar", "letbar", "epistle of baruch"]},
+    {"id": 95, "book": "Jubilees", "abbreviation": "Jub", "osis": "Jub", "usfm": "JUB", "abbreviations": ["jub", "book of jubilees"]},
+    {"id": 96, "book": "1 Meqabyan", "abbreviation": "1 Meq", "osis": "1Meq", "usfm": "1MQ", "abbreviations": ["1meqabyan", "i meqabyan", "1st meqabyan", "first meqabyan", "1 meq", "1meq", "i meq", "1st meq", "first meq"]},
+    {"id": 97, "book": "2 Meqabyan", "abbreviation": "2 Meq", "osis": "2Meq", "usfm": "2MQ", "abbreviations": ["2meqabyan", "ii meqabyan", "2nd meqabyan", "second meqabyan", "2 meq", "2meq", "ii meq", "2nd meq", "second meq"]},
+    {"id": 98, "book": "3 Meqabyan", "abbreviation": "3 Meq", "osis": "3Meq", "usfm": "3MQ", "abbreviations": ["3meqabyan", "iii meqabyan", "3rd meqabyan", "third meqabyan", "3 meq", "3meq", "iii meq", "3rd meq", "third meq"]},
+    {"id": 99, "book": "Reproof", "abbreviation": "Rep", "osis": "Rep", "usfm": "REP", "abbreviations": ["rep", "tegsas"], "ambiguous": ["reproof", "rep"]},
+    {"id": 100, "book": "4 Baruch", "abbreviation": "4 Bar", "osis": "4Bar", "usfm": "4BA", "abbreviations": ["4baruch", "iv baruch", "4th baruch", "fourth baruch", "4 bar", "4bar", "iv bar", "4th bar", "fourth bar", "paralipomena of jeremiah", "paraleipomena jeremiou", "rest of the words of baruch"]},
+    {"id": 101, "book": "4 Ezra", "abbreviation": "4 Ezra", "osis": "4Ezra", "usfm": "EZA", "abbreviations": ["4ezra", "iv ezra", "4th ezra", "fourth ezra", "apocalypse of ezra", "ezra apocalypse", "apoc ezra"]},
+    {"id": 102, "book": "5 Ezra", "abbreviation": "5 Ezra", "osis": "5Ezra", "usfm": "5EZ", "abbreviations": ["5ezra", "v ezra", "5th ezra", "fifth ezra"]},
+    {"id": 103, "book": "6 Ezra", "abbreviation": "6 Ezra", "osis": "6Ezra", "usfm": "6EZ", "abbreviations": ["6ezra", "vi ezra", "6th ezra", "sixth ezra"]}
   ],
   "genres": [
-    {"title": "Deuterocanon", "abbreviations": ["apocrypha", "deuterocanonical", "dc"], "books": ["Tobit", "Judith", "Greek Esther", "Additions to Esther", "Wisdom of Solomon", "Sirach", "Baruch", "Letter of Jeremiah", "Prayer of Azariah", "Susanna", "Bel and the Dragon", "Additions to Daniel", "1 Maccabees", "2 Maccabees", "1 Esdras", "Prayer of Manasseh", "Additional Psalm", "3 Maccabees", "2 Esdras", "4 Maccabees", "Odes", "Psalms of Solomon", "1 Enoch", "Laodiceans"]}
+    {"title": "Deuterocanon", "abbreviations": ["apocrypha", "deuterocanonical", "dc"], "books": ["Tobit", "Judith", "Greek Esther", "Additions to Esther", "Wisdom of Solomon", "Sirach", "Baruch", "Letter of Jeremiah", "Prayer of Azariah", "Susanna", "Bel and the Dragon", "Additions to Daniel", "1 Maccabees", "2 Maccabees", "1 Esdras", "Prayer of Manasseh", "Additional Psalm", "3 Maccabees", "2 Esdras", "4 Maccabees", "Odes", "Psalms of Solomon", "1 Enoch", "Laodiceans", "Greek Daniel", "Syriac Psalms", "2 Baruch", "Letter of Baruch", "Jubilees", "1 Meqabyan", "2 Meqabyan", "3 Meqabyan", "Reproof", "4 Baruch", "4 Ezra", "5 Ezra", "6 Ezra"]}
   ],
   "chapter_verses": {
     "Tobit": [22, 14, 17, 21, 22, 18, 16, 21, 6, 13, 18, 22, 17, 15],

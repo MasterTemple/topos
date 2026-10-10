@@ -204,8 +204,9 @@ is an error.
 
 The default books are the 66 of the Protestant canon. `BibleData::with_deuterocanon()` adds the 24
 others that SWORD's versifications use (Tobit, Sirach, 1 Maccabees, ...), with OSIS ids, chapter and
-verse counts, and the `Deuterocanon` genre; `DataPatch::deuterocanon()` merges them into your own
-data:
+verse counts, and the `Deuterocanon` genre, and the 13 other books USFM 3 has codes for (Jubilees,
+1 Meqabyan, 4 Ezra, ...), without chapter and verse counts; `DataPatch::deuterocanon()` merges them
+into your own data:
 
 ```rust
 use topos_bible::{data::BibleData, matcher::BibleMatcher};

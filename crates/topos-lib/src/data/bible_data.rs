@@ -269,13 +269,53 @@ mod tests {
                 "{osis}"
             );
         }
-        assert_eq!(data.genres().genre_ids("apocrypha").unwrap().len(), 24);
+        // The other books with USFM 3 codes, at the ids logoxide's book table gives them; they
+        // have no chapter and verse counts, so any chapter and verse parses
+        for (id, usfm, osis, reference, expected) in [
+            (91, "DAG", "DanGr", "Gk Dan 3:24", "Greek Daniel 3:24"),
+            (92, "PS3", "5ApocSyrPss", "Syr Pss 2:1", "Syriac Psalms 2:1"),
+            (93, "2BA", "2Bar", "2 Bar 29:5", "2 Baruch 29:5"),
+            (
+                94,
+                "LBA",
+                "EpBar",
+                "Letter of Baruch 1:2",
+                "Letter of Baruch 1:2",
+            ),
+            (95, "JUB", "Jub", "Jubilees 1:1", "Jubilees 1:1"),
+            (96, "1MQ", "1Meq", "1 Meqabyan 2:3", "1 Meqabyan 2:3"),
+            (97, "2MQ", "2Meq", "II Meq 1:1", "2 Meqabyan 1:1"),
+            (98, "3MQ", "3Meq", "3 Meq 4:5-6", "3 Meqabyan 4:5-6"),
+            (99, "REP", "Rep", "Reproof 1:1", "Reproof 1:1"),
+            (100, "4BA", "4Bar", "4 Baruch 9:1", "4 Baruch 9:1"),
+            (101, "EZA", "4Ezra", "4 Ezra 7:28", "4 Ezra 7:28"),
+            (102, "5EZ", "5Ezra", "5 Ezra 2:1", "5 Ezra 2:1"),
+            (103, "6EZ", "6Ezra", "6 Ezra 15:1", "6 Ezra 15:1"),
+        ] {
+            let book = BookId(id);
+            assert_eq!(books.search_usfm(usfm), Some(book), "{usfm}");
+            assert_eq!(books.search_osis(osis), Some(book), "{osis}");
+            assert_eq!(name(&data.parse(reference).unwrap()), expected);
+        }
+        assert_eq!(data.genres().genre_ids("apocrypha").unwrap().len(), 37);
         // Words aren't references without a verse
         let matcher = crate::matcher::BibleMatcher::new(
             data.clone(),
             crate::matcher::matches::ComplexFilter::default(),
         );
         assert!(matcher.search("a bar 2 drinks, sir 3").is_empty());
+        assert!(matcher.search("one rep 5 times").is_empty());
+        let found = matcher.search("Jubilees 1:1 and 2 Baruch 29:5 but Baruch 3:9 and 2 Bar. 3:1");
+        let found: Vec<_> = found.iter().map(|m| name(&m.psg)).collect();
+        assert_eq!(
+            found,
+            [
+                "Jubilees 1:1",
+                "2 Baruch 29:5",
+                "Baruch 3:9",
+                "2 Baruch 3:1"
+            ]
+        );
         let found = matcher.search("see Sir 24:3 and Wisdom 7:26");
         let found: Vec<_> = found.iter().map(|m| name(&m.psg)).collect();
         assert_eq!(found, ["Sirach 24:3", "Wisdom of Solomon 7:26"]);
