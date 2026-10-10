@@ -23,6 +23,12 @@ use std::{
 /// The largest file read, uncompressed: 256 MiB
 pub const MAX_FILE_BYTES: u64 = 256 * 1024 * 1024;
 
+/// The most read from one container in all, uncompressed, from opening on: 1 GiB
+pub const MAX_TOTAL_BYTES: u64 = 1024 * 1024 * 1024;
+
+/// The most entries an archive may list: 200,000
+pub const MAX_ENTRIES: usize = 200_000;
+
 /// Why an EPUB's container can't be opened, or a file in it read
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[non_exhaustive]
@@ -43,6 +49,11 @@ pub enum ContainerError {
     Package(String),
     /// A file is larger than [`MAX_FILE_BYTES`] uncompressed
     TooLarge { path: String },
+    /// Reading this file would take what's been read from the container past
+    /// [`MAX_TOTAL_BYTES`]
+    TooMuchData { path: String },
+    /// The archive lists more than [`MAX_ENTRIES`] entries
+    TooManyEntries { count: usize },
 }
 
 impl std::fmt::Display for ContainerError { /* … */ }

@@ -29,6 +29,20 @@ The input is a ZIP archive (EPUB 3.3 §4.3). Its entries are read with the `zip`
   (256 MiB) can't be read: `ContainerError::TooLarge`. The limit applies to the bytes actually
   produced while decompressing, not only to the size the archive declares, so a file that
   declares a small size but inflates further is cut off and is the same error.
+- **Total limit.** **Choice:** everything one opened container decompresses, from opening on
+  (`META-INF/container.xml`, the package document, and every file read after), counts toward
+  `MAX_TOTAL_BYTES` (1 GiB, four files at the size limit): a read that would take the total past
+  it is `ContainerError::TooMuchData` (with the path being read). Many entries, each under the
+  size limit, can't together exhaust memory (a ZIP bomb), and neither can one file read many
+  times (a spine that names one item over and over). Each read adds the bytes it decompressed,
+  whether it succeeded or not; a file whose declared size is already more than what is left fails
+  at once, before decompressing, and adds nothing. When a file is over both limits, the size limit
+  is the one reported (`TooLarge`). A file that isn't there, or is empty, reads as before, even with
+  nothing left.
+- **Entry limit.** **Choice:** an archive whose central directory lists more than `MAX_ENTRIES`
+  (200,000) entries, folders included, can't be opened: `ContainerError::TooManyEntries` (with the
+  count). It is checked first, before `META-INF/container.xml` is looked for. Books have hundreds
+  or a few thousand entries.
 
 ## 2. Finding the package document
 
@@ -134,7 +148,8 @@ With the empty base, `content.opf` is `content.opf` and `OEBPS/content.opf` is i
   case-insensitive file systems often get case wrong in their hrefs); otherwise there is no such
   file. A path ending in `/`, or the empty path, names no file.
 - **Bytes.** Reading a file gives its uncompressed bytes. No such file is `Ok(None)`. A file that
-  can't be decompressed, or is too large (section 1), is an error.
+  can't be decompressed, is too large, or would take the container past its total limit
+  (section 1), is an error.
 - **Text** (`read_text`, and the package document): the bytes are decoded as XML says
   (XML 1.0 Appendix F, restricted to what EPUB allows, §3.9):
   - starting with the UTF-8 byte order mark `EF BB BF`: UTF-8, without the mark;
@@ -150,7 +165,8 @@ With the empty base, `content.opf` is `content.opf` and `OEBPS/content.opf` is i
 
 ## 6. Opening
 
-Opening reads the archive's list of entries, `META-INF/container.xml`, and the package document
+Opening reads the archive's list of entries (and checks their number, section 1),
+`META-INF/container.xml`, and the package document
 (sections 2 and 3), in that order, and fails with the first error. After opening, the package
 document's path, text, and manifest are available without further reading; other files are read
 on request.
@@ -160,5 +176,7 @@ on request.
 `ContainerError` (api.md) has one variant per failure above. Its messages (`Display`) are
 lowercase sentences without a final period, naming the path when there is one, for example
 `no META-INF/container.xml`, `the package document OEBPS/content.opf is missing`,
-`OEBPS/big.xhtml is larger than 268435456 bytes`. Errors from the `zip` crate and the XML parser
+`OEBPS/big.xhtml is larger than 268435456 bytes`,
+`reading OEBPS/a.xhtml would take more than 1073741824 bytes from this archive in all`,
+`the archive has 250000 entries, more than 200000`. Errors from the `zip` crate and the XML parser
 are carried as text.

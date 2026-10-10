@@ -97,3 +97,11 @@ license as `cargo metadata` lists them, and sections 4 and 5 of W3C EPUB 3.3. It
    logoxide's (127), and logoxide's bindings' (16) pass, and logoxide's bindings build for
    WebAssembly. Neither workspace depends on any GPL crate with its default features (`cargo
    metadata`); the opt-in `pdf` feature still brings in MuPDF (AGPL-3.0).
+7. Limits on what one container reads (October 2026), against ZIP bombs: many entries, each under
+   `MAX_FILE_BYTES`, could still exhaust memory. The specification first
+   (`docs/spec/epub-container.md` section 1, `docs/spec/api.md`): `MAX_TOTAL_BYTES` (1 GiB, all
+   that one container decompresses, `TooMuchData`) and `MAX_ENTRIES` (200,000, `TooManyEntries`),
+   then the code and its tests. Both were written by Claude (Opus 5.5, Anthropic) in a Claude Code
+   session for the owner that had read topos (this reader's code among it) and logoxide's own
+   archive limits (`MAX_ENTRIES` there is the same number), from the ZIP application note; it
+   didn't read the `epub` crate's source or documentation, nor any other EPUB reader's code.
