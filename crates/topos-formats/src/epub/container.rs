@@ -10,6 +10,12 @@ use std::{
 /// The largest file read, uncompressed: 256 MiB
 pub const MAX_FILE_BYTES: u64 = 256 * 1024 * 1024;
 
+/// The most read from one container in all, uncompressed, from opening on: 1 GiB
+pub const MAX_TOTAL_BYTES: u64 = 1024 * 1024 * 1024;
+
+/// The most entries an archive may list: 200,000
+pub const MAX_ENTRIES: usize = 200_000;
+
 /// The container file's path, from the archive's root
 const CONTAINER_PATH: &str = "META-INF/container.xml";
 
@@ -39,6 +45,11 @@ pub enum ContainerError {
     Package(String),
     /// A file is larger than [`MAX_FILE_BYTES`] uncompressed
     TooLarge { path: String },
+    /// Reading this file would take what's been read from the container past
+    /// [`MAX_TOTAL_BYTES`]
+    TooMuchData { path: String },
+    /// The archive lists more than [`MAX_ENTRIES`] entries
+    TooManyEntries { count: usize },
 }
 
 impl std::fmt::Display for ContainerError {
@@ -61,6 +72,16 @@ impl std::fmt::Display for ContainerError {
             }
             ContainerError::TooLarge { path } => {
                 write!(f, "{path} is larger than {MAX_FILE_BYTES} bytes")
+            }
+            ContainerError::TooMuchData { path } => write!(
+                f,
+                "reading {path} would take more than {MAX_TOTAL_BYTES} bytes from this archive in all"
+            ),
+            ContainerError::TooManyEntries { count } => {
+                write!(
+                    f,
+                    "the archive has {count} entries, more than {MAX_ENTRIES}"
+                )
             }
         }
     }
@@ -338,6 +359,32 @@ fn read_manifest(text: &str, folder: &str) -> Result<Vec<ManifestItem>, Containe
     Ok(items)
 }
 
+/// How much a container reads: the constants, or smaller ones in tests
+#[derive(Debug, Clone, Copy)]
+struct Limits {
+    /// The largest file, uncompressed
+    file: u64,
+    /// The most read in all, uncompressed
+    total: u64,
+    /// The most entries the archive may list
+    entries: usize,
+}
+
+impl Limits {
+    const DEFAULT: Limits = Limits {
+        file: MAX_FILE_BYTES,
+        total: MAX_TOTAL_BYTES,
+        entries: MAX_ENTRIES,
+    };
+}
+
+/// What a container may still read, and how
+struct Budget {
+    limits: Limits,
+    /// Bytes decompressed so far
+    used: u64,
+}
+
 /// An archive entry: its name with `\` read as `/`, and its index in the archive
 struct Entry {
     name: String,
@@ -373,6 +420,7 @@ pub struct Container<R> {
     package_text: String,
     package_folder: String,
     manifest: Vec<ManifestItem>,
+    budget: Budget,
 }
 
 impl Container<BufReader<File>> {
@@ -386,7 +434,18 @@ impl Container<BufReader<File>> {
 impl<R: Read + Seek> Container<R> {
     /// Opens an EPUB from any reader (bytes in memory: `std::io::Cursor`)
     pub fn from_reader(reader: R) -> Result<Self, ContainerError> {
+        Self::with_limits(reader, Limits::DEFAULT)
+    }
+
+    /// Opens an EPUB, reading no more than `limits` allow
+    fn with_limits(reader: R, limits: Limits) -> Result<Self, ContainerError> {
         let mut archive = zip::ZipArchive::new(reader).map_err(zip_error)?;
+        if archive.len() > limits.entries {
+            return Err(ContainerError::TooManyEntries {
+                count: archive.len(),
+            });
+        }
+        let mut budget = Budget { limits, used: 0 };
         let entries = (0..archive.len())
             .filter_map(|index| {
                 archive.name_for_index(index).map(|name| Entry {
@@ -397,12 +456,22 @@ impl<R: Read + Seek> Container<R> {
             .collect::<Vec<_>>();
 
         let container_text = match find_entry(&entries, CONTAINER_PATH) {
-            Some(index) => decode_text(&read_entry(&mut archive, index, CONTAINER_PATH)?),
+            Some(index) => decode_text(&read_entry(
+                &mut archive,
+                index,
+                CONTAINER_PATH,
+                &mut budget,
+            )?),
             None => return Err(ContainerError::NoContainer),
         };
         let package_path = find_package_path(&container_text)?;
         let package_text = match find_entry(&entries, &package_path) {
-            Some(index) => decode_text(&read_entry(&mut archive, index, &package_path)?),
+            Some(index) => decode_text(&read_entry(
+                &mut archive,
+                index,
+                &package_path,
+                &mut budget,
+            )?),
             None => return Err(ContainerError::MissingPackage { path: package_path }),
         };
         let package_folder = match package_path.rfind('/') {
@@ -418,6 +487,7 @@ impl<R: Read + Seek> Container<R> {
             package_text,
             package_folder,
             manifest,
+            budget,
         })
     }
 
@@ -459,7 +529,7 @@ impl<R: Read + Seek> Container<R> {
     /// A file's bytes, or none when there's no such file
     pub fn read(&mut self, path: &str) -> Result<Option<Vec<u8>>, ContainerError> {
         match find_entry(&self.entries, path) {
-            Some(index) => read_entry(&mut self.archive, index, path).map(Some),
+            Some(index) => read_entry(&mut self.archive, index, path, &mut self.budget).map(Some),
             None => Ok(None),
         }
     }
@@ -500,40 +570,270 @@ fn find_entry(entries: &[Entry], path: &str) -> Option<usize> {
     found.map(|entry| entry.index)
 }
 
-/// An entry's uncompressed bytes, at most [`MAX_FILE_BYTES`] of them
+/// An entry's uncompressed bytes, at most the file limit of them, and no more than the budget
+/// has left; what's decompressed is taken from the budget
 fn read_entry<R: Read + Seek>(
     archive: &mut zip::ZipArchive<R>,
     index: usize,
     path: &str,
+    budget: &mut Budget,
 ) -> Result<Vec<u8>, ContainerError> {
     let too_large = || ContainerError::TooLarge {
+        path: path.to_string(),
+    };
+    let too_much = || ContainerError::TooMuchData {
         path: path.to_string(),
     };
     let undecompressable = |e: std::io::Error| ContainerError::Zip(format!("{path}: {e}"));
     let mut file = archive
         .by_index(index)
         .map_err(|e| ContainerError::Zip(format!("{path}: {e}")))?;
-    if file.size() > MAX_FILE_BYTES {
+    let left = budget.limits.total.saturating_sub(budget.used);
+    if file.size() > budget.limits.file {
         return Err(too_large());
     }
+    if file.size() > left {
+        return Err(too_much());
+    }
+    // Whichever limit comes first stops the reading; at a tie, it's the file's own.
+    let file_limit_first = budget.limits.file <= left;
+    let cap = budget.limits.file.min(left);
     // The declared size is only a claim, so the bytes produced are counted, and no more than
     // a little memory is set aside on its word.
     let capacity = usize::try_from(file.size().min(MAX_FIRST_ALLOCATION)).unwrap_or(0);
     let mut bytes = Vec::with_capacity(capacity);
-    (&mut file)
-        .take(MAX_FILE_BYTES)
-        .read_to_end(&mut bytes)
-        .map_err(undecompressable)?;
-    // Up to the limit, the file may still go on: one more byte makes it too large. (Reading
-    // the limit and then one byte apart, rather than the limit and one at once, keeps the
-    // buffer from doubling past the limit.)
+    let read = (&mut file).take(cap).read_to_end(&mut bytes);
+    budget.used = budget.used.saturating_add(bytes.len() as u64);
+    read.map_err(undecompressable)?;
+    // Up to the cap, the file may still go on: one more byte is over a limit. (Reading the cap
+    // and then one byte apart, rather than the cap and one at once, keeps the buffer from
+    // doubling past it.)
     let mut probe = [0u8; 1];
     loop {
         match file.read(&mut probe) {
             Ok(0) => return Ok(bytes),
-            Ok(_) => return Err(too_large()),
+            Ok(_) => {
+                budget.used = budget.used.saturating_add(1);
+                return Err(if file_limit_first {
+                    too_large()
+                } else {
+                    too_much()
+                });
+            }
             Err(e) if e.kind() == std::io::ErrorKind::Interrupted => {}
             Err(e) => return Err(undecompressable(e)),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::io::{Cursor, Write};
+
+    /// An EPUB's bytes: its container and package document, then `files` (name, bytes), stored
+    fn epub(files: &[(String, Vec<u8>)]) -> Vec<u8> {
+        epub_with(files, zip::CompressionMethod::Stored)
+    }
+
+    /// An EPUB's bytes, every entry compressed with `method`
+    fn epub_with(files: &[(String, Vec<u8>)], method: zip::CompressionMethod) -> Vec<u8> {
+        let mut zip = zip::ZipWriter::new(Cursor::new(Vec::new()));
+        let stored = zip::write::SimpleFileOptions::default().compression_method(method);
+        let mut add = |name: &str, bytes: &[u8]| {
+            zip.start_file(name, stored).expect("an entry");
+            zip.write_all(bytes).expect("its bytes");
+        };
+        add(
+            CONTAINER_PATH,
+            br#"<container><rootfiles><rootfile full-path="content.opf" media-type="application/oebps-package+xml"/></rootfiles></container>"#,
+        );
+        add("content.opf", b"<package><manifest/></package>");
+        for (name, bytes) in files {
+            add(name, bytes);
+        }
+        zip.finish().expect("an archive").into_inner()
+    }
+
+    /// `count` files of `size` bytes each
+    fn files(count: usize, size: usize) -> Vec<(String, Vec<u8>)> {
+        (0..count)
+            .map(|i| (format!("f{i}.xhtml"), vec![b'a'; size]))
+            .collect()
+    }
+
+    /// What opening and reading take: the container and package document's bytes
+    fn opening_bytes() -> u64 {
+        let book = Container::from_reader(Cursor::new(epub(&[]))).expect("opens");
+        book.budget.used
+    }
+
+    fn limits(file: u64, total: u64, entries: usize) -> Limits {
+        Limits {
+            file,
+            total,
+            entries,
+        }
+    }
+
+    #[test]
+    fn the_limits_are_as_specified() {
+        assert_eq!(MAX_FILE_BYTES, 256 << 20);
+        assert_eq!(MAX_TOTAL_BYTES, 1 << 30);
+        assert_eq!(MAX_ENTRIES, 200_000);
+    }
+
+    #[test]
+    fn too_many_entries_cant_be_opened() {
+        // Two entries for the container and package document, and eight files
+        let bytes = epub(&files(8, 1));
+        assert!(Container::with_limits(Cursor::new(&bytes), limits(1000, 1000, 10)).is_ok());
+        let error = Container::with_limits(Cursor::new(&bytes), limits(1000, 1000, 9))
+            .err()
+            .expect("too many entries");
+        assert_eq!(error, ContainerError::TooManyEntries { count: 10 });
+        assert_eq!(
+            error.to_string(),
+            "the archive has 10 entries, more than 200000"
+        );
+    }
+
+    #[test]
+    fn many_small_files_stop_at_the_total() {
+        let opening = opening_bytes();
+        // Ten files of 100 bytes, each under the file limit, with room for five in all
+        let bytes = epub(&files(10, 100));
+        let mut book =
+            Container::with_limits(Cursor::new(&bytes), limits(1000, opening + 500, 1000))
+                .expect("opens");
+        for i in 0..5 {
+            let read = book.read(&format!("f{i}.xhtml")).expect("in the budget");
+            assert_eq!(read.map(|bytes| bytes.len()), Some(100));
+        }
+        let error = book.read("f5.xhtml").expect_err("over the total");
+        assert_eq!(
+            error,
+            ContainerError::TooMuchData {
+                path: "f5.xhtml".into()
+            }
+        );
+        assert_eq!(
+            error.to_string(),
+            "reading f5.xhtml would take more than 1073741824 bytes from this archive in all"
+        );
+        // A file that isn't there is still none
+        assert_eq!(book.read("missing.xhtml"), Ok(None));
+    }
+
+    #[test]
+    fn reading_one_file_again_counts_again() {
+        let opening = opening_bytes();
+        let bytes = epub(&files(1, 100));
+        let mut book =
+            Container::with_limits(Cursor::new(&bytes), limits(1000, opening + 250, 1000))
+                .expect("opens");
+        assert!(book.read("f0.xhtml").is_ok());
+        assert!(book.read_text("f0.xhtml").is_ok());
+        assert_eq!(
+            book.read("f0.xhtml"),
+            Err(ContainerError::TooMuchData {
+                path: "f0.xhtml".into()
+            })
+        );
+    }
+
+    #[test]
+    fn an_empty_file_reads_with_nothing_left() {
+        let opening = opening_bytes();
+        let mut list = files(1, 100);
+        list.push(("empty.xhtml".into(), Vec::new()));
+        let bytes = epub(&list);
+        let mut book =
+            Container::with_limits(Cursor::new(&bytes), limits(1000, opening + 100, 1000))
+                .expect("opens");
+        assert!(book.read("f0.xhtml").is_ok());
+        assert_eq!(book.read("empty.xhtml"), Ok(Some(Vec::new())));
+    }
+
+    #[test]
+    fn the_file_limit_is_reported_over_both() {
+        let bytes = epub(&files(1, 1000));
+        let mut book =
+            Container::with_limits(Cursor::new(&bytes), limits(500, opening_bytes() + 10, 1000))
+                .expect("opens");
+        assert_eq!(
+            book.read("f0.xhtml"),
+            Err(ContainerError::TooLarge {
+                path: "f0.xhtml".into()
+            })
+        );
+    }
+
+    #[test]
+    fn opening_counts_toward_the_total() {
+        let bytes = epub(&[]);
+        let error = Container::with_limits(Cursor::new(&bytes), limits(1000, 10, 1000))
+            .err()
+            .expect("container.xml is over the total");
+        assert_eq!(
+            error,
+            ContainerError::TooMuchData {
+                path: CONTAINER_PATH.into()
+            }
+        );
+    }
+
+    #[test]
+    fn a_declared_size_over_whats_left_reads_nothing() {
+        let opening = opening_bytes();
+        let bytes = epub(&files(1, 100));
+        let mut book =
+            Container::with_limits(Cursor::new(&bytes), limits(1000, opening + 99, 1000))
+                .expect("opens");
+        assert!(matches!(
+            book.read("f0.xhtml"),
+            Err(ContainerError::TooMuchData { .. })
+        ));
+        assert_eq!(book.budget.used, opening);
+    }
+
+    /// A deflated entry that declares fewer bytes than it inflates to (its headers changed after
+    /// writing) is stopped by what it produces, which is counted
+    #[test]
+    fn bytes_produced_are_counted_whatever_the_declared_size() {
+        let opening = opening_bytes();
+        let mut bytes = epub_with(
+            &[("bomb.xhtml".into(), vec![b'a'; 1000])],
+            zip::CompressionMethod::Deflated,
+        );
+        // Every header's uncompressed size of 1000 becomes 10: the local header's at offset 22,
+        // the central directory's at offset 24
+        let name = b"bomb.xhtml";
+        let mut patched = 0;
+        let mut at = 0;
+        while let Some(found) = bytes[at..].windows(name.len()).position(|w| w == name) {
+            let start = at + found;
+            for (signature, offset, name_at) in [(*b"PK\x03\x04", 22, 30), (*b"PK\x01\x02", 24, 46)]
+            {
+                if start >= name_at && bytes[start - name_at..start - name_at + 4] == signature {
+                    let size = start - name_at + offset;
+                    assert_eq!(bytes[size..size + 4], 1000u32.to_le_bytes());
+                    bytes[size..size + 4].copy_from_slice(&10u32.to_le_bytes());
+                    patched += 1;
+                }
+            }
+            at = start + name.len();
+        }
+        assert_eq!(patched, 2);
+        let mut book =
+            Container::with_limits(Cursor::new(&bytes), limits(1000, opening + 500, 1000))
+                .expect("opens");
+        assert_eq!(
+            book.read("bomb.xhtml"),
+            Err(ContainerError::TooMuchData {
+                path: "bomb.xhtml".into()
+            })
+        );
+        assert_eq!(book.budget.used, opening + 501);
     }
 }
