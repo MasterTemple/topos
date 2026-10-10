@@ -50,9 +50,11 @@ Obsidian.
   usfm-onion was faster (0.58 s against 0.86 s). But usfm-onion's USX drops the space between
   adjacent `\w` words (`For</char><char …>God`), so it reads "ForGodsoloved". usfm3 keeps the
   spaces, and it's on crates.io.
-- **The package manager never reads text** (decided 2026-10-10): markup, text, and imports become
-  logoxide's own crates (`PLAN-CRATES.md` in logoxide). topos-bible-markup moved there as
-  `logoxide-markup`, with its history.
+- **The package manager never reads text** (decided 2026-10-10): markup, text, and imports became
+  logoxide's own crates (`PLAN-CRATES.md` in logoxide, phases A–F done by 2026-10-11).
+  topos-bible-markup moved there as `logoxide-markup`, with its history; `logoxide-text` reads
+  formats and `logoxide-import` reads publishers, and the `logoxide` crate asks a `TextReader`
+  for the facts it versions.
 
 ## Status
 
@@ -191,12 +193,15 @@ Catalogs and imports (from step 7):
 ```
 topos-bible          references: parsing, search, Translations (names, aliases, counts)
 logoxide-markup      formats into one tree, text and HTML (logoxide's, from topos-bible-markup)
-sword-modules        SWORD modules: read, install from SWORD repositories
-logoxide               packages (logoxide.toml), sources (formats), the library (installed
-                     versions), the cache, the lock file; builds topos's Translations
+logoxide-text        what's in a Bible or a book: verses, hashes, titles, .vrs maps, timings,
+                     passages as text, an EPUB's citations; knows no packages
+sword-modules        SWORD modules: read from memory (its versification systems for logoxide-text)
+logoxide             packages (logoxide.toml), the library (installed versions), the cache, the
+                     lock file, catalogs, summaries as data; never reads text: asks a TextReader
+logoxide-import      eBible.org, fetch.bible, CCEL, SWORD: their lists and downloads into packages
 lx                   the CLI
-logoxide-ffi           logoxide's and topos's API for apps (Python, WASM, Swift, Kotlin)
-front ends           topos CLI, LSP, Neovim, Obsidian
+logoxide-ffi         logoxide's and topos's API for apps (Python, WASM, Swift, Kotlin)
+front ends           topos CLI, logoxide-lsp, Neovim, Obsidian
 ```
 
 ## Packages
