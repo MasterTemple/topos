@@ -109,13 +109,24 @@ pub fn with_defaults(args: Vec<OsString>) -> Result<Vec<OsString>, String> {
         .collect())
 }
 
-/// Settings only the language server uses (it reads this file too), which the CLI skips
-const LSP_KEYS: [&str; 6] = [
+/// Settings only the language server (logoxide-lsp) uses (it reads this file too), which the
+/// CLI skips: keep in step with its `Settings`
+const LSP_KEYS: [&str; 16] = [
     "inlay-hints",
     "reference-diagnostics",
     "hover",
     "bible",
+    "bibles",
+    "default-bible",
+    "hover-bibles",
+    "library",
+    "project",
     "markup",
+    "commentaries",
+    "stretch-notes",
+    "strongs",
+    "epub",
+    "pdf",
     "insertions",
 ];
 
@@ -227,5 +238,21 @@ mod tests {
     fn skips_language_server_settings() {
         let text = "hover = [\"osis\"]\ninlay_hints = \"never\"\nreference-diagnostics = \"hint\"\nmode = \"json\"\nbible = \"~/Bibles/BSB\"\n[markup]\nverse_numbers = { display = \"{verse}\" }\n[[insertions]]\nname = \"Callout\"";
         assert_eq!(parse(text).unwrap(), ["--mode", "json"]);
+        let text = "bibles = [\"kjv\"]\ndefault_bible = \"KJV\"\nhover-bibles = [\"BSB\"]\nlibrary = \"~/lib\"\nproject = \"~/vault\"\ncommentaries = true\nstretch-notes = true\nstrongs = true\nepub = true\npdf = false\nmode = \"json\"\n";
+        assert_eq!(parse(text).unwrap(), ["--mode", "json"]);
+    }
+
+    /// No key the language server alone reads is one of the CLI's options
+    #[test]
+    fn language_server_keys_are_not_options() {
+        let command = Args::command();
+        for key in LSP_KEYS {
+            assert!(
+                !command
+                    .get_arguments()
+                    .any(|arg| arg.get_long() == Some(key)),
+                "{key}"
+            );
+        }
     }
 }
