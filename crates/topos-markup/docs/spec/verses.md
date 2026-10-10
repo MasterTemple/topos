@@ -34,20 +34,33 @@ part of that word after its last `.` or `:` (`John.3.16` → `16`, `JHN 3:16` �
 - the text is split at the first `-`, `–` (U+2013), or `,` into a first part and the rest;
 - each part's value is its leading ASCII digits after trimming whitespace, as a `u8`;
 - if the first part has no digits or its value is over 255, the marker has no number;
+- the first verse's **part** is the letter right after the first part's digits, when that is one
+  ASCII letter not followed by another ASCII letter: `a` or `A` is 1, `b` or `B` is 2, … `z` or
+  `Z` is 26 (a partial verse, as USFM's `\v 20a` and USX's `number="20a"` write it). Anything
+  else (no letter, two letters, a space before the letter) is part 0, the whole verse;
 - the last verse is the rest's value when it has one (else the first), and never less than the
-  first.
+  first. A letter after the rest's digits is not read: a bridge's last verse counts whole.
 
-| Written | (first, last) |
+| Written | (first, part, last) |
 |---|---|
-| `16` | (16, 16) |
-| `4-5`, `4–5`, `4,5` | (4, 5) |
-| `2a` | (2, 2) |
-| ` 9 ` | (9, 9) |
-| `5-3` | (5, 5) |
-| `7-x` | (7, 7) |
-| `256`, `x`, `` | none |
-| `255` | (255, 255) |
-| `4-300` | (4, 4) (the rest does not fit a `u8`) |
+| `16` | (16, 0, 16) |
+| `4-5`, `4–5`, `4,5` | (4, 0, 5) |
+| `2a` | (2, 1, 2) |
+| `2B` | (2, 2, 2) |
+| `2ab`, `2 a`, `2.a` | (2, 0, 2) |
+| `20b-21` | (20, 2, 21) |
+| `20-21a` | (20, 0, 21) |
+| `20a-b` | (20, 1, 20) (the rest has no digits) |
+| ` 9 ` | (9, 0, 9) |
+| `5-3` | (5, 0, 5) |
+| `7-x` | (7, 0, 7) |
+| `256`, `x`, `a`, `` | none |
+| `255` | (255, 0, 255) |
+| `4-300` | (4, 0, 4) (the rest does not fit a `u8`) |
+
+The id is read the same way, so `osisID="Gen.1.20a"` and `sID="GEN 1:20a"` give verse 20, part 1.
+A bridge's part belongs to its first verse: `20b-21` is the second part of verse 20 through the
+whole of verse 21.
 
 ### Building the spans
 
@@ -67,7 +80,8 @@ verse starts (none at first), and the verse that is open (none at first).
      not changed by this.)
   2. If the marker has no number, nothing more happens (the remembered start is kept for the next
      verse).
-  3. Otherwise a verse is made: chapter = the current chapter; verse and last from the number;
+  3. Otherwise a verse is made: chapter = the current chapter; verse, part, and last from the
+     number;
      marker = its path; start = the remembered start, which is then forgotten, or the marker's own
      path when there is none; end = one past the last top-level node (`[nodes.len()]`). But when
      there is a holding chapter and this marker is inside it (the chapter's path is a proper
@@ -93,7 +107,9 @@ Consequences:
 - Without end markers (USX 2, OSIS milestones without `eID`), each verse starts at its own marker
   and ends at the next verse's or chapter's marker, except that the first verse after a chapter
   marker starts right after that chapter marker.
-- The same chapter and verse can appear twice (`2a`, `2b`); both are listed.
+- The parts of a verse (`2a`, `2b`) are listed as two verses with the same chapter and verse and
+  parts 1 and 2, so (chapter, verse, part) tells them apart; the same chapter, verse, and part can
+  still appear twice (a repeated marker), and both are listed.
 - Chapter numbers are not checked; markers inside notes or other elements count.
 
 ### Example (USX)
@@ -162,6 +178,9 @@ chapter ends at verse 255, `VerseRange::END_OF_CHAPTER`):
 - the result for the part is `first..last + 1`, where `first` and `last` are the indexes of the
   first and last spans in it; a part with none is left out.
 
+A span's `part` is not compared: a reference names whole verses, so `Genesis 1:20` is in both
+`20a` and `20b`, and `Genesis 1:21` is in `20b-21`.
+
 Indexes, not places, are returned: use `spans[r.start].start` and `spans[r.end - 1].end`.
 
 With the Psalm example above and topos's default data: `Psalm 1:3` → `[1..2]`; `Psalm 1:1-3` →
@@ -172,7 +191,8 @@ whole of `Psalm 1` (`spans[0].start` to `spans[2].end`) and writing it with `Fil
 ## `chapter_verses(spans)`
 
 The verse count of each chapter, as a `Vec<u8>` whose index `i` is chapter `i + 1`: for each span
-with chapter at least 1, the count of its chapter is raised to `max(span.last, span.verse)`. The
+with chapter at least 1, the count of its chapter is raised to `max(span.last, span.verse)`
+(parts are not counted: `20a` and `20b` are verse 20). The
 vector is as long as the highest chapter that has a span; chapters with no spans are 0. Spans in
 chapter 0 are ignored. No spans → empty.
 

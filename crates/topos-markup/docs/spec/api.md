@@ -38,7 +38,7 @@ Checked in October 2026; nothing here may be removed or changed in type.
 | topos `topos-formats` (feature `markup`) | `Flat` (`text`, `source_range`), `Point` (as a public field type; needs `Clone`, `Debug`, `PartialEq`, `Eq`), `flatten::flatten`, `parse`, `Markup`, `TextOptions`; doc links to `Filter`, `Flattener`, `HtmlRenderer::mark` |
 | topos `topos-ffi` (feature `markup`) | `Filter::all/drop`, `HtmlOptions` (struct literal with both fields), `HtmlRenderer::with_options/render`, `Kind`, `Markup::from_name`, `Node`, `TextOptions` (struct update syntax), `find_all`, `parse`, `plain_text`, `Element::attr`, `verses::{VerseSpan, chapter_verses, passage_ranges, slice, usx_chapter_verses, verses}`, `VerseSpan.start/.end` |
 | logoxide `logoxide` | re-exports the crate as `logoxide::markup`; `Filter::text`, `Kind`, `Node` (matches `Node::Element`), `Element.kind`, `Element::strongs`, `TextOptions`, `plain_text`, `parse`, `Markup::Usx`, `verses::{VerseSpan, chapter_verses, slice, usx_chapter_verses, verses}`; stores `Vec<Node>` and `Vec<VerseSpan>` with serde (postcard) |
-| logoxide `logoxide-lsp` | `Filter::all/drop/unwrap`, `Flat` (`text`, `spans`, `entries`), `Flattener::new/push/finish`, `flatten::flatten`, `Kind` (as a `BTreeMap` key in `TextOptions::templates`), `NodePath` (as a `HashMap` key: `Hash` + `Eq`), `TextOptions` (fields `filter`, `verse_label`, `chapter_label`, `templates`), `Span` (`range`, `kind`, `path`), `VerseSpan` (`chapter`, `verse`, `last`, `marker`, `start`, `end`), `passage_ranges`, `slice` |
+| logoxide `logoxide-lsp` | `Filter::all/drop/unwrap`, `Flat` (`text`, `spans`, `entries`), `Flattener::new/push/finish`, `flatten::flatten`, `Kind` (as a `BTreeMap` key in `TextOptions::templates`), `NodePath` (as a `HashMap` key: `Hash` + `Eq`), `TextOptions` (fields `filter`, `verse_label`, `chapter_label`, `templates`), `Span` (`range`, `kind`, `path`), `VerseSpan` (`chapter`, `verse`, `last`, `marker`, `start`, `end`; `part` since October 2026), `passage_ranges`, `slice` |
 | sword-modules-cleanroom | re-exports the crate as `markup` and `Filter`, `HtmlRenderer`, `Kind`, `Node`, `Strongs`, `TextOptions`, `Markup`; `parse`, `plain_text`, `strongs_numbers`, `HtmlRenderer::new/render`, `Markup::from_name`, `Markup::{Gbf, Plaintext}` |
 | topos `topos-index`, `topos-cli` | none |
 
@@ -710,6 +710,13 @@ pub struct VerseSpan {
     pub verse: u8,
     /// The last verse, for a bridge like `<verse number="4-5">` (else the same as `verse`)
     pub last: u8,
+    /**
+    Which part of `verse` this is: 0 for the whole verse, 1 for `a` (`<verse number="20a">`,
+    USFM `\v 20a`), 2 for `b`, and so on to 26 for `z`
+    - In a bridge like `20b-21` it is the first verse's part; the last verse counts whole
+    - A verse's parts are separate spans with the same `chapter` and `verse`
+    */
+    pub part: u8,
     /// The verse's marker
     pub marker: NodePath,
     /**
@@ -730,6 +737,7 @@ Every verse in a book's tree, in order
   from `number`, `n`, or the last part of `osisID`/`sID` (`John.3.16`, `JHN 3:16`)
 - Verses that are elements with their text inside (OSIS without milestones) work too: the
   verse is that element
+- A partial verse (`20a`, `20b`) is its own span, told apart by [`VerseSpan::part`]
 */
 pub fn verses(nodes: &[Node]) -> Vec<VerseSpan>;
 
@@ -745,6 +753,7 @@ pub fn slice(nodes: &[Node], start: &NodePath, end: Option<&NodePath>) -> Vec<No
 The places each part of a passage covers, as `start..end` for [`slice`], in the passage's order
 - Verses the book doesn't have are left out; a part with none of its verses is left out
 - A whole chapter is every verse the book has in it, whatever the versification says
+- A verse's parts are all in it: `Genesis 1:20` covers both `20a` and `20b`
 */
 pub fn passage_ranges(spans: &[VerseSpan], passage: &Passage) -> Vec<Range<usize>>;
 

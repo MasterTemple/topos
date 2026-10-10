@@ -135,3 +135,14 @@ with the decision and what settled it. In short:
   between different models.
 - This record describes a process. It is not legal advice, and it does not decide whether the
   result is free of any copyright claim.
+
+## Later changes
+
+Changes after the rewrite follow the same order: the specification first, then the code and its
+tests.
+
+- Partial verses (October 2026): a verse number's letter (`20a`, `20b`) becomes
+  `VerseSpan::part` (`docs/spec/verses.md`, `docs/spec/api.md`, `docs/spec/golden-format.md`),
+  so a verse's parts are told apart. Written by Claude (Opus 5.5, Anthropic) in a Claude Code
+  session for the owner that had read this crate's code; it didn't read libsword or any other SWORD
+  reader's code.

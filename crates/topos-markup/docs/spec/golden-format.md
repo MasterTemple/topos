@@ -12,6 +12,10 @@ Changed on purpose since then (the prose was changed first):
   empty. The `verses` sections of `osis/chapter-element-with-verses`,
   `osis/fixture-osis-document-genesis-1`, and `osis/test-verse-elements` changed.
 
+- October 2026, verses.md: a verse number's letter is its part (`VerseSpan::part`), and the
+  verses line writes it after the verse (`1:2a-2`). The `verses` sections of
+  `usx/verse-variants` and `osis/verse-n-attribute` changed.
+
 ## File format
 
 A golden file is a sequence of sections. Each section starts with a header line
@@ -100,8 +104,9 @@ offsets continue; the grouping is of the observable `source` results, not of the
 
 ## Verses
 
-One line per `VerseSpan`, `<chapter>:<verse>-<last> marker=<path> start=<path> end=<path> "<text>"`,
-where the text is the escaped `plain_text` of `slice(nodes, &start, Some(&end))` with
+One line per `VerseSpan`, `<chapter>:<verse><part>-<last> marker=<path> start=<path> end=<path> "<text>"`,
+where `<part>` is empty for part 0 and the lowercase letter for parts 1 to 26 (`a` to `z`), and
+the text is the escaped `plain_text` of `slice(nodes, &start, Some(&end))` with
 `TextOptions { filter: Filter::all(), ..default }`. Then `chapter_verses: ` and `Debug` of
 `chapter_verses` (`[2]`), and `\n`.
 
