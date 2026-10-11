@@ -260,6 +260,11 @@ pub struct Args {
     )]
     pub complete: Option<String>,
 
+    /// Whether --complete offers the chapter or verse already typed, first ("Matthew 1" gives
+    /// Matthew 1, then Matthew 10, ...) [default: true]
+    #[arg(long, value_name = "BOOL", num_args = 0..=1, default_missing_value = "true")]
+    pub complete_typed: Option<bool>,
+
     /// Print every book, one per line, and exit (the same as `--complete ""`)
     #[arg(long)]
     pub list_books: bool,

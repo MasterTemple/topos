@@ -317,11 +317,14 @@ topos --complete "jn 3:16-"       # John 3:16-17, John 3:16-18, ...
 topos --list-books -f abbreviation --nt
 topos --complete "jn 3:" -f osis  # John.3.1 ...
 topos --complete "Rom 8" -m json  # {"text":"Romans 8","label":"Romans 8","kind":"chapter"}
+topos --complete "Matthew 1"      # Matthew 1, Matthew 10, ... Matthew 19
 ```
 
 `-f`, `--psg-fmt`, and `--fmt-*` set how completions are written, the book and passage filters
 narrow the list, and `-m json` prints
-each completion's text, label, and kind (book, chapter, or verse).
+each completion's text, label, and kind (book, chapter, or verse). The chapter or verse already
+typed comes first, so an editor can show its passage; `--complete-typed=false` (or
+`complete-typed = false` in config.toml) leaves it out.
 
 ## Shell completions
 
@@ -598,6 +601,9 @@ Options:
 
       --complete [<TEXT>]
           Print the completions for a partly typed reference, one per line, and exit: books for "" (or nothing), then chapters, verses, and range ends ("John 3:" gives John 3:1, ...). Uses -f for the book style and the book filters; -m json prints objects
+
+      --complete-typed [<BOOL>]
+          Whether --complete offers the chapter or verse already typed, first ("Matthew 1" gives Matthew 1, then Matthew 10, ...) [default: true]
 
       --list-books
           Print every book, one per line, and exit (the same as `--complete ""`)

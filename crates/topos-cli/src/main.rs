@@ -77,7 +77,10 @@ fn main() -> ExitCode {
     // Before reading the input, since these never search
     if let Some(text) = args.complete.take().or(args.list_books.then(String::new)) {
         let json = args.mode == OutputMode::Json;
-        for suggestion in complete::suggestions(&matcher, &text, &args.format_options()) {
+        let include_typed = args.complete_typed.unwrap_or(true);
+        let suggestions =
+            complete::suggestions(&matcher, &text, &args.format_options(), include_typed);
+        for suggestion in suggestions {
             if json {
                 output::emit(serde_json::to_string(&suggestion).unwrap_or_default());
             } else {

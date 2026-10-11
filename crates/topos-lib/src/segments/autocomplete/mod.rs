@@ -18,13 +18,26 @@ use crate::{
 };
 
 /// How completions are written
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug)]
 pub struct CompleteOptions {
     /// Book style and separators of the completed text, so `gen 1:1,2` can become
     /// `Genesis 1:1, 2` by setting `book` and `verse_separator`
     pub format: FormatOptions,
     /// At most this many completions
     pub limit: Option<usize>,
+    /// Offer the chapter or verse already typed, as it's written (`Matthew 1` offers
+    /// `Matthew 1` before `Matthew 10`), so an editor can show its passage; on by default
+    pub include_typed: bool,
+}
+
+impl Default for CompleteOptions {
+    fn default() -> Self {
+        Self {
+            format: FormatOptions::default(),
+            limit: None,
+            include_typed: true,
+        }
+    }
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -60,8 +73,9 @@ impl BibleMatcher {
     - Book names complete from a prefix of any name or abbreviation (`1 Co` → `1 Corinthians`)
     - Chapters and verses complete from the book's versification
     - Each edit rewrites the whole reference in the style of [`CompleteOptions::format`]
-    - Completions that would leave the text as it is are left out (`John 3:1` doesn't offer
-      itself, but `jn 3:1` offers `John 3:1`)
+    - A chapter or verse completion that would leave the text as it is (`John 3:1` offering
+      itself) comes first, unless [`CompleteOptions::include_typed`] is off; a book's never does
+      (`Genesis` offers its chapters instead)
     - Every front end (the CLI, the language server, the bindings, and the editor plugins) uses
       this as is; `tests/cases/complete.txt` checks each of them against the same cases
     - For LSP, convert edit ranges with [`LineIndex`](crate::matcher::LineIndex), whose positions
@@ -94,7 +108,10 @@ impl BibleMatcher {
             }
         }
         completions.extend(segment_completions(self.data(), before, &options.format));
-        completions.retain(|c| before[c.edit.range.clone()].trim_end() != c.edit.text.trim_end());
+        completions.retain(|c| {
+            (options.include_typed && c.passage.is_some())
+                || before[c.edit.range.clone()].trim_end() != c.edit.text.trim_end()
+        });
         if let Some(limit) = options.limit {
             completions.truncate(limit);
         }
@@ -316,6 +333,7 @@ mod tests {
                     ..FormatOptions::default()
                 },
                 limit: Some(1),
+                ..CompleteOptions::default()
             };
             matcher
                 .complete(text, text.len(), &options)
@@ -361,6 +379,7 @@ mod tests {
                 ..FormatOptions::default()
             },
             limit: Some(2),
+            ..CompleteOptions::default()
         };
         let text = "jn 3:16-";
         let labels: Vec<_> = matcher
@@ -403,14 +422,14 @@ mod tests {
 
     #[test]
     fn narrows_by_the_number_being_typed() {
-        // John has 21 chapters, and John 3 has 36 verses; what is already typed isn't offered
-        assert_eq!(labels("John 2"), ["John 20", "John 21"]);
-        assert_eq!(labels("John 3"), Vec::<String>::new());
-        // Unless completing it changes how it's written
+        // John has 21 chapters, and John 3 has 36 verses; what is already typed comes first
+        assert_eq!(labels("John 2"), ["John 2", "John 20", "John 21"]);
+        assert_eq!(labels("John 3"), ["John 3"]);
         assert_eq!(labels("jn 3"), ["John 3"]);
         assert_eq!(
             labels("John 3:3"),
             [
+                "John 3:3",
                 "John 3:30",
                 "John 3:31",
                 "John 3:32",
@@ -420,8 +439,28 @@ mod tests {
                 "John 3:36"
             ]
         );
-        assert_eq!(labels("John 3:1-2")[0], "John 3:1-20");
+        assert_eq!(&labels("John 3:1-2")[..2], ["John 3:1-2", "John 3:1-20"]);
         assert_eq!(labels("John 3:").len(), 36);
+    }
+
+    /// Without `include_typed`, a completion that changes nothing isn't offered
+    #[test]
+    fn leaves_out_what_is_typed() {
+        let matcher = BibleMatcher::default();
+        let options = CompleteOptions {
+            include_typed: false,
+            ..CompleteOptions::default()
+        };
+        let labels = |input: &str| -> Vec<String> {
+            (matcher.complete(input, input.len(), &options).into_iter())
+                .map(|c| c.label)
+                .collect()
+        };
+        assert_eq!(&labels("Matthew 1")[..2], ["Matthew 10", "Matthew 11"]);
+        assert!(labels("John 3").is_empty());
+        // Unless completing it changes how it's written
+        assert_eq!(labels("jn 3"), ["John 3"]);
+        assert_eq!(labels("John 3:3")[0], "John 3:30");
     }
 
     #[test]
@@ -448,6 +487,7 @@ mod tests {
                 ..FormatOptions::default()
             },
             limit: Some(1),
+            ..CompleteOptions::default()
         };
         let input = "Read gen 1:1,";
         let completions = matcher.complete(input, input.len(), &options);

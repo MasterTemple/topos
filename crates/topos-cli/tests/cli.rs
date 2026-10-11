@@ -563,6 +563,15 @@ fn complete_and_list_books() {
         lines(&["--complete", "Rom 8", "-m", "json"]),
         [r#"{"text":"Romans 8","label":"Romans 8","kind":"chapter"}"#]
     );
+    // What's typed comes first, unless --complete-typed=false
+    assert_eq!(
+        lines(&["--complete", "Matthew 1"])[..2],
+        ["Matthew 1", "Matthew 10"]
+    );
+    assert_eq!(
+        lines(&["--complete", "Matthew 1", "--complete-typed=false"])[0],
+        "Matthew 10"
+    );
 }
 
 #[test]

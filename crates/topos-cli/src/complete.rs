@@ -139,9 +139,15 @@ pub fn book_in_style(matcher: &BibleMatcher, id: BookId, style: BookStyle) -> Op
 Completions for a partly typed reference, for Tab and `--complete`
 - Nothing typed: every book (that the matcher's filters allow), in the format's book style
 - Otherwise the engine's completions (books, then chapters, verses, and range ends), applied to
-  the input, without ones that change nothing, and only those the filters keep
+  the input, and only those the filters keep; with `include_typed`, the chapter or verse already
+  typed comes first
 */
-pub fn suggestions(matcher: &BibleMatcher, text: &str, format: &FormatOptions) -> Vec<Suggestion> {
+pub fn suggestions(
+    matcher: &BibleMatcher,
+    text: &str,
+    format: &FormatOptions,
+    include_typed: bool,
+) -> Vec<Suggestion> {
     let possible = matcher.possible_books();
     let allowed = |id: BookId| possible.as_ref().is_none_or(|books| books.contains(&id));
     let books = matcher.data().books();
@@ -163,6 +169,7 @@ pub fn suggestions(matcher: &BibleMatcher, text: &str, format: &FormatOptions) -
     let options = CompleteOptions {
         format: format.clone(),
         limit: None,
+        include_typed,
     };
     matcher
         .complete(text, text.len(), &options)
@@ -171,7 +178,6 @@ pub fn suggestions(matcher: &BibleMatcher, text: &str, format: &FormatOptions) -
             Some(passage) => matcher.keeps(passage),
             None => books.search(&completion.label).is_none_or(allowed),
         })
-        // The library leaves out completions that change nothing
         .map(|completion| {
             let mut full = text.to_string();
             full.replace_range(completion.edit.range.clone(), &completion.edit.text);
@@ -202,16 +208,22 @@ pub fn passages(value: &OsStr) -> Vec<CompletionCandidate> {
     if text.trim().is_empty() {
         return books(value);
     }
-    suggestions(&BibleMatcher::default(), &text, &FormatOptions::default())
-        .into_iter()
-        .map(|s| {
-            // Book completions end with a space, ready for the chapter
-            let text = if s.kind == "book" {
-                format!("{} ", s.text)
-            } else {
-                s.text
-            };
-            candidate(value, text).help(Some(s.kind.into()))
-        })
-        .collect()
+    // What's typed is already on the command line
+    suggestions(
+        &BibleMatcher::default(),
+        &text,
+        &FormatOptions::default(),
+        false,
+    )
+    .into_iter()
+    .map(|s| {
+        // Book completions end with a space, ready for the chapter
+        let text = if s.kind == "book" {
+            format!("{} ", s.text)
+        } else {
+            s.text
+        };
+        candidate(value, text).help(Some(s.kind.into()))
+    })
+    .collect()
 }

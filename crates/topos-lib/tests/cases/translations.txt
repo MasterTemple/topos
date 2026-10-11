@@ -63,5 +63,5 @@ complete: John 3:16 (e => ESV
 complete: John 3:16 a => KJV
 complete: John 3:16 N => NASB | NASB95 | New King James Version
 complete: John 3:16 ESV =>
-complete: John 3:16 =>
+complete: John 3:16 => John 3:16
 complete: K =>

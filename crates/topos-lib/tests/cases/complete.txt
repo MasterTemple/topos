@@ -14,10 +14,11 @@ see Rev => Revelation | Revelation 1
 The =>
 Can =>
 
-# Chapters and verses, narrowed by the number being typed; what's already typed isn't offered
+# Chapters and verses, narrowed by the number being typed; what's already typed comes first
 John 3: => John 3:1 | John 3:2 | John 3:3
-John 2 => John 20 | John 21
-John 3 =>
+John 2 => John 2 | John 20 | John 21
+John 3 => John 3
+Matthew 1 => Matthew 1 | Matthew 10 | Matthew 11
 jn 3 => John 3
 John 3:16- => John 3:16-17 | John 3:16-18
 John 3:16, => John 3:16,17 | John 3:16,18
@@ -34,6 +35,7 @@ Jude 3, => Jude 1:3,4 | Jude 1:3,5
 [join] 1 Timothy 1:3,4,5- => 1 Timothy 1:3-6 | 1 Timothy 1:3-7
 [join] John 3:16,17- => John 3:16-18 | John 3:16-19
 [abbreviation] jn 3:1 => Jn 3:1 | Jn 3:10
+[abbreviation] Jn 3:1 => Jn 3:1 | Jn 3:10
 
 # `apply: text => result`: `|` is the cursor, and the result is the text after applying the first
 # completion (the CLI completes at the end of its text, so it skips these)

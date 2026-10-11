@@ -814,6 +814,7 @@ impl Topos {
         let options = CompleteOptions {
             format,
             limit: (limit > 0).then_some(limit as usize),
+            ..CompleteOptions::default()
         };
         let completions = match translations {
             Some(translations) => {

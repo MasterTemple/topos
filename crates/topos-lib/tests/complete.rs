@@ -47,6 +47,7 @@ fn completion_cases() {
                 ..FormatOptions::default()
             },
             limit: None,
+            ..CompleteOptions::default()
         };
         let labels: Vec<String> = matcher
             .complete(&input, input.len(), &options)
