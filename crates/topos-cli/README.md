@@ -185,6 +185,8 @@ topos --exclude-testament new -m table
 - `-m count` prints matches per file; `--total-count` prints one total across all files
 - Passage filters that keep references (`-i`, `--any-overlap`, `-o`, `--exact-overlap`) are joined
   with a logical OR, then `--exclude-overlap` removes references
+- A passage filter can name a book alone for the whole book: `-i mat` keeps every reference in
+  Matthew
 - `--overlaps` and `--outside` still work, as old names for `--any-overlap` and `--exclude-overlap`
 - Unknown books or genres are errors
 
@@ -425,6 +427,8 @@ Find Bible references in files, directories, text, or stdin.
 - Exclusions always win, so a book can be excluded from an included genre
 - Passage filters that keep references (`-i`, `--any-overlap`, `-o`, `--exact-overlap`) are joined
  with a logical OR, then `--exclude-overlap` removes references
+- A passage filter can name a book alone for the whole book: `-i mat` keeps every reference in
+ Matthew
 
 Usage: topos [OPTIONS] [PATHS]...
 

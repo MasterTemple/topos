@@ -4,7 +4,7 @@ use crate::{
     data::{bible_data::BibleData, books::BookId},
     error::{ToposError, ToposResult},
     matcher::{bible_matcher::BibleMatcher, matches::ComplexFilter},
-    segments::Passage,
+    segments::{Passage, segment::Segment},
 };
 
 pub trait IsFilter {
@@ -254,10 +254,26 @@ impl BibleFilter {
         Ok(psg)
     }
 
+    /// A reference, or a book alone (`Matthew`, `mat`) for the whole book
     fn parse_passage(&self, passage: &str) -> ToposResult<Passage> {
         self.data
             .parse(passage)
+            .or_else(|| self.whole_book(passage))
             .ok_or_else(|| ToposError::InvalidPassage(passage.to_string()))
+    }
+
+    /// Every chapter of the book named `name`, or `None` if it names no book
+    fn whole_book(&self, name: &str) -> Option<Passage> {
+        let book = self.data.books().search(name.trim())?;
+        let chapters = (self.data.chapter_verses())
+            .get_chapter_verses(&book)?
+            .get_chapter_count();
+        let segment = match chapters {
+            0 => return None,
+            1 => Segment::full_chapter(1),
+            n => Segment::full_chapter_range(1, n),
+        };
+        Some(segment.as_segments().with_book(book))
     }
 
     pub fn create_matcher(mut self) -> BibleMatcher {
@@ -320,6 +336,31 @@ mod tests {
         both.filter_any_overlap("John 8").unwrap();
         both.filter_exclude_overlap("Romans 9:2").unwrap();
         assert_eq!(search(both, text), ["John 8:1"]);
+    }
+
+    /// A book alone is the whole book, for every passage filter
+    #[test]
+    fn a_book_alone_is_the_whole_book() {
+        let text = "Matthew 1:5, Matthew 28:20, Matthew 1-28, Mark 1:1, Jude 5, 1 John 2:1";
+        let mut inside = BibleFilter::default();
+        inside.filter_inside("mat").unwrap();
+        assert_eq!(
+            search(inside, text),
+            ["Matthew 1:5", "Matthew 28:20", "Matthew 1-28"]
+        );
+
+        let mut jude = BibleFilter::default();
+        jude.filter_any_overlap("Jude").unwrap();
+        assert_eq!(search(jude, text), ["Jude 1:5"]);
+
+        let mut excluded = BibleFilter::default();
+        excluded.filter_exclude_overlap("Matthew").unwrap();
+        assert_eq!(
+            search(excluded, text),
+            ["Mark 1:1", "Jude 1:5", "1 John 2:1"]
+        );
+
+        assert!(BibleFilter::default().filter_inside("zzz").is_err());
     }
 
     fn books(filter: &BibleFilter) -> Vec<u8> {

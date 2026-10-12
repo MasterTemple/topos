@@ -29,6 +29,8 @@ Find Bible references in files, directories, text, or stdin.
 - Exclusions always win, so a book can be excluded from an included genre
 - Passage filters that keep references (`-i`, `--any-overlap`, `-o`, `--exact-overlap`) are joined
   with a logical OR, then `--exclude-overlap` removes references
+- A passage filter can name a book alone for the whole book: `-i mat` keeps every reference in
+  Matthew
 */
 #[derive(Parser, Debug)]
 #[command(
