@@ -111,10 +111,14 @@ pub fn with_defaults(args: Vec<OsString>) -> Result<Vec<OsString>, String> {
 
 /// Settings only the language server (logoxide-lsp) uses (it reads this file too), which the
 /// CLI skips: keep in step with its `Settings`
-const LSP_KEYS: [&str; 16] = [
+const LSP_KEYS: [&str; 21] = [
     "inlay-hints",
     "reference-diagnostics",
+    "reference-diagnostics-template",
     "hover",
+    "hover-trim",
+    "hover-max",
+    "hover-title",
     "bible",
     "bibles",
     "default-bible",
@@ -127,6 +131,8 @@ const LSP_KEYS: [&str; 16] = [
     "strongs",
     "epub",
     "pdf",
+    "templates",
+    // The old name of `templates`, which the language server explains
     "insertions",
 ];
 
@@ -239,6 +245,8 @@ mod tests {
         let text = "hover = [\"osis\"]\ninlay_hints = \"never\"\nreference-diagnostics = \"hint\"\nmode = \"json\"\nbible = \"~/Bibles/BSB\"\n[markup]\nverse_numbers = { display = \"{verse}\" }\n[[insertions]]\nname = \"Callout\"";
         assert_eq!(parse(text).unwrap(), ["--mode", "json"]);
         let text = "bibles = [\"kjv\"]\ndefault_bible = \"KJV\"\nhover-bibles = [\"BSB\"]\nlibrary = \"~/lib\"\nproject = \"~/vault\"\ncommentaries = true\nstretch-notes = true\nstrongs = true\nepub = true\npdf = false\nmode = \"json\"\n";
+        assert_eq!(parse(text).unwrap(), ["--mode", "json"]);
+        let text = "reference-diagnostics-template = \"verse\"\nhover-trim = true\nhover-max = 0\nhover-title = \"\"\nmode = \"json\"\n[templates.verse]\ndisplay = \"{first:1}\"";
         assert_eq!(parse(text).unwrap(), ["--mode", "json"]);
     }
 
