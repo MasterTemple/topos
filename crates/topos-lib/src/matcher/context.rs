@@ -56,6 +56,7 @@ impl BookContext {
     /**
     Bare references in `text` that are not inside `taken` (references that name their book)
     - `book_starts` are the sorted starts of book names, which end a bare reference's segments
+    - With `with_parts`, each has its segments' places
     */
     pub(crate) fn find_bare(
         &self,
@@ -63,6 +64,7 @@ impl BookContext {
         text: &str,
         taken: &[Range<usize>],
         book_starts: &[usize],
+        with_parts: bool,
     ) -> Vec<FoundPassage> {
         let regions = self.regions(data.books(), text);
         let mut found: Vec<FoundPassage> = vec![];
@@ -79,7 +81,7 @@ impl BookContext {
                 .get(book_starts.partition_point(|&s| s <= start))
                 .copied()
                 .unwrap_or(text.len());
-            if let Some(passage) = FoundPassage::find_bare(data, book, text, start..end) {
+            if let Some(passage) = FoundPassage::bare(data, book, text, start..end, with_parts) {
                 found.push(passage);
             }
         }

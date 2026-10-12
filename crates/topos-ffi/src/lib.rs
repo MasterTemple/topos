@@ -141,6 +141,23 @@ pub struct Match {
     pub column: u32,
 }
 
+/// One part of a reference (see `Topos.parts`): its passage, and where it is written
+#[data]
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct MatchPart {
+    /// The part, in its reference's book: `John 4:5-7`
+    pub passage: Passage,
+    /// Start and end offsets in the searched text
+    pub start: u32,
+    pub end: u32,
+    /// Where it starts: its first verse (`John 4:5`), or chapter (`John 3` of `John 3-4`)
+    pub first: Passage,
+    /// Where it ends: its last verse (`John 4:7`), or chapter
+    pub last: Passage,
+    /// Where the end of its range is written, when it is a range: the offset of the `7` in `4:5-7`
+    pub last_start: Option<u32>,
+}
+
 #[data]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum CompletionKind {
@@ -541,6 +558,41 @@ impl Topos {
     /// Every reference in `text`
     pub fn search(&self, text: String, unit: OffsetUnit) -> Vec<Match> {
         self.matches(&self.matcher, &text, unit)
+    }
+
+    /**
+    Each part of every reference in `text`, in order, where it is written: `John 3:16` and `4:5-7`
+    in `John 3:16; 4:5-7` (the first with the book's name), each with its passage
+    - Slower than `search`, so it is for one line at a time, when a part is needed (tapping a part
+      of a reference opens it)
+    */
+    pub fn parts(&self, text: String, unit: OffsetUnit) -> Vec<MatchPart> {
+        let offsets = Offsets::new(&text, unit);
+        let mut parts = Vec::new();
+        let passage = |segment: Segment, book| {
+            self.passage(&segment.as_segments().with_book(book), &self.format)
+        };
+        for (m, spans) in self.matcher.search_with_parts(&text) {
+            for (segment, span) in m.psg.segments.iter().zip(spans) {
+                let book = m.psg.book;
+                let (Some(whole), Some(first), Some(last)) = (
+                    passage(*segment, book),
+                    passage(segment.first(), book),
+                    passage(segment.last(), book),
+                ) else {
+                    continue;
+                };
+                parts.push(MatchPart {
+                    passage: whole,
+                    start: offsets.of_byte(span.written.start),
+                    end: offsets.of_byte(span.written.end),
+                    first,
+                    last,
+                    last_start: span.end.map(|end| offsets.of_byte(end)),
+                });
+            }
+        }
+        parts
     }
 
     /// The references in `text` that the query keeps

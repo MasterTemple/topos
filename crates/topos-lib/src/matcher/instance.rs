@@ -16,7 +16,7 @@ use crate::{
             lexer::{SPACES, is_unit_symbol},
         },
         passage::{Passage, Segments},
-        resolve::Resolver,
+        resolve::{Resolver, SegmentSpan},
     },
 };
 
@@ -80,6 +80,11 @@ pub struct FoundPassage {
     /// Byte range of the book name and segments in the searched text
     pub bytes: Range<usize>,
     pub psg: Passage,
+    /// Byte range of each segment, the first from the book name: `John 3:16` and `4:5-7` in
+    /// `John 3:16; 4:5-7`; only when asked for (see [`BibleMatcher::search_with_parts`]), else empty
+    ///
+    /// [`BibleMatcher::search_with_parts`]: crate::matcher::BibleMatcher::search_with_parts
+    pub parts: Vec<SegmentSpan>,
 }
 
 /// Whether `rest` starts with a number that has a unit or symbol (`5%`, `39pt`, `1 %`)
@@ -141,12 +146,13 @@ impl FoundPassage {
         cur: Match<'_>,
         next_start: Option<usize>,
     ) -> Option<Self> {
-        Self::find_translated(data, text, cur, next_start, None).map(|(found, _)| found)
+        Self::find_translated(data, text, cur, next_start, None, false).map(|(found, _)| found)
     }
 
     /**
     [`FoundPassage::find`], and the translation named right after the passage, if any of
-    `translations` is (the passage is checked against its chapter and verse counts)
+    `translations` is (the passage is checked against its chapter and verse counts), with each
+    segment's place when `with_parts`
     */
     pub(crate) fn find_translated(
         data: &BibleData,
@@ -154,6 +160,7 @@ impl FoundPassage {
         cur: Match<'_>,
         next_start: Option<usize>,
         translations: Option<&Translations>,
+        with_parts: bool,
     ) -> Option<(Self, Option<Translation>)> {
         let book = data.books().search(cur.as_str())?;
         if in_long_token(text, cur.start()) || !book_case_is_plausible(cur.as_str()) {
@@ -173,7 +180,8 @@ impl FoundPassage {
             .zip(translations)
             .and_then(|(t, translations)| translations.chapter_verses(&t.name, book))
             .or_else(|| data.chapter_verses().get_chapter_verses(&book));
-        let (found, verse) = Self::resolve(versification, book, cur.end(), window, &list)?;
+        let (found, verse) =
+            Self::resolve(versification, book, cur.end(), window, &list, with_parts)?;
         let has_verse = verse.is_some();
         // Abbreviations that are also words need a `:` verse (`Is 1:1`), since `is 2.5` is a
         // decimal; a `.` verse only counts after an abbreviation with a period (`Is. 53.5`)
@@ -192,10 +200,13 @@ impl FoundPassage {
         if glued && (!has_verse || first.start.kind == NumberKind::Roman) {
             return None;
         }
-        let found = Self {
+        let mut found = Self {
             bytes: cur.start()..found.bytes.end,
             ..found
         };
+        if let Some(first) = found.parts.first_mut() {
+            first.written.start = cur.start();
+        }
         Some((found, translation))
     }
 
@@ -206,14 +217,32 @@ impl FoundPassage {
         text: &str,
         window: Range<usize>,
     ) -> Option<Self> {
+        Self::bare(data, book, text, window, false)
+    }
+
+    /// [`FoundPassage::find_bare`], with each segment's place when `with_parts`
+    pub(crate) fn bare(
+        data: &BibleData,
+        book: BookId,
+        text: &str,
+        window: Range<usize>,
+        with_parts: bool,
+    ) -> Option<Self> {
         let list = SegmentList::parse(&text[window.clone()]);
         let first = list.nodes.first()?;
         if first.start_verse.is_none_or(|p| p.delimiter.actual != ':') {
             return None;
         }
         let versification = data.chapter_verses().get_chapter_verses(&book);
-        Self::resolve(versification, book, window.start, &text[window], &list)
-            .map(|(found, _)| found)
+        Self::resolve(
+            versification,
+            book,
+            window.start,
+            &text[window],
+            &list,
+            with_parts,
+        )
+        .map(|(found, _)| found)
     }
 
     /**
@@ -226,6 +255,7 @@ impl FoundPassage {
         start: usize,
         window: &str,
         list: &SegmentList,
+        with_parts: bool,
     ) -> Option<(Self, Option<char>)> {
         // `3:16%` or `2.5%`: the reference runs into a quantity, so it is not a reference
         if list.nodes.last().is_some_and(|n| !n.is_complete())
@@ -233,7 +263,12 @@ impl FoundPassage {
         {
             return None;
         }
-        let resolved = Resolver::for_book(versification).resolve(&list.nodes);
+        let resolver = Resolver::for_book(versification);
+        let (resolved, spans) = if with_parts {
+            resolver.resolve_with_spans(&list.nodes)
+        } else {
+            (resolver.resolve(&list.nodes), Vec::new())
+        };
         if resolved.used == 0 {
             return None;
         }
@@ -249,6 +284,12 @@ impl FoundPassage {
             // Only the text that resolved is part of the match
             bytes: start..start + resolved.end,
             psg: resolved.segments.with_book(book),
+            parts: (spans.into_iter())
+                .map(|span| SegmentSpan {
+                    written: start + span.written.start..start + span.written.end,
+                    end: span.end.map(|end| start + end),
+                })
+                .collect(),
         };
         Some((found, verse))
     }

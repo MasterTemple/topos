@@ -1,3 +1,5 @@
+use std::ops::Range;
+
 use crate::{
     data::chapter_verses::ChapterVerses,
     segments::{
@@ -29,6 +31,15 @@ pub struct Resolver<'a> {
     versification: Option<&'a ChapterVerses>,
 }
 
+/// Where a segment is written (byte offsets of the resolver's input)
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct SegmentSpan {
+    /// From its first number to its last: `4:5-7` in `3:16; 4:5-7`
+    pub written: Range<usize>,
+    /// Where the end of its range is written, when it has one: the `7` of `4:5-7`
+    pub end: Option<usize>,
+}
+
 /// The resolved segments, and what part of the input they came from
 #[derive(Clone, Debug)]
 pub struct Resolved {
@@ -52,6 +63,24 @@ impl<'a> Resolver<'a> {
     - Nothing after a shortened node is used
     */
     pub fn resolve(&self, nodes: &[SegmentNode]) -> Resolved {
+        self.resolve_into(nodes, None)
+    }
+
+    /**
+    [`Resolver::resolve`], and where each segment is written in the input, one per segment
+    */
+    pub fn resolve_with_spans(&self, nodes: &[SegmentNode]) -> (Resolved, Vec<SegmentSpan>) {
+        let mut spans = Vec::new();
+        let resolved = self.resolve_into(nodes, Some(&mut spans));
+        (resolved, spans)
+    }
+
+    /// Resolves `nodes`, adding each segment's span to `spans` when given
+    fn resolve_into(
+        &self,
+        nodes: &[SegmentNode],
+        mut spans: Option<&mut Vec<SegmentSpan>>,
+    ) -> Resolved {
         let mut segments = Segments::new();
         let mut prev_node: Option<SegmentNode> = None;
         let mut used = 0;
@@ -77,10 +106,23 @@ impl<'a> Resolver<'a> {
                 break;
             };
             // In `x, 8` the comma separates chapter and verse, so `10:8` replaces `10`
-            if is_old_style(&accepted, prev_node.as_ref()) {
+            let old_style = is_old_style(&accepted, prev_node.as_ref());
+            if old_style {
                 segments.pop();
             }
             segments.push(segment);
+            if let Some(spans) = spans.as_deref_mut() {
+                let mut start = accepted.start.span.start;
+                // `10:8` is written from the `x`
+                if old_style && let Some(replaced) = spans.pop() {
+                    start = replaced.written.start;
+                }
+                let end = (accepted.end).and_then(|p| p.number).map(|n| n.span.start);
+                spans.push(SegmentSpan {
+                    written: start..accepted.complete_end(),
+                    end,
+                });
+            }
             used += 1;
             end = accepted.complete_end();
             if accepted != *node {

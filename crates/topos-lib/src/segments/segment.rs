@@ -183,6 +183,24 @@ impl Segment {
         Segments(smallvec::smallvec![self])
     }
 
+    /// Where the segment starts: its first verse (`4:5` for `4:5-7`), or chapter (`3` for `3-4`)
+    pub fn first(&self) -> Self {
+        match self {
+            Segment::FullChapter(_)
+            | Segment::FullChapterRange(_)
+            | Segment::FullChapterVerseRange(_) => Self::full_chapter(self.starting_chapter()),
+            _ => Self::chapter_verse(self.starting_chapter(), self.starting_verse()),
+        }
+    }
+
+    /// Where the segment ends: its last verse (`4:7` for `4:5-7`), or chapter (`4` for `3-4`)
+    pub fn last(&self) -> Self {
+        match self.ending_verse() {
+            Some(verse) => Self::chapter_verse(self.ending_chapter(), verse),
+            None => Self::full_chapter(self.ending_chapter()),
+        }
+    }
+
     pub fn is_range(&self) -> bool {
         match self {
             Segment::ChapterVerse(_) | Segment::FullChapter(_) => false,

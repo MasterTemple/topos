@@ -14,7 +14,7 @@ use crate::{
         matches::{ComplexFilter, FilteredBibleMatches},
         text::SearchText,
     },
-    segments::Passage,
+    segments::{Passage, resolve::SegmentSpan},
 };
 
 #[derive(Clone, Debug)]
@@ -88,7 +88,18 @@ impl BibleMatcher {
     - Matches are then filtered by book and passage
     */
     pub fn search(&self, text: &str) -> Vec<BibleMatch> {
-        self.search_translated(text, None, |reference, _| reference)
+        self.search_translated(text, None, false, |reference, _, _| reference)
+    }
+
+    /**
+    [`BibleMatcher::search`], with where each segment of each match is written in `text`, one per
+    segment of its passage (`John 3:16` and `4:5-7` in `John 3:16; 4:5-7`, the first with the
+    book's name), and where its range's end is (the `7`)
+    - Slower than [`BibleMatcher::search`], so it is for one line or note at a time, when the parts
+      are needed (tapping a part of a reference opens that part)
+    */
+    pub fn search_with_parts(&self, text: &str) -> Vec<(BibleMatch, Vec<SegmentSpan>)> {
+        self.search_translated(text, None, true, |reference, _, parts| (reference, parts))
     }
 
     /**
@@ -105,19 +116,23 @@ impl BibleMatcher {
         text: &str,
         translations: &Translations,
     ) -> Vec<TranslatedMatch> {
-        self.search_translated(text, Some(translations), |reference, translation| {
-            TranslatedMatch {
+        self.search_translated(
+            text,
+            Some(translations),
+            false,
+            |reference, translation, _| TranslatedMatch {
                 reference,
                 translation,
-            }
-        })
+            },
+        )
     }
 
     fn search_translated<T>(
         &self,
         text: &str,
         translations: Option<&Translations>,
-        to_match: impl Fn(BibleMatch, Option<Translation>) -> T,
+        with_parts: bool,
+        to_match: impl Fn(BibleMatch, Option<Translation>, Vec<SegmentSpan>) -> T,
     ) -> Vec<T> {
         let original = text;
         let text = SearchText::new(original);
@@ -130,14 +145,21 @@ impl BibleMatcher {
             .enumerate()
             .filter_map(|(idx, cur)| {
                 let next_start = starts.get(idx + 1).map(|next| next.start());
-                FoundPassage::find_translated(data, text.as_str(), *cur, next_start, translations)
+                FoundPassage::find_translated(
+                    data,
+                    text.as_str(),
+                    *cur,
+                    next_start,
+                    translations,
+                    with_parts,
+                )
             })
             .collect();
 
         if let Some(context) = self.context() {
             let taken: Vec<_> = found.iter().map(|(f, _)| f.bytes.clone()).collect();
             let book_starts: Vec<_> = starts.iter().map(|s| s.start()).collect();
-            let bare = context.find_bare(data, text.as_str(), &taken, &book_starts);
+            let bare = context.find_bare(data, text.as_str(), &taken, &book_starts, with_parts);
             found.extend(bare.into_iter().map(|f| {
                 let after = &text.as_str()[f.bytes.end..];
                 let translation = translations
@@ -158,11 +180,17 @@ impl BibleMatcher {
                     span: text.original_range(t.span),
                     ..t
                 });
+                let parts = (found.parts.into_iter())
+                    .map(|part| SegmentSpan {
+                        written: text.original_range(part.written),
+                        end: part.end.map(|end| text.original(end)),
+                    })
+                    .collect();
                 let reference = BibleMatch {
                     location,
                     psg: found.psg,
                 };
-                to_match(reference, translation)
+                to_match(reference, translation, parts)
             })
             .collect()
     }
