@@ -148,7 +148,7 @@ fn cache_reuses_and_refreshes_results() {
     let dir = scratch("cache-test");
     std::fs::create_dir_all(dir.join("docs")).unwrap();
     let file = dir.join("docs/a.txt");
-    std::fs::write(&file, "See John 3:16\n").unwrap();
+    std::fs::write(&file, "See John 3:16 ESV\n").unwrap();
 
     let run = |args: &[&str]| {
         let output = Command::new(env!("CARGO_BIN_EXE_topos"))
@@ -169,7 +169,7 @@ fn cache_reuses_and_refreshes_results() {
     // Change the text but keep the size and modification time: a cached result shows the old
     // reference, which proves that other filters reuse the cached (unfiltered) results
     let modified = std::fs::metadata(&file).unwrap().modified().unwrap();
-    std::fs::write(&file, "See Ruth 3:16\n").unwrap();
+    std::fs::write(&file, "See Ruth 3:16 ESV\n").unwrap();
     std::fs::File::options()
         .write(true)
         .open(&file)
@@ -178,6 +178,8 @@ fn cache_reuses_and_refreshes_results() {
         .unwrap();
     assert!(run(&["--nt"]).ends_with(":1:5: John 3:16\n"));
     assert!(run(&["-o", "John 3"]).ends_with(":1:5: John 3:16\n"));
+    // A translation filter reads the text after references, so it searches the file again
+    assert!(run(&["--translation", "ESV"]).ends_with(":1:5: Ruth 3:16\n"));
     // Filters that rule the file out (by its books) find nothing
     assert_eq!(run(&["--ot"]), "");
     assert_eq!(run(&["-b", "Genesis"]), "");
@@ -216,6 +218,34 @@ fn inside_overlaps_and_outside() {
         refs(&["-o", "Romans 9", "--exclude-overlap", "Romans 9:2"]),
         ":1:11: Romans 8:38-9:1\n"
     );
+}
+
+#[test]
+fn verses_and_translations() {
+    let text = "John 3, John 2; 3:16, Jude 25 (KJV), Rom 8:28 ESV, Ps 22, LXX";
+    let refs = |config: Option<&str>, args: &[&str]| {
+        let mut all = vec!["--text", text, "-m", "quickfix"];
+        all.extend(args);
+        stdout(&topos_with_config(config, &all, None))
+    };
+    assert_eq!(
+        refs(None, &["--verses"]),
+        ":1:9: John 2; 3:16\n:1:23: Jude 1:25\n:1:38: Romans 8:28\n"
+    );
+    assert_eq!(
+        refs(None, &["--verses", "--skip-single-chapter"]),
+        ":1:9: John 2; 3:16\n:1:38: Romans 8:28\n"
+    );
+    assert_eq!(
+        refs(None, &["--translation", "kjv", "--translation", "LXX"]),
+        ":1:23: Jude 1:25\n:1:52: Psalm 22\n"
+    );
+    // Both, from the config file
+    let config = "verses = true\nskip-single-chapter = true\ntranslation = [\"KJV\", \"ESV\"]\n";
+    assert_eq!(refs(Some(config), &[]), ":1:38: Romans 8:28\n");
+    // --skip-single-chapter is only for --verses
+    let alone = topos(&["--text", text, "--skip-single-chapter"], None);
+    assert_eq!(alone.status.code(), Some(2));
 }
 
 #[test]

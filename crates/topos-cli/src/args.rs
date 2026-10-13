@@ -31,6 +31,7 @@ Find Bible references in files, directories, text, or stdin.
   with a logical OR, then `--exclude-overlap` removes references
 - A passage filter can name a book alone for the whole book: `-i mat` keeps every reference in
   Matthew
+- `--verses` and `--translation` narrow what the other filters keep
 */
 #[derive(Parser, Debug)]
 #[command(
@@ -117,6 +118,21 @@ pub struct Args {
         add = ArgValueCompleter::new(complete::passages)
     )]
     pub exclude_overlap: Vec<String>,
+
+    /// Only keep references that name a verse: whole chapters don't count (e.g. keeps John 3:16
+    /// and John 2; 3:16, but not John 3 or John 2-4)
+    #[arg(long)]
+    pub verses: bool,
+
+    /// With --verses, also drop references in single-chapter books, whose numbers are verses
+    /// without a chapter (e.g. Jude 25 and Obadiah 3)
+    #[arg(long, requires = "verses")]
+    pub skip_single_chapter: bool,
+
+    /// Only keep references followed by this translation (e.g. ESV keeps "John 3:16 ESV" and
+    /// "John 3:16 (ESV)"); several keep any of them. Searches again instead of using --cache
+    #[arg(long = "translation", value_name = "NAME")]
+    pub translations: Vec<String>,
 
     /// Treat the input as being about this book, so references like 3:16 match
     #[arg(long, add = ArgValueCompleter::new(complete::books))]
@@ -616,6 +632,12 @@ impl Args {
         }
         for passage in &self.exclude_overlap {
             filter.filter_exclude_overlap(passage)?;
+        }
+        if self.verses {
+            filter.filter_verses(!self.skip_single_chapter);
+        }
+        for name in &self.translations {
+            filter.filter_translation(name);
         }
 
         if let Some(reason) = filter.contradiction() {

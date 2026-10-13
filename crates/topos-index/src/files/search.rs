@@ -313,12 +313,15 @@ pub fn is_epub(path: &Path) -> bool {
 impl Searcher {
     /**
     Uses the cache when the file has not changed
-    - The cache holds unfiltered results, so they are filtered here, whatever the filters
+    - The cache holds unfiltered results, so they are filtered here, whatever the filters (except a
+      translation filter, which searches the file again)
     - New results are found without filters, stored, then filtered
     - Skipped (binary) files are stored with no results, so they aren't read again
     */
     fn search_file(&self, path: &Path) -> Result<Option<FileHits>, String> {
-        let Some(cached) = &self.cached else {
+        // A translation filter reads the text after each reference, which the cache doesn't keep
+        let cached = (self.cached.as_ref()).filter(|_| !self.matcher.filters_translations());
+        let Some(cached) = cached else {
             return search_file(&self.matcher, path, self.binary, self.cfi);
         };
         let keep = |hits: Vec<Hit>| -> Vec<Hit> {

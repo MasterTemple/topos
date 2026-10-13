@@ -54,6 +54,11 @@ fn filters() -> Vec<(&'static str, BibleFilter)> {
         f.include(TestamentFilter::New).unwrap();
         f.filter_exclude_overlap("John 1-21").unwrap();
     });
+    add("verses", &|f| f.filter_verses(true));
+    add("verses outside single-chapter books, nt", &|f| {
+        f.filter_verses(false);
+        f.include(TestamentFilter::New).unwrap();
+    });
     cases
 }
 

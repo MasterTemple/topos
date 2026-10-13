@@ -1,4 +1,4 @@
-use std::collections::BTreeSet;
+use std::{borrow::Cow, collections::BTreeSet};
 
 use crate::{
     data::{
@@ -67,9 +67,19 @@ impl BibleMatcher {
         }
     }
 
-    /// Whether this matcher's filters keep a passage
+    /// Whether this matcher's filters keep a passage (except its translations: see
+    /// [`Self::filters_translations`])
     pub fn keeps(&self, psg: &Passage) -> bool {
         self.complex_filter.keep(psg, &self.data)
+    }
+
+    /**
+    Whether matches must be followed by a translation
+    ([`BibleFilter::filter_translation`]), which [`Self::keeps`] can't check: then filtering
+    [`Self::without_filters`]'s results isn't the same as searching, so search the text again
+    */
+    pub fn filters_translations(&self) -> bool {
+        !self.complex_filter.translations().is_empty()
     }
 
     /// The only books a kept match can be in ([`None`] for any book), to skip text that
@@ -85,7 +95,8 @@ impl BibleMatcher {
     - Every book name followed by a chapter is a candidate, and its segments end where the next
       candidate starts (so `John 1:1, 3 John 5` is `John 1:1` and `3 John 5`)
     - With a [`BookContext`], references without a book name are found too
-    - Matches are then filtered by book and passage
+    - Matches are then filtered by book, passage, and translation (a translation filter reads the
+      names it was given after each reference, as [`Self::search_with_translations`] does)
     */
     pub fn search(&self, text: &str) -> Vec<BibleMatch> {
         self.search_translated(text, None, false, |reference, _, _| reference)
@@ -110,6 +121,8 @@ impl BibleMatcher {
     - A name ends the reference, so `Ps 22, LXX` is Psalm 22 (not Psalms 22 and 70)
     - References without a book name (with a [`BookContext`]) get the translation after them, but
       are checked against the data's counts
+    - A translation filter's names are looked up in `translations` (so an alias names the same
+      translation), and those it doesn't list are read too
     */
     pub fn search_with_translations(
         &self,
@@ -138,6 +151,8 @@ impl BibleMatcher {
         let text = SearchText::new(original);
         let index = LineIndex::new(original);
         let data = self.data();
+        let translations = self.translations_to_read(translations);
+        let translations = translations.as_deref();
 
         let starts: Vec<_> = data.books().candidates(text.as_str()).collect();
         let mut found: Vec<(FoundPassage, Option<Translation>)> = starts
@@ -172,7 +187,9 @@ impl BibleMatcher {
 
         found
             .into_iter()
-            .filter(|(found, _)| self.keeps(&found.psg))
+            .filter(|(found, translation)| {
+                self.keeps(&found.psg) && self.keeps_translation(translation.as_ref(), translations)
+            })
             .map(|(found, translation)| {
                 let bytes = text.original_range(found.bytes);
                 let location = LineColLocation::new(&index, bytes.start, bytes.end);
@@ -193,6 +210,45 @@ impl BibleMatcher {
                 to_match(reference, translation, parts)
             })
             .collect()
+    }
+
+    /// The translations to read after references: the caller's, plus the translation filter's
+    /// names it doesn't list
+    fn translations_to_read<'t>(
+        &self,
+        translations: Option<&'t Translations>,
+    ) -> Option<Cow<'t, Translations>> {
+        let names = self.complex_filter.translations();
+        let Some(translations) = translations else {
+            return (!names.is_empty()).then(|| Cow::Owned(Translations::new(names)));
+        };
+        let missing: Vec<_> = (names.iter())
+            .filter(|name| translations.get(name).is_none())
+            .collect();
+        Some(match missing.is_empty() {
+            true => Cow::Borrowed(translations),
+            false => Cow::Owned(
+                (missing.into_iter()).fold(translations.clone(), |t, name| t.alias(name, name)),
+            ),
+        })
+    }
+
+    /// Whether the translation after a match is one the translation filter keeps
+    fn keeps_translation(
+        &self,
+        translation: Option<&Translation>,
+        translations: Option<&Translations>,
+    ) -> bool {
+        let names = self.complex_filter.translations();
+        if names.is_empty() {
+            return true;
+        }
+        let (Some(translation), Some(translations)) = (translation, translations) else {
+            return false;
+        };
+        names
+            .iter()
+            .any(|name| translations.get(name) == Some(translation.name.as_str()))
     }
 
     /// The first reference in `text`

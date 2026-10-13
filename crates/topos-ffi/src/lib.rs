@@ -236,6 +236,14 @@ pub struct ToposQuery {
     pub exact_overlap: Vec<String>,
     /// Drop references that share any verse with one of these (`--exclude-overlap`)
     pub exclude_overlap: Vec<String>,
+    /// Keep references that name a verse, not whole chapters alone (`--verses`)
+    pub verses: bool,
+    /// With `verses`, also drop single-chapter books' references (`Jude 25`;
+    /// `--skip-single-chapter`)
+    pub skip_single_chapter: bool,
+    /// Keep references followed by one of these translations (`John 3:16 ESV`; `--translation`).
+    /// The index doesn't store translations, so its queries can't take these
+    pub translations: Vec<String>,
 }
 
 impl ToposQuery {
@@ -340,6 +348,26 @@ impl ToposQuery {
     pub fn exclude_overlap(&self, passage: String) -> Self {
         Self {
             exclude_overlap: with(self.exclude_overlap.clone(), passage),
+            ..self.clone()
+        }
+    }
+
+    /// Only references that name a verse (`John 3:16`, `John 2; 3:16`), not whole chapters alone
+    /// (`John 3`); `singleChapterBooks: false` also drops single-chapter books' references, whose
+    /// numbers are verses without a chapter (`Jude 25`)
+    pub fn verses(&self, single_chapter_books: bool) -> Self {
+        Self {
+            verses: true,
+            skip_single_chapter: !single_chapter_books,
+            ..self.clone()
+        }
+    }
+
+    /// Only references followed by this translation (`John 3:16 ESV`, `John 3:16 (ESV)`); several
+    /// keep any of them. With `searchWithTranslations`, its translations' aliases name them too
+    pub fn translation(&self, name: String) -> Self {
+        Self {
+            translations: with(self.translations.clone(), name),
             ..self.clone()
         }
     }
@@ -1019,6 +1047,12 @@ impl Topos {
         for passage in &query.exclude_overlap {
             filter.filter_exclude_overlap(passage).map_err(invalid)?;
         }
+        if query.verses {
+            filter.filter_verses(!query.skip_single_chapter);
+        }
+        for name in &query.translations {
+            filter.filter_translation(name);
+        }
         Ok(filter)
     }
 
@@ -1374,6 +1408,49 @@ mod tests {
     }
 
     #[test]
+    fn verses_and_translations_in_queries() {
+        let topos = Topos::new();
+        let text = "John 3 ESV, Jude 25 (KJV), Rom 8:28 AV, Gen 1:1".to_string();
+        let search = |query: &ToposQuery| {
+            references(
+                topos
+                    .search_with(text.clone(), OffsetUnit::Byte, query)
+                    .unwrap(),
+            )
+        };
+        assert_eq!(
+            search(&ToposQuery::create().verses(true)),
+            ["Jude 1:25", "Romans 8:28", "Genesis 1:1"]
+        );
+        assert_eq!(
+            search(&ToposQuery::create().verses(false)),
+            ["Romans 8:28", "Genesis 1:1"]
+        );
+        let kjv = ToposQuery::create().translation("kjv".into());
+        assert_eq!(search(&kjv), ["Jude 1:25"]);
+        assert_eq!(
+            search(&kjv.translation("ESV".into()).verses(true)),
+            ["Jude 1:25"]
+        );
+
+        // With the caller's translations, an alias names the same translation
+        let translations = ToposTranslations::create().add("KJV".into(), vec!["AV".into()]);
+        let found: Vec<_> = topos
+            .search_with_translations(text.clone(), OffsetUnit::Byte, &kjv, &translations)
+            .unwrap()
+            .into_iter()
+            .map(|m| (m.reference.passage.reference, m.translation.unwrap().name))
+            .collect();
+        assert_eq!(
+            found,
+            [
+                ("Jude 1:25".to_string(), "KJV".to_string()),
+                ("Romans 8:28".to_string(), "KJV".to_string())
+            ]
+        );
+    }
+
+    #[test]
     fn queries_chain_and_filter() {
         let topos = Topos::new();
         let text = "John 3, John 3:14-18, John 2; 3:16, Rom 8:28, Gen 1:1".to_string();
@@ -1407,6 +1484,17 @@ mod tests {
         assert_eq!(
             search(&nt.exclude_overlap("John 3".into())),
             ["Romans 8:28"]
+        );
+
+        let verses = ToposQuery::create().verses(true);
+        assert_eq!(
+            search(&verses),
+            ["John 3:14-18", "John 2; 3:16", "Romans 8:28", "Genesis 1:1"]
+        );
+        assert_eq!(
+            search(&verses.exclude_book("Genesis".into())).len(),
+            3,
+            "`verses` keeps the other filters"
         );
 
         let contradiction = ToposQuery::create()

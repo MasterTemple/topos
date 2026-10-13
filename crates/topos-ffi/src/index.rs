@@ -8,7 +8,7 @@ use topos_bible_index::{
     Detail, EntryMessage, EpubEntryBuilder, EpubRef, FileEntry, FileKind, Hit, Index, Order, Pack,
     PathFilter, Results, Scope, Stamp, Status, Unit, detail_name, text_entry,
 };
-use topos_lib::segments::Passage as CorePassage;
+use topos_lib::{matcher::BibleMatcher, segments::Passage as CorePassage};
 
 use crate::{OffsetUnit, Passage, Topos, ToposError, ToposQuery};
 
@@ -287,6 +287,16 @@ fn whole(n: f64) -> u64 {
     } else {
         0
     }
+}
+
+/// The matcher for an index query: the index keeps passages, not the translations after them
+fn index_matcher(topos: &Topos, query: &ToposQuery) -> Result<BibleMatcher, ToposError> {
+    if !query.translations.is_empty() {
+        return Err(ToposError::InvalidQuery {
+            message: "the index doesn't store translations, so it can't filter by them".into(),
+        });
+    }
+    Ok(topos.filter(query)?.create_matcher())
 }
 
 fn invalid(e: impl std::fmt::Display) -> ToposError {
@@ -621,7 +631,7 @@ impl ToposIndex {
         let results = if query.is_empty() {
             self.lock().query_in(None, None, &scope, &extensions, order)
         } else {
-            let matcher = topos.filter(query)?.create_matcher();
+            let matcher = index_matcher(topos, query)?;
             let books = matcher.possible_books();
             let keep = |p: &CorePassage| matcher.keeps(p);
             self.lock()
@@ -648,7 +658,7 @@ impl ToposIndex {
             self.lock()
                 .query_paths(None, None, &Scope::All, &filter, order)
         } else {
-            let matcher = topos.filter(query)?.create_matcher();
+            let matcher = index_matcher(topos, query)?;
             let books = matcher.possible_books();
             let keep = |p: &CorePassage| matcher.keeps(p);
             self.lock()
@@ -880,6 +890,20 @@ mod tests {
             .glob("*.md".into());
         assert_eq!(bad.problems().len(), 2);
         assert!(matches!(found(bad), Err(ToposError::InvalidQuery { .. })));
+
+        // Verses filter the index too; translations can't, since it doesn't store them
+        let all = ToposPaths::create();
+        let verses = ToposQuery::create().verses(true);
+        let results = index.query_paths(&topos, &verses, &all, IndexOrder::File)?;
+        let paths: Vec<_> = (index.page(&topos, &results, 0, 10).into_iter())
+            .map(|h| h.path)
+            .collect();
+        assert_eq!(paths, ["d.txt", "Notes/a.md", "Notes/drafts/b.md"]);
+        let esv = ToposQuery::create().translation("ESV".into());
+        assert!(matches!(
+            index.query_paths(&topos, &esv, &all, IndexOrder::File),
+            Err(ToposError::InvalidQuery { .. })
+        ));
         Ok(())
     }
 

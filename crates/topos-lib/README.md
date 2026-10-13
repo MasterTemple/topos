@@ -114,6 +114,22 @@ assert!(filter.contradiction().is_some());
 # Ok::<(), topos_bible::error::ToposError>(())
 ```
 
+Keep only references that name a verse (whole chapters alone don't count), or that are followed
+by a translation:
+
+```rust
+use topos_bible::filter::bible_filter::BibleFilter;
+
+let mut filter = BibleFilter::default();
+// `false` also drops single-chapter books, whose numbers are verses (`Jude 25`)
+filter.filter_verses(true);
+filter.filter_translation("ESV");
+let matcher = filter.create_matcher();
+let found = matcher.search("John 3 ESV, John 3:16 (ESV), Rom 8:28, Jude 25 ESV");
+let refs: Vec<_> = found.iter().map(|m| m.psg.segments.to_string()).collect();
+assert_eq!(refs, ["3:16", "1:25"]);
+```
+
 ## Problems
 
 References that parse but don't exist:

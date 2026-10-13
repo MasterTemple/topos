@@ -236,6 +236,22 @@ impl BibleFilter {
         Ok(())
     }
 
+    /// Keep matches that name a verse (`John 3:16`, `John 2; 3:16`), not whole chapters alone
+    /// (`John 3`); `single_chapter_books: false` also drops single-chapter books' matches, whose
+    /// numbers are verses without a chapter (`Jude 25`). See [`ComplexFilter::verses_only`]
+    pub fn filter_verses(&mut self, single_chapter_books: bool) {
+        self.complex_filter.verses_only(single_chapter_books);
+    }
+
+    /// Keep matches followed by this translation (`John 3:16 ESV`, `John 3:16 (ESV)`); several
+    /// keep any of them (an empty name is ignored). See [`BibleMatcher::filters_translations`]
+    pub fn filter_translation(&mut self, name: &str) {
+        let name = name.trim();
+        if !name.is_empty() {
+            self.complex_filter.translation(name);
+        }
+    }
+
     #[deprecated(since = "0.4.0", note = "renamed to `filter_any_overlap`")]
     pub fn filter_overlaps(&mut self, passage: &str) -> ToposResult<()> {
         self.filter_any_overlap(passage)
@@ -433,6 +449,80 @@ mod tests {
             found(&|f| f.filter_exclude_overlap("John 3:16").unwrap()),
             ["John 3:1-5"]
         );
+    }
+
+    #[test]
+    fn verses_only() {
+        let text = "John 3, John 2-4, John 3:16, John 2; 3:16, Jude 25, Jude 1:3, Obadiah 3";
+        let mut filter = BibleFilter::default();
+        filter.filter_verses(true);
+        assert_eq!(
+            search(filter, text),
+            [
+                "John 3:16",
+                "John 2; 3:16",
+                "Jude 1:25",
+                "Jude 1:3",
+                "Obadiah 1:3"
+            ]
+        );
+        let mut filter = BibleFilter::default();
+        filter.filter_verses(false);
+        assert_eq!(search(filter, text), ["John 3:16", "John 2; 3:16"]);
+        // With other filters, both must keep a match
+        let mut filter = BibleFilter::default();
+        filter.filter_verses(true);
+        filter.filter_any_overlap("John 3").unwrap();
+        assert_eq!(search(filter, text), ["John 3:16", "John 2; 3:16"]);
+    }
+
+    #[test]
+    fn translations() {
+        use crate::data::translations::Translations;
+
+        let text = "John 3:16 ESV, John 3:17 (KJV), John 3:18, Ps 22, LXX, Rom 8:28 AV";
+        let mut esv = BibleFilter::default();
+        esv.filter_translation("esv");
+        let matcher = esv.create_matcher();
+        assert!(matcher.filters_translations());
+        let found: Vec<_> = (matcher.search(text).into_iter())
+            .map(|m| m.psg.segments.to_string())
+            .collect();
+        assert_eq!(found, ["3:16"]);
+
+        let mut several = BibleFilter::default();
+        several.filter_translation("KJV");
+        several.filter_translation("LXX");
+        assert_eq!(search(several, text), ["John 3:17", "Psalm 22"]);
+
+        // With the caller's translations, an alias names the same one, and names they don't list
+        // are read too
+        let listed = Translations::new(["KJV"]).alias("AV", "KJV");
+        let mut kjv = BibleFilter::default();
+        kjv.filter_translation("av");
+        kjv.filter_translation("ESV");
+        let found: Vec<_> = (kjv.create_matcher())
+            .search_with_translations(text, &listed)
+            .into_iter()
+            .map(|m| {
+                (
+                    m.reference.psg.segments.to_string(),
+                    m.translation.unwrap().name,
+                )
+            })
+            .collect();
+        assert_eq!(
+            found,
+            [
+                ("3:16".into(), "ESV".into()),
+                ("3:17".into(), "KJV".into()),
+                ("8:28".into(), "KJV".into())
+            ]
+        );
+
+        let mut empty = BibleFilter::default();
+        empty.filter_translation(" ");
+        assert!(!empty.create_matcher().filters_translations());
     }
 
     #[test]

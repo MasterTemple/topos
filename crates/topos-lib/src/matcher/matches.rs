@@ -22,6 +22,11 @@ pub struct ComplexFilter {
     exact: Vec<Passage>,
     /// Drop matches that share any verse with one of these
     exclude_overlap: Vec<Passage>,
+    /// Keep matches that name a verse: [`None`] keeps whole chapters too, and `Some(false)` drops
+    /// single-chapter books (`Jude 25`)
+    verses: Option<bool>,
+    /// Keep matches followed by one of these translations (see [`ComplexFilter::translation`])
+    translations: Vec<String>,
 }
 
 impl ComplexFilter {
@@ -50,6 +55,31 @@ impl ComplexFilter {
         self.exclude_overlap.push(psg);
     }
 
+    /**
+    Only keep matches that name a verse: whole chapters don't count (`John 3`, `John 2-4`), but a
+    match with a verse anywhere does (`John 2; 3:16`)
+    - A single-chapter book's numbers are verses (`Jude 25` is `Jude 1:25`), so its matches always
+      name one; `single_chapter_books: false` drops them (`Jude 25`, `Jude 1:25`, `Obadiah 3`)
+    */
+    pub fn verses_only(&mut self, single_chapter_books: bool) {
+        self.verses = Some(single_chapter_books);
+    }
+
+    /**
+    Only keep matches followed by this translation (`John 3:16 ESV`, `John 3:16 (ESV)`); several
+    keep matches followed by any of them
+    - [`ComplexFilter::keep`] only sees passages, so this is checked by
+      [`BibleMatcher`](crate::matcher::BibleMatcher)'s searches
+    */
+    pub fn translation(&mut self, name: impl Into<String>) {
+        self.translations.push(name.into());
+    }
+
+    /// The translations a match must be followed by (any of them), if any were given
+    pub fn translations(&self) -> &[String] {
+        &self.translations
+    }
+
     /// The passages that include matches (inside, any, explicit, and exact)
     fn inclusions(&self) -> impl Iterator<Item = &Passage> {
         (self.inside_of.iter())
@@ -63,12 +93,20 @@ impl ComplexFilter {
       it is inside an `inside` passage, overlaps an `any_overlap` one, names a verse of an
       `explicit_overlap` one, or is exactly an `exact` one
     - Then a match that shares any verse with an `exclude_overlap` passage is dropped
+    - With [`ComplexFilter::verses_only`], a match that names no verse is dropped
+    - Translations ([`ComplexFilter::translation`]) aren't checked here
     */
     pub fn keep(&self, psg: &Passage, data: &BibleData) -> bool {
         if self.books.as_ref().is_some_and(|b| !b.contains(&psg.book)) {
             return false;
         }
         let versification = data.chapter_verses().get_chapter_verses(&psg.book);
+        if let Some(single_chapter_books) = self.verses {
+            let single_chapter = versification.is_some_and(|v| v.has_one_chapter());
+            if psg.explicit_verses().is_none() || (single_chapter && !single_chapter_books) {
+                return false;
+            }
+        }
         let overlaps = |other: &Passage| other.overlaps_passage(psg, versification);
         let included = self.inclusions().next().is_none()
             || self

@@ -52,8 +52,13 @@ topos.searchWith(text, OffsetUnit.Utf16, nt.genre("Pauline Epistles").explicitOv
 | `explicitOverlap(passage)` | `-o` | name a verse of it (whole chapters don't count) |
 | `exactOverlap(passage)` | `--exact-overlap` | are exactly it, however written |
 | `excludeOverlap(passage)` | `--exclude-overlap` | share no verse with it |
+| `verses(singleChapterBooks)` | `--verses` (`--skip-single-chapter` for `false`) | name a verse (whole chapters alone don't count; `false` also drops `Jude 25`) |
+| `translation(name)` | `--translation` | are followed by the translation (`John 3:16 ESV`) |
 
-The passage methods that keep references are joined with OR; `excludeOverlap` then drops.
+The passage methods that keep references are joined with OR; `excludeOverlap` then drops, and
+`verses` and `translation` narrow what's left. `translation` reads the names it's given after
+each reference (with `searchWithTranslations`, an alias of one of its translations names it too);
+the index doesn't store translations, so its queries return `ToposError.InvalidQuery` for it.
 
 **Options** (`ToposOptions`) set up an instance, like the CLI's data and context options. Chain
 them, then `build()`:
