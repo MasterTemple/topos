@@ -60,7 +60,7 @@ The phases are in order, and each one leaves the repo working.
 - [x] Clarify inputs: `topos [PATH]...` (paths only, like ripgrep), with `--text` or piped stdin for literal text (`-i` already filters by passage)
 - [x] `--config` for custom book, genre and versification data (JSON, via `BibleDataInput`)
 - [x] Cache search results [#2](https://github.com/MasterTemple/topos-bible/issues/2) (`--cache`)
-- [x] `--verses` (references that name a verse; `--skip-single-chapter` also drops `Jude 25`) and `--translation NAME` (references followed by a translation), in the library (`BibleFilter::filter_verses`, `filter_translation`) and the FFI (`ToposQuery.verses`, `translation`)
+- [x] Verses only by default, `--chapters` for whole chapters (also when every passage filter names no verse; `--skip-single-chapter` also drops `Jude 25`) and `--translation NAME` (references followed by a translation), in the library (`BibleFilter::filter_verses`, `filter_translation`) and the FFI (`ToposQuery.verses`, `translation`)
 - [x] `--epub-links wiki|markdown`: an EPUB++ link to each reference in EPUBs (`--cfi-assertions` for `[id]` assertions)
 - [x] EPUB positions in `-m json` (spine index, chapter, offsets and lines in the book's text)
 - [x] `topos-bible-index`: a persistent, compact index (about 15 bytes a reference) with checks for changed files, per-device packs that sync without conflicts, and filtered, sorted, paged queries; in the bindings (`ToposIndex`) and the CLI (`-m index`); the Obsidian plugin keeps a million references in it and searches only changed files

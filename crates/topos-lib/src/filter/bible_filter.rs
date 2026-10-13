@@ -236,6 +236,13 @@ impl BibleFilter {
         Ok(())
     }
 
+    /// Whether there are passage filters that include matches (inside, any, explicit, and exact)
+    /// and none of them names a verse: only chapters or books (`-i "John 3"`, `-i mat`)
+    pub fn includes_only_chapters(&self) -> bool {
+        !self.included_passages.is_empty()
+            && (self.included_passages.iter()).all(|(_, psg)| psg.explicit_verses().is_none())
+    }
+
     /// Keep matches that name a verse (`John 3:16`, `John 2; 3:16`), not whole chapters alone
     /// (`John 3`); `single_chapter_books: false` also drops single-chapter books' matches, whose
     /// numbers are verses without a chapter (`Jude 25`). See [`ComplexFilter::verses_only`]

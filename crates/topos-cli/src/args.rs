@@ -31,7 +31,9 @@ Find Bible references in files, directories, text, or stdin.
   with a logical OR, then `--exclude-overlap` removes references
 - A passage filter can name a book alone for the whole book: `-i mat` keeps every reference in
   Matthew
-- `--verses` and `--translation` narrow what the other filters keep
+- Whole chapters alone (`John 3`) are left out unless `--chapters`, or unless every passage
+  filter names only chapters or books (`-i "John 3"`); `--translation` narrows what the other
+  filters keep
 */
 #[derive(Parser, Debug)]
 #[command(
@@ -119,14 +121,15 @@ pub struct Args {
     )]
     pub exclude_overlap: Vec<String>,
 
-    /// Only keep references that name a verse: whole chapters don't count (e.g. keeps John 3:16
-    /// and John 2; 3:16, but not John 3 or John 2-4)
+    /// Also keep references that name no verse, only whole chapters (e.g. John 3 or John 2-4);
+    /// without it, only references that name a verse are kept (John 3:16, John 2; 3:16), unless
+    /// every passage filter names only chapters or books (-i "John 3", -i mat)
     #[arg(long)]
-    pub verses: bool,
+    pub chapters: bool,
 
-    /// With --verses, also drop references in single-chapter books, whose numbers are verses
-    /// without a chapter (e.g. Jude 25 and Obadiah 3)
-    #[arg(long, requires = "verses")]
+    /// Also drop references in single-chapter books, whose numbers are verses without a chapter
+    /// (e.g. Jude 25 and Obadiah 3)
+    #[arg(long, conflicts_with = "chapters")]
     pub skip_single_chapter: bool,
 
     /// Only keep references followed by this translation (e.g. ESV keeps "John 3:16 ESV" and
@@ -633,7 +636,13 @@ impl Args {
         for passage in &self.exclude_overlap {
             filter.filter_exclude_overlap(passage)?;
         }
-        if self.verses {
+        // Completions and the book list suggest chapters too, and passages that name no verse
+        // (`-i "John 3"`) keep them
+        if !self.chapters
+            && self.complete.is_none()
+            && !self.list_books
+            && !filter.includes_only_chapters()
+        {
             filter.filter_verses(!self.skip_single_chapter);
         }
         for name in &self.translations {

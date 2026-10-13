@@ -221,31 +221,59 @@ fn inside_overlaps_and_outside() {
 }
 
 #[test]
-fn verses_and_translations() {
+fn chapters_and_translations() {
     let text = "John 3, John 2; 3:16, Jude 25 (KJV), Rom 8:28 ESV, Ps 22, LXX";
     let refs = |config: Option<&str>, args: &[&str]| {
         let mut all = vec!["--text", text, "-m", "quickfix"];
         all.extend(args);
         stdout(&topos_with_config(config, &all, None))
     };
+    // By default, only references that name a verse
     assert_eq!(
-        refs(None, &["--verses"]),
+        refs(None, &[]),
         ":1:9: John 2; 3:16\n:1:23: Jude 1:25\n:1:38: Romans 8:28\n"
     );
     assert_eq!(
-        refs(None, &["--verses", "--skip-single-chapter"]),
+        refs(None, &["--chapters"]),
+        ":1:1: John 3\n:1:9: John 2; 3:16\n:1:23: Jude 1:25\n:1:38: Romans 8:28\n:1:52: Psalm 22,70\n"
+    );
+    assert_eq!(
+        refs(None, &["--skip-single-chapter"]),
         ":1:9: John 2; 3:16\n:1:38: Romans 8:28\n"
     );
     assert_eq!(
-        refs(None, &["--translation", "kjv", "--translation", "LXX"]),
+        refs(
+            None,
+            &["--chapters", "--translation", "kjv", "--translation", "LXX"]
+        ),
         ":1:23: Jude 1:25\n:1:52: Psalm 22\n"
     );
     // Both, from the config file
-    let config = "verses = true\nskip-single-chapter = true\ntranslation = [\"KJV\", \"ESV\"]\n";
+    let config = "skip-single-chapter = true\ntranslation = [\"KJV\", \"ESV\"]\n";
     assert_eq!(refs(Some(config), &[]), ":1:38: Romans 8:28\n");
-    // --skip-single-chapter is only for --verses
-    let alone = topos(&["--text", text, "--skip-single-chapter"], None);
-    assert_eq!(alone.status.code(), Some(2));
+    assert_eq!(
+        refs(Some("chapters = true\ntranslation = \"LXX\"\n"), &[]),
+        ":1:52: Psalm 22\n"
+    );
+    // Passage filters that name no verse keep whole chapters; one with a verse doesn't
+    assert_eq!(
+        refs(None, &["-i", "John 2-3"]),
+        ":1:1: John 3\n:1:9: John 2; 3:16\n"
+    );
+    assert_eq!(
+        refs(None, &["-i", "jn"]),
+        ":1:1: John 3\n:1:9: John 2; 3:16\n"
+    );
+    assert_eq!(
+        refs(None, &["-i", "John 2-3", "-i", "Rom 8:28"]),
+        ":1:9: John 2; 3:16\n:1:38: Romans 8:28\n"
+    );
+    // --skip-single-chapter drops verses, so it can't go with --chapters
+    let both = topos(
+        &["--text", text, "--chapters", "--skip-single-chapter"],
+        None,
+    );
+    assert_eq!(both.status.code(), Some(2));
 }
 
 #[test]
@@ -803,8 +831,16 @@ fn path_options() {
 #[test]
 fn passage_filters() {
     let text = "John 3, John 2-4, John 3:14-18, John 2; 3:16, Jn 3:16, John 3:16-17";
+    // --chapters, so the filters themselves decide about whole chapters
     let run = |args: &[&str]| {
-        let mut all = vec!["--no-config", "--text", text, "-m", "quickfix"];
+        let mut all = vec![
+            "--no-config",
+            "--chapters",
+            "--text",
+            text,
+            "-m",
+            "quickfix",
+        ];
         all.extend(args);
         stdout(&topos(&all, None))
             .lines()
@@ -848,7 +884,9 @@ fn passage_filters() {
 
     // Old names work in config.toml too
     let configured = topos_with_config(
-        Some("overlaps = \"John 3:16\"\noutside = \"John 2\"\nmode = \"quickfix\"\n"),
+        Some(
+            "overlaps = \"John 3:16\"\noutside = \"John 2\"\nmode = \"quickfix\"\nchapters = true\n",
+        ),
         &["--text", text],
         None,
     );

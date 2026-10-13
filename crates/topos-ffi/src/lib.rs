@@ -236,7 +236,7 @@ pub struct ToposQuery {
     pub exact_overlap: Vec<String>,
     /// Drop references that share any verse with one of these (`--exclude-overlap`)
     pub exclude_overlap: Vec<String>,
-    /// Keep references that name a verse, not whole chapters alone (`--verses`)
+    /// Keep references that name a verse, not whole chapters alone (the CLI's default, without `--chapters`)
     pub verses: bool,
     /// With `verses`, also drop single-chapter books' references (`Jude 25`;
     /// `--skip-single-chapter`)

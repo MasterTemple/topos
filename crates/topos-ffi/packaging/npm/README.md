@@ -76,7 +76,7 @@ const query = ToposQuery.create()
   .genre("Pauline Epistles")      // -g; also book(), excludeGenre(), excludeBook()
   .explicitOverlap("Romans 8")    // -o: names a verse of Romans 8 (whole chapters don't count)
   .excludeOverlap("Romans 8:28")  // also inside(), anyOverlap(), exactOverlap()
-  .verses(true);                  // --verses: names a verse; also translation("ESV")
+  .verses(true);                  // topos without --chapters: names a verse; also translation("ESV")
 const matches = Topos.new().searchWith(text, OffsetUnit.Utf16, query);
 
 const topos = ToposOptions.create()

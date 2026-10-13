@@ -152,11 +152,13 @@ So `1 Peter 4` above is kept by `--any-overlap`, but not by `-o` (it names no ve
 (it isn't inside the passage). The options that keep references can be combined and repeated
 (a reference passes if any one keeps it); `--exclude-overlap` then removes references.
 
-### Verses and translations
+### Chapters and translations
 
-`--verses` keeps references that name a verse, so whole chapters alone (`John 3`, `John 2-4`) are
-left out; `John 2; 3:16` names one, so it stays. A single-chapter book's numbers are verses
-(`Jude 25` is `Jude 1:25`), so its references stay too, unless `--skip-single-chapter` drops them.
+Only references that name a verse are kept by default, so whole chapters alone (`John 3`, `John
+2-4`) are left out; `John 2; 3:16` names one, so it stays. `--chapters` keeps them too, and so do
+passage filters that all name no verse (`-i "John 3"`, `-i mat`). A single-chapter book's numbers
+are verses (`Jude 25` is `Jude 1:25`), so its references stay too, unless `--skip-single-chapter`
+drops them.
 
 `--translation NAME` keeps references followed by that translation (`John 3:16 ESV`, `John 3:16
 (ESV)`, `John 3:16, ESV`); repeat it to keep any of several. Only the names given are read as
@@ -164,7 +166,7 @@ translations, and a name ends a reference (`Ps 22, LXX` is Psalm 22). It reads t
 reference, so `--cache` searches the files again.
 
 ```bash
-topos --verses --skip-single-chapter --translation ESV --translation NASB
+topos --skip-single-chapter --translation ESV --translation NASB
 ```
 
 ### Exclude Testament/Genre/Book/Passage
@@ -202,7 +204,9 @@ topos --exclude-testament new -m table
   with a logical OR, then `--exclude-overlap` removes references
 - A passage filter can name a book alone for the whole book: `-i mat` keeps every reference in
   Matthew
-- `--verses` and `--translation` narrow what the other filters keep
+- Whole chapters alone (`John 3`) are left out unless `--chapters`, or unless every passage
+  filter names only chapters or books (`-i "John 3"`); `--translation` narrows what the other
+  filters keep
 - `--overlaps` and `--outside` still work, as old names for `--any-overlap` and `--exclude-overlap`
 - Unknown books or genres are errors
 
@@ -445,7 +449,9 @@ Find Bible references in files, directories, text, or stdin.
  with a logical OR, then `--exclude-overlap` removes references
 - A passage filter can name a book alone for the whole book: `-i mat` keeps every reference in
  Matthew
-- `--verses` and `--translation` narrow what the other filters keep
+- Whole chapters alone (`John 3`) are left out unless `--chapters`, or unless every passage
+ filter names only chapters or books (`-i "John 3"`); `--translation` narrows what the other
+ filters keep
 
 Usage: topos [OPTIONS] [PATHS]...
 
@@ -496,11 +502,11 @@ Options:
       --exclude-overlap <EXCLUDE_OVERLAP>
           Drop references that share any verse with this passage
 
-      --verses
-          Only keep references that name a verse: whole chapters don't count (e.g. keeps John 3:16 and John 2; 3:16, but not John 3 or John 2-4)
+      --chapters
+          Also keep references that name no verse, only whole chapters (e.g. John 3 or John 2-4); without it, only references that name a verse are kept (John 3:16, John 2; 3:16), unless every passage filter names only chapters or books (-i "John 3", -i mat)
 
       --skip-single-chapter
-          With --verses, also drop references in single-chapter books, whose numbers are verses without a chapter (e.g. Jude 25 and Obadiah 3)
+          Also drop references in single-chapter books, whose numbers are verses without a chapter (e.g. Jude 25 and Obadiah 3)
 
       --translation <NAME>
           Only keep references followed by this translation (e.g. ESV keeps "John 3:16 ESV" and "John 3:16 (ESV)"); several keep any of them. Searches again instead of using --cache
