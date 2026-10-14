@@ -60,8 +60,22 @@ pub struct Books {
     regexes: BookRegexes,
 }
 
+/// The spaces that may stand between a book name's words (`1 Corinthians`, `Song of Songs`): any
+/// Unicode space separator, since typeset text (EPUBs above all) puts a no-break, narrow no-break,
+/// or thin space after a book's number
+const NAME_SPACE: &str = r"[ \u{A0}\u{1680}\u{2000}-\u{200A}\u{202F}\u{205F}\u{3000}]";
+
+/// Whether `c` is one of [`NAME_SPACE`]'s spaces
+fn is_name_space(c: char) -> bool {
+    matches!(
+        c,
+        ' ' | '\u{A0}' | '\u{1680}' | '\u{2000}'
+            ..='\u{200A}' | '\u{202F}' | '\u{205F}' | '\u{3000}'
+    )
+}
+
 /// Every regex alternates over all book names, escaped and longest first, so `1 John` wins over
-/// `John` and `Song of Songs` over `Song`
+/// `John` and `Song of Songs` over `Song`. A name's spaces match any of [`NAME_SPACE`]'s
 #[derive(Clone, Debug)]
 struct BookRegexes {
     /// The alternation of every book name (escaped, longest first), without flags or groups
@@ -84,7 +98,10 @@ impl BookRegexes {
         } else {
             r"\b"
         };
-        let books = keys.into_iter().map(|k| regex::escape(k)).join("|");
+        let books = keys
+            .into_iter()
+            .map(|k| regex::escape(k).replace(' ', NAME_SPACE))
+            .join("|");
         Ok(Self {
             pattern: books.clone(),
             candidate: Regex::new(&format!(r"(?i){b}((?:{books})\.?)"))?,
@@ -280,8 +297,11 @@ impl Books {
         Some(segments.with_book(book))
     }
 
+    /// A name as a key: lowercase, trimmed, without a trailing `.`, and with [`NAME_SPACE`]'s
+    /// spaces as plain ones (`1\u{a0}Cor` is `1 cor`)
     pub fn normalize_book_name(name: &str) -> String {
         name.to_lowercase()
+            .replace(is_name_space, " ")
             .trim()
             .trim_end_matches(".")
             .trim()
