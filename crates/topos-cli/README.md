@@ -57,6 +57,25 @@ topos "Church 07-27-25.md" -m table
 ..
 ```
 
+### Show Each Reference's Line
+
+`-C 0` prints the line each reference is on, `-C 2` two lines around it too (`-A` after, `-B` before), as ripgrep does. In EPUBs a line is a paragraph, and in PDFs a line of a page.
+
+**Command**
+
+```bash
+topos "The Dorean Principle.epub" -C 0
+```
+
+**Output**
+
+```
+The Dorean Principle.epub
+2 Timothy 3:2 (epubcfi(/6/2!/4/2/34/4,/1:0,/1:10))
+  34: “More than ever before, Christian fundraising in the modern church has become a worldly, …
+..
+```
+
 ### Filter by Testament
 
 **Command**
@@ -545,8 +564,8 @@ Options:
           How to print results
 
           Possible values:
-          - auto:        Grouped by file on a terminal, otherwise `path:line:column: reference`
-          - grouped:     Grouped by file, with optional context lines
+          - auto:        Grouped by file on a terminal or with context (-A, -B, -C), otherwise `path:line:column: reference`
+          - grouped:     Grouped by file, with context lines with -A, -B, or -C
           - quickfix:    `path:line:column: reference` (for Vim's quickfix list)
           - table:       A Markdown table
           - json:        One JSON object per match
@@ -563,6 +582,7 @@ Options:
           - name:         `Genesis 1:1`
           - abbreviation: `Gn 1:1`
           - osis:         `Gen.1.1`
+          - usfm:         `GEN 1:1`
 
       --psg-fmt <JSON>
           How to write references (results and completions), as JSON with any of: book, book_separator, chapter_verse, range, verse_separator, chapter_separator, omit_first_verse_of_chapter_range, join_adjacent, chapter_in_single_chapter_books. In config.toml it is a table: psg-fmt = { join_adjacent = true }
@@ -608,17 +628,13 @@ Options:
           Write EPUB CFIs with `[id]` assertions, like /6/14[chapter-1]!/4/2[p3]/1:0: more robust if the book changes, but `[` and `]` break wikilinks (EPUB++ leaves them out by default)
 
   -A, --after-context <AFTER_CONTEXT>
-          Lines of context to show after each match
-          
-          [default: 0]
+          Lines of context to show after each match (prints the matched line too, grouped by file; for EPUBs, a line is a paragraph, and for PDFs, a line of a page)
 
   -B, --before-context <BEFORE_CONTEXT>
-          Lines of context to show before each match
-          
-          [default: 0]
+          Lines of context to show before each match (prints the matched line too, as -A does)
 
   -C, --context <CONTEXT>
-          Lines of context to show before and after each match
+          Lines of context to show before and after each match; -C 0 shows only the matched line
 
       --color <COLOR>
           When to use colors
@@ -640,6 +656,8 @@ Options:
 
       --complete-typed [<BOOL>]
           Whether --complete offers the chapter or verse already typed, first ("Matthew 1" gives Matthew 1, then Matthew 10, ...) [default: true]
+          
+          [possible values: true, false]
 
       --list-books
           Print every book, one per line, and exit (the same as `--complete ""`)

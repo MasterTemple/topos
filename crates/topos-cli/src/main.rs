@@ -106,7 +106,6 @@ fn main() -> ExitCode {
         Input::Text(_) => vec![],
     };
     let mut printer = Printer::new(&args, matcher.data().clone(), roots);
-    let (before, after) = args.context_lines();
     let cached = args
         .cache
         .then(|| Cache::open(&args.fingerprint()))
@@ -123,7 +122,7 @@ fn main() -> ExitCode {
         matcher,
         // --files never searches, so it never needs the cache
         cached: cached.filter(|_| !args.files),
-        needs_text: before + after > 0 || printer.needs_text(),
+        needs_text: args.context_lines().is_some() || printer.needs_text(),
         walk,
         binary: args.search_binary(),
         list_only: args.files,

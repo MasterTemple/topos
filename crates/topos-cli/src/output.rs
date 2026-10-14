@@ -27,7 +27,8 @@ pub struct Printer {
     color: bool,
     options: topos_bible::segments::formatter::FormatOptions,
     data: BibleData,
-    context: (usize, usize),
+    /// Lines before and after each match, with -A, -B, or -C
+    context: Option<(usize, usize)>,
     rows: Vec<[String; 5]>,
     printed_group: bool,
     total: usize,
@@ -54,6 +55,8 @@ impl Printer {
         let tty = io::stdout().is_terminal();
         let mode = match args.mode {
             _ if args.total_count => OutputMode::TotalCount,
+            // Context needs grouped output, even when piped
+            OutputMode::Auto if args.context_lines().is_some() => OutputMode::Grouped,
             OutputMode::Auto if tty => OutputMode::Grouped,
             OutputMode::Auto => OutputMode::Quickfix,
             mode => mode,
@@ -328,10 +331,19 @@ impl Printer {
         if !path.is_empty() {
             emit(self.paint(PATH, path));
         }
-        let (before, after) = self.context;
-        let show_context = before + after > 0;
+        // EPUBs and PDFs have no text of their own here, so it's read for context
+        let book;
+        let text = match (&file.text, self.context) {
+            (Some(text), Some(_)) => Some(&**text),
+            (None, Some(_)) => {
+                book = book_text(file);
+                book.as_deref()
+            }
+            _ => None,
+        };
+        let lines = text.map(Lines::new);
         for (idx, hit) in file.hits.iter().enumerate() {
-            if show_context && idx > 0 {
+            if self.context.is_some() && idx > 0 {
                 emit(String::from("--"));
             }
             let reference = self.paint(BOLD, &self.reference(&hit.passage));
@@ -347,36 +359,30 @@ impl Printer {
                 }
                 None => emit(format!("{reference}{label}")),
             }
-            if show_context && let Some(text) = &file.text {
-                self.context_lines(text, hit, before, after);
+            if let (Some((before, after)), Some(lines)) = (self.context, &lines) {
+                self.context_lines(lines, hit, before, after);
             }
         }
     }
 
     /// The lines around a hit, with the matched text highlighted
-    fn context_lines(&self, text: &str, hit: &Hit, before: usize, after: usize) {
-        let (Some((start, end)), Some(bytes)) = (hit.position, &hit.bytes) else {
+    fn context_lines(&self, lines: &Lines, hit: &Hit, before: usize, after: usize) {
+        let Some(span) = lines.span(hit) else {
             return;
         };
-        let first = start.line.saturating_sub(before).max(1);
-        let last = end.line + after;
-        let mut offset = 0;
-        for (idx, line) in text.split_inclusive('\n').enumerate() {
-            let number = idx + 1;
-            let line_start = offset;
-            offset += line.len();
-            if number < first {
-                continue;
-            }
-            if number > last {
-                break;
-            }
-            let content = line.trim_end_matches(['\n', '\r']);
-            let in_match = (start.line..=end.line).contains(&number);
+        let first = span.lines.start().saturating_sub(before).max(1);
+        let last = (span.lines.end() + after).min(lines.len());
+        for number in first..=last {
+            let (line_start, content) = lines.line(number);
+            let in_match = span.lines.contains(&number);
             let marker = if in_match { ':' } else { '-' };
             let content = if in_match {
-                let from = bytes.start.saturating_sub(line_start).min(content.len());
-                let to = bytes.end.saturating_sub(line_start).min(content.len());
+                let from = span
+                    .bytes
+                    .start
+                    .saturating_sub(line_start)
+                    .min(content.len());
+                let to = span.bytes.end.saturating_sub(line_start).min(content.len());
                 format!(
                     "{}{}{}",
                     &content[..from],
@@ -392,6 +398,109 @@ impl Printer {
             ));
         }
     }
+}
+
+/// An EPUB's or PDF's text as its hits' lines count it, for context
+fn book_text(file: &FileHits) -> Option<String> {
+    let path = file.path.as_deref()?;
+    let text = if is_epub(path) {
+        let reader = io::BufReader::new(std::fs::File::open(path).ok()?);
+        topos_bible_formats::epub::epub_text_reader(reader).map_err(|e| e.to_string())
+    } else if file.hits.iter().any(|hit| hit.pdf.is_some()) {
+        pdf_text(path)
+    } else {
+        return None;
+    };
+    text.inspect_err(|err| eprintln!("topos: {}: no context: {err}", path.display()))
+        .ok()
+}
+
+#[cfg(feature = "pdf")]
+fn pdf_text(path: &Path) -> Result<String, String> {
+    topos_bible_formats::pdf::pdf_file_text(path).map_err(|e| e.to_string())
+}
+
+#[cfg(not(feature = "pdf"))]
+fn pdf_text(_: &Path) -> Result<String, String> {
+    Err(String::from("PDFs need the pdf feature"))
+}
+
+/// A text's lines (1-based), found once for all of a file's hits
+struct Lines<'a> {
+    text: &'a str,
+    /// Where each line starts
+    starts: Vec<usize>,
+}
+
+/// The lines and bytes a hit covers
+struct Span {
+    lines: std::ops::RangeInclusive<usize>,
+    bytes: std::ops::Range<usize>,
+}
+
+impl<'a> Lines<'a> {
+    fn new(text: &'a str) -> Self {
+        let starts = text
+            .split_inclusive('\n')
+            .scan(0, |offset, line| {
+                let start = *offset;
+                *offset += line.len();
+                Some(start)
+            })
+            .collect();
+        Self { text, starts }
+    }
+
+    fn len(&self) -> usize {
+        self.starts.len()
+    }
+
+    /// A line's start and text, without its line break
+    fn line(&self, number: usize) -> (usize, &'a str) {
+        let start = self.starts[number - 1];
+        let end = self.starts.get(number).copied().unwrap_or(self.text.len());
+        (start, self.text[start..end].trim_end_matches(['\n', '\r']))
+    }
+
+    /// The line a byte offset is on
+    fn line_of(&self, byte: usize) -> usize {
+        self.starts.partition_point(|&start| start <= byte).max(1)
+    }
+
+    /// Where a hit is: by its bytes in text, or for EPUBs and PDFs, by its line, UTF-16 column,
+    /// and UTF-16 length in the book's text
+    fn span(&self, hit: &Hit) -> Option<Span> {
+        if let (Some((start, end)), Some(bytes)) = (hit.position, &hit.bytes) {
+            return Some(Span {
+                lines: start.line..=end.line,
+                bytes: bytes.clone(),
+            });
+        }
+        let (line, column, utf16) = match (&hit.epub, &hit.pdf) {
+            (Some(epub), _) => (epub.line, epub.utf16_column, &epub.text_utf16),
+            (_, Some(pdf)) => (pdf.line, pdf.utf16_column, &pdf.text_utf16),
+            _ => return None,
+        };
+        let line_start = *self.starts.get(line.checked_sub(1)?)?;
+        let start = utf16_to_byte(self.text, line_start, column.checked_sub(1)?)?;
+        let end = utf16_to_byte(self.text, start, utf16.len())?;
+        Some(Span {
+            lines: line..=self.line_of(end.saturating_sub(1).max(start)),
+            bytes: start..end,
+        })
+    }
+}
+
+/// The byte offset `units` UTF-16 code units after `from`
+fn utf16_to_byte(text: &str, from: usize, units: usize) -> Option<usize> {
+    let mut counted = 0;
+    for (offset, c) in text.get(from..)?.char_indices() {
+        if counted >= units {
+            return Some(from + offset);
+        }
+        counted += c.len_utf16();
+    }
+    (counted >= units).then_some(text.len())
 }
 
 /// A file's `-m index` line: its path, and its entry for topos-bible-index (base64)

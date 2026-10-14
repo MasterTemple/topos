@@ -1073,6 +1073,49 @@ fn write_epub(path: &std::path::Path) {
     zip.finish().unwrap();
 }
 
+/// -A, -B, and -C print the matched line even at 0, piped or not, and in EPUBs (their book's
+/// text), with or without the cache
+#[test]
+fn context_lines() {
+    let text = "one\nSee John 3:16 here.\nthree\n";
+    assert_eq!(
+        stdout(&topos(&["--no-config", "-C", "0"], Some(text))),
+        "2:5: John 3:16\n  2: See John 3:16 here.\n"
+    );
+    assert_eq!(
+        stdout(&topos(&["--no-config", "-B", "1"], Some(text))),
+        "2:5: John 3:16\n  1- one\n  2: See John 3:16 here.\n"
+    );
+    // Without context, piped output is still quickfix
+    assert_eq!(
+        stdout(&topos(&["--no-config"], Some(text))),
+        ":2:5: John 3:16\n"
+    );
+    let dir = scratch("epub-context");
+    let book = dir.join("book.epub");
+    write_epub(&book);
+    let book = book.to_str().unwrap();
+    let expected = format!(
+        "{book}\nJohn 3:16 (epubcfi(/6/2!/4/2,/1:4,/1:11))\n  1: See Jn 3:16.\n  2- \n--\n\
+         Romans 8:28 (epubcfi(/6/4!/4/2,/1:4,/1:15))\n  2- \n  3: And Romans 8:28\n  4- \n"
+    );
+    assert_eq!(
+        stdout(&topos(&["--no-config", "-C", "1", book], None)),
+        expected
+    );
+    // The second run reads the cache, which keeps no text for EPUBs
+    for _ in 0..2 {
+        let output = Command::new(env!("CARGO_BIN_EXE_topos"))
+            .args(["--no-config", "--cache", "-C", "1", book])
+            .env("XDG_CACHE_HOME", dir.join("cache"))
+            .stdin(Stdio::null())
+            .output()
+            .unwrap();
+        assert_eq!(stdout(&output), expected);
+    }
+    assert!(dir.join("cache").exists());
+}
+
 #[test]
 fn epub_links() {
     let dir = scratch("epub-links");

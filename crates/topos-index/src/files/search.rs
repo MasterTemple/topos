@@ -338,7 +338,9 @@ impl Searcher {
             })),
             Some(Cached::Hits(hits)) => {
                 let hits = keep(hits);
-                let text = (self.needs_text && !hits.is_empty())
+                // EPUBs and PDFs have no text of their own (a file's bytes aren't its text)
+                let has_text = hits.iter().all(|h| h.epub.is_none() && h.pdf.is_none());
+                let text = (self.needs_text && has_text && !hits.is_empty())
                     .then(|| fs::read(path).ok())
                     .flatten()
                     .map(|bytes| Arc::from(String::from_utf8_lossy(&bytes).as_ref()));

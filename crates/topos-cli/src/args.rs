@@ -241,15 +241,16 @@ pub struct Args {
     #[arg(long)]
     pub cfi_assertions: bool,
 
-    /// Lines of context to show after each match
-    #[arg(long, short = 'A', default_value_t = 0)]
-    pub after_context: usize,
+    /// Lines of context to show after each match (prints the matched line too, grouped by file;
+    /// for EPUBs, a line is a paragraph, and for PDFs, a line of a page)
+    #[arg(long, short = 'A')]
+    pub after_context: Option<usize>,
 
-    /// Lines of context to show before each match
-    #[arg(long, short = 'B', default_value_t = 0)]
-    pub before_context: usize,
+    /// Lines of context to show before each match (prints the matched line too, as -A does)
+    #[arg(long, short = 'B')]
+    pub before_context: Option<usize>,
 
-    /// Lines of context to show before and after each match
+    /// Lines of context to show before and after each match; -C 0 shows only the matched line
     #[arg(long, short = 'C')]
     pub context: Option<usize>,
 
@@ -383,10 +384,11 @@ pub struct Args {
 
 #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, ValueEnum)]
 pub enum OutputMode {
-    /// Grouped by file on a terminal, otherwise `path:line:column: reference`
+    /// Grouped by file on a terminal or with context (-A, -B, -C), otherwise
+    /// `path:line:column: reference`
     #[default]
     Auto,
-    /// Grouped by file, with optional context lines
+    /// Grouped by file, with context lines with -A, -B, or -C
     Grouped,
     /// `path:line:column: reference` (for Vim's quickfix list)
     #[value(alias = "qf", alias = "vimgrep")]
@@ -536,14 +538,15 @@ impl Args {
         files::fingerprint(&config, self.search_binary(), self.cfi_options())
     }
 
-    pub fn context_lines(&self) -> (usize, usize) {
-        match self.context {
-            Some(lines) => (
-                lines.max(self.before_context),
-                lines.max(self.after_context),
-            ),
-            None => (self.before_context, self.after_context),
+    /// Lines before and after each match, when any of -A, -B, or -C is given (even 0, which shows
+    /// the matched line alone)
+    pub fn context_lines(&self) -> Option<(usize, usize)> {
+        let (before, after, both) = (self.before_context, self.after_context, self.context);
+        if before.is_none() && after.is_none() && both.is_none() {
+            return None;
         }
+        let both = both.unwrap_or(0);
+        Some((both.max(before.unwrap_or(0)), both.max(after.unwrap_or(0))))
     }
 
     /// How references are written: the defaults, then --psg-fmt, then each --fmt-* option, then -f

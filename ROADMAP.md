@@ -55,7 +55,7 @@ The phases are in order, and each one leaves the repo working.
 
 - [x] Stream results while the directory walk runs (`--sort` waits and sorts by path)
 - [x] Output modes: rg-style `path:line:col: ref` (default when piped), grouped and colored (TTY), real NDJSON (`-m json`), counts, aligned tables
-- [x] Context: `-C/-A/-B` lines with highlighting, `--format name|abbreviation|osis`, `--color`
+- [x] Context: `-C/-A/-B` lines with highlighting (`-C 0` for the matched line alone; EPUBs and PDFs too, a paragraph or a line of a page), `--format name|abbreviation|osis`, `--color`
 - [x] Choose a format by file extension through `topos-formats`, skip binary files, and report unreadable files on stderr (exit codes like ripgrep)
 - [x] Clarify inputs: `topos [PATH]...` (paths only, like ripgrep), with `--text` or piped stdin for literal text (`-i` already filters by passage)
 - [x] `--config` for custom book, genre and versification data (JSON, via `BibleDataInput`)
