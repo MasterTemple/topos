@@ -111,14 +111,16 @@ pub fn with_defaults(args: Vec<OsString>) -> Result<Vec<OsString>, String> {
 
 /// Settings only the language server (logoxide-lsp) uses (it reads this file too), which the
 /// CLI skips: keep in step with its `Settings`
-const LSP_KEYS: [&str; 21] = [
+const LSP_KEYS: [&str; 24] = [
     "inlay-hints",
     "reference-diagnostics",
     "reference-diagnostics-template",
     "hover",
     "hover-trim",
+    "hover-line",
     "hover-max",
     "hover-title",
+    "book-hover",
     "bible",
     "bibles",
     "default-bible",
@@ -131,6 +133,7 @@ const LSP_KEYS: [&str; 21] = [
     "strongs",
     "epub",
     "pdf",
+    "search-folders",
     "templates",
     // The old name of `templates`, which the language server explains
     "insertions",
