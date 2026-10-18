@@ -14,101 +14,143 @@ The npm and Python guides are also each package's page on its registry.
 
 ## API
 
-Every language gets the same object and types:
+Every language gets the same objects and types, with names in each language's style
+(`searchWith` in TypeScript, Swift, and Kotlin; `search_with` in Python). The
+[npm guide](./packaging/npm/README.md) and the [Python guide](./packaging/python/README.md) have
+a working example of every method, with what it prints: their code blocks are parts of
+[`examples/node/index.ts`](./examples/node/index.ts) and
+[`examples/python/example.py`](./examples/python/example.py), which print exactly what the
+guides show. The Examples column links each one.
 
-| | |
-|---|---|
-| `Topos()` / `Topos.new()` | Default English book names and versification |
-| `Topos.with_config(json)` | Custom `books`, `genres`, or `chapter_verses` (the same JSON as the CLI's `--data`) |
-| `search(text, unit) -> [Match]` | Every reference in `text` |
-| `parse(reference, style) -> Passage?` | One reference (`Jn 3:16` or OSIS `John.3.16`) |
-| `complete(text, cursor, unit, style, limit) -> [Completion]` | Completions for the reference ending at `cursor` (`limit` 0 means no limit) |
-| `verse_ranges(passage) -> [VerseRange]` | Each segment with both ends written out; whole chapters run from verse 1 to their last verse |
-| `verses(passage) -> [ChapterVerse]` | Every verse in the passage, in order |
-| `contains(outer, inner)` / `overlaps(a, b) -> bool` | Verse-by-verse containment and overlap |
-| `search_with(text, unit, query) -> [Match]` | The references a `ToposQuery` keeps (raises `ToposError.InvalidQuery` for an unknown book, genre, or passage) |
-| `contradiction(query) -> String?` | Why nothing can match, if the query's filters contradict each other |
-| `complete_with(text, cursor, unit, format, limit)` | Like `complete`, written with a `ToposFormat` |
-| `format_passage(passage, format) -> String?` | A passage written with a `ToposFormat` |
-| `parse_with_translation(reference, unit, translations, style) -> TranslatedPassage?` | Like `parse`, and the translation named after the reference (`John 3:16 (KJV)`) |
-| `search_with_translations(text, unit, query, translations) -> [TranslatedMatch]` | Like `search_with`, each reference with the translation named after it |
-| `complete_with_translations(text, cursor, unit, format, limit, translations)` | Like `complete_with`, offering translations first after a reference (`John 3:16 K` → `KJV`) |
+| `Topos` | | Examples |
+|---|---|---|
+| `Topos()` / `Topos.new()` | Default English book names and versification | [TS](./packaging/npm/README.md#usage), [Python](./packaging/python/README.md#usage) |
+| `Topos.with_config(json)` | Custom `books`, `genres`, or `chapter_verses` (the same JSON as the CLI's `--data`) | [TS](./packaging/npm/README.md#options), [Python](./packaging/python/README.md#options) |
+| `search(text, unit) -> [Match]` | Every reference in `text` | [TS](./packaging/npm/README.md#finding-references), [Python](./packaging/python/README.md#finding-references) |
+| `parts(text, unit) -> [MatchPart]` | Each part of every reference (`John 3:16` and `4:5-7` in `John 3:16; 4:5-7`), where it is written | [TS](./packaging/npm/README.md#finding-references), [Python](./packaging/python/README.md#finding-references) |
+| `parse(reference, style) -> Passage?` | One reference (`Jn 3:16`, OSIS `John.3.16`, or USFM `JHN 3:16`) | [TS](./packaging/npm/README.md#parsing-a-reference), [Python](./packaging/python/README.md#parsing-a-reference) |
+| `verse_ranges(passage) -> [VerseRange]` | Each segment with both ends written out; whole chapters run from verse 1 to their last verse | [TS](./packaging/npm/README.md#verses), [Python](./packaging/python/README.md#verses) |
+| `verses(passage) -> [ChapterVerse]` | Every verse in the passage, in order | [TS](./packaging/npm/README.md#verses), [Python](./packaging/python/README.md#verses) |
+| `contains(outer, inner)` / `overlaps(a, b) -> bool` | Verse-by-verse containment and overlap | [TS](./packaging/npm/README.md#verses), [Python](./packaging/python/README.md#verses) |
+| `books() -> [BookInfo]`, `genres() -> [GenreInfo]` | Every book and genre, in order | [TS](./packaging/npm/README.md#books-and-genres), [Python](./packaging/python/README.md#books-and-genres) |
+| `find_book(name) -> u8?`, `find_genre(name) -> GenreInfo?` | A book's id, or a genre, by name or abbreviation, ignoring case | [TS](./packaging/npm/README.md#books-and-genres), [Python](./packaging/python/README.md#books-and-genres) |
+| `complete(text, cursor, unit, style, limit) -> [Completion]` | Completions for the reference ending at `cursor` (`limit` 0 means no limit) | [TS](./packaging/npm/README.md#completing), [Python](./packaging/python/README.md#completing) |
+| `search_with(text, unit, query) -> [Match]` | The references a `ToposQuery` keeps (raises `ToposError.InvalidQuery` for an unknown book, genre, or passage) | [TS](./packaging/npm/README.md#queries), [Python](./packaging/python/README.md#queries) |
+| `contradiction(query) -> String?` | Why nothing can match, if the query's filters contradict each other | [TS](./packaging/npm/README.md#queries), [Python](./packaging/python/README.md#queries) |
+| `complete_with(text, cursor, unit, format, limit)` | Like `complete`, written with a `ToposFormat` | [TS](./packaging/npm/README.md#formats), [Python](./packaging/python/README.md#formats) |
+| `format_passage(passage, format) -> String?` | A passage written with a `ToposFormat` | [TS](./packaging/npm/README.md#formats), [Python](./packaging/python/README.md#formats) |
+| `parse_with_translation(reference, unit, translations, style) -> TranslatedPassage?` | Like `parse`, and the translation named after the reference (`John 3:16 (KJV)`) | [TS](./packaging/npm/README.md#translations), [Python](./packaging/python/README.md#translations) |
+| `search_with_translations(text, unit, query, translations) -> [TranslatedMatch]` | Like `search_with`, each reference with the translation named after it | [TS](./packaging/npm/README.md#translations), [Python](./packaging/python/README.md#translations) |
+| `complete_with_translations(text, cursor, unit, format, limit, translations)` | Like `complete_with`, offering translations first after a reference (`John 3:16 K` → `KJV`) | [TS](./packaging/npm/README.md#translations), [Python](./packaging/python/README.md#translations) |
+| `search_files(paths, files, query, unit) -> [FileMatches]`, `list_files(paths, files)` | Files and folders, like the CLI (native only) | [TS](./packaging/npm/README.md#files-and-folders) (the error), [Python](./packaging/python/README.md#files-and-folders) |
+| `index_entry`, `index_epub`, `index_pdf` | A file's references, for `ToposIndex.insert` | [TS](./packaging/npm/README.md#an-index-of-many-files), [Python](./packaging/python/README.md#an-index-of-many-files) |
 
 **Queries** (`ToposQuery`) choose which references to keep, like the CLI's filter options.
-Chain the methods; each returns a new query, so one can be reused and extended:
+Chain the methods; each returns a new query, so one can be reused and extended
+([TS](./packaging/npm/README.md#queries), [Python](./packaging/python/README.md#queries)):
 
 ```ts
-const nt = ToposQuery.create().newTestament();
-topos.searchWith(text, OffsetUnit.Utf16, nt.genre("Pauline Epistles").explicitOverlap("Romans 8"));
+console.log(found(every.newTestament().excludeTestament(Testament.Old).genre("Pauline Epistles")));
+// Romans 8:28, Romans 8:1-4, 1 Corinthians 13:4
+```
+
+```python
+print(found(every.new_testament().exclude_testament(Testament.OLD).genre("Pauline Epistles")))
+# ['Romans 8:28', 'Romans 8:1-4', '1 Corinthians 13:4']
 ```
 
 | Method | CLI | Keeps references that |
 |---|---|---|
-| `testament(t)`, `oldTestament()`, `newTestament()` | `-t`, `--ot`, `--nt` | are in the testament (it narrows the rest) |
+| `create()` | | (all of them) |
+| `testament(t)`, `old_testament()`, `new_testament()` | `-t`, `--ot`, `--nt` | are in the testament (it narrows the rest) |
 | `genre(name)`, `book(name)` | `-g`, `-b` | are in the genre or book (these add up) |
-| `excludeTestament`, `excludeGenre`, `excludeBook` | `--exclude-*` | aren't (exclusions always win) |
+| `exclude_testament`, `exclude_genre`, `exclude_book` | `--exclude-*` | aren't (exclusions always win) |
 | `inside(passage)` | `-i` | are entirely inside the passage |
-| `anyOverlap(passage)` | `--any-overlap` | share any verse with it |
-| `explicitOverlap(passage)` | `-o` | name a verse of it (whole chapters don't count) |
-| `exactOverlap(passage)` | `--exact-overlap` | are exactly it, however written |
-| `excludeOverlap(passage)` | `--exclude-overlap` | share no verse with it |
-| `verses(singleChapterBooks)` | the CLI's default without `--chapters` (`--skip-single-chapter` for `false`) | name a verse (whole chapters alone don't count; `false` also drops `Jude 25`) |
+| `any_overlap(passage)` | `--any-overlap` | share any verse with it |
+| `explicit_overlap(passage)` | `-o` | name a verse of it (whole chapters don't count) |
+| `exact_overlap(passage)` | `--exact-overlap` | are exactly it, however written |
+| `exclude_overlap(passage)` | `--exclude-overlap` | share no verse with it |
+| `verses(single_chapter_books)` | the CLI's default without `--chapters` (`--skip-single-chapter` for `false`) | name a verse (whole chapters alone don't count; `false` also drops `Jude 25`) |
 | `translation(name)` | `--translation` | are followed by the translation (`John 3:16 ESV`) |
 
-The passage methods that keep references are joined with OR; `excludeOverlap` then drops, and
+The passage methods that keep references are joined with OR; `exclude_overlap` then drops, and
 `verses` and `translation` narrow what's left. `translation` reads the names it's given after
-each reference (with `searchWithTranslations`, an alias of one of its translations names it too);
-the index doesn't store translations, so its queries return `ToposError.InvalidQuery` for it.
+each reference (with `search_with_translations`, an alias of one of its translations names it
+too); the index doesn't store translations, so its queries return `ToposError.InvalidQuery` for
+it.
 
 **Options** (`ToposOptions`) set up an instance, like the CLI's data and context options. Chain
-them, then `build()`:
+them, then `build()` ([TS](./packaging/npm/README.md#options),
+[Python](./packaging/python/README.md#options)):
 
 ```ts
-const topos = ToposOptions.create()
-  .mergeData('{"books":[{"book":"John","abbreviations":["jhn"]}]}') // --merge-data
-  .removeData('{"books":[{"book":"Jude"}]}')                       // --remove-data
-  .contextBook("John")                                             // --context-book
+const custom = ToposOptions.create()
+  .mergeData('{"books":[{"book":"John","abbreviations":["jhn"]}]}')
+  .removeData('{"books":[{"book":"Jude"}]}')
   .build();
+console.log(custom.search("Jhn 3:16 and Jude 5", OffsetUnit.Utf16).map((m) => m.passage.reference).join(", "));
+// John 3:16
+```
+
+```python
+custom = (
+    ToposOptions.create()
+    .merge_data('{"books":[{"book":"John","abbreviations":["jhn"]}]}')
+    .remove_data('{"books":[{"book":"Jude"}]}')
+    .build()
+)
+print([m.passage.reference for m in custom.search("Jhn 3:16 and Jude 5", OffsetUnit.CHAR)])
+# ['John 3:16']
 ```
 
 | Method | CLI |
 |---|---|
 | `data(json)` | `--data`: replaces the defaults (each part the JSON has) |
-| `mergeData(json)` | `--merge-data`: adds names, books, genres, or chapter counts (each value once) |
-| `removeData(json)` | `--remove-data`: removes values, or a book or genre listed alone |
-| `contextBook(name)` | `--context-book`: bare references like `3:16` belong to this book |
-| `contextHeading(pattern)` | `--context-heading`: headings like `^#+ {book}$` set the book |
+| `merge_data(json)` | `--merge-data`: adds names, books, genres, or chapter counts (each value once) |
+| `remove_data(json)` | `--remove-data`: removes values, or a book or genre listed alone |
+| `context_book(name)` | `--context-book`: bare references like `3:16` belong to this book |
+| `context_heading(pattern)` | `--context-heading`: headings like `^#+ {book}$` set the book |
+| `format(format)` | `--psg-fmt`: how `search` and `search_with` write references |
 
 `build()` raises `ToposError.InvalidConfig` when the data or context can't be used, such as a
 name that would mean two books.
 
 **Formats** (`ToposFormat`) say how references are written, like the CLI's `--psg-fmt`. Chain
-them, or start from the CLI's JSON with `withJson(json)` (unknown fields raise `InvalidConfig`):
+them, or start from the CLI's JSON with `with_json(json)` (unknown fields raise `InvalidConfig`)
+([TS](./packaging/npm/README.md#formats), [Python](./packaging/python/README.md#formats)):
 
 ```ts
-const format = ToposFormat.create().book(BookStyle.Abbreviation).joinAdjacent(true).range("–");
-const topos = ToposOptions.create().format(format).build(); // results: "Jn 3:16–18"
-topos.completeWith(text, cursor, OffsetUnit.Utf16, format, 20);
-topos.formatPassage(passage, ToposFormat.create().withJson('{"chapter_verse": "."}'));
+const short = plain.book(BookStyle.Abbreviation).joinAdjacent(true).range("–");
+console.log(topos.formatPassage(passage, short));
+// Jn 3:16–18; 4
+```
+
+```python
+short = default.book(BookStyle.ABBREVIATION).join_adjacent(True).range("–")
+print(topos.format_passage(passage, short))
+# Jn 3:16–18; 4
 ```
 
 | Method | CLI | Default |
 |---|---|---|
 | `book(style)` | `-f` | `Name` |
-| `bookSeparator(text)` | `--fmt-book-separator` | `" "` |
-| `chapterVerse(text)` | `--fmt-chapter-verse` | `":"` |
+| `book_separator(text)` | `--fmt-book-separator` | `" "` |
+| `chapter_verse(text)` | `--fmt-chapter-verse` | `":"` |
 | `range(text)` | `--fmt-range` | `"-"` |
-| `verseSeparator(text)` | `--fmt-verse-separator` | `","` |
-| `chapterSeparator(text)` | `--fmt-chapter-separator` | `"; "` |
-| `joinAdjacent(bool)` | `--fmt-join-adjacent` | `false` |
-| `omitFirstVerseOfChapterRange(bool)` | `--fmt-omit-first-verse-of-chapter-range` | `false` |
-| `chapterInSingleChapterBooks(bool)` | `--fmt-chapter-in-single-chapter-books` | `true` |
+| `verse_separator(text)` | `--fmt-verse-separator` | `","` |
+| `chapter_separator(text)` | `--fmt-chapter-separator` | `"; "` |
+| `join_adjacent(bool)` | `--fmt-join-adjacent` | `false` |
+| `omit_first_verse_of_chapter_range(bool)` | `--fmt-omit-first-verse-of-chapter-range` | `false` |
+| `chapter_in_single_chapter_books(bool)` | `--fmt-chapter-in-single-chapter-books` | `true` |
 
-`ToposOptions.format(format)` sets how `search` and `searchWith` write references; `parse` and
-`complete` use it too, with the book style they're given. `completeWith(text, cursor, unit,
-format, limit)` and `formatPassage(passage, format)` take a format directly.
+`ToposOptions.format(format)` sets how `search` and `search_with` write references; `parse` and
+`complete` use it too, with the book style they're given. `complete_with(text, cursor, unit,
+format, limit)` and `format_passage(passage, format)` take a format directly.
 
-- `Passage { book_id, book, reference, segments, osis }`, written in the requested `BookStyle` (`Name`, `Abbreviation`, `Osis`)
+**Records and enums**
+
+- `Passage { book_id, book, reference, segments, osis, usfm }`, written in the requested
+  `BookStyle` (`Name`, `Abbreviation`, `Osis`, `Usfm`)
 - `segments: [PassageSegment]`, each part of the reference as written: `Verses { start, end }`
   with `ChapterVerse { chapter, verse }` ends, or `Chapters { start, end }` with chapter numbers.
   `end` is empty for a single verse or chapter, so `John 3:16-18; 5` is verses 3:16 to 3:18
@@ -116,25 +158,48 @@ format, limit)` and `formatPassage(passage, format)` take a format directly.
 - `VerseRange { start, end }` always has both ends; `end.verse` is `255` only when a custom config
   has no verse counts for the book (verse `0` is a chapter's introduction)
 - `Match { passage, start, end, line, column }`
-- `Completion { label, kind, start, end, text }`: accept it by replacing `start..end` with `text`
+- `MatchPart { passage, start, end, first, last, last_start }`: a part of a reference, where it
+  starts and ends (`first`, `last`), and where the end of a range is written (`last_start`)
+- `Completion { label, kind, start, end, text }`: accept it by replacing `start..end` with `text`;
+  `kind` is a `CompletionKind` (`Book`, `Chapter`, `Verse`, `Translation`)
+- `BookInfo { id, name, abbreviation, osis, usfm, chapters }` and `GenreInfo { name, book_ids }`
+- `Testament` (`Old`, `New`), for `ToposQuery.testament`
 
 **Translations** (`ToposTranslations`) are the names a reference can be followed by, like the
 Bibles a plugin has. Only the methods that take them read translations; the others never do.
-Chain the methods:
+Chain `create()`, `add(name, aliases)`, and `chapter_verses(name, book_id, counts)`; `names()`
+lists the names, and `get(name)` finds the name an alias belongs to
+([TS](./packaging/npm/README.md#translations), [Python](./packaging/python/README.md#translations)):
 
 ```ts
-const translations = ToposTranslations.create().add("ESV", []).add("KJV", ["AV"])
-  .chapterVerses("ESV", 64, [15]); // a book's own verse counts (3 John in the ESV)
-topos.parseWithTranslation("3 John 15 (av)", OffsetUnit.Utf16, translations, BookStyle.Name);
-// null: the KJV (the default counts) ends 3 John at verse 14
-topos.parseWithTranslation("3 John 15 (esv)", OffsetUnit.Utf16, translations, BookStyle.Name);
-// { passage: 3 John 1:15, translation: { name: "ESV", start: 11, end: 14 } }
+const translations = ToposTranslations.create()
+  .add("ESV", [])
+  .add("KJV", ["AV"])
+  .add("LXX", [])
+  .chapterVerses("ESV", 64, new Uint8Array([15])); // 3 John has 15 verses in the ESV
+console.log(translations.names().join(", "), "|", translations.get("av"), translations.get("NIV"));
+// ESV, KJV, LXX | KJV null
+
+const named = topos.parseWithTranslation("3 John 15 (esv)", OffsetUnit.Utf16, translations, BookStyle.Name);
+console.log(named?.passage.reference, JSON.stringify(named?.translation));
+// 3 John 1:15 {"name":"ESV","start":11,"end":14}
+console.log(topos.parseWithTranslation("3 John 15 (av)", OffsetUnit.Utf16, translations, BookStyle.Name));
+// null
+```
+
+```python
+named = topos.parse_with_translation("3 John 15 (esv)", OffsetUnit.CHAR, translations, BookStyle.NAME)
+print(named.passage.reference, named.translation)
+# 3 John 1:15 Translation(name='ESV', start=11, end=14)
+print(topos.parse_with_translation("3 John 15 (av)", OffsetUnit.CHAR, translations, BookStyle.NAME))
+# None
 ```
 
 Names and aliases match ignoring case, the longest first, as whole words after the reference
 (`John 3:16 KJV`, `, KJV`, ` — KJV`, `(KJV)`, `[KJV]`, on the same line). A name ends the reference,
 so `Ps 22, LXX` is Psalm 22 in the LXX (not Psalms 22 and 70). A reference naming a translation
-with verse counts (`chapterVerses(name, bookId, counts)`) is checked against them for that book.
+with verse counts (`chapter_verses(name, book_id, counts)`) is checked against them for that book:
+3 John 15 exists in the ESV, but the KJV uses the default counts, which end 3 John at verse 14.
 `TranslatedPassage { passage, translation? }` and `TranslatedMatch { reference, translation? }`
 carry a `Translation { name, start, end }` (offsets in your unit); completions of translations are
 `CompletionKind.Translation`.
@@ -149,35 +214,65 @@ carry a `Translation { name, start, end }` (offsets in your unit); completions o
 | Swift | `Utf16` (use `String.utf16` indices) |
 | Rust, C, raw bytes | `Byte` |
 
-**An index of many files.** `ToposIndex` (from
-[`topos-bible-index`](../topos-index)) keeps the references of many files between runs, compactly
-(about 15 bytes each), and searches only files that changed: `check(path, size, mtime)` says
-whether its entry is current; `indexText` searches a text file, `insert` adds an entry made
-elsewhere (`Topos.indexEntry` on another thread, `Topos.indexEpub` for an EPUB's bytes,
-`Topos.indexPdf` for a PDF's in native builds with the `pdf` feature, or the CLI's `-m index`). `query(topos, query, scope, path, order)` filters with a `ToposQuery`, sorts,
-and counts, and `page` reads the results. `takeDirtyPacks` and `takeUnsavedDetails` give the files
-to write, and `loadPack` and `loadDetail` read them back; each device writes its own packs, so
-devices that sync the same files share the index. Each kind of file (text, EPUB, PDF) has packs of
-its own (`<device>-<kind>-<number>.bin`; `packKind(name)` says which), so an app reads only the
-kinds it searches: one without PDFs never reads their packs. Packs from before kinds fail to load
-(another format), and their files are searched again.
+**An index of many files.** `ToposIndex` (from [`topos-bible-index`](../topos-index)) keeps the
+references of many files between runs, compactly (about 15 bytes each), and searches only files
+that changed ([TS](./packaging/npm/README.md#an-index-of-many-files),
+[Python](./packaging/python/README.md#an-index-of-many-files)):
 
-**Files and folders.** `searchFiles(paths, files, query, unit)` searches like the CLI (not in
+| Method | |
+|---|---|
+| `ToposIndex.create(device, engine, unit)` | An empty index for this device (`device` names its packs; `engine`, a version, is written in them) |
+| `check(path, size, mtime) -> IndexStatus` | Whether its entry is current (`Fresh`, `Unconfirmed`, `Missing`), and makes it the one in use |
+| `confirm(path, size, mtime, text?) -> bool` | Checks an `Unconfirmed` file by its text (or its size alone) |
+| `index_text(topos, path, size, mtime, text, written) -> u32` | Searches a text file and keeps its references |
+| `insert(bytes, path, size, mtime)` | Adds an entry made elsewhere: `Topos.index_entry` (another thread), `Topos.index_epub` (an EPUB's bytes), `Topos.index_pdf` (a PDF's, in native builds with the `pdf` feature), or the CLI's `-m index` |
+| `set_epub(path, size, mtime, written, [EpubReference])` | Keeps an EPUB's references found elsewhere |
+| `query(topos, query, scope, path, order) -> IndexResults` | The references a `ToposQuery` keeps, in every file, a file, or a folder (`IndexScope`), by file or by Bible order (`IndexOrder`) |
+| `query_in(..., extensions, order)`, `query_paths(topos, query, paths, order)` | The same, in files with these extensions, or the files a `ToposPaths` keeps (`path`, `glob`, `iglob`, `regex`, `extension`; `problems()` for patterns that can't be read) |
+| `page(topos, results, offset, limit) -> [IndexHit]` | Reads results (`IndexResults` has `len()`, `is_empty()`, `file_count()`); EPUBs' hits have an `IndexEpub`, PDFs' an `IndexPdf` |
+| `extension_counts(results) -> [ExtensionCount]` | How many references and files each extension has |
+| `file_hits(topos, path)`, `paths()`, `file_count()`, `reference_count()` | One file's references, and what the index has |
+| `is_dirty()`, `take_dirty_packs()`, `take_unsaved_details() -> [IndexFile]` | The files to write |
+| `load_pack(bytes)`, `load_detail(name, bytes)` | Reads them back |
+| `pack_kind(name) -> IndexKind?`, `kind_of(path) -> IndexKind` | Which kind of file (`Text`, `Epub`, `Pdf`) a pack is for, or a file is |
+| `detail_names()`, `missing_details(results, offset, limit)`, `missing_file_detail(path)` | The details entries use, and those a page or a file needs that aren't loaded |
+| `is_current(results)` | Whether the index is unchanged since the query |
+| `remove(path)`, `rename(old, new)`, `retain(paths)` | Follows the files |
+
+Each device writes its own packs, so devices that sync the same files share the index; a loaded
+entry is used once `check` finds it current. Each kind of file (text, EPUB, PDF) has packs of its
+own (`<device>-<kind>-<number>.bin`; `pack_kind(name)` says which), so an app reads only the
+kinds it searches: one without PDFs never reads their packs. Packs from before kinds fail to load
+(another format), and their files are searched again. EPUB and PDF entries count offsets in
+UTF-16, so an index that holds them is created with `Utf16` (`insert` raises `InvalidIndex`
+otherwise).
+
+**Files and folders.** `search_files(paths, files, query, unit)` searches like the CLI (not in
 WebAssembly, which has no file access): `ToposFiles` holds the CLI's walking options (`hidden`,
-`noIgnore`, `glob`, `extension`, `maxDepth`, and the rest; `.gitignore`, `.ignore`, and
+`no_ignore`, `no_ignore_vcs`, `no_ignore_parent`, `no_require_git`, `ignore_file`,
+`follow_links`, `max_depth`, `max_filesize`, `one_file_system`, `glob`, `iglob`, `path_regex`,
+`extension`, `exclude_extension`, `binary`, `cfi_assertions`; `.gitignore`, `.ignore`, and
 `.toposignore` files are respected), every format is searched (EPUBs with CFIs, subtitles with
-times, PDFs in builds with MuPDF, anything else as text), and `cacheDir(folder)` keeps each file's
-results until it changes, in a folder of your choice (an app's cache folder on a phone; `cache(true)`
-uses the CLI's). Each file comes back with its `FileMatch`es (`passage`, offsets in your unit,
-`line`, `column`, a `label` like a time or page, and `epub` with the CFI and chapter) or an
-`error`. `listFiles(paths, files)` lists what would be searched.
+times, PDFs in builds with MuPDF, anything else as text), and `cache_dir(folder)` keeps each
+file's results until it changes, in a folder of your choice (an app's cache folder on a phone;
+`cache(true)` uses the CLI's). Each file comes back as `FileMatches { path, matches, error }`,
+with its `FileMatch`es (`passage`, offsets in your unit, `line`, `column`, a `label` like a time
+or page, and `epub`, a `FileEpubPlace` with the CFI and chapter) or an `error`.
+`list_files(paths, files)` lists what would be searched
+([Python](./packaging/python/README.md#files-and-folders)).
 
 **Errors.** `ToposError` is `InvalidConfig { message }`, `InvalidQuery { message }`,
 `InvalidIndex { message }` (an index file that's damaged or from another version), or
 `Files { message }` (a bad glob or ignore file, or no file access). Python raises
-`ToposErrorException`; JavaScript throws `ToposErrorException`, with the error in its
-`value` (`e.value.message`). `Topos.with_config` is older: in JavaScript it returns `null` on bad
-input instead, so prefer `ToposOptions.create().data(json).build()`, which throws everywhere.
+`ToposErrorException`, with the error in its `error` (`ToposErrorInvalidConfig` and the rest);
+JavaScript throws `ToposErrorException`, with the error in its `value` (`e.value.tag`,
+`e.value.message`). `Topos.with_config` is older: in JavaScript it returns `null` on bad input
+instead, so prefer `ToposOptions.create().data(json).build()`, which throws everywhere
+([TS](./packaging/npm/README.md#errors), [Python](./packaging/python/README.md#errors)).
+
+**JavaScript only.** In browsers and with bundlers, `await initialized` before the first call;
+`dispose()` frees an object's Rust memory without waiting for garbage collection
+([TS](./packaging/npm/README.md#browsers-and-bundlers)).
 
 ## Building
 
@@ -198,8 +293,10 @@ directory (outputs go to `dist/`, which is gitignored):
 - Names are set in [`boltffi.toml`](./boltffi.toml) (npm and PyPI `topos-bible`, Python module
   `topos_bible`, Swift module `Topos`, Kotlin package `io.github.mastertemple.topos`).
 
-Runnable examples: [`examples/node`](./examples/node) (`npm install && npm start`) and
-[`examples/python`](./examples/python/example.py).
+Runnable examples of every method: [`examples/node`](./examples/node) (`npm install && npm start`,
+after `npm run pack:wasm`) and [`examples/python`](./examples/python/example.py) (`python
+example.py`, after installing the wheel). The comments after each `console.log` and `print` are
+what it prints, and the guides' code blocks are parts of them.
 
 ## Releasing
 
