@@ -170,7 +170,9 @@ pub fn serialize<S: Serializer>(refs: &[Reference], serializer: S) -> Result<S::
     serializer.serialize_bytes(&encode(refs))
 }
 
-pub fn deserialize<'de, D: Deserializer<'de>>(deserializer: D) -> Result<Vec<Reference>, D::Error> {
+pub fn deserialize<'de, D: Deserializer<'de>>(
+    deserializer: D,
+) -> Result<std::sync::Arc<[Reference]>, D::Error> {
     struct Bytes;
     impl<'de> de::Visitor<'de> for Bytes {
         type Value = Vec<Reference>;
@@ -191,7 +193,7 @@ pub fn deserialize<'de, D: Deserializer<'de>>(deserializer: D) -> Result<Vec<Ref
             self.visit_bytes(&bytes)
         }
     }
-    deserializer.deserialize_bytes(Bytes)
+    deserializer.deserialize_bytes(Bytes).map(Into::into)
 }
 
 #[cfg(test)]

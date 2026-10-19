@@ -135,6 +135,25 @@ impl Slot {
         }
     }
 
+    /**
+    Makes an entry share the references of an entry the slot has for the same version of the
+    file: each device that indexed it has one, and the copies would otherwise be kept once per
+    device
+    */
+    fn share(&self, entry: &mut FileEntry) {
+        let same = self.candidates().map(|(_, e)| e).find(|e| {
+            e.stamp.size == entry.stamp.size
+                && e.stamp.hash == entry.stamp.hash
+                && e.refs == entry.refs
+        });
+        if let Some(same) = same {
+            entry.refs = Arc::clone(&same.refs);
+            if same.chapters == entry.chapters {
+                entry.chapters = Arc::clone(&same.chapters);
+            }
+        }
+    }
+
     /// Every entry, as (who, entry)
     fn candidates(&self) -> impl Iterator<Item = (Active, &FileEntry)> {
         let own = self.own.iter().map(|e| (Active::Own, e));
@@ -272,9 +291,10 @@ impl Index {
             }
         }
         // Entries of another kind or number than the pack's aren't its (a renamed pack)
-        for (path, entry) in pack.entries.into_iter().filter(|(p, _)| in_pack(p)) {
+        for (path, mut entry) in pack.entries.into_iter().filter(|(p, _)| in_pack(p)) {
             let id = self.slot_id(&path) as usize;
             let slot = &mut self.slots[id];
+            slot.share(&mut entry);
             if own {
                 slot.own = Some(entry);
             } else {
@@ -388,6 +408,8 @@ impl Index {
     pub fn set(&mut self, path: &str, entry: FileEntry) {
         let id = self.slot_id(path) as usize;
         let slot = &mut self.slots[id];
+        let mut entry = entry;
+        slot.share(&mut entry);
         slot.own = Some(entry);
         slot.confirmed = None;
         slot.active = Some(Active::Own);
@@ -916,6 +938,39 @@ mod tests {
         assert_eq!(again.check("a.md", 8, 50), Status::Fresh);
         assert_eq!(again.check("b.epub", 500, 60), Status::Fresh);
         assert_eq!(again.check("b.epub", 501, 60), Status::Missing);
+    }
+
+    #[test]
+    fn devices_entries_of_the_same_version_share_their_references() {
+        let mut phone = Index::new("phone", Unit::Utf16, "test");
+        for device in ["laptop", "tablet", "desktop"] {
+            let mut other = Index::new(device, Unit::Utf16, "test");
+            other.set("a.md", entry("Rom 8:28", 8, 1, 100));
+            other.set("b.md", entry(&format!("Gen 1:1 ({device})"), 20, 1, 100));
+            for pack in other.take_dirty_packs() {
+                phone
+                    .load_pack(Pack::decode(&pack.encode()).unwrap())
+                    .unwrap();
+            }
+        }
+        let refs = |path: &str| -> Vec<Arc<[Reference]>> {
+            let slot = phone.slot(path).unwrap();
+            slot.candidates()
+                .map(|(_, e)| Arc::clone(&e.refs))
+                .collect()
+        };
+        let a = refs("a.md");
+        assert_eq!(a.len(), 3);
+        assert!(a.iter().all(|r| Arc::ptr_eq(r, &a[0])), "one copy");
+        // Another version of the file (another hash) keeps its own
+        let b = refs("b.md");
+        assert!(!Arc::ptr_eq(&b[0], &b[1]));
+        // This device's own entry shares them too
+        phone.set("a.md", entry("Rom 8:28", 8, 1, 200));
+        assert!(Arc::ptr_eq(
+            &phone.slot("a.md").unwrap().own.as_ref().unwrap().refs,
+            &a[0]
+        ));
     }
 
     #[test]

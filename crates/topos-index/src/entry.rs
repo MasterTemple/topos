@@ -1,6 +1,8 @@
 //! What the index keeps about one file: its references, compactly, and for EPUBs the details
 //! that are only needed when a reference is shown (its CFI and the text around it)
 
+use std::sync::Arc;
+
 use serde::{Deserialize, Serialize};
 use topos_bible::{matcher::BibleMatcher, segments::Passage};
 
@@ -73,10 +75,11 @@ pub struct FileEntry {
     /// indexed the same version)
     pub written: u64,
     /// EPUB chapter titles, which [`Section::chapter`] points into (each is kept once)
-    pub chapters: Vec<String>,
-    /// In the order they appear in the file
+    pub chapters: Arc<[String]>,
+    /// In the order they appear in the file. Shared, since devices that indexed the same version
+    /// of a file have the same references (see [`crate::Index::load_pack`])
     #[serde(with = "crate::codec")]
-    pub refs: Vec<Reference>,
+    pub refs: Arc<[Reference]>,
     /// For EPUBs: the name of its [`Detail`], stored separately and loaded when needed
     pub detail: Option<String>,
 }
@@ -86,8 +89,8 @@ impl FileEntry {
         Self {
             stamp,
             written,
-            chapters: vec![],
-            refs,
+            chapters: Arc::default(),
+            refs: refs.into(),
             detail: None,
         }
     }
@@ -305,8 +308,8 @@ impl EpubEntryBuilder {
         let entry = FileEntry {
             stamp,
             written,
-            chapters: self.chapters,
-            refs: self.refs,
+            chapters: self.chapters.into(),
+            refs: self.refs.into(),
             detail: Some(detail),
         };
         (entry, Detail { refs: self.details })
