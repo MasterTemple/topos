@@ -249,6 +249,15 @@ print(topos.contradiction(every.old_testament().genre("Pauline Epistles")), topo
 # no included genre or book is in the included testaments None
 ```
 
+`books_in(query)` lists the books its testaments, genres, and books keep (its passage filters
+aside), by id (as `bytes`): every book for an empty query, and none when they contradict each
+other. An unknown genre or book raises `ToposErrorInvalidQuery`:
+
+```python
+print(list(topos.books_in(every.genre("Gospels").exclude_book("John"))), len(topos.books_in(every.old_testament().genre("Pauline Epistles"))))
+# [40, 41, 42] 0
+```
+
 ## Formats
 
 A `ToposFormat` says how references are written, like the CLI's `--psg-fmt` and `--fmt-*`

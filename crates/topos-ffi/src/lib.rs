@@ -21,10 +21,7 @@ use topos_lib::{
         patch::DataPatch,
         translations::Translations,
     },
-    filter::{
-        bible_filter::BibleFilter,
-        filters::{book::BookFilter, genre::GenreFilter, testament::TestamentFilter},
-    },
+    filter::{BookScope, bible_filter::BibleFilter, filters::testament::TestamentFilter},
     matcher::{BibleMatch, BibleMatcher, context::BookContext},
     segments::{
         Passage as CorePassage, Segment, Segments,
@@ -250,6 +247,22 @@ impl ToposQuery {
     /// Whether it keeps every reference
     fn is_empty(&self) -> bool {
         *self == Self::default()
+    }
+
+    /// Its testaments, genres, and books
+    fn scope(&self) -> BookScope {
+        let testament = |t: &Testament| match t {
+            Testament::Old => TestamentFilter::Old,
+            Testament::New => TestamentFilter::New,
+        };
+        BookScope {
+            testaments: self.testaments.iter().map(testament).collect(),
+            genres: self.genres.clone(),
+            books: self.books.clone(),
+            exclude_testaments: self.exclude_testaments.iter().map(testament).collect(),
+            exclude_genres: self.exclude_genres.clone(),
+            exclude_books: self.exclude_books.clone(),
+        }
     }
 }
 
@@ -649,6 +662,23 @@ impl Topos {
         Ok(self.matches(&matcher, &text, unit))
     }
 
+    /**
+    The books the query's testaments, genres, and books keep (its passage filters aside), in
+    order: every book for `ToposQuery.create()`, and none when they contradict each other (see
+    `contradiction`). Throws `InvalidQuery` for an unknown genre or book
+
+    ```ts
+    topos.booksIn(ToposQuery.create().genre("Gospels").excludeBook("John")); // [40, 41, 42]
+    ```
+    */
+    pub fn books_in(&self, query: &ToposQuery) -> Result<Vec<u8>, ToposError> {
+        let books =
+            (query.scope().books(self.matcher.data())).map_err(|e| ToposError::InvalidQuery {
+                message: e.to_string(),
+            })?;
+        Ok(books.into_iter().map(|book| book.0).collect())
+    }
+
     /// Why nothing can match the query, if its filters contradict each other (like the Old
     /// Testament and the Pauline Epistles)
     pub fn contradiction(&self, query: &ToposQuery) -> Result<Option<String>, ToposError> {
@@ -1045,29 +1075,7 @@ impl Topos {
         let invalid = |e: topos_lib::error::ToposError| ToposError::InvalidQuery {
             message: e.to_string(),
         };
-        let testament = |t: &Testament| match t {
-            Testament::Old => TestamentFilter::Old,
-            Testament::New => TestamentFilter::New,
-        };
-        let mut filter = BibleFilter::new(self.matcher.data().clone());
-        filter
-            .include_many(query.testaments.iter().map(testament))
-            .map_err(invalid)?;
-        filter
-            .include_many(query.genres.iter().map(GenreFilter::new))
-            .map_err(invalid)?;
-        filter
-            .include_many(query.books.iter().map(BookFilter::new))
-            .map_err(invalid)?;
-        filter
-            .exclude_many(query.exclude_testaments.iter().map(testament))
-            .map_err(invalid)?;
-        filter
-            .exclude_many(query.exclude_genres.iter().map(GenreFilter::new))
-            .map_err(invalid)?;
-        filter
-            .exclude_many(query.exclude_books.iter().map(BookFilter::new))
-            .map_err(invalid)?;
+        let mut filter = query.scope().filter(self.matcher.data()).map_err(invalid)?;
         for passage in &query.inside {
             filter.filter_inside(passage).map_err(invalid)?;
         }
@@ -1537,6 +1545,16 @@ mod tests {
             .old_testament()
             .genre("Pauline Epistles".into());
         assert!(topos.contradiction(&contradiction).unwrap().is_some());
+        assert_eq!(topos.books_in(&contradiction).unwrap(), Vec::<u8>::new());
+        assert_eq!(topos.books_in(&ToposQuery::create()).unwrap().len(), 66);
+        let synoptics = ToposQuery::create()
+            .genre("Gospels".into())
+            .exclude_book("John".into());
+        assert_eq!(topos.books_in(&synoptics).unwrap(), [40, 41, 42]);
+        assert!(matches!(
+            topos.books_in(&ToposQuery::create().genre("Psalms".into())),
+            Err(ToposError::InvalidQuery { .. })
+        ));
         assert_eq!(topos.contradiction(&nt).unwrap(), None);
 
         let unknown = topos.search_with(

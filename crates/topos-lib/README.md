@@ -114,6 +114,17 @@ assert!(filter.contradiction().is_some());
 # Ok::<(), topos_bible::error::ToposError>(())
 ```
 
+The same book filters as data (a settings file's JSON, say) are a `BookScope`, which lists the
+books they keep:
+
+```rust
+use topos_bible::{data::BibleData, filter::BookScope};
+
+let scope: BookScope = serde_json::from_str(r#"{ "testaments": ["new"], "genres": ["pauline"] }"#)?;
+assert_eq!(scope.books(&BibleData::default())?.len(), 13);
+# Ok::<(), Box<dyn std::error::Error>>(())
+```
+
 Keep only references that name a verse (whole chapters alone don't count), or that are followed
 by a translation:
 

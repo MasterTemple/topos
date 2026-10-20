@@ -260,6 +260,15 @@ console.log(topos.contradiction(every.oldTestament().genre("Pauline Epistles")),
 // no included genre or book is in the included testaments | null
 ```
 
+`booksIn(query)` lists the books its testaments, genres, and books keep (its passage filters
+aside), by id: every book for an empty query, and none when they contradict each other. An
+unknown genre or book throws `InvalidQuery`:
+
+```ts
+console.log(topos.booksIn(every.genre("Gospels").excludeBook("John")).join(", "), "|", topos.booksIn(every.oldTestament().genre("Pauline Epistles")).length);
+// 40, 41, 42 | 0
+```
+
 ## Formats
 
 A `ToposFormat` says how references are written, like the CLI's `--psg-fmt` and `--fmt-*`

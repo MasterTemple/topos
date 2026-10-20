@@ -209,6 +209,8 @@ console.log(found(every.verses(false)), "|", found(every.translation("ESV")));
 
 console.log(topos.contradiction(every.oldTestament().genre("Pauline Epistles")), "|", topos.contradiction(every));
 // no included genre or book is in the included testaments | null
+console.log(topos.booksIn(every.genre("Gospels").excludeBook("John")).join(", "), "|", topos.booksIn(every.oldTestament().genre("Pauline Epistles")).length);
+// 40, 41, 42 | 0
 
 // --- Formats
 

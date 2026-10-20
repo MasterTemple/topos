@@ -5,7 +5,9 @@ use itertools::Itertools;
 use crate::error::{ToposError, ToposResult};
 use crate::{data::books::BookId, filter::bible_filter::IsFilter};
 
-#[derive(Copy, Clone, Debug)]
+/// A testament; in JSON and TOML `"old"` or `"new"` (reading also takes `"OT"`, `"nt"`, `"Old
+/// Testament"`, and the rest that [`FromStr`] does)
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub enum TestamentFilter {
     Old,
     New,
@@ -47,6 +49,22 @@ impl FromStr for TestamentFilter {
             "o" | "ot" | "old" | "old testament" => Self::Old,
             _ => Err(ToposError::UnknownTestament(s.to_string()))?,
         })
+    }
+}
+
+impl serde::Serialize for TestamentFilter {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        serializer.serialize_str(match self {
+            TestamentFilter::Old => "old",
+            TestamentFilter::New => "new",
+        })
+    }
+}
+
+impl<'de> serde::Deserialize<'de> for TestamentFilter {
+    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        let name = String::deserialize(deserializer)?;
+        name.parse().map_err(serde::de::Error::custom)
     }
 }
 

@@ -188,6 +188,8 @@ print(found(every.verses(False)), found(every.translation("ESV")))
 
 print(topos.contradiction(every.old_testament().genre("Pauline Epistles")), topos.contradiction(every))
 # no included genre or book is in the included testaments None
+print(list(topos.books_in(every.genre("Gospels").exclude_book("John"))), len(topos.books_in(every.old_testament().genre("Pauline Epistles"))))
+# [40, 41, 42] 0
 
 # --- Formats
 
