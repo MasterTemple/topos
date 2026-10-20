@@ -146,7 +146,9 @@ for (const segment of passage.segments) {
 
 `verseRanges(passage)` writes each segment as a `VerseRange { start, end }` with both ends, so
 whole chapters run from verse 1 to their last verse; `verses(passage)` lists every verse.
-`contains(outer, inner)` and `overlaps(a, b)` compare passages verse by verse.
+`contains(outer, inner)` and `overlaps(a, b)` compare passages verse by verse. `passageFromVerses(bookId, verses)` makes one passage of a
+list of verses (sorted, without repeats, and with verses that follow each other as ranges), and
+`merge(passages)` joins passages into one per book, in order: the union of their verses.
 
 ```ts
 const john = topos.parse("John 3; 4:1-3", BookStyle.Name)!;
@@ -160,6 +162,13 @@ console.log(topos.contains(john3, topos.parse("John 3:16", BookStyle.Name)!), to
 // true false
 console.log(topos.overlaps(john3, john), topos.overlaps(john3, topos.parse("John 4", BookStyle.Name)!));
 // true false
+
+const listed = [32, 28, 29, 30, 29].map((verse) => ({ chapter: 8, verse }));
+console.log(topos.passageFromVerses(45, listed)?.reference);
+// Romans 8:28-30,32
+const parts = ["Rom 8:30-32", "John 3:16", "Rom 8:28-29", "John 4", "John 3"].map((r) => topos.parse(r, BookStyle.Name)!);
+console.log(topos.merge(parts).map((p) => p.reference).join(" | "));
+// John 3-4 | Romans 8:28-32
 ```
 
 ## Books and genres

@@ -872,6 +872,45 @@ impl Topos {
             .collect()
     }
 
+    /**
+    The verses as one passage in a book, sorted, without repeats, and with verses that follow each
+    other as ranges (a chapter's last verse and the next chapter's first too); `null` for no
+    verses or a book that isn't in the data
+
+    ```ts
+    const verses = [32, 28, 29, 30].map((verse) => ({ chapter: 8, verse }));
+    topos.passageFromVerses(45, verses)?.reference; // "Romans 8:28-30,32"
+    ```
+    */
+    pub fn passage_from_verses(&self, book_id: u8, verses: Vec<ChapterVerse>) -> Option<Passage> {
+        let book = BookId(book_id);
+        let verses = (verses.into_iter()).map(|cv| CoreChapterVerse::new(cv.chapter, cv.verse));
+        let versification = self
+            .matcher
+            .data()
+            .chapter_verses()
+            .get_chapter_verses(&book);
+        let passage = CorePassage::from_verses(book, verses, versification)?;
+        self.passage(&passage, &self.format)
+    }
+
+    /**
+    The passages as one per book, in the books' order: the union of their verses, with parts
+    that overlap or follow each other joined (whole chapters stay whole chapters)
+
+    ```ts
+    const passages = ["Rom 8:30-32", "John 3:16", "Rom 8:28-29", "John 3"].map((r) => topos.parse(r, BookStyle.Name)!);
+    topos.merge(passages).map((p) => p.reference); // ["John 3", "Romans 8:28-32"]
+    ```
+    */
+    pub fn merge(&self, passages: Vec<Passage>) -> Vec<Passage> {
+        let passages = passages.iter().map(CorePassage::from);
+        CorePassage::merge(passages, self.matcher.data())
+            .iter()
+            .filter_map(|passage| self.passage(passage, &self.format))
+            .collect()
+    }
+
     /// Whether every verse of `inner` is in `outer`
     pub fn contains(&self, outer: Passage, inner: Passage) -> bool {
         let (outer, inner) = (CorePassage::from(&outer), CorePassage::from(&inner));
@@ -1768,6 +1807,36 @@ mod tests {
         assert!(!topos.contains(parse("John 3:16"), parse("John 3:16-17")));
         assert!(topos.overlaps(parse("John 3:16-17"), parse("John 3:17-4:1")));
         assert!(!topos.overlaps(parse("John 3"), parse("Romans 3")));
+    }
+
+    #[test]
+    fn verses_and_passages_joined() {
+        let topos = Topos::new();
+        let verses = [32, 28, 29, 30, 29].map(|verse| cv(8, verse)).to_vec();
+        let romans = topos.passage_from_verses(45, verses).unwrap();
+        assert_eq!(romans.reference, "Romans 8:28-30,32");
+        let joined = ToposFormat::create().join_adjacent(true);
+        assert_eq!(
+            topos.format_passage(romans, &joined).as_deref(),
+            Some("Romans 8:28-30,32")
+        );
+        assert_eq!(topos.passage_from_verses(45, vec![]), None);
+        assert_eq!(topos.passage_from_verses(200, vec![cv(1, 1)]), None);
+
+        let parse = |reference: &str| topos.parse(reference.into(), BookStyle::Name).unwrap();
+        let merged: Vec<String> = topos
+            .merge(vec![
+                parse("Rom 8:30-32"),
+                parse("John 3:16"),
+                parse("Rom 8:28-29"),
+                parse("John 3"),
+                parse("John 3:36-4:1"),
+            ])
+            .into_iter()
+            .map(|p| p.reference)
+            .collect();
+        assert_eq!(merged, ["John 3:1-4:1", "Romans 8:28-32"]);
+        assert!(topos.merge(vec![]).is_empty());
     }
 
     #[test]

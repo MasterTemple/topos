@@ -124,6 +124,15 @@ print(topos.contains(john3, topos.parse("John 3:16", BookStyle.NAME)), topos.con
 print(topos.overlaps(john3, john), topos.overlaps(john3, topos.parse("John 4", BookStyle.NAME)))
 # True False
 
+from topos_bible import ChapterVerse
+
+listed = [ChapterVerse(chapter=8, verse=verse) for verse in [32, 28, 29, 30, 29]]
+print(topos.passage_from_verses(45, listed).reference)
+# Romans 8:28-30,32
+parts = [topos.parse(r, BookStyle.NAME) for r in ["Rom 8:30-32", "John 3:16", "Rom 8:28-29", "John 4", "John 3"]]
+print([p.reference for p in topos.merge(parts)])
+# ['John 3-4', 'Romans 8:28-32']
+
 # --- Books and genres
 
 books = topos.books()

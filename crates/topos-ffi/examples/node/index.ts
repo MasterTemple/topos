@@ -152,6 +152,13 @@ console.log(topos.contains(john3, topos.parse("John 3:16", BookStyle.Name)!), to
 console.log(topos.overlaps(john3, john), topos.overlaps(john3, topos.parse("John 4", BookStyle.Name)!));
 // true false
 
+const listed = [32, 28, 29, 30, 29].map((verse) => ({ chapter: 8, verse }));
+console.log(topos.passageFromVerses(45, listed)?.reference);
+// Romans 8:28-30,32
+const parts = ["Rom 8:30-32", "John 3:16", "Rom 8:28-29", "John 4", "John 3"].map((r) => topos.parse(r, BookStyle.Name)!);
+console.log(topos.merge(parts).map((p) => p.reference).join(" | "));
+// John 3-4 | Romans 8:28-32
+
 // --- Books and genres
 
 const books = topos.books();

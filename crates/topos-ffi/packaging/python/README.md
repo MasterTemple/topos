@@ -128,7 +128,9 @@ for segment in passage.segments:
 
 `verse_ranges(passage)` writes each segment as a `VerseRange(start, end)` with both ends, so
 whole chapters run from verse 1 to their last verse; `verses(passage)` lists every verse.
-`contains(outer, inner)` and `overlaps(a, b)` compare passages verse by verse.
+`contains(outer, inner)` and `overlaps(a, b)` compare passages verse by verse. `passage_from_verses(book_id, verses)` makes one passage of
+a list of verses (sorted, without repeats, and with verses that follow each other as ranges), and
+`merge(passages)` joins passages into one per book, in order: the union of their verses.
 
 ```python
 john = topos.parse("John 3; 4:1-3", BookStyle.NAME)
@@ -142,6 +144,15 @@ print(topos.contains(john3, topos.parse("John 3:16", BookStyle.NAME)), topos.con
 # True False
 print(topos.overlaps(john3, john), topos.overlaps(john3, topos.parse("John 4", BookStyle.NAME)))
 # True False
+
+from topos_bible import ChapterVerse
+
+listed = [ChapterVerse(chapter=8, verse=verse) for verse in [32, 28, 29, 30, 29]]
+print(topos.passage_from_verses(45, listed).reference)
+# Romans 8:28-30,32
+parts = [topos.parse(r, BookStyle.NAME) for r in ["Rom 8:30-32", "John 3:16", "Rom 8:28-29", "John 4", "John 3"]]
+print([p.reference for p in topos.merge(parts)])
+# ['John 3-4', 'Romans 8:28-32']
 ```
 
 ## Books and genres

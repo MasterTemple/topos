@@ -63,6 +63,23 @@ assert_eq!(osis, "1Cor.13.4-1Cor.13.7 1Cor.13.13");
 assert_eq!(data.books().parse_osis(&osis).unwrap(), passage);
 ```
 
+A list of verses becomes one passage with ranges, and passages merge into one per book (the
+union of their verses):
+
+```rust
+use topos_bible::{data::BibleData, segments::{Passage, units::chapter_verse::ChapterVerse}};
+
+let data = BibleData::default();
+let romans = data.books().search("Romans").unwrap();
+let versification = data.chapter_verses().get_chapter_verses(&romans);
+let verses = [32, 28, 29, 30].map(|verse| ChapterVerse::new(8, verse));
+let listed = Passage::from_verses(romans, verses, versification).unwrap();
+assert_eq!(listed.segments.to_string(), "8:28-30,32");
+
+let merged = Passage::merge([listed, data.parse("Rom 8:31").unwrap()], &data);
+assert_eq!(merged[0].segments.to_string(), "8:28-32");
+```
+
 ## Autocomplete
 
 Completions come from the same grammar as search, so they always agree with it. Each one is a
