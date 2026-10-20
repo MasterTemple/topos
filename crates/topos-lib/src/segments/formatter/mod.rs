@@ -89,20 +89,14 @@ impl FormatOptions {
         let books = data.books();
         let book = self.book.book(books, passage.book)?;
         let versification = data.chapter_verses().get_chapter_verses(&passage.book);
+        // A whole book is its name alone (`Jude`, `Genesis`), which parses back as the whole book;
+        // `Jude 1` would be its first verse
+        let whole = data.whole_book(passage.book);
+        if whole.is_some_and(|whole| passage.contains_passage(&whole, versification)) {
+            return Some(book.clone());
+        }
         let single_chapter = versification.is_some_and(|cv| cv.has_one_chapter());
-        // A single-chapter book's number is a verse (`Jude 1` is its first verse), so its whole
-        // chapter is written as its verses (`Jude 1:1-25`) to parse back the same
-        let last_verse = versification
-            .filter(|cv| cv.has_one_chapter())
-            .and_then(|cv| cv.get_last_verse(1));
-        let whole = |seg: &Segment| match (seg, last_verse) {
-            (Segment::FullChapter(_), Some(last)) if seg.starting_chapter() == 1 => {
-                Segment::chapter_range(1, 1, 1, last)
-            }
-            _ => *seg,
-        };
-        let segments: Vec<Segment> = passage.segments.iter().map(whole).collect();
-        let segments = self.write(&segments, single_chapter);
+        let segments = self.write(&passage.segments, single_chapter);
         Some(format!("{book}{}{segments}", self.book_separator))
     }
 
@@ -333,17 +327,25 @@ mod tests {
             ..FormatOptions::default()
         };
         assert_eq!(format(bare.clone(), "Jude 1:5-7, 9"), "Jude 5-7,9");
-        // Its whole chapter (`Jude.1`, or the book alone) is every verse, since `Jude 1` is a verse
+        // Its whole chapter (`Jude.1`, or every verse) is the whole book, written as its name,
+        // since `Jude 1` is a verse; so is any other whole book
         let data = BibleData::default();
-        let whole = data.books().parse_osis("Jude.1").unwrap();
+        for whole in ["Jude.1", "Jude.1.1-Jude.1.25", "Gen.1-Gen.50"] {
+            let whole = data.books().parse_osis(whole).unwrap();
+            let name = data.books().get_name(whole.book).unwrap().clone();
+            assert_eq!(
+                FormatOptions::default().passage(&whole, &data).unwrap(),
+                name
+            );
+            assert_eq!(
+                data.parse(&name),
+                Some(data.whole_book(whole.book).unwrap())
+            );
+        }
+        let most = data.books().parse_osis("Gen.1-Gen.49").unwrap();
         assert_eq!(
-            FormatOptions::default().passage(&whole, &data).unwrap(),
-            "Jude 1:1-25"
-        );
-        assert_eq!(bare.passage(&whole, &data).unwrap(), "Jude 1-25");
-        assert_eq!(
-            data.parse("Jude 1:1-25").unwrap().segments.to_string(),
-            "1:1-25"
+            FormatOptions::default().passage(&most, &data).unwrap(),
+            "Genesis 1-49"
         );
     }
 }

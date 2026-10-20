@@ -561,7 +561,7 @@ impl ToposOptions {
 
     /**
     Whether searches also find books named alone, without a chapter (`Romans and Jude, Titus`),
-    each as the whole book (`Romans 1-16`, `Jude 1:1-25`); off by default, since in running text
+    each as the whole book (written `Romans`, `Jude`); off by default, since in running text
     `Mark`, `Job`, and `Acts` are also words, so it suits text meant to be references, like a
     search box. `parse` always reads a book alone
     */
@@ -689,7 +689,7 @@ impl Topos {
     The first reference in `text`, read as one reference (`Jn 3:16`, `John.3.16`, or USFM
     `JHN 3:16`), the way search reads it: `Jude 5` is verse 5, and a reference that doesn't exist
     is `None`
-    - A book's name alone (`Gen`, `Romans`) is the whole book (`Genesis 1-50`), since nothing else
+    - A book's name alone (`Gen`, `Romans`) is the whole book (written `Genesis`), since nothing else
       is in the text
     */
     pub fn parse(&self, reference: String, style: BookStyle) -> Option<Passage> {
@@ -1912,9 +1912,9 @@ mod tests {
             Some(passage.reference)
         };
         // `parse` reads a book alone as the whole book
-        assert_eq!(parse("Gen").as_deref(), Some("Genesis 1-50"));
-        assert_eq!(parse(" romans ").as_deref(), Some("Romans 1-16"));
-        assert_eq!(parse("Jude").as_deref(), Some("Jude 1:1-25"));
+        assert_eq!(parse("Gen").as_deref(), Some("Genesis"));
+        assert_eq!(parse(" romans ").as_deref(), Some("Romans"));
+        assert_eq!(parse("Jude").as_deref(), Some("Jude"));
         assert_eq!(parse("Gen and more"), None);
         let translations = ToposTranslations::create();
         let found = topos.parse_with_translation(
@@ -1923,7 +1923,7 @@ mod tests {
             &translations,
             BookStyle::Name,
         );
-        assert_eq!(found.unwrap().passage.reference, "Genesis 1-50");
+        assert_eq!(found.unwrap().passage.reference, "Genesis");
 
         // Searches find them only when asked
         let text = String::from("Romans and Jude, Titus 2:11");
@@ -1933,17 +1933,14 @@ mod tests {
         );
         let alone = ToposOptions::create().books_alone(true).build().unwrap();
         let found = alone.search(text.clone(), OffsetUnit::Utf16);
-        assert_eq!(
-            references(found.clone()),
-            ["Romans 1-16", "Jude 1:1-25", "Titus 2:11"]
-        );
+        assert_eq!(references(found.clone()), ["Romans", "Jude", "Titus 2:11"]);
         assert_eq!((found[1].start, found[1].end), (11, 15));
         let query = ToposQuery::create()
             .new_testament()
             .exclude_book("Jude".into());
         assert_eq!(
             references(alone.search_with(text, OffsetUnit::Utf16, &query).unwrap()),
-            ["Romans 1-16", "Titus 2:11"]
+            ["Romans", "Titus 2:11"]
         );
     }
 
@@ -1957,7 +1954,7 @@ mod tests {
         // Commas between OSIS references, and a range whose ends are the same
         let parse = |reference: &str| topos.parse(reference.into(), BookStyle::Name).unwrap();
         assert_eq!(parse("Rom.8.28,Rom.8.30").reference, "Romans 8:28,30");
-        assert_eq!(parse("Phlm.1-Phlm.1").reference, "Philemon 1:1-25");
+        assert_eq!(parse("Phlm.1-Phlm.1").reference, "Philemon");
     }
 
     #[test]

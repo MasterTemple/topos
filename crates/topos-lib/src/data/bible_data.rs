@@ -61,16 +61,23 @@ impl BibleData {
     One reference, like `jn 3:16-18` or `Jude 5`, resolved with the book's chapters and verses
     the way search does: `Jude 5` is verse 5 (Jude has one chapter), and a reference that doesn't
     exist (`John 3:99`) is [`None`]; parts after one that doesn't exist are ignored, like search
+    - A book alone (`Jude`, `Gen`) is the whole book ([`BibleData::parse_book`]), as
+      [`FormatOptions::passage`](crate::segments::formatter::FormatOptions::passage) writes one
     */
     pub fn parse(&self, input: &str) -> Option<Passage> {
-        let (book, _, segments) = self.books.split_reference(input)?;
-        self.resolve(book, &SegmentList::parse(segments))
+        match self.books.split_reference(input) {
+            Some((book, _, segments)) if !segments.trim().is_empty() => {
+                self.resolve(book, &SegmentList::parse(segments))
+            }
+            // A book alone, as the formatter writes a whole book
+            _ => self.parse_book(input),
+        }
     }
 
     /**
     A book's name or abbreviation alone (`Genesis`, `gen`, `1 Cor.`), as the whole book (see
-    [`BibleData::whole_book`]); [`None`] for anything else, including a reference (`Gen 1`), which
-    [`BibleData::parse`] reads
+    [`BibleData::whole_book`]); [`None`] for anything else, including a reference (`Gen 1`).
+    [`BibleData::parse`] reads both
     - A name alone is unambiguous when it is all of the input, so this suits a single reference
       typed or stored on its own; in running text, `Mark`, `Job`, and `Acts` are also words (see
       [`BibleMatcher::with_books_alone`](crate::matcher::BibleMatcher::with_books_alone))
@@ -83,10 +90,9 @@ impl BibleData {
     assert_eq!(genesis.segments.to_string(), "1-50");
     assert_eq!(data.parse_book("Jude").unwrap().segments.to_string(), "1");
     assert_eq!(data.parse_book("Gen 1"), None);
-    // A reference, else a book alone
-    let parse = |input: &str| data.parse(input).or_else(|| data.parse_book(input));
-    assert_eq!(parse("Gen 1").unwrap().segments.to_string(), "1");
-    assert_eq!(parse("Gen"), Some(genesis));
+    // parse reads a reference, else a book alone
+    assert_eq!(data.parse("Gen 1").unwrap().segments.to_string(), "1");
+    assert_eq!(data.parse("Gen"), Some(genesis));
     ```
     */
     pub fn parse_book(&self, input: &str) -> Option<Passage> {

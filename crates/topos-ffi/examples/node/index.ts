@@ -125,7 +125,7 @@ console.log(topos.parse("John.3.16", BookStyle.Name)?.reference, "|", topos.pars
 console.log(topos.parse("Jude 5", BookStyle.Name)?.reference, "|", topos.parse("John 3:99", BookStyle.Name));
 // Jude 1:5 | null
 console.log(topos.parse("Gen", BookStyle.Name)?.reference, "|", topos.parse("Jude", BookStyle.Name)?.reference);
-// Genesis 1-50 | Jude 1:1-25
+// Genesis | Jude
 
 for (const segment of passage.segments) {
   if (segment.tag === "Verses") {
@@ -266,7 +266,7 @@ console.log(abbreviated.search("John 3:16,17,18", OffsetUnit.Utf16).map((m) => m
 // Jn 3:16–18
 const alone = ToposOptions.create().booksAlone(true).build();
 console.log(alone.search("Romans and Jude, Titus 2:11", OffsetUnit.Utf16).map((m) => m.passage.reference).join(", "));
-// Romans 1-16, Jude 1:1-25, Titus 2:11
+// Romans, Jude, Titus 2:11
 
 const twoBooks = JSON.stringify({
   books: [

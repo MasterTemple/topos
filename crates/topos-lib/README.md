@@ -220,7 +220,7 @@ assert_eq!(found[0].psg.book, john);
 
 ## Books alone
 
-A book's name alone is the whole book (`Romans 1-16`), but only where that's what the text means:
+A book's name alone is the whole book (`Romans 1-16`, written `Romans`), but only where that's what the text means:
 `BibleData::parse_book` reads one when it's all of the input, and a matcher finds them in text
 when asked (in running text `Mark`, `Job`, and `Acts` are also words):
 
@@ -236,8 +236,8 @@ assert_eq!(found.len(), 3);
 assert_eq!(found[1].psg.segments.to_string(), "1"); // Jude has one chapter
 ```
 
-A single-chapter book's whole chapter is written as its verses (`Jude 1:1-25`), since `Jude 1`
-is its first verse.
+A whole book is written as its name alone (`Jude`, `Genesis`), which `BibleData::parse` reads
+back as the whole book (`Jude 1` would be Jude's first verse).
 
 ## Custom data
 

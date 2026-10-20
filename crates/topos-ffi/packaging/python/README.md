@@ -102,7 +102,7 @@ book's whole book is written as its verses, since `Jude 1` is its first verse:
 
 ```python
 print(topos.parse("Gen", BookStyle.NAME).reference, "|", topos.parse("Jude", BookStyle.NAME).reference)
-# Genesis 1-50 | Jude 1:1-25
+# Genesis | Jude
 ```
 
 `passage.segments` lists each part of the reference as written. Each is either a
@@ -369,7 +369,7 @@ text meant to be references, like a search box:
 ```python
 alone = ToposOptions.create().books_alone(True).build()
 print([m.passage.reference for m in alone.search("Romans and Jude, Titus 2:11", OffsetUnit.CHAR)])
-# ['Romans 1-16', 'Jude 1:1-25', 'Titus 2:11']
+# ['Romans', 'Jude', 'Titus 2:11']
 ```
 
 `data(json)` replaces the default `books`, `genres`, or `chapter_verses` (each part the JSON

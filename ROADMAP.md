@@ -53,7 +53,7 @@ The phases are in order, and each one leaves the repo working.
 - [x] Passages joined: `Passage::from_verses` (a list of verses as ranges), `Passage::joined`, and `Passage::merge` (one passage per book, the union of their verses); the FFI's `Topos.passageFromVerses` and `merge`
 - [x] A chapter's verse count in one call: `BibleData::verse_count` (in a translation's counts, when given), the FFI's `Topos.verseCount` and `verseCountIn`
 - [x] Book filters as data: `filter::BookScope` (testaments, genres, and books, included and excluded; serde, snake or camel case) and the books they keep (the FFI's `Topos.booksIn(query)`)
-- [x] Books alone as the whole book: `BibleData::parse_book` (the FFI's `parse` reads `Gen` as `Genesis 1-50`) and, opt-in for running text, `BibleMatcher::with_books_alone` (the FFI's `ToposOptions.booksAlone`); a single-chapter book's whole chapter is written as its verses (`Jude 1:1-25`)
+- [x] Books alone as the whole book: `BibleData::parse_book` (`parse` reads `Gen` as Genesis 1-50) and, opt-in for running text, `BibleMatcher::with_books_alone` (the FFI's `ToposOptions.booksAlone`); a whole book is written as its name alone (`Jude`, `Genesis`), which parses back the same
 
 ## Phase 5: CLI
 

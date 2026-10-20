@@ -122,7 +122,7 @@ book's whole book is written as its verses, since `Jude 1` is its first verse:
 
 ```ts
 console.log(topos.parse("Gen", BookStyle.Name)?.reference, "|", topos.parse("Jude", BookStyle.Name)?.reference);
-// Genesis 1-50 | Jude 1:1-25
+// Genesis | Jude
 ```
 
 `passage.segments` lists each part of the reference as written. Each is either verses
@@ -372,7 +372,7 @@ meant to be references, like a search box:
 ```ts
 const alone = ToposOptions.create().booksAlone(true).build();
 console.log(alone.search("Romans and Jude, Titus 2:11", OffsetUnit.Utf16).map((m) => m.passage.reference).join(", "));
-// Romans 1-16, Jude 1:1-25, Titus 2:11
+// Romans, Jude, Titus 2:11
 ```
 
 `data(json)` replaces the default `books`, `genres`, or `chapter_verses` (each part the JSON
