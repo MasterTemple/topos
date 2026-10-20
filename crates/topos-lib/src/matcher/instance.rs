@@ -210,6 +210,46 @@ impl FoundPassage {
         Some((found, translation))
     }
 
+    /**
+    A book named alone (`name`, a match of [`Books::book_regex`]), as the whole book: not an
+    abbreviation that is also a word (`is`), not followed by a number (that's a reference, or
+    nothing), and never inside encoded data or oddly cased (`mK`); its `.` isn't part of it
+    (`Romans.` ending a sentence)
+
+    [`Books::book_regex`]: crate::data::books::Books::book_regex
+    */
+    pub(crate) fn book_alone(
+        data: &BibleData,
+        text: &str,
+        name: Match<'_>,
+        with_parts: bool,
+    ) -> Option<Self> {
+        let written = name.as_str().trim_end_matches('.');
+        let books = data.books();
+        let followed_by_number = text[name.end()..]
+            .trim_start()
+            .bytes()
+            .next()
+            .is_some_and(|b| b.is_ascii_digit());
+        if followed_by_number
+            || books.is_ambiguous(written)
+            || in_long_token(text, name.start())
+            || !book_case_is_plausible(written)
+        {
+            return None;
+        }
+        let psg = data.whole_book(books.search(written)?)?;
+        let bytes = name.start()..name.start() + written.len();
+        let parts = match with_parts {
+            true => vec![SegmentSpan {
+                written: bytes.clone(),
+                end: None,
+            }],
+            false => Vec::new(),
+        };
+        Some(Self { bytes, psg, parts })
+    }
+
     /// A reference without a book name (`1:1-5`), which must start with `chapter:verse`
     pub fn find_bare(
         data: &BibleData,

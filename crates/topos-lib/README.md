@@ -190,6 +190,27 @@ assert_eq!(found[0].psg.book, john);
 
 `BookContext::headings` instead takes the book from headings, like `^#+ {book}$` in Markdown.
 
+## Books alone
+
+A book's name alone is the whole book (`Romans 1-16`), but only where that's what the text means:
+`BibleData::parse_book` reads one when it's all of the input, and a matcher finds them in text
+when asked (in running text `Mark`, `Job`, and `Acts` are also words):
+
+```rust
+use topos_bible::{data::BibleData, matcher::BibleMatcher};
+
+let data = BibleData::default();
+assert_eq!(data.parse_book("Gen").unwrap().segments.to_string(), "1-50");
+
+let matcher = BibleMatcher::default().with_books_alone(true);
+let found = matcher.search("Romans and Jude, Titus 2:11");
+assert_eq!(found.len(), 3);
+assert_eq!(found[1].psg.segments.to_string(), "1"); // Jude has one chapter
+```
+
+A single-chapter book's whole chapter is written as its verses (`Jude 1:1-25`), since `Jude 1`
+is its first verse.
+
 ## Custom data
 
 The books (names, abbreviations, OSIS ids), genres, and chapter and verse counts are data. Replace

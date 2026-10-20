@@ -88,11 +88,21 @@ impl FormatOptions {
     pub fn passage(&self, passage: &Passage, data: &BibleData) -> Option<String> {
         let books = data.books();
         let book = self.book.book(books, passage.book)?;
-        let single_chapter = data
-            .chapter_verses()
-            .get_chapter_verses(&passage.book)
-            .is_some_and(|cv| cv.has_one_chapter());
-        let segments = self.write(&passage.segments, single_chapter);
+        let versification = data.chapter_verses().get_chapter_verses(&passage.book);
+        let single_chapter = versification.is_some_and(|cv| cv.has_one_chapter());
+        // A single-chapter book's number is a verse (`Jude 1` is its first verse), so its whole
+        // chapter is written as its verses (`Jude 1:1-25`) to parse back the same
+        let last_verse = versification
+            .filter(|cv| cv.has_one_chapter())
+            .and_then(|cv| cv.get_last_verse(1));
+        let whole = |seg: &Segment| match (seg, last_verse) {
+            (Segment::FullChapter(_), Some(last)) if seg.starting_chapter() == 1 => {
+                Segment::chapter_range(1, 1, 1, last)
+            }
+            _ => *seg,
+        };
+        let segments: Vec<Segment> = passage.segments.iter().map(whole).collect();
+        let segments = self.write(&segments, single_chapter);
         Some(format!("{book}{}{segments}", self.book_separator))
     }
 
@@ -322,6 +332,18 @@ mod tests {
             chapter_in_single_chapter_books: false,
             ..FormatOptions::default()
         };
-        assert_eq!(format(bare, "Jude 1:5-7, 9"), "Jude 5-7,9");
+        assert_eq!(format(bare.clone(), "Jude 1:5-7, 9"), "Jude 5-7,9");
+        // Its whole chapter (`Jude.1`, or the book alone) is every verse, since `Jude 1` is a verse
+        let data = BibleData::default();
+        let whole = data.books().parse_osis("Jude.1").unwrap();
+        assert_eq!(
+            FormatOptions::default().passage(&whole, &data).unwrap(),
+            "Jude 1:1-25"
+        );
+        assert_eq!(bare.passage(&whole, &data).unwrap(), "Jude 1-25");
+        assert_eq!(
+            data.parse("Jude 1:1-25").unwrap().segments.to_string(),
+            "1:1-25"
+        );
     }
 }

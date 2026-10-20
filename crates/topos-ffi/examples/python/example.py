@@ -95,6 +95,8 @@ print(topos.parse("John.3.16", BookStyle.NAME).reference, "|", topos.parse("JHN 
 # John 3:16 | John 3:16
 print(topos.parse("Jude 5", BookStyle.NAME).reference, "|", topos.parse("John 3:99", BookStyle.NAME))
 # Jude 1:5 | None
+print(topos.parse("Gen", BookStyle.NAME).reference, "|", topos.parse("Jude", BookStyle.NAME).reference)
+# Genesis 1-50 | Jude 1:1-25
 
 from topos_bible import PassageSegmentChapters, PassageSegmentVerses
 
@@ -236,6 +238,9 @@ print([m.passage.reference for m in headings.search("# Romans\nsee 8:28\n# John\
 abbreviated = ToposOptions.create().format(short).build()
 print([m.passage.reference for m in abbreviated.search("John 3:16,17,18", OffsetUnit.CHAR)])
 # ['Jn 3:16–18']
+alone = ToposOptions.create().books_alone(True).build()
+print([m.passage.reference for m in alone.search("Romans and Jude, Titus 2:11", OffsetUnit.CHAR)])
+# ['Romans 1-16', 'Jude 1:1-25', 'Titus 2:11']
 
 two_books = '{"books":[{"id":1,"book":"Genesis","abbreviation":"Gn","osis":"Gen","abbreviations":["gen"]},{"id":2,"book":"Exodus","abbreviation":"Ex","osis":"Exod","abbreviations":["exod"]}],"chapter_verses":{"Genesis":[31,25],"Exodus":[22]}}'
 small = ToposOptions.create().data(two_books).build()

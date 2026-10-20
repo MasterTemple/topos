@@ -97,6 +97,14 @@ print(topos.parse("Jude 5", BookStyle.NAME).reference, "|", topos.parse("John 3:
 # Jude 1:5 | None
 ```
 
+A book's name alone is the whole book, since nothing else is in the text. A single-chapter
+book's whole book is written as its verses, since `Jude 1` is its first verse:
+
+```python
+print(topos.parse("Gen", BookStyle.NAME).reference, "|", topos.parse("Jude", BookStyle.NAME).reference)
+# Genesis 1-50 | Jude 1:1-25
+```
+
 `passage.segments` lists each part of the reference as written. Each is either a
 `PassageSegmentVerses(start, end)` with `ChapterVerse(chapter, verse)` ends, or a
 `PassageSegmentChapters(start, end)` with chapter numbers; `end` is `None` for a single verse or
@@ -328,6 +336,16 @@ use it too, with the book style they're given):
 abbreviated = ToposOptions.create().format(short).build()
 print([m.passage.reference for m in abbreviated.search("John 3:16,17,18", OffsetUnit.CHAR)])
 # ['Jn 3:16–18']
+```
+
+`books_alone(True)` makes searches find books named alone too, each as the whole book. It's
+off by default, since in running text `Mark`, `Job`, and `Acts` are also words; turn it on for
+text meant to be references, like a search box:
+
+```python
+alone = ToposOptions.create().books_alone(True).build()
+print([m.passage.reference for m in alone.search("Romans and Jude, Titus 2:11", OffsetUnit.CHAR)])
+# ['Romans 1-16', 'Jude 1:1-25', 'Titus 2:11']
 ```
 
 `data(json)` replaces the default `books`, `genres`, or `chapter_verses` (each part the JSON

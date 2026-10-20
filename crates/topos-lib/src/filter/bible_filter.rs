@@ -4,7 +4,7 @@ use crate::{
     data::{bible_data::BibleData, books::BookId},
     error::{ToposError, ToposResult},
     matcher::{bible_matcher::BibleMatcher, matches::ComplexFilter},
-    segments::{Passage, segment::Segment},
+    segments::Passage,
 };
 
 pub trait IsFilter {
@@ -281,22 +281,8 @@ impl BibleFilter {
     fn parse_passage(&self, passage: &str) -> ToposResult<Passage> {
         self.data
             .parse(passage)
-            .or_else(|| self.whole_book(passage))
+            .or_else(|| self.data.parse_book(passage))
             .ok_or_else(|| ToposError::InvalidPassage(passage.to_string()))
-    }
-
-    /// Every chapter of the book named `name`, or `None` if it names no book
-    fn whole_book(&self, name: &str) -> Option<Passage> {
-        let book = self.data.books().search(name.trim())?;
-        let chapters = (self.data.chapter_verses())
-            .get_chapter_verses(&book)?
-            .get_chapter_count();
-        let segment = match chapters {
-            0 => return None,
-            1 => Segment::full_chapter(1),
-            n => Segment::full_chapter_range(1, n),
-        };
-        Some(segment.as_segments().with_book(book))
     }
 
     pub fn create_matcher(mut self) -> BibleMatcher {

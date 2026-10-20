@@ -491,6 +491,8 @@ pub struct ToposOptions {
     pub context_heading: Option<String>,
     /// How references in results are written
     pub format: FormatOptions,
+    /// Whether searches find books named alone (`Romans`), as the whole book
+    pub books_alone: bool,
 }
 
 #[export]
@@ -540,6 +542,19 @@ impl ToposOptions {
     pub fn format(&self, format: &ToposFormat) -> Self {
         Self {
             format: format.options.clone(),
+            ..self.clone()
+        }
+    }
+
+    /**
+    Whether searches also find books named alone, without a chapter (`Romans and Jude, Titus`),
+    each as the whole book (`Romans 1-16`, `Jude 1:1-25`); off by default, since in running text
+    `Mark`, `Job`, and `Acts` are also words, so it suits text meant to be references, like a
+    search box. `parse` always reads a book alone
+    */
+    pub fn books_alone(&self, books_alone: bool) -> Self {
+        Self {
+            books_alone,
             ..self.clone()
         }
     }
@@ -630,11 +645,7 @@ impl Topos {
         unit: OffsetUnit,
         query: &ToposQuery,
     ) -> Result<Vec<Match>, ToposError> {
-        let matcher = self.filter(query)?.create_matcher();
-        let matcher = match self.matcher.context() {
-            Some(context) => matcher.with_context(context.clone()),
-            None => matcher,
-        };
+        let matcher = self.query_matcher(query)?;
         Ok(self.matches(&matcher, &text, unit))
     }
 
@@ -644,8 +655,13 @@ impl Topos {
         Ok(self.filter(query)?.contradiction())
     }
 
-    /// The first reference in `text`, read as one reference (`Jn 3:16`, `John.3.16`, or USFM `JHN 3:16`), the
-    /// way search reads it: `Jude 5` is verse 5, and a reference that doesn't exist is `None`
+    /**
+    The first reference in `text`, read as one reference (`Jn 3:16`, `John.3.16`, or USFM
+    `JHN 3:16`), the way search reads it: `Jude 5` is verse 5, and a reference that doesn't exist
+    is `None`
+    - A book's name alone (`Gen`, `Romans`) is the whole book (`Genesis 1-50`), since nothing else
+      is in the text
+    */
     pub fn parse(&self, reference: String, style: BookStyle) -> Option<Passage> {
         let data = self.matcher.data();
         // OSIS first: as plain text, `John.3.16-John.3.18` would read as just John 3:16
@@ -654,7 +670,8 @@ impl Topos {
             .parse_osis(&reference)
             .or_else(|_| data.books().parse_usfm(&reference))
             .ok()
-            .or_else(|| data.parse(&reference))?;
+            .or_else(|| data.parse(&reference))
+            .or_else(|| data.parse_book(&reference))?;
         self.passage(&passage, &self.format_with(style))
     }
 
@@ -663,7 +680,8 @@ impl Topos {
     `John 3:16, KJV`, `John 3:16 (KJV)`) if it is one of `translations`, with its offsets in
     `unit`
     - A reference naming a translation with verse counts is checked against them
-    - Without a translation, it's the same passage as `parse` gives
+    - Without a translation, it's the same passage as `parse` gives (a book alone is the whole
+      book)
     */
     pub fn parse_with_translation(
         &self,
@@ -684,7 +702,14 @@ impl Topos {
                 translation: None,
             });
         }
-        let found = data.parse_with_translation(&reference, &translations.translations)?;
+        let Some(found) = data.parse_with_translation(&reference, &translations.translations)
+        else {
+            let passage = data.parse_book(&reference)?;
+            return Some(TranslatedPassage {
+                passage: self.passage(&passage, &format)?,
+                translation: None,
+            });
+        };
         let offsets = Offsets::new(&reference, unit);
         Some(TranslatedPassage {
             passage: self.passage(&found.passage, &format)?,
@@ -709,11 +734,7 @@ impl Topos {
         let matcher = if query.is_empty() {
             &self.matcher
         } else {
-            let matcher = self.filter(query)?.create_matcher();
-            filtered = match self.matcher.context() {
-                Some(context) => matcher.with_context(context.clone()),
-                None => matcher,
-            };
+            filtered = self.query_matcher(query)?;
             &filtered
         };
         let offsets = Offsets::new(&text, unit);
@@ -963,7 +984,11 @@ impl Topos {
             ),
             (None, None) => None,
         };
-        let matcher = BibleFilter::new(data).create_matcher();
+        let matcher = BibleFilter::new(data)
+            .create_matcher()
+            .with_books_alone(options.books_alone);
+        // Books alone change what a search finds, so they name another cache
+        let books_alone = options.books_alone.then_some("books alone");
         Ok(Self {
             matcher: match &context {
                 Some(context) => matcher.with_context(context.clone()),
@@ -977,7 +1002,8 @@ impl Topos {
                     &options.merge_data,
                     &options.remove_data,
                     &options.context_book,
-                    &options.context_heading
+                    &options.context_heading,
+                    books_alone,
                 )
             ),
         })
@@ -1001,6 +1027,16 @@ impl Topos {
             end: offsets.of_byte(bytes.end),
             line: m.location.start.line as u32,
             column: offsets.of_byte(bytes.start) - offsets.of_byte(line_start) + 1,
+        })
+    }
+
+    /// A matcher for the query, finding what this instance's finds (its context and books alone)
+    fn query_matcher(&self, query: &ToposQuery) -> Result<BibleMatcher, ToposError> {
+        let matcher =
+            (self.filter(query)?.create_matcher()).with_books_alone(self.matcher.books_alone());
+        Ok(match self.matcher.context() {
+            Some(context) => matcher.with_context(context.clone()),
+            None => matcher,
         })
     }
 
@@ -1745,6 +1781,49 @@ mod tests {
     }
 
     #[test]
+    fn books_alone() {
+        let topos = Topos::new();
+        let parse = |reference: &str| {
+            let passage = topos.parse(reference.into(), BookStyle::Name)?;
+            Some(passage.reference)
+        };
+        // `parse` reads a book alone as the whole book
+        assert_eq!(parse("Gen").as_deref(), Some("Genesis 1-50"));
+        assert_eq!(parse(" romans ").as_deref(), Some("Romans 1-16"));
+        assert_eq!(parse("Jude").as_deref(), Some("Jude 1:1-25"));
+        assert_eq!(parse("Gen and more"), None);
+        let translations = ToposTranslations::create();
+        let found = topos.parse_with_translation(
+            "Gen".into(),
+            OffsetUnit::Utf16,
+            &translations,
+            BookStyle::Name,
+        );
+        assert_eq!(found.unwrap().passage.reference, "Genesis 1-50");
+
+        // Searches find them only when asked
+        let text = String::from("Romans and Jude, Titus 2:11");
+        assert_eq!(
+            references(topos.search(text.clone(), OffsetUnit::Utf16)),
+            ["Titus 2:11"]
+        );
+        let alone = ToposOptions::create().books_alone(true).build().unwrap();
+        let found = alone.search(text.clone(), OffsetUnit::Utf16);
+        assert_eq!(
+            references(found.clone()),
+            ["Romans 1-16", "Jude 1:1-25", "Titus 2:11"]
+        );
+        assert_eq!((found[1].start, found[1].end), (11, 15));
+        let query = ToposQuery::create()
+            .new_testament()
+            .exclude_book("Jude".into());
+        assert_eq!(
+            references(alone.search_with(text, OffsetUnit::Utf16, &query).unwrap()),
+            ["Romans 1-16", "Titus 2:11"]
+        );
+    }
+
+    #[test]
     fn parses_osis_ranges() {
         let topos = Topos::new();
         let range = topos.parse("John.3.16-John.3.18 John.4".into(), BookStyle::Name);
@@ -1754,7 +1833,7 @@ mod tests {
         // Commas between OSIS references, and a range whose ends are the same
         let parse = |reference: &str| topos.parse(reference.into(), BookStyle::Name).unwrap();
         assert_eq!(parse("Rom.8.28,Rom.8.30").reference, "Romans 8:28,30");
-        assert_eq!(parse("Phlm.1-Phlm.1").reference, "Philemon 1");
+        assert_eq!(parse("Phlm.1-Phlm.1").reference, "Philemon 1:1-25");
     }
 
     #[test]

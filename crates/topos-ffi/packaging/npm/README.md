@@ -117,6 +117,14 @@ console.log(topos.parse("Jude 5", BookStyle.Name)?.reference, "|", topos.parse("
 // Jude 1:5 | null
 ```
 
+A book's name alone is the whole book, since nothing else is in the text. A single-chapter
+book's whole book is written as its verses, since `Jude 1` is its first verse:
+
+```ts
+console.log(topos.parse("Gen", BookStyle.Name)?.reference, "|", topos.parse("Jude", BookStyle.Name)?.reference);
+// Genesis 1-50 | Jude 1:1-25
+```
+
 `passage.segments` lists each part of the reference as written. Each is either verses
 (`tag: "Verses"`, with `ChapterVerse { chapter, verse }` ends) or whole chapters
 (`tag: "Chapters"`, with chapter numbers), and `end` is `null` for a single verse or chapter:
@@ -333,6 +341,16 @@ it too, with the book style they're given):
 const abbreviated = ToposOptions.create().format(short).build();
 console.log(abbreviated.search("John 3:16,17,18", OffsetUnit.Utf16).map((m) => m.passage.reference).join(", "));
 // Jn 3:16–18
+```
+
+`booksAlone(true)` makes searches find books named alone too, each as the whole book. It's off
+by default, since in running text `Mark`, `Job`, and `Acts` are also words; turn it on for text
+meant to be references, like a search box:
+
+```ts
+const alone = ToposOptions.create().booksAlone(true).build();
+console.log(alone.search("Romans and Jude, Titus 2:11", OffsetUnit.Utf16).map((m) => m.passage.reference).join(", "));
+// Romans 1-16, Jude 1:1-25, Titus 2:11
 ```
 
 `data(json)` replaces the default `books`, `genres`, or `chapter_verses` (each part the JSON

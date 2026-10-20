@@ -28,7 +28,7 @@ guides show. The Examples column links each one.
 | `Topos.with_config(json)` | Custom `books`, `genres`, or `chapter_verses` (the same JSON as the CLI's `--data`) | [TS](./packaging/npm/README.md#options), [Python](./packaging/python/README.md#options) |
 | `search(text, unit) -> [Match]` | Every reference in `text` | [TS](./packaging/npm/README.md#finding-references), [Python](./packaging/python/README.md#finding-references) |
 | `parts(text, unit) -> [MatchPart]` | Each part of every reference (`John 3:16` and `4:5-7` in `John 3:16; 4:5-7`), where it is written | [TS](./packaging/npm/README.md#finding-references), [Python](./packaging/python/README.md#finding-references) |
-| `parse(reference, style) -> Passage?` | One reference (`Jn 3:16`, OSIS `John.3.16`, or USFM `JHN 3:16`) | [TS](./packaging/npm/README.md#parsing-a-reference), [Python](./packaging/python/README.md#parsing-a-reference) |
+| `parse(reference, style) -> Passage?` | One reference (`Jn 3:16`, OSIS `John.3.16`, or USFM `JHN 3:16`), or a book alone (`Gen`) as the whole book | [TS](./packaging/npm/README.md#parsing-a-reference), [Python](./packaging/python/README.md#parsing-a-reference) |
 | `verse_ranges(passage) -> [VerseRange]` | Each segment with both ends written out; whole chapters run from verse 1 to their last verse | [TS](./packaging/npm/README.md#verses), [Python](./packaging/python/README.md#verses) |
 | `verses(passage) -> [ChapterVerse]` | Every verse in the passage, in order | [TS](./packaging/npm/README.md#verses), [Python](./packaging/python/README.md#verses) |
 | `contains(outer, inner)` / `overlaps(a, b) -> bool` | Verse-by-verse containment and overlap | [TS](./packaging/npm/README.md#verses), [Python](./packaging/python/README.md#verses) |
@@ -111,6 +111,7 @@ print([m.passage.reference for m in custom.search("Jhn 3:16 and Jude 5", OffsetU
 | `context_book(name)` | `--context-book`: bare references like `3:16` belong to this book |
 | `context_heading(pattern)` | `--context-heading`: headings like `^#+ {book}$` set the book |
 | `format(format)` | `--psg-fmt`: how `search` and `search_with` write references |
+| `books_alone(bool)` | (none): searches also find books named alone (`Romans and Jude`), each as the whole book; off by default, since `Mark` and `Job` are also words |
 
 `build()` raises `ToposError.InvalidConfig` when the data or context can't be used, such as a
 name that would mean two books.

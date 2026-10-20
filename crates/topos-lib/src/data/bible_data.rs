@@ -9,7 +9,7 @@ use crate::{
         translations::{TranslatedPassage, Translation, Translations},
     },
     error::ToposResult,
-    segments::{Passage, grammar::SegmentList, resolve::Resolver},
+    segments::{Passage, Segment, grammar::SegmentList, resolve::Resolver},
 };
 
 #[derive(Clone, Debug, Default)]
@@ -65,6 +65,51 @@ impl BibleData {
     pub fn parse(&self, input: &str) -> Option<Passage> {
         let (book, _, segments) = self.books.split_reference(input)?;
         self.resolve(book, &SegmentList::parse(segments))
+    }
+
+    /**
+    A book's name or abbreviation alone (`Genesis`, `gen`, `1 Cor.`), as the whole book (see
+    [`BibleData::whole_book`]); [`None`] for anything else, including a reference (`Gen 1`), which
+    [`BibleData::parse`] reads
+    - A name alone is unambiguous when it is all of the input, so this suits a single reference
+      typed or stored on its own; in running text, `Mark`, `Job`, and `Acts` are also words (see
+      [`BibleMatcher::with_books_alone`](crate::matcher::BibleMatcher::with_books_alone))
+
+    ```
+    use topos_bible::data::BibleData;
+
+    let data = BibleData::default();
+    let genesis = data.parse_book(" Gen ").unwrap();
+    assert_eq!(genesis.segments.to_string(), "1-50");
+    assert_eq!(data.parse_book("Jude").unwrap().segments.to_string(), "1");
+    assert_eq!(data.parse_book("Gen 1"), None);
+    // A reference, else a book alone
+    let parse = |input: &str| data.parse(input).or_else(|| data.parse_book(input));
+    assert_eq!(parse("Gen 1").unwrap().segments.to_string(), "1");
+    assert_eq!(parse("Gen"), Some(genesis));
+    ```
+    */
+    pub fn parse_book(&self, input: &str) -> Option<Passage> {
+        self.whole_book(self.books.search(input.trim())?)
+    }
+
+    /**
+    Every chapter of `book`: `1-50` for Genesis, and `1` for a single-chapter book like Jude;
+    [`None`] if the data has no chapter counts for it
+    */
+    pub fn whole_book(&self, book: BookId) -> Option<Passage> {
+        let chapters = self
+            .chapter_verses
+            .get_chapter_verses(&book)?
+            .get_chapter_count();
+        if chapters == 0 {
+            return None;
+        }
+        Some(
+            Segment::full_chapter_range(1, chapters)
+                .as_segments()
+                .with_book(book),
+        )
     }
 
     /**

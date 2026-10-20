@@ -320,11 +320,7 @@ mod native {
         unit: OffsetUnit,
         list_only: bool,
     ) -> Result<Vec<FileMatches>, ToposError> {
-        let matcher = topos.filter(query)?.create_matcher();
-        let matcher = match topos.matcher.context() {
-            Some(context) => matcher.with_context(context.clone()),
-            None => matcher,
-        };
+        let matcher = topos.query_matcher(query)?;
         let walk = WalkOptions {
             hidden: files.hidden,
             no_ignore: files.no_ignore,
