@@ -13,6 +13,7 @@ Romans 8:28–9:1 => Romans 8:28-9:1
 Psalm 119:176 => Psalm 119:176
 Genesis 1 => Genesis 1
 Genesis 1-3 => Genesis 1-3
+Genesis 3-3 => Genesis 3
 Hello there, nothing here => 
 
 # Multiple segments (written back in the shortest form that parses the same way)

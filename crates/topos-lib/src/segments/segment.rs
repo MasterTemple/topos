@@ -175,8 +175,13 @@ impl Segment {
         Self::FullChapter(FullChapter::new(chapter))
     }
 
+    /// `3-4`, or the chapter alone when both ends are the same (`3-3` is `3`)
     pub fn full_chapter_range(start: u8, end: u8) -> Self {
-        Self::FullChapterRange(FullChapterRange::new(start, end))
+        if start == end {
+            Self::full_chapter(start)
+        } else {
+            Self::FullChapterRange(FullChapterRange::new(start, end))
+        }
     }
 
     pub fn as_segments(self) -> Segments {

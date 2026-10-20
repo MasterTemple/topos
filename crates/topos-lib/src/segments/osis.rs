@@ -68,12 +68,19 @@ impl Passage {
 }
 
 impl Books {
-    /// Parses space-separated OSIS references in one book (`John.3.16-John.3.18 John.4`)
+    /**
+    Parses space-separated OSIS references in one book (`John.3.16-John.3.18 John.4`)
+    - A comma or semicolon also separates them (`Rom.8.28,Rom.8.30`), as people often write them
+    - A range whose ends are the same is one chapter or verse (`Phlm.1-Phlm.1` is `Phlm.1`)
+    */
     pub fn parse_osis(&self, input: &str) -> ToposResult<Passage> {
         let invalid = || ToposError::InvalidOsis(input.to_string());
         let mut book: Option<BookId> = None;
         let mut segments = vec![];
-        for reference in input.split_whitespace() {
+        let references = input
+            .split(|c: char| c.is_whitespace() || c == ',' || c == ';')
+            .filter(|reference| !reference.is_empty());
+        for reference in references {
             let (start, end) = match reference.split_once('-') {
                 Some((start, end)) => (start, Some(end)),
                 None => (reference, None),
@@ -145,6 +152,23 @@ mod tests {
             assert_eq!(parsed.book, passage.book);
             assert_eq!(parsed.segments.0, passage.segments.0, "{osis}");
         }
+    }
+
+    #[test]
+    fn commas_and_equal_ends() {
+        let data = BibleData::default();
+        let books = data.books();
+        for (osis, expected) in [
+            ("Rom.8.28,Rom.8.30", "8:28,30"),
+            ("Rom.8.28, Rom.8.30; Rom.9", "8:28,30; 9"),
+            ("Phlm.1-Phlm.1", "1"),
+            ("John.3-John.3", "3"),
+            ("John.3.16-John.3.16", "3:16"),
+        ] {
+            let parsed = books.parse_osis(osis).unwrap();
+            assert_eq!(parsed.segments.to_string(), expected, "{osis}");
+        }
+        assert!(books.parse_osis(",").is_err());
     }
 
     #[test]

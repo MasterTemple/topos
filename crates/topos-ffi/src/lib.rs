@@ -1751,6 +1751,10 @@ mod tests {
         assert_eq!(range.unwrap().reference, "John 3:16-18; 4");
         let plain = topos.parse("Jn 3:16-18".into(), BookStyle::Name);
         assert_eq!(plain.unwrap().reference, "John 3:16-18");
+        // Commas between OSIS references, and a range whose ends are the same
+        let parse = |reference: &str| topos.parse(reference.into(), BookStyle::Name).unwrap();
+        assert_eq!(parse("Rom.8.28,Rom.8.30").reference, "Romans 8:28,30");
+        assert_eq!(parse("Phlm.1-Phlm.1").reference, "Philemon 1");
     }
 
     #[test]
