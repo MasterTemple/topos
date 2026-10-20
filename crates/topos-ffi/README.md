@@ -266,7 +266,8 @@ or page, and `epub`, a `FileEpubPlace` with the CFI and chapter) or an `error`.
 `Files { message }` (a bad glob or ignore file, or no file access). Python raises
 `ToposErrorException`, with the error in its `error` (`ToposErrorInvalidConfig` and the rest);
 JavaScript throws `ToposErrorException`, with the error in its `value` (`e.value.tag`,
-`e.value.message`). `Topos.with_config` is older: in JavaScript it returns `null` on bad input
+`e.value.message`) and that message as its own `message` (BoltFFI's would be `"ToposError"`;
+`scripts/pack-wasm.sh` changes it). `Topos.with_config` is older: in JavaScript it returns `null` on bad input
 instead, so prefer `ToposOptions.create().data(json).build()`, which throws everywhere
 ([TS](./packaging/npm/README.md#errors), [Python](./packaging/python/README.md#errors)).
 

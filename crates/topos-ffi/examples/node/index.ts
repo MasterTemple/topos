@@ -309,9 +309,10 @@ try {
 try {
   topos.searchWith("John 3:16", OffsetUnit.Utf16, ToposQuery.create().book("Hezekiah"));
 } catch (error) {
-  if (error instanceof ToposErrorException) console.log(error.value.tag, error.value.message);
+  // `message` is the error's own, so code that only logs errors says why too
+  if (error instanceof ToposErrorException) console.log(error.value.tag, "|", error.message);
 }
-// InvalidQuery unknown book "Hezekiah"
+// InvalidQuery | unknown book "Hezekiah"
 
 try {
   ToposFormat.create().withJson('{"bold": true}');
