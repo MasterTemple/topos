@@ -126,11 +126,13 @@ for segment in passage.segments:
 
 ## Verses
 
-`verse_ranges(passage)` writes each segment as a `VerseRange(start, end)` with both ends, so
-whole chapters run from verse 1 to their last verse; `verses(passage)` lists every verse.
-`contains(outer, inner)` and `overlaps(a, b)` compare passages verse by verse. `passage_from_verses(book_id, verses)` makes one passage of
-a list of verses (sorted, without repeats, and with verses that follow each other as ranges), and
-`merge(passages)` joins passages into one per book, in order: the union of their verses.
+`verse_ranges(passage)` writes each segment as a `VerseRange(start, end)` with both ends, so whole
+chapters run from verse 1 to their last verse; `verses(passage)` lists every verse.
+`verse_count(book_id, chapter)` says how many verses a chapter has (`None` for one that isn't in the
+data). `contains(outer, inner)` and `overlaps(a, b)` compare passages verse by verse.
+`passage_from_verses(book_id, verses)` makes one passage of a list of verses (sorted, without
+repeats, and with verses that follow each other as ranges), and `merge(passages)` joins passages
+into one per book, in order: the union of their verses.
 
 ```python
 john = topos.parse("John 3; 4:1-3", BookStyle.NAME)
@@ -138,6 +140,8 @@ print([(r.start.chapter, r.start.verse, r.end.chapter, r.end.verse) for r in top
 # [(3, 1, 3, 36), (4, 1, 4, 3)]
 print(len(topos.verses(john)), [(v.chapter, v.verse) for v in topos.verses(topos.parse("John 3:16-18", BookStyle.NAME))])
 # 39 [(3, 16), (3, 17), (3, 18)]
+print(topos.verse_count(43, 3), topos.verse_count(43, 22))
+# 36 None
 
 john3 = topos.parse("John 3", BookStyle.NAME)
 print(topos.contains(john3, topos.parse("John 3:16", BookStyle.NAME)), topos.contains(john3, john))
@@ -404,7 +408,8 @@ print(translations.names(), translations.get("av"), translations.get("NIV"))
 `parse_with_translation(reference, unit, translations, style)` is like `parse`, and returns a
 `TranslatedPassage(passage, translation)` with the `Translation(name, start, end)` named after
 it. A reference naming a translation with its own verse counts is checked against them, so
-3 John 15 exists in the ESV but not in the KJV (which uses the default counts):
+3 John 15 exists in the ESV but not in the KJV (which uses the default counts), and
+`verse_count_in(book_id, chapter, translations, name)` counts a chapter's verses in one:
 
 ```python
 named = topos.parse_with_translation("3 John 15 (esv)", OffsetUnit.CHAR, translations, BookStyle.NAME)
@@ -412,6 +417,8 @@ print(named.passage.reference, named.translation)
 # 3 John 1:15 Translation(name='ESV', start=11, end=14)
 print(topos.parse_with_translation("3 John 15 (av)", OffsetUnit.CHAR, translations, BookStyle.NAME))
 # None
+print(topos.verse_count(64, 1), topos.verse_count_in(64, 1, translations, "esv"), topos.verse_count_in(64, 1, translations, "AV"))
+# 14 15 14
 ```
 
 `search_with_translations(text, unit, query, translations)` returns each reference as a

@@ -117,6 +117,8 @@ print([(r.start.chapter, r.start.verse, r.end.chapter, r.end.verse) for r in top
 # [(3, 1, 3, 36), (4, 1, 4, 3)]
 print(len(topos.verses(john)), [(v.chapter, v.verse) for v in topos.verses(topos.parse("John 3:16-18", BookStyle.NAME))])
 # 39 [(3, 16), (3, 17), (3, 18)]
+print(topos.verse_count(43, 3), topos.verse_count(43, 22))
+# 36 None
 
 john3 = topos.parse("John 3", BookStyle.NAME)
 print(topos.contains(john3, topos.parse("John 3:16", BookStyle.NAME)), topos.contains(john3, john))
@@ -279,6 +281,8 @@ print(named.passage.reference, named.translation)
 # 3 John 1:15 Translation(name='ESV', start=11, end=14)
 print(topos.parse_with_translation("3 John 15 (av)", OffsetUnit.CHAR, translations, BookStyle.NAME))
 # None
+print(topos.verse_count(64, 1), topos.verse_count_in(64, 1, translations, "esv"), topos.verse_count_in(64, 1, translations, "AV"))
+# 14 15 14
 
 text = "Ps 22, LXX; John 3:16 AV"
 for m in topos.search_with_translations(text, OffsetUnit.CHAR, ToposQuery.create(), translations):

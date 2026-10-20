@@ -33,6 +33,8 @@ guides show. The Examples column links each one.
 | `verses(passage) -> [ChapterVerse]` | Every verse in the passage, in order | [TS](./packaging/npm/README.md#verses), [Python](./packaging/python/README.md#verses) |
 | `passage_from_verses(book_id, verses) -> Passage?` | A list of verses as one passage: sorted, without repeats, and verses that follow each other as ranges (`Romans 8:28-30,32`) | [TS](./packaging/npm/README.md#verses), [Python](./packaging/python/README.md#verses) |
 | `merge(passages) -> [Passage]` | The passages as one per book, in order: the union of their verses, with parts that overlap or follow each other joined | [TS](./packaging/npm/README.md#verses), [Python](./packaging/python/README.md#verses) |
+| `verse_count(book_id, chapter) -> u8?` | How many verses a chapter has | [TS](./packaging/npm/README.md#verses), [Python](./packaging/python/README.md#verses) |
+| `verse_count_in(book_id, chapter, translations, name) -> u8?` | The same in a translation: its own count if it has counts for the book, else the default | [TS](./packaging/npm/README.md#translations), [Python](./packaging/python/README.md#translations) |
 | `contains(outer, inner)` / `overlaps(a, b) -> bool` | Verse-by-verse containment and overlap | [TS](./packaging/npm/README.md#verses), [Python](./packaging/python/README.md#verses) |
 | `books() -> [BookInfo]`, `genres() -> [GenreInfo]` | Every book and genre, in order | [TS](./packaging/npm/README.md#books-and-genres), [Python](./packaging/python/README.md#books-and-genres) |
 | `find_book(name) -> u8?`, `find_genre(name) -> GenreInfo?` | A book's id, or a genre, by name or abbreviation, ignoring case | [TS](./packaging/npm/README.md#books-and-genres), [Python](./packaging/python/README.md#books-and-genres) |

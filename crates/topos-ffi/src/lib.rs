@@ -911,6 +911,29 @@ impl Topos {
             .collect()
     }
 
+    /// How many verses a chapter has (`verseCount(43, 3)` is 36 for John 3), or `null` if the book
+    /// or chapter isn't in the data
+    pub fn verse_count(&self, book_id: u8, chapter: u8) -> Option<u8> {
+        self.matcher
+            .data()
+            .verse_count(BookId(book_id), chapter, None)
+    }
+
+    /// Like `verseCount`, in a translation: its own count if it has verse counts for the book
+    /// (`ToposTranslations.chapterVerses`), else the default data's
+    pub fn verse_count_in(
+        &self,
+        book_id: u8,
+        chapter: u8,
+        translations: &ToposTranslations,
+        translation: String,
+    ) -> Option<u8> {
+        let translation = Some((&translations.translations, translation.as_str()));
+        self.matcher
+            .data()
+            .verse_count(BookId(book_id), chapter, translation)
+    }
+
     /// Whether every verse of `inner` is in `outer`
     pub fn contains(&self, outer: Passage, inner: Passage) -> bool {
         let (outer, inner) = (CorePassage::from(&outer), CorePassage::from(&inner));
@@ -1837,6 +1860,20 @@ mod tests {
             .collect();
         assert_eq!(merged, ["John 3:1-4:1", "Romans 8:28-32"]);
         assert!(topos.merge(vec![]).is_empty());
+    }
+
+    #[test]
+    fn verse_counts() {
+        let topos = Topos::new();
+        assert_eq!(topos.verse_count(43, 3), Some(36));
+        assert_eq!(topos.verse_count(43, 22), None);
+        assert_eq!(topos.verse_count(200, 1), None);
+        let esv = ToposTranslations::create()
+            .add("ESV".into(), vec![])
+            .chapter_verses("ESV".into(), 64, vec![15]);
+        assert_eq!(topos.verse_count_in(64, 1, &esv, "esv".into()), Some(15));
+        assert_eq!(topos.verse_count_in(64, 1, &esv, "KJV".into()), Some(14));
+        assert_eq!(topos.verse_count_in(43, 3, &esv, "ESV".into()), Some(36));
     }
 
     #[test]

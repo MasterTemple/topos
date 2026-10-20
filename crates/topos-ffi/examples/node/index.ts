@@ -145,6 +145,8 @@ console.log(JSON.stringify(topos.verseRanges(john)));
 // [{"start":{"chapter":3,"verse":1},"end":{"chapter":3,"verse":36}},{"start":{"chapter":4,"verse":1},"end":{"chapter":4,"verse":3}}]
 console.log(topos.verses(john).length, JSON.stringify(topos.verses(topos.parse("John 3:16-18", BookStyle.Name)!)));
 // 39 [{"chapter":3,"verse":16},{"chapter":3,"verse":17},{"chapter":3,"verse":18}]
+console.log(topos.verseCount(43, 3), topos.verseCount(43, 22));
+// 36 null
 
 const john3 = topos.parse("John 3", BookStyle.Name)!;
 console.log(topos.contains(john3, topos.parse("John 3:16", BookStyle.Name)!), topos.contains(john3, john));
@@ -294,6 +296,8 @@ console.log(named?.passage.reference, JSON.stringify(named?.translation));
 // 3 John 1:15 {"name":"ESV","start":11,"end":14}
 console.log(topos.parseWithTranslation("3 John 15 (av)", OffsetUnit.Utf16, translations, BookStyle.Name));
 // null
+console.log(topos.verseCount(64, 1), topos.verseCountIn(64, 1, translations, "esv"), topos.verseCountIn(64, 1, translations, "AV"));
+// 14 15 14
 
 text = "Ps 22, LXX; John 3:16 AV";
 for (const m of topos.searchWithTranslations(text, OffsetUnit.Utf16, ToposQuery.create(), translations)) {

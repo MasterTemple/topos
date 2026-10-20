@@ -167,6 +167,36 @@ impl BibleData {
         Self::new(input).expect("the default data with the deuterocanon is valid")
     }
 
+    /**
+    How many verses a chapter has (`John 3` has 36), or [`None`] if the book or chapter isn't in
+    the data; with `translations`, the named translation's own count when it has counts for the
+    book (see [`Translations::set_chapter_verses`])
+
+    ```
+    use topos_bible::data::{BibleData, books::BookId, chapter_verses::ChapterVerses, translations::Translations};
+
+    let data = BibleData::default();
+    let (john, third_john) = (BookId(43), BookId(64));
+    assert_eq!(data.verse_count(john, 3, None), Some(36));
+    assert_eq!(data.verse_count(john, 22, None), None);
+    let esv = Translations::new(["ESV"]).with_chapter_verses("ESV", third_john, ChapterVerses::new(vec![15]));
+    assert_eq!(data.verse_count(third_john, 1, None), Some(14));
+    assert_eq!(data.verse_count(third_john, 1, Some((&esv, "esv"))), Some(15));
+    assert_eq!(data.verse_count(john, 3, Some((&esv, "ESV"))), Some(36));
+    ```
+    */
+    pub fn verse_count(
+        &self,
+        book: BookId,
+        chapter: u8,
+        translation: Option<(&Translations, &str)>,
+    ) -> Option<u8> {
+        translation
+            .and_then(|(translations, name)| translations.chapter_verses(name, book))
+            .or_else(|| self.chapter_verses.get_chapter_verses(&book))?
+            .get_last_verse(chapter)
+    }
+
     pub fn books(&self) -> &Books {
         &self.books
     }
