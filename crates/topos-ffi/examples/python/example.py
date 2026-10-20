@@ -147,6 +147,8 @@ print(topos.find_book("1 cor"), topos.find_book("Hezekiah"))
 gospels = topos.find_genre("gospels")
 print(gospels.name, list(gospels.book_ids))
 # Gospels [40, 41, 42, 43]
+print([b.name for b in topos.suggest_books("john", 6)], [b.name for b in topos.suggest_books("1", 3)])
+# ['John', '1 John', '2 John', '3 John'] ['1 Samuel', '1 Kings', '1 Chronicles']
 
 # --- Completing
 

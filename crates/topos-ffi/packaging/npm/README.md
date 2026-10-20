@@ -179,7 +179,11 @@ console.log(topos.merge(parts).map((p) => p.reference).join(" | "));
 
 `books()` lists every book as a `BookInfo { id, name, abbreviation, osis, usfm, chapters }`, and
 `genres()` every group of books as a `GenreInfo { name, bookIds }`. `findBook(name)` and
-`findGenre(name)` look one up by name or abbreviation, ignoring case.
+`findGenre(name)` look one up by name or abbreviation, ignoring case. `suggestBooks(typed,
+limit)` is what a book picker offers for what's typed, best first: the book it names exactly,
+then books whose names start with it, then books with a later word starting with it (`john`
+offers 1, 2, and 3 John after John). Unlike `complete`, a whole name offers its book, not its
+chapters.
 
 ```ts
 const books = topos.books();
@@ -192,6 +196,8 @@ console.log(topos.findBook("1 cor"), topos.findBook("Hezekiah"));
 const gospels = topos.findGenre("gospels")!;
 console.log(gospels.name, gospels.bookIds.join(", "));
 // Gospels 40, 41, 42, 43
+console.log(topos.suggestBooks("john", 6).map((b) => b.name).join(", "), "|", topos.suggestBooks("1", 3).map((b) => b.name).join(", "));
+// John, 1 John, 2 John, 3 John | 1 Samuel, 1 Kings, 1 Chronicles
 ```
 
 ## Completing

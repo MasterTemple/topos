@@ -587,6 +587,25 @@ pub struct Topos {
     config: String,
 }
 
+impl Topos {
+    /// A book's names, codes, and chapter count
+    fn book_info(&self, id: BookId) -> BookInfo {
+        let data = self.matcher.data();
+        let books = data.books();
+        BookInfo {
+            id: id.0,
+            name: books.get_name(id).cloned().unwrap_or_default(),
+            abbreviation: books.get_abbrev(id).cloned().unwrap_or_default(),
+            osis: books.get_osis(id).cloned().unwrap_or_default(),
+            usfm: books.get_usfm(id).cloned().unwrap_or_default(),
+            chapters: data
+                .chapter_verses()
+                .get_chapter_verses(&id)
+                .map_or(0, |cv| cv.get_chapter_count()),
+        }
+    }
+}
+
 #[export]
 impl Topos {
     /// With the default English book names and versification
@@ -804,21 +823,21 @@ impl Topos {
 
     /// Every book, in order
     pub fn books(&self) -> Vec<BookInfo> {
-        let data = self.matcher.data();
-        let books = data.books();
-        books
-            .ids()
-            .map(|id| BookInfo {
-                id: id.0,
-                name: books.get_name(id).cloned().unwrap_or_default(),
-                abbreviation: books.get_abbrev(id).cloned().unwrap_or_default(),
-                osis: books.get_osis(id).cloned().unwrap_or_default(),
-                usfm: books.get_usfm(id).cloned().unwrap_or_default(),
-                chapters: data
-                    .chapter_verses()
-                    .get_chapter_verses(&id)
-                    .map_or(0, |cv| cv.get_chapter_count()),
-            })
+        let books = self.matcher.data().books();
+        books.ids().map(|id| self.book_info(id)).collect()
+    }
+
+    /**
+    The books a book picker offers for what's typed, best first, at most `limit`: the book it
+    names exactly (`jn` is John), then books whose name, abbreviation, or OSIS id starts with it
+    (`1` offers 1 Samuel through 1 John), with spaces left out (`1jo`), and with a later word
+    starting with it (`john` offers 1, 2, and 3 John after John). Unlike `complete`, which
+    finishes a reference in running text, a whole name is offered too (`Jude` offers Jude)
+    */
+    pub fn suggest_books(&self, typed: String, limit: u32) -> Vec<BookInfo> {
+        let books = self.matcher.data().books();
+        (books.suggest(&typed, limit as usize).into_iter())
+            .map(|id| self.book_info(id))
             .collect()
     }
 
@@ -1902,6 +1921,26 @@ mod tests {
         let prophets = genres.iter().find(|g| g.name == "Prophets").unwrap();
         assert_eq!(prophets.book_ids.len(), 17);
         assert_eq!(topos.find_genre("gospels".into()).unwrap().name, "Gospels");
+    }
+
+    #[test]
+    fn suggested_books() {
+        let topos = Topos::new();
+        let names = |typed: &str, limit| -> Vec<String> {
+            (topos.suggest_books(typed.into(), limit).into_iter())
+                .map(|b| b.name)
+                .collect()
+        };
+        assert_eq!(names("john", 6), ["John", "1 John", "2 John", "3 John"]);
+        assert_eq!(names("Jude", 6), ["Jude"]);
+        assert_eq!(names("  1  john", 6), ["1 John"]);
+        assert_eq!(names("1", 2), ["1 Samuel", "1 Kings"]);
+        assert!(names("", 6).is_empty());
+        let john = &topos.suggest_books("jn".into(), 1)[0];
+        assert_eq!(
+            (john.id, john.usfm.as_str(), john.chapters),
+            (43, "JHN", 21)
+        );
     }
 
     #[test]

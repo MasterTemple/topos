@@ -164,6 +164,10 @@ print([p.reference for p in topos.merge(parts)])
 `books()` lists every book as a `BookInfo(id, name, abbreviation, osis, usfm, chapters)`, and
 `genres()` every group of books as a `GenreInfo(name, book_ids)` (`book_ids` is `bytes`).
 `find_book(name)` and `find_genre(name)` look one up by name or abbreviation, ignoring case.
+`suggest_books(typed, limit)` is what a book picker offers for what's typed, best first: the book
+it names exactly, then books whose names start with it, then books with a later word starting
+with it (`john` offers 1, 2, and 3 John after John). Unlike `complete`, a whole name offers its
+book, not its chapters.
 
 ```python
 books = topos.books()
@@ -176,6 +180,8 @@ print(topos.find_book("1 cor"), topos.find_book("Hezekiah"))
 gospels = topos.find_genre("gospels")
 print(gospels.name, list(gospels.book_ids))
 # Gospels [40, 41, 42, 43]
+print([b.name for b in topos.suggest_books("john", 6)], [b.name for b in topos.suggest_books("1", 3)])
+# ['John', '1 John', '2 John', '3 John'] ['1 Samuel', '1 Kings', '1 Chronicles']
 ```
 
 ## Completing

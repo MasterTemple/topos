@@ -135,6 +135,82 @@ impl Books {
         let name = Self::normalize_book_name(name);
         self.key_to_id().get(&name).cloned()
     }
+    /**
+    The books a book picker offers for what's typed, best first, at most `limit` (none for
+    nothing typed). Unlike [`BibleMatcher::complete`](crate::matcher::BibleMatcher::complete),
+    which finishes a reference in running text (a whole name moves on to its chapters), this
+    always offers books:
+    1. The book the text names exactly, by any name or abbreviation (`jn` is John)
+    2. Books with a name, abbreviation, or OSIS id starting with it (`phil`: Philippians,
+       Philemon; `1`: 1 Samuel through 1 John)
+    3. The same with spaces left out (`1jo` is 1 John)
+    4. Books with a later word of a name starting with it (`john`: 1, 2, and 3 John after John;
+       `cor`: 1 and 2 Corinthians)
+    - Spaces are collapsed and case is ignored, so `  1  john` is 1 John; books of the same rank
+      are in canon order
+
+    ```
+    use topos_bible::data::{BibleData, books::BookId};
+
+    let books = BibleData::default().books().clone();
+    let names = |typed: &str| -> Vec<String> {
+        (books.suggest(typed, 6).into_iter())
+            .filter_map(|id| books.get_name(id).cloned())
+            .collect()
+    };
+    assert_eq!(names("john"), ["John", "1 John", "2 John", "3 John"]);
+    assert_eq!(names("jn")[0], "John");
+    assert_eq!(names("phil"), ["Philippians", "Philemon"]);
+    assert_eq!(names("  1  john"), ["1 John"]);
+    assert_eq!(names("1")[..2], ["1 Samuel", "1 Kings"]);
+    assert!(names("").is_empty());
+    ```
+    */
+    pub fn suggest(&self, typed: &str, limit: usize) -> Vec<BookId> {
+        let typed = Self::normalize_book_name(typed)
+            .split_whitespace()
+            .join(" ");
+        if typed.is_empty() || limit == 0 {
+            return vec![];
+        }
+        let compact: String = typed.split(' ').collect();
+        let exact = self.search(&typed);
+        // Each book's names as keys: its names and abbreviations, and its OSIS id
+        let mut names: BTreeMap<BookId, Vec<String>> = BTreeMap::new();
+        for (key, id) in self.iter_keys_and_ids() {
+            names.entry(*id).or_default().push(key.clone());
+        }
+        for (id, osis) in &self.book_id_to_osis {
+            names.entry(*id).or_default().push(osis.to_lowercase());
+        }
+        let rank = |id: &BookId, names: &[String]| -> Option<u8> {
+            if exact == Some(*id) {
+                return Some(0);
+            }
+            if names.iter().any(|n| n.starts_with(&typed)) {
+                return Some(1);
+            }
+            let without_spaces = |n: &String| n.split(' ').collect::<String>();
+            if names
+                .iter()
+                .any(|n| without_spaces(n).starts_with(&compact))
+            {
+                return Some(2);
+            }
+            let later_word = |n: &String| n.split(' ').skip(1).any(|w| w.starts_with(&typed));
+            if !typed.contains(' ') && names.iter().any(later_word) {
+                return Some(3);
+            }
+            None
+        };
+        (names.iter())
+            .filter_map(|(id, names)| Some((rank(id, names)?, *id)))
+            .sorted()
+            .take(limit)
+            .map(|(_, id)| id)
+            .collect()
+    }
+
     pub fn get_name(&self, id: BookId) -> Option<&String> {
         self.id_to_name().get(&id)
     }
@@ -404,5 +480,39 @@ pub struct BooksInput(pub(crate) Vec<Book>);
 impl Default for BooksInput {
     fn default() -> Self {
         serde_json::from_str(DEFAULT_BOOKS_JSON).expect("the default book data is valid JSON")
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn names(typed: &str, limit: usize) -> Vec<String> {
+        let books = Books::default();
+        (books.suggest(typed, limit).into_iter())
+            .filter_map(|id| books.get_name(id).cloned())
+            .collect()
+    }
+
+    #[test]
+    fn suggestions_for_a_book_picker() {
+        // A whole name is offered (complete moves on to its chapters instead)
+        assert_eq!(names("Jude", 3), ["Jude"]);
+        assert_eq!(names("genesis", 3), ["Genesis"]);
+        // An exact abbreviation comes first, then names starting with it, in canon order
+        assert_eq!(
+            names("jo", 10)[..5],
+            ["Joshua", "Job", "Joel", "Jonah", "John"]
+        );
+        assert_eq!(names("cor", 5), ["1 Corinthians", "2 Corinthians"]);
+        assert_eq!(names("song", 2), ["Song of Solomon"]);
+        // OSIS ids, and names with their spaces left out
+        assert_eq!(names("1sam", 2), ["1 Samuel"]);
+        assert_eq!(names("2 jn", 2)[0], "2 John");
+        assert_eq!(names("Rev.", 2), ["Revelation"]);
+        // A number alone offers the books numbered with it; nothing for no book
+        assert_eq!(names("3", 10), ["3 John"]);
+        assert!(names("xyz", 5).is_empty());
+        assert!(names("john", 0).is_empty());
     }
 }

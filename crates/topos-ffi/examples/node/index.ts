@@ -173,6 +173,8 @@ console.log(topos.findBook("1 cor"), topos.findBook("Hezekiah"));
 const gospels = topos.findGenre("gospels")!;
 console.log(gospels.name, gospels.bookIds.join(", "));
 // Gospels 40, 41, 42, 43
+console.log(topos.suggestBooks("john", 6).map((b) => b.name).join(", "), "|", topos.suggestBooks("1", 3).map((b) => b.name).join(", "));
+// John, 1 John, 2 John, 3 John | 1 Samuel, 1 Kings, 1 Chronicles
 
 // --- Completing
 

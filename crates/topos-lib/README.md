@@ -101,6 +101,21 @@ done.replace_range(edit.range.clone(), &edit.text);
 assert_eq!(done, "Read John 3:16");
 ```
 
+Completion finishes a reference in running text, so a whole book's name moves on to its chapters
+(`John` offers `John 1`, `John 2`, ...). A book picker wants books instead: `Books::suggest`
+offers the book a text names exactly, then books whose names start with it, then books with a
+later word starting with it:
+
+```rust
+use topos_bible::data::BibleData;
+
+let books = BibleData::default().books().clone();
+let names: Vec<String> = (books.suggest("john", 6).into_iter())
+    .filter_map(|id| books.get_name(id).cloned())
+    .collect();
+assert_eq!(names, ["John", "1 John", "2 John", "3 John"]);
+```
+
 ## Filters
 
 Keep references by testament, genre, book, or passage. Testaments narrow the rest, included
