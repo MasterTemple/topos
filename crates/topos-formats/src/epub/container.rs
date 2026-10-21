@@ -259,11 +259,9 @@ fn decode_text(bytes: &[u8]) -> String {
 
 /// UTF-16 text, invalid sequences and an odd final byte replaced
 fn decode_utf16(bytes: &[u8], big_endian: bool) -> String {
-    let pairs = bytes.chunks_exact(2);
-    let odd = !pairs.remainder().is_empty();
-    let units = pairs.map(|pair| {
-        let pair = [pair.first().copied(), pair.get(1).copied()];
-        let pair = [pair[0].unwrap_or(0), pair[1].unwrap_or(0)];
+    let (pairs, rest) = bytes.as_chunks::<2>();
+    let odd = !rest.is_empty();
+    let units = pairs.iter().map(|&pair| {
         if big_endian {
             u16::from_be_bytes(pair)
         } else {
